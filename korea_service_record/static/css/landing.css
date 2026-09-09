@@ -38,6 +38,18 @@
     margin-bottom: 0.15rem;
 }
 
+/* The flag fills the gap the name and rank already left between them. It sits
+   on the text baseline rather than centred, so it lines up with both. */
+.career-flag {
+    width: 46px;
+    height: auto;
+    flex: 0 0 auto;
+    margin-right: auto;
+    align-self: center;
+    border-radius: 1px;
+    box-shadow: 0 1px 2px rgba(60, 40, 20, 0.28);
+}
+
 .career-pilot {
     font-size: 1.25rem;
     color: var(--ink-strong);

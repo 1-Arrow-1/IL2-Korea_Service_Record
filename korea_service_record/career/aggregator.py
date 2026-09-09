@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional
 
 from ..assets import AssetResolver
 from ..flightlog import FlightLogIndex
-from ..gamedata import AwardsConfig, LocaleStrings, DEFAULT_TVD, PLANE_TYPES
+from ..gamedata import COUNTRY_FLAGS, COUNTRY_NAMES, AwardsConfig, LocaleStrings, DEFAULT_TVD, PLANE_TYPES
 from ..icons import IconLibrary
 from ..worldobjects import WorldObjectIndex
 from .attributes import PilotAttributes
@@ -279,6 +279,8 @@ class CareerAggregator:
                         "squadron": meta.squadron_name,
                         "rank": self.locale.rank_name(player["country"],
                                                       player["rankId"]),
+                        "flag": COUNTRY_FLAGS.get(player["country"], ""),
+                        "country_name": COUNTRY_NAMES.get(player["country"], ""),
                         "start_date": career["startDate"],
                         "current_date": career["currentDate"],
                         "sorties": player["sorties"],

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40"
+     role="img" aria-label="People's Republic of China">
+  <title>People's Republic of China</title>
+  <defs>
+    <filter id="fraycn" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.09 0.16"
+                    numOctaves="4" seed="209" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.7"
+                         xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="staincn" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035"
+                    numOctaves="5" seed="216"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <linearGradient id="foldcn" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#000" stop-opacity="0.16"/>
+      <stop offset="14%"  stop-color="#000" stop-opacity="0"/>
+      <stop offset="46%"  stop-color="#000" stop-opacity="0.10"/>
+      <stop offset="62%"  stop-color="#fff" stop-opacity="0.10"/>
+      <stop offset="88%"  stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.18"/>
+    </linearGradient>
+    <clipPath id="clipcn"><rect width="60.0" height="40.0"/></clipPath>
+  </defs>
+  <g filter="url(#fraycn)">
+    <rect width="60" height="40" fill="#9c3129"/>
+    <polygon points="10.00,4.60 11.21,8.33 15.14,8.33 11.96,10.64 13.17,14.37 10.00,12.06 6.83,14.37 8.04,10.64 4.86,8.33 8.79,8.33" fill="#dcb548"/>
+    <polygon points="16.49,2.44 17.56,3.13 18.55,2.33 18.22,3.56 19.29,4.25 18.02,4.32 17.70,5.55 17.24,4.36 15.97,4.43 16.95,3.63" fill="#dcb548"/>
+    <polygon points="19.95,5.51 20.64,6.58 21.87,6.25 21.07,7.23 21.76,8.30 20.57,7.85 19.77,8.83 19.84,7.56 18.65,7.11 19.88,6.78" fill="#dcb548"/>
+    <polygon points="20.67,9.87 20.87,11.13 22.13,11.32 21.00,11.90 21.20,13.16 20.30,12.26 19.17,12.84 19.74,11.71 18.84,10.81 20.09,11.01" fill="#dcb548"/>
+    <polygon points="18.53,13.32 18.22,14.55 19.30,15.23 18.03,15.31 17.71,16.55 17.24,15.37 15.97,15.45 16.95,14.64 16.48,13.45 17.56,14.13" fill="#dcb548"/>
+  </g>
+  <g clip-path="url(#clipcn)">
+    <rect width="60" height="40" filter="url(#staincn)"
+          opacity="0.16" style="mix-blend-mode:multiply"/>
+    <rect width="60" height="40" fill="url(#foldcn)"/>
+  </g>
+</svg>

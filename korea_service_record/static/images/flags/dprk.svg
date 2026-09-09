@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40"
+     role="img" aria-label="Democratic People's Republic of Korea">
+  <title>Democratic People's Republic of Korea</title>
+  <defs>
+    <filter id="fraykp" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.09 0.16"
+                    numOctaves="4" seed="219" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.7"
+                         xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="stainkp" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035"
+                    numOctaves="5" seed="226"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <linearGradient id="foldkp" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#000" stop-opacity="0.16"/>
+      <stop offset="14%"  stop-color="#000" stop-opacity="0"/>
+      <stop offset="46%"  stop-color="#000" stop-opacity="0.10"/>
+      <stop offset="62%"  stop-color="#fff" stop-opacity="0.10"/>
+      <stop offset="88%"  stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.18"/>
+    </linearGradient>
+    <clipPath id="clipkp"><rect width="60.0" height="40.0"/></clipPath>
+  </defs>
+  <g filter="url(#fraykp)">
+    <rect width="60" height="40" fill="#33527d"/>
+    <rect y="5.333" width="60" height="29.333" fill="#f0e7d6"/>
+    <rect y="8.000" width="60" height="24.000" fill="#9c3129"/>
+    <circle cx="18.60" cy="20.00" r="6.4" fill="#f0e7d6"/>
+    <polygon points="18.60,15.40 19.63,18.58 22.97,18.58 20.27,20.54 21.30,23.72 18.60,21.76 15.90,23.72 16.93,20.54 14.23,18.58 17.57,18.58" fill="#9c3129"/>
+  </g>
+  <g clip-path="url(#clipkp)">
+    <rect width="60" height="40" filter="url(#stainkp)"
+          opacity="0.16" style="mix-blend-mode:multiply"/>
+    <rect width="60" height="40" fill="url(#foldkp)"/>
+  </g>
+</svg>

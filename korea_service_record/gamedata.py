@@ -269,3 +269,25 @@ class LocaleStrings:
         """
         key = f"rank{country}{rank_id}"
         return self.ranks.get(key) or f"Rank {rank_id}"
+
+
+# Rank locale keys give the country codes away: 501 runs Lieutenant/Senior
+# Lieutenant, 502 Zhongwei/Shangwei, 503 Chungwi/Sangwi, and 601/602/603 are
+# the three US services (Air Force, Navy ranks, Marines) flying the same flag.
+COUNTRY_FLAGS = {
+    501: "ussr",
+    502: "china",
+    503: "dprk",
+    601: "us",
+    602: "us",
+    603: "us",
+}
+
+COUNTRY_NAMES = {
+    501: "Soviet Union",
+    502: "China",
+    503: "North Korea",
+    601: "United States",
+    602: "United States",
+    603: "United States",
+}

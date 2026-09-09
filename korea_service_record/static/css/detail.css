@@ -180,9 +180,15 @@ table.roster td.award-cell { white-space: normal; }
 
 .award-list { list-style: none; }
 .award-list li {
-    padding: 0.55rem 0;
+    padding: 0.55rem 0.5rem;
+    margin: 0 -0.5rem;
     border-bottom: 1px dotted var(--border-soft);
+    /* Every emblem in here opens a lightbox, so the row highlights on hover
+       the way a roster row does. The negative margin keeps the text aligned
+       with the rest of the panel while the highlight runs a little wider. */
+    transition: background 90ms ease-in;
 }
+.award-list li:hover { background: var(--paper-deep); }
 .award-list li:last-child { border-bottom: none; }
 .award-name { display: block; color: var(--ink-strong); overflow-wrap: anywhere; }
 .award-dates { font-size: 0.84rem; color: var(--ink-muted); }

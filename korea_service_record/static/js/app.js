@@ -115,6 +115,11 @@
         return '<button class="career-card" data-id="' + esc(career.id) + '">' +
             '<div class="career-card-head">' +
                 '<span class="career-pilot">' + esc(career.pilot) + "</span>" +
+                (career.flag
+                    ? '<img class="career-flag" src="/static/images/flags/' +
+                      esc(career.flag) + '.svg" alt="' + esc(career.country_name) +
+                      '" title="' + esc(career.country_name) + '">'
+                    : "") +
                 '<span class="career-rank">' + esc(career.rank) + "</span>" +
             "</div>" +
             '<div class="career-squadron">' + esc(career.squadron) + "</div>" +
