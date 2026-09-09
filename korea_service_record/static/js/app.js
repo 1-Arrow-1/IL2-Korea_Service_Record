@@ -26,6 +26,16 @@
 
     const cell = (v) => (v === null || v === undefined) ? "&mdash;" : esc(v);
 
+    // Level with its booster, as the game's own panel shows it: 4 (↑1).
+    function levelCell(level, points) {
+        if (level === null || level === undefined) {
+            return points ? '<span class="boost">↑' + esc(points) + "</span>" : "&mdash;";
+        }
+        const boost = points
+            ? ' <span class="boost">(↑' + esc(points) + ")</span>" : "";
+        return esc(level) + boost;
+    }
+
     const rows = (pairs) => pairs
         .map(([k, v]) => "<tr><th>" + esc(k) + "</th><td>" + esc(v) + "</td></tr>")
         .join("");
@@ -101,7 +111,10 @@
     // shows a dash and he sorts last rather than as a level-1 pilot.
     function flatten(pilot) {
         const out = Object.assign({}, pilot);
-        (pilot.attributes || []).forEach((a) => { out[a.name] = a.level; });
+        (pilot.attributes || []).forEach((a) => {
+            out[a.name] = a.level;
+            out[a.name + "_points"] = a.points;
+        });
         return out;
     }
 
@@ -156,11 +169,25 @@
             '<span class="service-text">' + esc(entry.label) + detail + "</span></li>";
     }
 
+    // Category pictograms, reused from the Great Battles tracker so the two
+    // read as one product.
+    const CATEGORY_ICON = {
+        aircraft: "icon_aircraft", vehicles: "icon_vehicles",
+        rail: "icon_railroad", armaments: "icon_armaments",
+        buildings: "icon_buildings", naval: "icon_marine"
+    };
+
     function statStrip(items) {
-        return items.map((item) =>
-            '<div class="stat-cell"><span class="stat-value">' + esc(item.value) +
-            '</span><span class="stat-label">' + esc(item.label) + "</span></div>"
-        ).join("");
+        return items.map((item) => {
+            const icon = CATEGORY_ICON[item.key];
+            const img = icon
+                ? '<img class="stat-icon" src="/static/images/icons/' + icon +
+                  '.png" alt="">'
+                : "";
+            return '<div class="stat-cell">' + img +
+                '<span class="stat-value">' + esc(item.value) + "</span>" +
+                '<span class="stat-label">' + esc(item.label) + "</span></div>";
+        }).join("");
     }
 
     function breakdown(items) {
@@ -175,12 +202,18 @@
         const flags = [];
         if (d.outcome !== "returned") flags.push("aircraft " + esc(d.outcome));
         if (d.wounded) flags.push("wounded");
-        const log = d.log.length
-            ? d.log.map((k) =>
-                '<div class="log-row' + (k.air ? " air" : "") + '">' +
+        let log = d.log.map((k) => {
+            const note = k.parked ? ' <span class="log-note">on the ground</span>' : "";
+            return '<div class="log-row' + (k.air ? " air" : "") + '">' +
                 '<span class="log-time">' + esc(k.time) + "</span>" +
-                "<span>" + esc(k.target) + "</span></div>").join("")
-            : '<div class="log-row empty">No confirmed kills.</div>';
+                "<span>" + esc(k.target) + note + "</span></div>";
+        }).join("");
+        if (d.scenery) {
+            log += '<div class="log-row scenery"><span class="log-time"></span>' +
+                "<span>+ " + esc(d.scenery) +
+                " structures and materiel destroyed</span></div>";
+        }
+        if (!log) log = '<div class="log-row empty">No confirmed kills.</div>';
         return '<article class="debrief"><header class="debrief-head">' +
             '<span class="debrief-no">Mission ' + esc(d.mission_num) + "</span>" +
             '<span class="debrief-date">' + esc(d.date) + " " + esc(d.time) + "</span>" +
@@ -215,14 +248,17 @@
                 "<td>" + esc(p.rank) + "</td>" +
                 "<td>" + esc(p.name) + "</td>" +
                 '<td class="award-cell">' + (esc(p.top_award) || "&mdash;") + "</td>" +
-                '<td><span class="status-dot ' + dotClass + '"></span>' + esc(p.state) + "</td>" +
+                '<td><span class="status-dot ' + dotClass + '"></span>' + esc(p.state) +
+                    (p.state_until
+                        ? ' <span class="until">until ' + esc(p.state_until) + "</span>"
+                        : "") + "</td>" +
                 '<td class="num">' + esc(p.airborne) + "</td>" +
                 '<td class="num">' + esc(p.ground_targets) + "</td>" +
                 '<td class="num">' + esc(p.sorties) + "</td>" +
                 '<td class="num">' + esc(p.flight_hours) + "</td>" +
-                '<td class="num">' + cell(p.skills) + "</td>" +
-                '<td class="num">' + cell(p.discipline) + "</td>" +
-                '<td class="num">' + cell(p.courage) + "</td>" +
+                '<td class="num">' + levelCell(p.skills, p.skills_points) + "</td>" +
+                '<td class="num">' + levelCell(p.discipline, p.discipline_points) + "</td>" +
+                '<td class="num">' + levelCell(p.courage, p.courage_points) + "</td>" +
                 '<td class="num">' + esc(p.awards_held) + "</td>" +
                 '<td class="num">' + (p.awards_pending ? esc(p.awards_pending) : "") + "</td>" +
                 "</tr>";

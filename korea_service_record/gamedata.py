@@ -33,22 +33,62 @@ logger = logging.getLogger(__name__)
 DEFAULT_LANG = "eng"
 SUPPORTED_LANGS = ("eng", "ger", "fra", "spa", "rus", "chs")
 
-# The game's locale files are not strict JSON — missiontypes.locale=eng.json has
-# a trailing comma before its closing brace. json.loads rejects that, which would
-# silently drop a whole file's strings, so trailing commas are stripped first.
+# The game's JSON is not strict. missiontypes.locale=eng.json has a trailing
+# comma before its closing brace, and the worldobject info.json files carry
+# // line comments:
+#     "requiredAirfield": 1, // 0 - any, 1 - small, 2- medium, 3 - large
+# json.loads rejects both, which would silently drop a whole file, so comments
+# and trailing commas are removed before parsing.
 _TRAILING_COMMA = re.compile(r',(\s*[}\]])')
 
 
+def _strip_line_comments(text: str) -> str:
+    """
+    Remove ``//`` comments that are not inside a string.
+
+    Scanning rather than a regex because values are file paths — "graphics/
+    planes/yak9p.mgm" — and a naive rule would happily cut one in half.
+    """
+    out = []
+    in_string = escaped = False
+    i, n = 0, len(text)
+    while i < n:
+        ch = text[i]
+        if in_string:
+            out.append(ch)
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            i += 1
+            continue
+        if ch == '"':
+            in_string = True
+            out.append(ch)
+            i += 1
+            continue
+        if ch == "/" and i + 1 < n and text[i + 1] == "/":
+            while i < n and text[i] != "\n":
+                i += 1
+            continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
 def loads_lenient(text: str) -> dict:
-    """Parse JSON that may carry trailing commas. Returns {} on real errors."""
+    """Parse the game's near-JSON. Returns {} if it is genuinely malformed."""
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        try:
-            return json.loads(_TRAILING_COMMA.sub(r'\1', text))
-        except json.JSONDecodeError as exc:
-            logger.warning("Locale file is not parseable even leniently: %s", exc)
-            return {}
+        pass
+    try:
+        return json.loads(_TRAILING_COMMA.sub(r'\1', _strip_line_comments(text)))
+    except json.JSONDecodeError as exc:
+        logger.warning("File is not parseable even leniently: %s", exc)
+        return {}
 
 
 # Aircraft the game ships, from the per-plane folders under nsdata/.../planes/.

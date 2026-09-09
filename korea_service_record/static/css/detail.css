@@ -266,3 +266,19 @@ table.roster tr.is-kia td { color: #93796a; }
 .attr-row.booster { margin-bottom: 0.55rem; }
 .attr-row.booster .attr-head { font-size: 0.8rem; }
 .attr-row.booster .attr-points { font-size: 0.95rem; color: var(--accent-dark); }
+
+/* Category pictograms above the combat numbers, from the GB tracker. */
+.stat-icon {
+    display: block;
+    width: 30px; height: 30px;
+    margin: 0 auto 0.2rem;
+    opacity: 0.82;
+}
+
+/* Boosters in the roster: "4 (↑1)". */
+.boost { color: var(--accent); font-size: 0.78em; }
+.until { color: var(--ink-muted); font-size: 0.78em; }
+
+/* Debrief log extras. */
+.log-row.scenery { font-style: italic; color: var(--ink-muted); }
+.log-note { color: var(--ink-muted); font-size: 0.9em; font-weight: normal; }

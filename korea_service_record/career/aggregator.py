@@ -20,11 +20,14 @@ modules (killstats, attributes, events) so this file stays about assembly.
 """
 
 import logging
+import re
 from collections import Counter, OrderedDict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from ..assets import AssetResolver
 from ..gamedata import AwardsConfig, LocaleStrings, DEFAULT_TVD, PLANE_TYPES
+from ..worldobjects import WorldObjectIndex
 from .attributes import PilotAttributes
 from .database import CareerFile, KoreaCareerDatabase, find_careers
 from .events import describe, is_award_event
@@ -32,10 +35,11 @@ from .killstats import KillStats
 
 logger = logging.getLogger(__name__)
 
-PILOT_STATE = {
-    0: "active", 1: "commander", 2: "kia", 3: "wounded",
-    4: "pow", 5: "transferred", 7: "gone",
-}
+# pilot.state. Only 0, 2 and 4 occur in a real career, and all three are
+# confirmed: every state-2 pilot has a KIA event, and the two state-4 pilots are
+# in hospital with a stateEndDate to return on — NOT prisoners, which is what an
+# earlier guess had them as. The rest are left unmapped rather than invented.
+PILOT_STATE = {0: "active", 2: "kia", 4: "wounded"}
 
 # sortie.planeStatus, from the live career: 21 sorties at 0, 8 at 2, 2 at 3,
 # and the two 3s line up with the player's two "aircraft lost" events.
@@ -70,6 +74,11 @@ def _top_combat_award(country: int, award_ids) -> Optional[int]:
     return max((a for a in award_ids if lo <= a <= hi), default=None)
 
 
+def _humanise(key: str) -> str:
+    """IndustrialBuilding -> Industrial Building; Raildoad -> Raildoad (sic)."""
+    return re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', key)
+
+
 def _hours(seconds: Optional[int]) -> float:
     return round((seconds or 0) / 3600.0, 1)
 
@@ -85,7 +94,9 @@ class CareerAggregator:
     def __init__(self, game_dir: Path, lang: str = "eng"):
         self.game_dir = Path(game_dir)
         self.lang = lang
-        self.locale = LocaleStrings(self.game_dir, lang)
+        self.resolver = AssetResolver(self.game_dir)
+        self.locale = LocaleStrings(self.game_dir, lang, resolver=self.resolver)
+        self.objects = WorldObjectIndex(self.resolver, lang)
         self.awards_cfg = AwardsConfig(
             self.game_dir / "data" / "scg" / str(DEFAULT_TVD) / "awards.cfg")
 
@@ -113,7 +124,10 @@ class CareerAggregator:
             # pilot.rankId is authoritative. The game's own Award and Promotion
             # panel shifts ranks up by the number of promotions a pilot has had.
             "rank": self.locale.rank_name(row["country"], row["rankId"]),
-            "state": PILOT_STATE.get(row["state"], f"state{row['state']}"),
+            "state": PILOT_STATE.get(row["state"], f"state {row['state']}"),
+            "state_until": (row["stateEndDate"][:10]
+                            if row["state"] == 4
+                            and not row["stateEndDate"].startswith("0000") else ""),
             "health": row["health"],
             "sorties": row["sorties"],
             "good_sorties": row["goodSorties"],
@@ -172,7 +186,7 @@ class CareerAggregator:
         headline = [{"key": key, "label": label,
                      "value": sum(cats.get(s, 0) for s in sources)}
                     for key, (label, sources) in COMBAT_CATEGORIES.items()]
-        breakdown = [{"label": k, "value": v}
+        breakdown = [{"label": _humanise(k), "value": v}
                      for k, v in sorted(kills.counts.items(), key=lambda x: -x[1])
                      if k != "Aircraft" and v]
         return {
@@ -245,7 +259,7 @@ class CareerAggregator:
                 })
         return {"promotions": promotions, "awards": medals}
 
-    def _incidences(self, events) -> List[Dict[str, Any]]:
+    def _incidences(self, events, aircraft_flown: str = "") -> List[Dict[str, Any]]:
         """Everything in the pilot's history that is *not* an award."""
         out = []
         for row in events:
@@ -255,7 +269,12 @@ class CareerAggregator:
             entry = {"date": row["date"][:10], "kind": info.key,
                      "label": info.label, "confidence": info.confidence}
             if info.key == "plane_lost":
-                entry["detail"] = row["tpar1"]
+                # tpar1 is the aircraft type for AI pilots but the player's own
+                # account name for the player, which is neither useful nor
+                # something to put on screen. Fall back to the aircraft flown.
+                described = self.objects.describe(row["tpar1"])
+                entry["detail"] = (described["name"] if described["named"]
+                                   else aircraft_flown)
             elif info.key in ("wounded", "medical"):
                 if info.key == "medical" and row["ipar1"] == 1:
                     entry["label"] = "Returned to duty"
@@ -267,6 +286,15 @@ class CareerAggregator:
         return out
 
     def _debriefings(self, db, sorties, kill_events) -> List[Dict[str, Any]]:
+        """
+        One block per sortie, with a kill log worth reading.
+
+        Only named targets are listed — aircraft, vehicles, guns, ships,
+        trains. Scenery (crates, coils, barrels, tents) has no name or category
+        in the game's own data and is summarised as a count instead: a napalm
+        run on an airfield can register forty of them, which buries the kills
+        that actually matter.
+        """
         by_mission: Dict[int, List] = {}
         for row in kill_events:
             by_mission.setdefault(row["missionId"], []).append(row)
@@ -275,11 +303,21 @@ class CareerAggregator:
         out = []
         for sortie in sorties:
             mission = missions.get(sortie["missionId"])
-            kills = sorted(by_mission.get(sortie["missionId"], []),
-                           key=lambda r: r["date"])
-            log = [{"time": r["date"][11:19], "target": r["tpar1"],
-                    "air": (r["tpar1"] or "").lower() in PLANE_TYPES}
-                   for r in kills]
+            events = sorted(by_mission.get(sortie["missionId"], []),
+                            key=lambda r: r["date"])
+            log, scenery = [], 0
+            for row in events:
+                info = self.objects.describe(row["tpar1"])
+                if not info["named"]:
+                    scenery += 1
+                    continue
+                log.append({
+                    "time": row["date"][11:19],
+                    "target": info["name"],
+                    "category": info["category"],
+                    "air": info["aircraft"] and not info["parked"],
+                    "parked": info["parked"],
+                })
             k = KillStats(sortie["killStats"])
             out.append({
                 "mission_num": mission["missionNum"] if mission else None,
@@ -293,6 +331,7 @@ class CareerAggregator:
                 "airborne": k.airborne,
                 "ground_targets": k.ground_targets,
                 "log": log,
+                "scenery": scenery,
             })
         out.reverse()
         return out
@@ -326,6 +365,17 @@ class CareerAggregator:
             # The rank on the earliest sortie is where the career began.
             starting_rank_id = sorties[0]["rankId"] if sorties else player["rankId"]
 
+            # The type the player actually flies, for incidences where the
+            # event text is unusable.
+            plane_row = db.query_one(
+                "SELECT config FROM plane WHERE squadronId=? LIMIT 1",
+                (player["squadronId"],))
+            aircraft_flown = ""
+            if plane_row and plane_row["config"]:
+                stem = Path(plane_row["config"]).stem
+                described = self.objects.describe(stem)
+                aircraft_flown = described["name"] if described["named"] else stem
+
             return {
                 "id": career_id,
                 "squadron": meta.squadron_name,
@@ -339,7 +389,7 @@ class CareerAggregator:
                 "missions_flown": self._missions_flown(sorties),
                 "promotions": groups["promotions"],
                 "awards": groups["awards"],
-                "incidences": self._incidences(db.events(pid)),
+                "incidences": self._incidences(db.events(pid), aircraft_flown),
                 "debriefings": self._debriefings(db, sorties, kill_events),
                 "progression": {
                     "starting_rank": self.locale.rank_name(player["country"],
