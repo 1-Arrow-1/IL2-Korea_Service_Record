@@ -15,13 +15,16 @@
     <rect x="8" y="8" width="184" height="229" stroke-width="0.75"/>
   </g>
 
-  <!-- corner brackets, as on a mounted print -->
+  <!--
+    Corner brackets. The print is inset 10px, so these sit at 11 — hugging its
+    corners the way mounting corners do, without reaching across the face.
+  -->
   <g fill="none" stroke="#2c2212" stroke-opacity="0.8" stroke-width="2.5"
      stroke-linecap="square">
-    <path d="M14 32 V14 H32"/>
-    <path d="M168 14 H186 V32"/>
-    <path d="M186 213 V231 H168"/>
-    <path d="M32 231 H14 V213"/>
+    <path d="M11 30 V11 H30"/>
+    <path d="M170 11 H189 V30"/>
+    <path d="M189 215 V234 H170"/>
+    <path d="M30 234 H11 V215"/>
   </g>
 
   <!-- registration ticks -->
