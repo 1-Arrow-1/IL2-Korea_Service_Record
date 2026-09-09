@@ -159,7 +159,7 @@
         const when = award.pending
             ? "awaiting award points" : "received " + esc(award.received);
         return '<li class="with-icon">' +
-            icon("award", award.type, 44, "award-icon", award.name) +
+            icon("award", award.type, 64, "award-icon", award.name) +
             "<div>" +
             '<span class="award-name">' + esc(award.name) + badge + "</span>" +
             '<span class="award-dates">earned ' + esc(award.earned) +
@@ -169,7 +169,7 @@
     function promotionItem(promotion) {
         const badge = promotion.pending ? '<span class="badge pending">pending</span>' : "";
         return '<li class="with-icon">' +
-            icon("rank", promotion.rank_key, 26, "rank-icon", promotion.rank) +
+            icon("rank", promotion.rank_key, 40, "rank-icon", promotion.rank) +
             "<div>" +
             '<span class="award-name">' + esc(promotion.rank) + badge + "</span>" +
             '<span class="award-dates">' + esc(promotion.date) + "</span></div></li>";
@@ -227,11 +227,27 @@
                 " structures and materiel destroyed</span></div>";
         }
         if (!log) log = '<div class="log-row empty">No confirmed kills.</div>';
+        // Take-off, landing and how it ended come from the flight log; the
+        // career DB has none of the three.
+        const flight = (d.takeoff || d.landing_time)
+            ? '<div class="debrief-flight">' +
+              (d.takeoff ? "&uarr; " + esc(d.takeoff) + "  " : "") +
+              (d.landing_time ? "&darr; " + esc(d.landing_time) : "") +
+              (d.landing
+                  ? ' <span class="debrief-landing' +
+                    (d.landing === "landed" ? "" : " bad") + '">' +
+                    esc(d.landing) + "</span>"
+                  : "") +
+              (d.aircraft ? ' <span class="debrief-plane">' + esc(d.aircraft) +
+                            "</span>" : "") +
+              "</div>"
+            : "";
         return '<article class="debrief"><header class="debrief-head">' +
             '<span class="debrief-no">Mission ' + esc(d.mission_num) + "</span>" +
             '<span class="debrief-date">' + esc(d.date) + " " + esc(d.time) + "</span>" +
             "</header>" +
             '<div class="debrief-type">' + esc(d.type) + "</div>" +
+            flight +
             '<div class="debrief-meta">' + esc(d.duration) + " &middot; air " +
                 esc(d.airborne) + " &middot; ground " + esc(d.ground_targets) +
                 (flags.length
@@ -259,15 +275,18 @@
                          p.state === "kia" ? "is-kia" : ""].filter(Boolean).join(" ");
             return '<tr class="' + cls + '">' +
                 '<td class="rank-cell">' +
-                    (icon("rank", p.rank_key, 22, "rank-icon", p.rank) ||
+                    (icon("rank", p.rank_key, 34, "rank-icon", p.rank) ||
                      esc(p.rank)) + "</td>" +
                 "<td>" + esc(p.name) + "</td>" +
                 '<td class="award-cell">' +
-                    (icon("award", p.top_award_id, 40, "award-icon", p.top_award) ||
+                    (icon("award", p.top_award_id, 56, "award-icon", p.top_award) ||
                      "&mdash;") + "</td>" +
                 '<td><span class="status-dot ' + dotClass + '"></span>' + esc(p.state) +
                     (p.state_until
                         ? ' <span class="until">until ' + esc(p.state_until) + "</span>"
+                        : "") +
+                    (p.state_since
+                        ? ' <span class="until">' + esc(p.state_since) + "</span>"
                         : "") + "</td>" +
                 '<td class="num">' + esc(p.airborne) + "</td>" +
                 '<td class="num">' + esc(p.ground_targets) + "</td>" +
@@ -295,9 +314,9 @@
 
             el("d-name").textContent = p.name;
             el("d-subtitle").innerHTML =
-                icon("rank", p.rank_key, 26, "rank-icon", p.rank) +
+                icon("rank", p.rank_key, 44, "rank-icon", p.rank) +
                 "<span>" + esc(p.rank) + " · " + esc(d.squadron) + "</span>" +
-                icon("squadron", d.squadron_key, 64, "squadron-emblem", d.squadron);
+                icon("squadron", d.squadron_key, 96, "squadron-emblem", d.squadron);
             el("d-meta").innerHTML = [
                 ["Career", d.start_date + " – " + d.current_date],
                 ["Sorties", p.sorties + " (" + p.good_sorties + " successful)"],
@@ -352,7 +371,7 @@
             el("d-debriefings").innerHTML = d.debriefings.map(debriefBlock).join("");
 
             el("d-squadron-strip").innerHTML =
-                icon("squadron", d.squadron_key, 56, "squadron-emblem strip", d.squadron) +
+                icon("squadron", d.squadron_key, 84, "squadron-emblem strip", d.squadron) +
                 statStrip(d.squadron_totals);
             rosterRows = d.roster.map(flatten);
             el("d-roster-count").textContent = "(" + rosterRows.length + ")";

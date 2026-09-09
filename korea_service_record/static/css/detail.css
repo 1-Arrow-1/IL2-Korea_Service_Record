@@ -275,7 +275,7 @@ table.roster tr.is-kia td { color: #93796a; }
 /* Category pictograms above the combat numbers, from the GB tracker. */
 .stat-icon {
     display: block;
-    width: 30px; height: 30px;
+    width: 44px; height: 44px;
     margin: 0 auto 0.2rem;
     opacity: 0.82;
 }
@@ -291,24 +291,52 @@ table.roster tr.is-kia td { color: #93796a; }
 /* ------------------------------------------------------------- artwork -- */
 
 .record-sub { display: flex; align-items: center; gap: 0.7rem; }
-.record-sub .rank-icon { height: 26px; width: auto; }
-.squadron-emblem { height: 64px; width: auto; }
-.squadron-emblem.strip { height: 56px; margin-right: 1rem; align-self: center; }
+.record-sub .rank-icon { height: 44px; width: auto; }
+.squadron-emblem { height: 96px; width: auto; }
+.squadron-emblem.strip { height: 84px; margin-right: 1.4rem; align-self: center; }
 
 #d-squadron-strip { display: flex; align-items: center; gap: 0.5rem; }
 #d-squadron-strip .stat-cell { flex: 1; }
 
 .award-list li.with-icon {
     display: grid;
-    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-columns: 72px minmax(0, 1fr);
     gap: 0.7rem;
     align-items: center;
 }
-.award-list .award-icon { max-height: 44px; max-width: 46px; display: block; margin: 0 auto; }
-.award-list .rank-icon { max-height: 26px; max-width: 46px; display: block; margin: 0 auto; }
+.award-list .award-icon { max-height: 64px; max-width: 68px; display: block; margin: 0 auto; }
+.award-list .rank-icon { max-height: 40px; max-width: 68px; display: block; margin: 0 auto; }
 
-table.roster td.rank-cell .rank-icon { height: 22px; width: auto; display: block; }
+table.roster td.rank-cell .rank-icon { height: 34px; width: auto; display: block; }
 table.roster td.award-cell { min-width: 60px; }
-table.roster td.award-cell .award-icon { max-height: 40px; max-width: 44px; display: block; }
+table.roster td.award-cell .award-icon { max-height: 56px; max-width: 60px; display: block; }
 
 .list-head { font-weight: bold; }
+
+
+/* The debriefing column runs the full height of the record grid and scrolls
+   inside itself, so the page has one scrollbar rather than a short panel
+   floating beside two long ones. */
+.record-grid { align-items: stretch; }
+.record-col:last-child > .panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.record-col:last-child .debriefings {
+    flex: 1 1 0;
+    min-height: 320px;
+    max-height: none;
+}
+
+/* Squadron statistics is the widest panel; its heading carries more weight. */
+.roster-panel > h3 { font-size: 1.05rem; letter-spacing: 0.14em; }
+.roster-panel .stat-value { font-size: 1.55rem; }
+.roster-panel .stat-label { font-size: 0.68rem; }
+.roster-panel .stat-icon { width: 52px; height: 52px; }
+
+/* Take-off / landing line, from the flight log. */
+.debrief-flight { font-size: 0.82rem; color: var(--ink-strong); margin-top: 0.1rem; }
+.debrief-landing { color: var(--good); }
+.debrief-landing.bad { color: var(--bad); }
+.debrief-plane { color: var(--ink-muted); }

@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from ..assets import AssetResolver
+from ..flightlog import FlightLogIndex
 from ..gamedata import AwardsConfig, LocaleStrings, DEFAULT_TVD, PLANE_TYPES
 from ..icons import IconLibrary
 from ..worldobjects import WorldObjectIndex
@@ -84,6 +85,18 @@ def _hours(seconds: Optional[int]) -> float:
     return round((seconds or 0) / 3600.0, 1)
 
 
+def _clock(start: str, offset_s: Optional[float]) -> str:
+    """Mission start time plus an offset in seconds, as HH:MM:SS."""
+    if offset_s is None:
+        return ""
+    try:
+        hh, mm = (int(n) for n in start.split(":")[:2])
+    except (ValueError, IndexError):
+        return ""
+    total = hh * 3600 + mm * 60 + int(offset_s)
+    return f"{total // 3600 % 24:02d}:{total // 60 % 60:02d}:{total % 60:02d}"
+
+
 def _hm(seconds: Optional[int]) -> str:
     total = int(seconds or 0)
     return f"{total // 3600}h {total % 3600 // 60:02d}m"
@@ -99,6 +112,7 @@ class CareerAggregator:
         self.locale = LocaleStrings(self.game_dir, lang, resolver=self.resolver)
         self.objects = WorldObjectIndex(self.resolver, lang)
         self.icons = IconLibrary(self.resolver)
+        self.flightlogs = FlightLogIndex(self.game_dir)
         self.awards_cfg = AwardsConfig(
             self.game_dir / "data" / "scg" / str(DEFAULT_TVD) / "awards.cfg")
 
@@ -130,6 +144,10 @@ class CareerAggregator:
             "state_until": (row["stateEndDate"][:10]
                             if row["state"] == 4
                             and not row["stateEndDate"].startswith("0000") else ""),
+            # For the dead, stateDate is the day they were lost.
+            "state_since": (row["stateDate"][:10]
+                            if row["state"] == 2
+                            and not row["stateDate"].startswith("0000") else ""),
             "health": row["health"],
             "sorties": row["sorties"],
             "good_sorties": row["goodSorties"],
@@ -325,7 +343,29 @@ class CareerAggregator:
                     "parked": info["parked"],
                 })
             k = KillStats(sortie["killStats"])
+            # The flight log knows when the wheels left the ground and how the
+            # sortie ended; the career DB knows neither.
+            # Named `flight` rather than `log`: the kill list in this scope is
+            # already called `log`, and shadowing it serialised this NamedTuple
+            # into the payload as a list.
+            flight = self.flightlogs.for_sortie(sortie["date"][:10],
+                                                sortie["date"][11:16])
+            outcome = PLANE_OUTCOME.get(sortie["planeStatus"], "unknown")
+            landing = ""
+            if flight is not None:
+                if flight.ejected:
+                    landing = "bailed out"
+                elif flight.landing_s is None:
+                    landing = "did not return"
+                elif outcome == "damaged":
+                    landing = "landed, aircraft damaged"
+                else:
+                    landing = "landed"
             out.append({
+                "takeoff": _clock(sortie["date"][11:], flight.takeoff_s) if flight else "",
+                "landing_time": _clock(sortie["date"][11:], flight.landing_s) if flight else "",
+                "landing": landing,
+                "aircraft": flight.plane if flight else "",
                 "mission_num": mission["missionNum"] if mission else None,
                 "date": sortie["date"][:10],
                 "time": sortie["date"][11:16],
