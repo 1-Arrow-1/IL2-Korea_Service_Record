@@ -54,8 +54,9 @@ per-mission, per-pilot attribution is available, not just cumulative counters.
 - **Locale files are encrypted.** `awards.locale=*.json` and `ranks.locale=*.json`
   live inside `Interface.gtp`. They are only loose on a modded install. The
   extractor must be wired in before a stock install can show real names.
-- **`pilot.persLevel` is 0 for the player** in the test career, so the
-  commander's own attributes may be stored elsewhere. Unresolved.
+- **`pilot.persLevel` is 0 for the player**, decoding to the minimum 1/1/1.
+  Probably correct rather than missing — the human supplies the skill — but the
+  player's bar values have not been read off the panel to confirm it.
 - Ten `event.type` values remain unidentified.
 
 ## Layout

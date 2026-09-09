@@ -154,6 +154,12 @@ def main(game_arg):
             check("pilot 17 air victories", rk.airborne, 1)
             check("pilot 17 ground targets", rk.ground_targets, 102)
 
+        # The player's own panel reports up-numbers 0 / 2 / 2 in display order,
+        # from leadLevel 0x220. A third pilot confirming the packed order, and
+        # the only one whose skills nibble is zero.
+        pa = PilotAttributes(player["persLevel"], player["leadLevel"])
+        check("player up-points", [r["points"] for r in pa.display_rows()], [0, 2, 2])
+
         m50 = db.query_one(
             "SELECT * FROM sortie WHERE isPlayer=1 AND missionId=50")
         if m50 is not None:

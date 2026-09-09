@@ -27,7 +27,18 @@ it::
 
 The high nibble is 4 and the only bar reading 5 is DISCIPLINE, so the packed
 order is **skills, courage, discipline** while the panel lists skills,
-discipline, courage. Rivera re-checks consistently under this order.
+discipline, courage. Rivera re-checks consistently under this order, and so
+does the player, whose leadLevel 0x220 yields up-numbers 0 / 2 / 2 in panel
+order.
+
+The player character
+--------------------
+The player's ``persLevel`` is 0, which decodes to the minimum 1 / 1 / 1. That
+looks wrong but is probably correct: the human at the controls supplies the
+skill, so the engine has no reason to simulate the player's. Every AI pilot
+checked has a non-zero ``persLevel``, including brand-new replacements
+(pilot 45 = 0x011 -> skills 2, courage 2, discipline 1). Treat a zero
+``persLevel`` as "not simulated" rather than as missing data.
 """
 
 import logging
