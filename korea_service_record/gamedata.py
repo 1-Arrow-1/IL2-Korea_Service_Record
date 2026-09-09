@@ -33,6 +33,33 @@ logger = logging.getLogger(__name__)
 DEFAULT_LANG = "eng"
 SUPPORTED_LANGS = ("eng", "ger", "fra", "spa", "rus", "chs")
 
+# The game's locale files are not strict JSON — missiontypes.locale=eng.json has
+# a trailing comma before its closing brace. json.loads rejects that, which would
+# silently drop a whole file's strings, so trailing commas are stripped first.
+_TRAILING_COMMA = re.compile(r',(\s*[}\]])')
+
+
+def loads_lenient(text: str) -> dict:
+    """Parse JSON that may carry trailing commas. Returns {} on real errors."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        try:
+            return json.loads(_TRAILING_COMMA.sub(r'\1', text))
+        except json.JSONDecodeError as exc:
+            logger.warning("Locale file is not parseable even leniently: %s", exc)
+            return {}
+
+
+# Aircraft the game ships, from the per-plane folders under nsdata/.../planes/.
+# Kill events name their target with these (case-insensitively), which is how an
+# airborne victory is told apart from a truck: the alternative — guessing from
+# name prefixes — misses jets and miscounts ground clutter such as "Windsock".
+PLANE_TYPES = {
+    "b29", "c47b", "f51d", "f80c10", "f84e", "f86a5",
+    "il10", "la11", "li2t", "mig15bis", "tu2", "yak9p",
+}
+
 # Theatre id. career.tvd is 2 for Korea; the awards folder is scg/<tvd>.
 DEFAULT_TVD = 2
 
@@ -155,6 +182,7 @@ class LocaleStrings:
         self.resolver = resolver
         self.awards: Dict[str, str] = self._load("awards")
         self.ranks: Dict[str, str] = self._load("ranks")
+        self.mission_types: Dict[str, str] = self._load("missiontypes")
 
     def vpath(self, stem: str) -> str:
         return f"nsdata/assets/locale/{stem}.locale={self.lang}.json"
@@ -165,16 +193,24 @@ class LocaleStrings:
         if text is None:
             logger.info("Locale not found in loose files, cache or archives: %s", vpath)
             return {}
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError as exc:
-            logger.warning("Cannot parse %s: %s", vpath, exc)
-            return {}
+        return loads_lenient(text)
 
     def sources(self) -> Dict[str, str]:
         """Where each locale file came from — useful in a debug endpoint."""
         return {stem: self.resolver.source_of(self.vpath(stem))
-                for stem in ("awards", "ranks")}
+                for stem in ("awards", "ranks", "missiontypes")}
+
+    def mission_type_name(self, type_id: int) -> str:
+        """
+        A readable name for a mission type.
+
+        The locale holds per-objective strings (missionType1128Obj0 = "Find and
+        destroy ground targets"); Obj0 is the actual task, the others are always
+        take-off and landing.
+        """
+        return (self.mission_types.get(f"missionType{type_id}Obj0")
+                or self.mission_types.get(f"missionType{type_id}")
+                or f"Mission type {type_id}")
 
     @property
     def has_awards(self) -> bool:

@@ -63,37 +63,79 @@
                     </header>
 
                     <div class="record-grid">
-                        <section class="panel">
-                            <h3>Characteristics</h3>
-                            <div id="d-attributes" class="attributes"></div>
-                            <h3 class="panel-subhead">Efficiency</h3>
-                            <table class="mini-table" id="d-efficiency"></table>
-                        </section>
 
-                        <section class="panel">
-                            <h3>Awards</h3>
-                            <ul id="d-awards" class="award-list"></ul>
-                        </section>
+                        <!-- left: who he is -->
+                        <div class="record-col">
+                            <section class="panel">
+                                <h3>Pilot Information</h3>
+                                <table class="mini-table" id="d-info"></table>
+                                <h3 class="panel-subhead">Characteristics</h3>
+                                <div id="d-attributes" class="attributes"></div>
+                            </section>
 
-                        <section class="panel">
-                            <h3>Service Record</h3>
-                            <ol id="d-service" class="service-list"></ol>
-                        </section>
+                            <section class="panel">
+                                <h3>Other Incidences</h3>
+                                <ol id="d-incidences" class="service-list"></ol>
+                            </section>
+
+                            <section class="panel">
+                                <h3>Promotions &amp; Awards</h3>
+                                <h4 class="list-head">Promotions</h4>
+                                <ul id="d-promotions" class="award-list"></ul>
+                                <h4 class="list-head">Awards</h4>
+                                <ul id="d-awards" class="award-list"></ul>
+                            </section>
+                        </div>
+
+                        <!-- middle: what he did -->
+                        <div class="record-col">
+                            <section class="panel">
+                                <h3>Combat Results</h3>
+                                <div id="d-combat-strip" class="stat-strip"></div>
+                                <div id="d-combat-breakdown" class="breakdown"></div>
+                            </section>
+
+                            <section class="panel">
+                                <h3>Air Kills by Type</h3>
+                                <table class="mini-table" id="d-air-kills"></table>
+                            </section>
+
+                            <section class="panel">
+                                <h3>Missions Flown</h3>
+                                <table class="mini-table" id="d-missions"></table>
+                            </section>
+
+                            <section class="panel">
+                                <h3>Career Progression</h3>
+                                <table class="mini-table" id="d-progression"></table>
+                            </section>
+                        </div>
+
+                        <!-- right: mission by mission -->
+                        <div class="record-col">
+                            <section class="panel">
+                                <h3>Mission Debriefings <span id="d-debrief-count" class="count"></span></h3>
+                                <div id="d-debriefings" class="debriefings"></div>
+                            </section>
+                        </div>
+
                     </div>
 
                     <section class="panel roster-panel">
-                        <h3>Squadron Roster <span id="d-roster-count" class="count"></span></h3>
+                        <h3>Squadron Statistics <span id="d-roster-count" class="count"></span></h3>
+                        <div id="d-squadron-strip" class="stat-strip"></div>
                         <div class="table-scroll">
                             <table class="roster" id="d-roster">
                                 <thead>
                                     <tr>
-                                        <th data-sort="name">Pilot</th>
                                         <th data-sort="rank_id">Rank</th>
+                                        <th data-sort="name">Name</th>
+                                        <th data-sort="top_award">Highest Combat Award</th>
                                         <th data-sort="state">Status</th>
-                                        <th data-sort="sorties" class="num">Sorties</th>
-                                        <th data-sort="flight_hours" class="num">Hours</th>
                                         <th data-sort="airborne" class="num">Air</th>
                                         <th data-sort="ground_targets" class="num">Ground</th>
+                                        <th data-sort="sorties" class="num">Sorties</th>
+                                        <th data-sort="flight_hours" class="num">Hours</th>
                                         <th data-sort="skills" class="num">Skl</th>
                                         <th data-sort="discipline" class="num">Dis</th>
                                         <th data-sort="courage" class="num">Cou</th>

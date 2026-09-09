@@ -4,6 +4,10 @@
  * Two views held in one document: a career list, and the detail for whichever
  * career was clicked. Navigation is by hash so the browser Back button and a
  * page reload both land where the user expects.
+ *
+ * The detail view follows the Great Battles tracker's three-column service
+ * record: who he is on the left, what he did in the middle, mission by mission
+ * on the right, and the squadron table across the bottom.
  */
 
 (function () {
@@ -20,9 +24,15 @@
             .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
     }
 
+    const cell = (v) => (v === null || v === undefined) ? "&mdash;" : esc(v);
+
+    const rows = (pairs) => pairs
+        .map(([k, v]) => "<tr><th>" + esc(k) + "</th><td>" + esc(v) + "</td></tr>")
+        .join("");
+
     async function getJSON(url) {
         const response = await fetch(url);
-        if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+        if (!response.ok) throw new Error(response.status + " " + response.statusText);
         return response.json();
     }
 
@@ -30,26 +40,23 @@
 
     function careerCard(career) {
         const stat = (value, label) =>
-            `<div class="career-stat"><span class="value">${esc(value)}</span>` +
-            `<span class="label">${esc(label)}</span></div>`;
-        return `
-            <button class="career-card" data-id="${esc(career.id)}">
-                <div class="career-card-head">
-                    <span class="career-pilot">${esc(career.pilot)}</span>
-                    <span class="career-rank">${esc(career.rank)}</span>
-                </div>
-                <div class="career-squadron">${esc(career.squadron)}</div>
-                <div class="career-dates">
-                    ${esc(career.start_date)} &rarr; ${esc(career.current_date)}
-                </div>
-                <div class="career-stats">
-                    ${stat(career.sorties, "Sorties")}
-                    ${stat(career.flight_hours, "Hours")}
-                    ${stat(career.airborne, "Air")}
-                    ${stat(career.ground_targets, "Ground")}
-                    ${stat(career.awards, "Awards")}
-                </div>
-            </button>`;
+            '<div class="career-stat"><span class="value">' + esc(value) +
+            '</span><span class="label">' + esc(label) + "</span></div>";
+        return '<button class="career-card" data-id="' + esc(career.id) + '">' +
+            '<div class="career-card-head">' +
+                '<span class="career-pilot">' + esc(career.pilot) + "</span>" +
+                '<span class="career-rank">' + esc(career.rank) + "</span>" +
+            "</div>" +
+            '<div class="career-squadron">' + esc(career.squadron) + "</div>" +
+            '<div class="career-dates">' + esc(career.start_date) + " &rarr; " +
+                esc(career.current_date) + "</div>" +
+            '<div class="career-stats">' +
+                stat(career.sorties, "Sorties") +
+                stat(career.flight_hours, "Hours") +
+                stat(career.airborne, "Air") +
+                stat(career.ground_targets, "Ground") +
+                stat(career.awards, "Awards") +
+            "</div></button>";
     }
 
     async function loadLanding() {
@@ -71,8 +78,9 @@
             const list = el("careers-list");
             list.innerHTML = careers.map(careerCard).join("");
             list.querySelectorAll(".career-card").forEach((card) => {
-                card.addEventListener("click",
-                    () => { location.hash = "#career/" + encodeURIComponent(card.dataset.id); });
+                card.addEventListener("click", () => {
+                    location.hash = "#career/" + encodeURIComponent(card.dataset.id);
+                });
             });
             show(list);
         } catch (err) {
@@ -88,113 +96,136 @@
     let sortKey = "rank_id";
     let sortAsc = false;
 
-    // The roster carries attributes as display rows; flatten so the table can
-    // sort on them like any other column.
+    // Flatten the attribute rows so the table can sort on them like any other
+    // column. level is null for the commander; keeping it null means his cell
+    // shows a dash and he sorts last rather than as a level-1 pilot.
     function flatten(pilot) {
         const out = Object.assign({}, pilot);
-        // level is null for the commander; keep it null so the cell shows a dash
-        // and sorting treats him as unranked rather than as a level-1 pilot.
         (pilot.attributes || []).forEach((a) => { out[a.name] = a.level; });
         return out;
     }
 
-    const cell = (value) => (value === null || value === undefined) ? "&mdash;" : esc(value);
-
     // The commander has no skill levels — the game shows him boosters only,
     // with no bars. Rendering his zero nibbles as 1/1/1 would be a fiction.
     function attributeBlock(attributes, hasLevels) {
-        const rows = (attributes || []).map((attr) => {
-            const points = `<span class="attr-points">&uarr;${esc(attr.points || 0)}</span>`;
+        const body = (attributes || []).map((attr) => {
+            const points = '<span class="attr-points">&uarr;' +
+                esc(attr.points || 0) + "</span>";
             if (!hasLevels) {
-                return `
-                    <div class="attr-row booster">
-                        <div class="attr-head">
-                            <span>${esc(attr.name)} booster</span>
-                            <span>${points}</span>
-                        </div>
-                    </div>`;
+                return '<div class="attr-row booster"><div class="attr-head">' +
+                    "<span>" + esc(attr.name) + " booster</span>" +
+                    "<span>" + points + "</span></div></div>";
             }
-            const pips = Array.from({ length: 5 }, (_, i) =>
-                `<span class="attr-pip${i < attr.level ? " on" : ""}"></span>`).join("");
-            return `
-                <div class="attr-row">
-                    <div class="attr-head">
-                        <span>${esc(attr.name)}</span>
-                        <span><span class="attr-value">${esc(attr.level)}</span>${points}</span>
-                    </div>
-                    <div class="attr-bar">${pips}</div>
-                </div>`;
+            let pips = "";
+            for (let i = 0; i < 5; i += 1) {
+                pips += '<span class="attr-pip' + (i < attr.level ? " on" : "") + '"></span>';
+            }
+            return '<div class="attr-row"><div class="attr-head">' +
+                "<span>" + esc(attr.name) + "</span>" +
+                '<span><span class="attr-value">' + esc(attr.level) + "</span>" +
+                points + "</span></div>" +
+                '<div class="attr-bar">' + pips + "</div></div>";
         }).join("");
-        const note = hasLevels ? ""
-            : '<p class="panel-note">Squadron commander &mdash; contributes boosters ' +
-              'rather than a simulated skill level.</p>';
-        return rows + note;
+        const note = hasLevels ? "" :
+            '<p class="panel-note">Squadron commander &mdash; contributes boosters ' +
+            "rather than a simulated skill level.</p>";
+        return body + note;
     }
 
     function awardItem(award) {
-        const badges =
-            (award.pending ? '<span class="badge pending">pending</span>' : "") +
-            (award.is_promotion ? '<span class="badge promotion">promotion</span>' : "");
-        const received = award.pending
-            ? "awaiting award points"
-            : `received ${esc(award.received)}`;
-        return `<li>
-            <span class="award-name">${esc(award.name)}${badges}</span>
-            <span class="award-dates">earned ${esc(award.earned)} &middot; ${received}</span>
-        </li>`;
+        const badge = award.pending ? '<span class="badge pending">pending</span>' : "";
+        const when = award.pending
+            ? "awaiting award points" : "received " + esc(award.received);
+        return "<li>" +
+            '<span class="award-name">' + esc(award.name) + badge + "</span>" +
+            '<span class="award-dates">earned ' + esc(award.earned) +
+            " &middot; " + when + "</span></li>";
     }
 
-    function serviceItem(entry) {
-        let text = esc(entry.label);
-        if (entry.award) {
-            const verb = entry.action === "granted" ? "Awarded" : "Presented";
-            text = `${verb}: ${esc(entry.award)}`;
-            if (entry.action === "granted") {
-                const route = entry.route === "mission"
-                    ? "earned in the air" : "roster review";
-                text += `<span class="service-route">${route}</span>`;
-            }
-        } else if (entry.aircraft) {
-            text = `${esc(entry.label)} &mdash; ${esc(entry.aircraft)}`;
-        } else if (entry.health !== undefined) {
-            text = entry.phase === "returned"
-                ? esc(entry.label) + " &mdash; returned to duty"
-                : `${esc(entry.label)} &mdash; health ${esc(entry.health)}`;
-        }
-        return `<li class="kind-${esc(entry.kind)}">
-            <span class="service-date">${esc(entry.date)}</span>
-            <span class="service-text">${text}</span>
-        </li>`;
+    function promotionItem(promotion) {
+        const badge = promotion.pending ? '<span class="badge pending">pending</span>' : "";
+        return "<li>" +
+            '<span class="award-name">' + esc(promotion.rank) + badge + "</span>" +
+            '<span class="award-dates">' + esc(promotion.date) + "</span></li>";
+    }
+
+    function incidenceItem(entry) {
+        const detail = entry.detail ? " &mdash; " + esc(entry.detail) : "";
+        return '<li class="kind-' + esc(entry.kind) + '">' +
+            '<span class="service-date">' + esc(entry.date) + "</span>" +
+            '<span class="service-text">' + esc(entry.label) + detail + "</span></li>";
+    }
+
+    function statStrip(items) {
+        return items.map((item) =>
+            '<div class="stat-cell"><span class="stat-value">' + esc(item.value) +
+            '</span><span class="stat-label">' + esc(item.label) + "</span></div>"
+        ).join("");
+    }
+
+    function breakdown(items) {
+        return items.map((item) =>
+            '<div class="breakdown-row"><span>' + esc(item.label) + "</span>" +
+            "<span>" + esc(item.value) + "</span></div>").join("");
+    }
+
+    // One block per sortie: the header the game shows at debrief, then the kill
+    // log rebuilt from the timestamped kill events.
+    function debriefBlock(d) {
+        const flags = [];
+        if (d.outcome !== "returned") flags.push("aircraft " + esc(d.outcome));
+        if (d.wounded) flags.push("wounded");
+        const log = d.log.length
+            ? d.log.map((k) =>
+                '<div class="log-row' + (k.air ? " air" : "") + '">' +
+                '<span class="log-time">' + esc(k.time) + "</span>" +
+                "<span>" + esc(k.target) + "</span></div>").join("")
+            : '<div class="log-row empty">No confirmed kills.</div>';
+        return '<article class="debrief"><header class="debrief-head">' +
+            '<span class="debrief-no">Mission ' + esc(d.mission_num) + "</span>" +
+            '<span class="debrief-date">' + esc(d.date) + " " + esc(d.time) + "</span>" +
+            "</header>" +
+            '<div class="debrief-type">' + esc(d.type) + "</div>" +
+            '<div class="debrief-meta">' + esc(d.duration) + " &middot; air " +
+                esc(d.airborne) + " &middot; ground " + esc(d.ground_targets) +
+                (flags.length
+                    ? ' &middot; <span class="debrief-flag">' + flags.join(", ") + "</span>"
+                    : "") +
+            "</div>" +
+            '<div class="debrief-log">' + log + "</div></article>";
     }
 
     function renderRoster() {
         const body = el("d-roster").querySelector("tbody");
-        const rows = rosterRows.slice().sort((a, b) => {
+        const sorted = rosterRows.slice().sort((a, b) => {
             const x = a[sortKey], y = b[sortKey];
+            if (x === null || x === undefined) return 1;
+            if (y === null || y === undefined) return -1;
             const cmp = (typeof x === "string")
                 ? String(x).localeCompare(String(y))
                 : (Number(x) || 0) - (Number(y) || 0);
             return sortAsc ? cmp : -cmp;
         });
-        body.innerHTML = rows.map((p) => {
-            const dotClass = ["active", "kia", "wounded", "pow"].includes(p.state)
+        body.innerHTML = sorted.map((p) => {
+            const dotClass = ["active", "kia", "wounded", "pow"].indexOf(p.state) >= 0
                 ? "status-" + p.state : "status-other";
-            const cls = [p.is_player ? "is-player" : "", p.state === "kia" ? "is-kia" : ""]
-                .filter(Boolean).join(" ");
-            return `<tr class="${cls}">
-                <td>${esc(p.name)}</td>
-                <td>${esc(p.rank)}</td>
-                <td><span class="status-dot ${dotClass}"></span>${esc(p.state)}</td>
-                <td class="num">${esc(p.sorties)}</td>
-                <td class="num">${esc(p.flight_hours)}</td>
-                <td class="num">${esc(p.airborne)}</td>
-                <td class="num">${esc(p.ground_targets)}</td>
-                <td class="num">${cell(p.skills)}</td>
-                <td class="num">${cell(p.discipline)}</td>
-                <td class="num">${cell(p.courage)}</td>
-                <td class="num">${esc(p.awards_held)}</td>
-                <td class="num">${p.awards_pending ? esc(p.awards_pending) : ""}</td>
-            </tr>`;
+            const cls = [p.is_player ? "is-player" : "",
+                         p.state === "kia" ? "is-kia" : ""].filter(Boolean).join(" ");
+            return '<tr class="' + cls + '">' +
+                "<td>" + esc(p.rank) + "</td>" +
+                "<td>" + esc(p.name) + "</td>" +
+                '<td class="award-cell">' + (esc(p.top_award) || "&mdash;") + "</td>" +
+                '<td><span class="status-dot ' + dotClass + '"></span>' + esc(p.state) + "</td>" +
+                '<td class="num">' + esc(p.airborne) + "</td>" +
+                '<td class="num">' + esc(p.ground_targets) + "</td>" +
+                '<td class="num">' + esc(p.sorties) + "</td>" +
+                '<td class="num">' + esc(p.flight_hours) + "</td>" +
+                '<td class="num">' + cell(p.skills) + "</td>" +
+                '<td class="num">' + cell(p.discipline) + "</td>" +
+                '<td class="num">' + cell(p.courage) + "</td>" +
+                '<td class="num">' + esc(p.awards_held) + "</td>" +
+                '<td class="num">' + (p.awards_pending ? esc(p.awards_pending) : "") + "</td>" +
+                "</tr>";
         }).join("");
         el("d-roster").querySelectorAll("th").forEach((th) => {
             th.classList.toggle("sorted", th.dataset.sort === sortKey);
@@ -210,40 +241,75 @@
             const p = d.player;
 
             el("d-name").textContent = p.name;
-            el("d-subtitle").textContent = `${p.rank} · ${d.squadron}`;
+            el("d-subtitle").textContent = p.rank + " · " + d.squadron;
             el("d-meta").innerHTML = [
-                ["Career", `${d.start_date} – ${d.current_date}`],
-                ["Sorties", `${p.sorties} (${p.good_sorties} successful)`],
-                ["Flight hours", p.flight_hours],
-                ["Award points", d.award_points],
-            ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+                ["Career", d.start_date + " – " + d.current_date],
+                ["Sorties", p.sorties + " (" + p.good_sorties + " successful)"],
+                ["Flight time", p.flight_time],
+                ["Award points", d.award_points]
+            ].map((kv) => "<div><dt>" + esc(kv[0]) + "</dt><dd>" +
+                          esc(kv[1]) + "</dd></div>").join("");
 
+            el("d-info").innerHTML = rows([
+                ["Rank", p.rank],
+                ["Squadron", d.squadron],
+                ["Status", p.state],
+                ["Health", p.health],
+                ["Air victories", p.airborne],
+                ["Ground targets", p.ground_targets],
+                ["Squadron efficiency", d.efficiency]
+            ]);
             el("d-attributes").innerHTML = attributeBlock(p.attributes, p.has_levels);
-            el("d-efficiency").innerHTML = `
-                <tr><th>Air victories</th><td>${esc(p.airborne)}</td></tr>
-                <tr><th>Ground targets</th><td>${esc(p.ground_targets)}</td></tr>
-                <tr><th>Squadron efficiency</th><td>${esc(d.efficiency)}</td></tr>`;
 
-            el("d-awards").innerHTML = d.player_awards.length
-                ? d.player_awards.map(awardItem).join("")
-                : "<li>No awards yet.</li>";
+            el("d-incidences").innerHTML = d.incidences.length
+                ? d.incidences.map(incidenceItem).join("")
+                : '<li class="muted">Nothing recorded.</li>';
 
-            el("d-service").innerHTML = d.service_record.length
-                ? d.service_record.map(serviceItem).join("")
-                : "<li>Nothing recorded yet.</li>";
+            el("d-promotions").innerHTML = d.promotions.length
+                ? d.promotions.map(promotionItem).join("")
+                : '<li class="muted">None yet.</li>';
+            el("d-awards").innerHTML = d.awards.length
+                ? d.awards.map(awardItem).join("")
+                : '<li class="muted">None yet.</li>';
 
+            el("d-combat-strip").innerHTML = statStrip(d.combat.headline);
+            el("d-combat-breakdown").innerHTML = breakdown(d.combat.breakdown);
+
+            const air = d.air_kills_by_type;
+            let airHtml = rows(air.airborne.map((a) => [a.name, a.value]));
+            if (air.parked.length) {
+                airHtml += '<tr><th class="group">Destroyed on the ground</th><td></td></tr>' +
+                           rows(air.parked.map((a) => [a.name, a.value]));
+            }
+            el("d-air-kills").innerHTML = airHtml;
+
+            el("d-missions").innerHTML =
+                rows(d.missions_flown.map((m) => [m.label, m.value]));
+            el("d-progression").innerHTML = rows([
+                ["Starting rank", d.progression.starting_rank],
+                ["Current rank", d.progression.current_rank],
+                ["Promotions", d.progression.promotions],
+                ["Awards", d.progression.awards]
+            ]);
+
+            el("d-debrief-count").textContent = "(" + d.debriefings.length + ")";
+            el("d-debriefings").innerHTML = d.debriefings.map(debriefBlock).join("");
+
+            el("d-squadron-strip").innerHTML = statStrip(d.squadron_totals);
             rosterRows = d.roster.map(flatten);
-            el("d-roster-count").textContent = `(${rosterRows.length})`;
+            el("d-roster-count").textContent = "(" + rosterRows.length + ")";
             renderRoster();
             el("d-pending-note").textContent = d.pending_total
-                ? `${d.pending_total} awards are waiting on award points; you have ${d.award_points}.`
+                ? d.pending_total + " awards are waiting on award points; you have " +
+                  d.award_points + "."
                 : "";
 
             show(el("detail-loading"), false);
             show(el("detail-body"));
         } catch (err) {
             el("detail-loading").innerHTML =
-                `<p class="state-message">Could not open that career: ${esc(err.message)}</p>`;
+                '<p class="state-message">Could not open that career: ' +
+                esc(err.message) + "</p>";
         }
     }
 
@@ -266,7 +332,7 @@
             const key = th.dataset.sort;
             if (!key) return;
             if (key === sortKey) sortAsc = !sortAsc;
-            else { sortKey = key; sortAsc = key === "name"; }
+            else { sortKey = key; sortAsc = (key === "name" || key === "top_award"); }
             renderRoster();
         });
     });
