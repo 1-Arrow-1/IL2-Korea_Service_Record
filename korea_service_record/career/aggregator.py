@@ -402,7 +402,8 @@ class CareerAggregator:
         out.reverse()
         return out
 
-    def _debriefings(self, db, sorties, kill_events) -> List[Dict[str, Any]]:
+    def _debriefings(self, db, sorties, kill_events,
+                     with_flight_log: bool = True) -> List[Dict[str, Any]]:
         """
         One block per sortie, with a kill log worth reading.
 
@@ -441,8 +442,9 @@ class CareerAggregator:
             # Named `flight` rather than `log`: the kill list in this scope is
             # already called `log`, and shadowing it serialised this NamedTuple
             # into the payload as a list.
-            flight = self.flightlogs.for_sortie(sortie["date"][:10],
-                                                sortie["date"][11:16])
+            flight = (self.flightlogs.for_sortie(sortie["date"][:10],
+                                                 sortie["date"][11:16])
+                      if with_flight_log else None)
             outcome = PLANE_OUTCOME.get(sortie["planeStatus"], "unknown")
             landing = ""
             if flight is not None:
@@ -475,18 +477,64 @@ class CareerAggregator:
         out.reverse()
         return out
 
+    def pilot_summary(self, career_id: str, pilot_id: int) -> Optional[Dict[str, Any]]:
+        """
+        Enough for the roster modal: who he is, what he has done, what he wears.
+
+        Deliberately not the whole record — the modal is for a glance while
+        scanning the roster, and offers a link to the full page for the rest.
+        """
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with KoreaCareerDatabase(meta.path) as db:
+            row = db.pilot(pilot_id)
+            if row is None:
+                return None
+            awards_by_pilot = {pilot_id: db.awards(pilot_id)}
+            summary = self._pilot_row(row, awards_by_pilot)
+            groups = self._promotions_and_awards(db.awards(pilot_id), row["country"])
+            sorties = db.sorties(pilot_id)
+            kills = KillStats(row["killStats"])
+            summary.update({
+                "career_id": career_id,
+                "squadron": meta.squadron_name,
+                "combat": self._combat_results(kills)["headline"],
+                "awards_list": groups["awards"],
+                "promotions_list": groups["promotions"],
+                "incidences": self._incidences(db.events(pilot_id)),
+                "recent": self._debriefings(
+                    db, sorties[-5:], db.events(pilot_id, types=[0]),
+                    with_flight_log=bool(row["isPlayer"])),
+                "missions_flown": self._missions_flown(sorties),
+            })
+            return summary
+
     # -- detail page -------------------------------------------------------
 
-    def career_detail(self, career_id: str) -> Optional[Dict[str, Any]]:
+    def career_detail(self, career_id: str,
+                      pilot_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+        """
+        The service record for one pilot, defaulting to the player.
+
+        The player is not a special case — he is simply the pilot the page
+        opens on — so every panel is built from the same code whoever is
+        being shown. The one thing an AI pilot cannot have is the take-off
+        and landing line: the flight log only marks the human's aircraft
+        (ISPL:1), so those fields come back empty rather than invented.
+        """
         meta = self._career_files().get(career_id)
         if meta is None:
             return None
 
         with KoreaCareerDatabase(meta.path) as db:
-            career, squad, player = db.career(), db.squadron(), db.player()
-            if career is None or player is None:
+            career, squad = db.career(), db.squadron()
+            subject = db.pilot(pilot_id) if pilot_id is not None else db.player()
+            if career is None or subject is None:
                 return None
+            player = subject
             pid = player["id"]
+            is_player = bool(player["isPlayer"])
 
             awards_by_pilot: Dict[int, List] = {}
             for row in db.awards():
@@ -532,7 +580,10 @@ class CareerAggregator:
                 "promotions": groups["promotions"],
                 "awards": groups["awards"],
                 "incidences": self._incidences(db.events(pid), aircraft_flown),
-                "debriefings": self._debriefings(db, sorties, kill_events),
+                "debriefings": self._debriefings(db, sorties, kill_events,
+                                                 with_flight_log=is_player),
+                "subject_id": pid,
+                "is_player": is_player,
                 "progression": {
                     "starting_rank": self.locale.rank_name(player["country"],
                                                            starting_rank_id),

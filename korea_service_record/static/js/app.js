@@ -362,15 +362,16 @@
         });
     }
 
-    async function loadDetail(careerId) {
+    async function loadDetail(careerId, pilotId) {
         show(el("detail-loading"));
         show(el("detail-body"), false);
         try {
-            const d = await getJSON("/api/career/" + encodeURIComponent(careerId));
+            const d = await getJSON("/api/career/" + encodeURIComponent(careerId) +
+                                    (pilotId ? "?pilot=" + pilotId : ""));
             const p = d.player;
 
             currentCareer = d.id;
-            currentPilot = d.player_id;
+            currentPilot = d.subject_id;
             currentAvatar = p.avatar;
             showPortrait(currentCareer, currentPilot, p.avatar);
 
@@ -451,6 +452,80 @@
                 '<p class="state-message">Could not open that career: ' +
                 esc(err.message) + "</p>";
         }
+    }
+
+    /* ------------------------------------------------------- pilot modal -- */
+
+    // A modal rather than a page: the roster is 46 rows and the point is to
+    // check two or three pilots without losing your place. The full record is
+    // one click further on, and renders through the same code the player's
+    // page uses.
+    async function openPilot(careerId, pilotId) {
+        const box = el("pilotbox");
+        el("pb-body").innerHTML = '<p class="state-message">Loading\u2026</p>';
+        show(box);
+        document.body.classList.add("lightbox-open");
+        try {
+            const p = await getJSON("/api/pilot/" + encodeURIComponent(careerId) +
+                                    "/" + pilotId);
+            const status = p.state +
+                (p.state_until ? " until " + p.state_until : "") +
+                (p.state_since ? ", " + p.state_since : "");
+            const awards = p.awards_list.length
+                ? p.awards_list.map((a) =>
+                    icon("award", a.type, 56, "award-icon", a.name)).join("")
+                : '<span class="muted">No awards yet.</span>';
+            const promos = p.promotions_list.length
+                ? p.promotions_list.map((r) =>
+                    icon("rank", r.rank_key, 34, "rank-icon", r.rank)).join("")
+                : '<span class="muted">No promotions.</span>';
+            const recent = p.recent.length
+                ? p.recent.map((d) =>
+                    '<div class="pb-sortie"><span>' + esc(d.date) + "</span><span>" +
+                    esc(d.type) + '</span><span class="num">' + esc(d.airborne) +
+                    " air</span></div>").join("")
+                : '<span class="muted">No sorties flown.</span>';
+
+            el("pb-body").innerHTML =
+                '<div class="pb-head">' +
+                    '<div class="portrait-frame small">' +
+                        '<div class="portrait"><img src="' +
+                            photoUrl(careerId, p.id, p.avatar, 392) + '" alt=""></div>' +
+                        '<img class="portrait-overlay" src="/static/images/photo-frame.svg" alt="">' +
+                    "</div>" +
+                    '<div class="pb-identity">' +
+                        '<h2 id="pb-name">' + esc(p.name) + "</h2>" +
+                        '<p class="pb-rank">' +
+                            icon("rank", p.rank_key, 34, "rank-icon", p.rank) +
+                            "<span>" + esc(p.rank) + " \u00b7 " + esc(p.squadron) +
+                            "</span></p>" +
+                        '<p class="pb-status">' + esc(status) + "</p>" +
+                        '<a class="nav-btn small" href="#career/' +
+                            encodeURIComponent(careerId) + "/pilot/" + p.id +
+                            '">Full record &rarr;</a>' +
+                    "</div>" +
+                "</div>" +
+                '<div class="stat-strip pb-strip">' + statStrip(p.combat) + "</div>" +
+                '<div class="pb-grid">' +
+                    "<div><h3>Characteristics</h3>" +
+                        attributeBlock(p.attributes, p.has_levels) + "</div>" +
+                    "<div><h3>Missions Flown</h3><table class=\"mini-table\">" +
+                        rows(p.missions_flown.map((m) => [m.label, m.value])) +
+                        "</table></div>" +
+                "</div>" +
+                "<h3>Promotions</h3><div class=\"pb-emblems\">" + promos + "</div>" +
+                "<h3>Awards</h3><div class=\"pb-emblems\">" + awards + "</div>" +
+                "<h3>Recent Sorties</h3><div class=\"pb-sorties\">" + recent + "</div>";
+        } catch (err) {
+            el("pb-body").innerHTML =
+                '<p class="state-message">Could not open that pilot: ' +
+                esc(err.message) + "</p>";
+        }
+    }
+
+    function closePilot() {
+        show(el("pilotbox"), false);
+        document.body.classList.remove("lightbox-open");
     }
 
     /* -------------------------------------------------------- portraits -- */
@@ -615,18 +690,28 @@
     /* --------------------------------------------------------- navigation -- */
 
     function route() {
-        const match = location.hash.match(/^#career\/(.+)$/);
+        closePilot();
+        const match = location.hash.match(/^#career\/(.+?)(?:\/pilot\/(\d+))?$/);
         const onDetail = Boolean(match);
         show(el("landing-page"), !onDetail);
         show(el("detail-page"), onDetail);
         show(el("back-btn"), onDetail);
         window.scrollTo(0, 0);
-        if (onDetail) loadDetail(decodeURIComponent(match[1]));
-        else loadLanding();
+        if (!onDetail) { loadLanding(); return; }
+        const careerId = decodeURIComponent(match[1]);
+        const pilotId = match[2] ? Number(match[2]) : null;
+        el("back-btn").textContent = pilotId
+            ? "\u2190 Back to the Career" : "\u2190 Back to Careers";
+        loadDetail(careerId, pilotId);
     }
 
     wirePortrait();
-    el("back-btn").addEventListener("click", () => { location.hash = ""; });
+    el("back-btn").addEventListener("click", () => {
+        // From a pilot's record, step back to the career rather than all the
+        // way out to the career list.
+        const match = location.hash.match(/^#career\/(.+?)\/pilot\/\d+$/);
+        location.hash = match ? "#career/" + match[1] : "";
+    });
     el("d-roster").querySelectorAll("th").forEach((th) => {
         th.addEventListener("click", () => {
             const key = th.dataset.sort;
@@ -640,6 +725,15 @@
     // One delegated listener: icons are rebuilt on every render, so binding
     // per element would leak handlers.
     document.addEventListener("click", (event) => {
+        if (event.target.closest && event.target.closest("[data-pilot-close]")) {
+            closePilot();
+            return;
+        }
+        const row = event.target.closest && event.target.closest("tr[data-pilot]");
+        if (row && !(event.target.closest && event.target.closest("img.emblem"))) {
+            openPilot(currentCareer, Number(row.dataset.pilot));
+            return;
+        }
         const img = event.target.closest && event.target.closest("img.emblem");
         if (img) {
             openLightbox(img.dataset.kind, img.dataset.id, img.dataset.title);
@@ -652,6 +746,7 @@
     document.addEventListener("keydown", (event) => {
         if (event.key !== "Escape") return;
         if (!el("cropper").hidden) closeCropper();
+        else if (!el("pilotbox").hidden) closePilot();
         else if (!el("lightbox").hidden) closeLightbox();
     });
 

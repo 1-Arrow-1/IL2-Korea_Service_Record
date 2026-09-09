@@ -421,3 +421,35 @@ table.roster th.col-status, table.roster td.col-status {
 table.roster td.col-award, table.roster th.col-award { width: 104px; min-width: 0; }
 
 table.roster tbody tr { cursor: pointer; }
+
+
+/* ---------------------------------------------------------- pilot modal -- */
+
+.pilot-panel { max-width: 760px; }
+.pilot-body h3 {
+    font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em;
+    font-weight: bold; color: var(--ink-muted);
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 0.3rem; margin: 1.3rem 0 0.7rem;
+}
+.pb-head { display: flex; gap: 1.4rem; align-items: flex-start; }
+.portrait-frame.small { width: 160px; height: 196px; margin: 0; flex: 0 0 auto; }
+.portrait-frame.small .portrait { inset: 8px; }
+.pb-identity h2 { font-size: 1.55rem; font-weight: normal; color: var(--ink-strong); }
+.pb-rank { display: flex; align-items: center; gap: 0.6rem; color: var(--ink-muted); }
+.pb-rank .rank-icon { height: 34px; width: auto; }
+.pb-status { color: var(--ink-muted); font-style: italic; margin-bottom: 0.9rem; }
+.pb-strip { margin-top: 1.2rem; }
+.pb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+@media (max-width: 640px) { .pb-grid { grid-template-columns: 1fr; }
+                            .pb-head { flex-direction: column; } }
+.pb-emblems { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: flex-end; }
+.pb-emblems .award-icon { max-height: 56px; max-width: 60px; }
+.pb-emblems .rank-icon { max-height: 34px; max-width: 60px; }
+.pb-sortie {
+    display: grid; grid-template-columns: 6rem 1fr 5rem;
+    gap: 0.5rem; padding: 0.25rem 0; font-size: 0.88rem;
+    border-bottom: 1px dotted var(--border-soft);
+}
+.pb-sortie .num { text-align: right; color: var(--ink-muted); }
+.muted { color: var(--ink-muted); font-style: italic; }
