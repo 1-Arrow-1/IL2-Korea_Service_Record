@@ -570,10 +570,29 @@ class CareerAggregator:
                     "wounded": row["status"] == 4,
                 })
 
+            # events name the actor by IL-2 account ("Arrow_1974") for the
+            # human and by aircraft type for everyone else. Neither is what a
+            # reader wants, so the account name is swapped for the character's
+            # and the type is resolved to its proper designation.
+            nickname = ""
+            for row in result.players():
+                nick = urllib.parse.unquote(row.get("personageNickname", ""))
+                if nick:
+                    nickname = nick
+                    break
+            player_name = next((f["name"] for f in flown if f["is_player"]), "")
+
             start = mission["startTime"][11:] if mission["startTime"] else ""
             log = []
             for e in result.events():
                 info = self.objects.describe(e["target"])
+                actor = e["actor"]
+                if nickname and actor == nickname and player_name:
+                    actor = player_name
+                else:
+                    by = self.objects.describe(actor)
+                    if by["named"]:
+                        actor = by["name"]
                 log.append({
                     "time": _clock(start, e["tick"]),
                     "target": info["name"] if info["named"] else e["target"],
@@ -582,7 +601,8 @@ class CareerAggregator:
                                                   .startswith("static_"),
                     "victim": e["victim"],
                     "altitude": e["altitude"],
-                    "actor": e["actor"],
+                    "actor": actor,
+                    "by_player": bool(nickname and e["actor"] == nickname),
                 })
 
             briefing = urllib.parse.unquote(mission["briefing"] or "")

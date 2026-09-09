@@ -505,7 +505,8 @@
                 const alt = k.altitude
                     ? ' <span class="log-alt">' + esc(k.altitude) + " m</span>" : "";
                 return '<div class="log-row' + (k.air ? " air" : "") +
-                    (k.named ? "" : " scenery") + '">' +
+                    (k.named ? "" : " scenery") +
+                    (k.by_player ? " by-player" : "") + '">' +
                     '<span class="log-time">' + esc(k.time) + "</span>" +
                     "<span>" + esc(k.target) + who + alt + "</span>" +
                     '<span class="log-actor">' + esc(k.actor) + "</span></div>";

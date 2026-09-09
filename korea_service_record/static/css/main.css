@@ -33,7 +33,7 @@
 html {
     min-height: 100%;
     font-family: 'Georgia', 'Times New Roman', serif;
-    font-size: 16px;
+    font-size: 17px;
     line-height: 1.6;
     color: var(--ink);
     background-color: var(--paper);
@@ -91,7 +91,7 @@ body {
 #app-footer {
     border-top: 1px solid var(--border-soft);
     padding: 1rem 0;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     color: var(--ink-muted);
 }
 
@@ -110,7 +110,7 @@ body {
 
 .nav-btn {
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.96rem;
     padding: 0.45rem 1rem;
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -149,7 +149,7 @@ body {
 }
 
 .panel h3 {
-    font-size: 0.85rem;
+    font-size: 0.91rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-weight: bold;
@@ -159,8 +159,8 @@ body {
     margin-bottom: 1rem;
 }
 .panel-subhead { margin-top: 1.5rem; }
-.panel-note { margin-top: 0.9rem; font-size: 0.82rem; color: var(--ink-muted); }
-.count { color: var(--ink-muted); font-size: 0.8rem; letter-spacing: 0; }
+.panel-note { margin-top: 0.9rem; font-size: 0.88rem; color: var(--ink-muted); }
+.count { color: var(--ink-muted); font-size: 0.86rem; letter-spacing: 0; }
 
 /* ------------------------------------------------------------- lightbox -- */
 
@@ -203,7 +203,7 @@ body.lightbox-open { overflow: hidden; }
 .lightbox-text { min-width: 0; }
 .lightbox-text h2 { font-size: 1.5rem; font-weight: normal; color: var(--ink-strong); }
 .lightbox-sub {
-    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+    font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em;
     color: var(--accent-dark); margin-bottom: 0.9rem;
 }
 .lightbox-desc p { margin-bottom: 0.8rem; text-align: justify; }

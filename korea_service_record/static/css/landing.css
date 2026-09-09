@@ -44,7 +44,7 @@
 }
 
 .career-rank {
-    font-size: 0.85rem;
+    font-size: 0.91rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--accent-dark);
@@ -52,14 +52,14 @@
 }
 
 .career-squadron {
-    font-size: 0.95rem;
+    font-size: 1.01rem;
     color: var(--ink-muted);
     font-style: italic;
     margin-bottom: 0.9rem;
 }
 
 .career-dates {
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     color: var(--ink-muted);
     border-top: 1px solid var(--border-soft);
     padding-top: 0.7rem;
@@ -82,7 +82,7 @@
 
 .career-stat .label {
     display: block;
-    font-size: 0.68rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.07em;
     color: var(--ink-muted);
