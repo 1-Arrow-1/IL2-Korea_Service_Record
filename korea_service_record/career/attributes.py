@@ -14,15 +14,20 @@ SKILLS 4 / DISCIPLINE 5 / COURAGE 5 with up-numbers 13 / 2 / 2::
 
 So ``persLevel`` holds the attribute levels **zero-based** and the UI renders
 level + 1, while ``leadLevel`` holds the up-numbers verbatim. Both read low
-nibble first, in panel order (top to bottom).
+nibble first.
 
-Open question
--------------
-Rivera's middle and high persLevel nibbles are both 4, so his row cannot
-distinguish DISCIPLINE from COURAGE. Jesse Funston (pilot 8) breaks the tie:
-persLevel 1075 = 0x433 -> 3, 3, 4, so whichever of his DISCIPLINE/COURAGE bars
-reads 5 identifies the high nibble. Until that is checked in game, the ordering
-below is the best-supported guess and is flagged by ``ORDER_VERIFIED``.
+The packing order is NOT the panel's display order. Rivera cannot distinguish
+them because his two upper nibbles are equal; Jesse Funston (pilot 8) settles
+it::
+
+    persLevel = 1075 = 0x433  -> nibbles low->high 3, 3, 4
+    panel: SKILLS 4, DISCIPLINE 5, COURAGE 4
+    leadLevel =    1 = 0x001  -> nibbles low->high 1, 0, 0
+    panel up-numbers: SKILLS 1, DISCIPLINE 0, COURAGE 0
+
+The high nibble is 4 and the only bar reading 5 is DISCIPLINE, so the packed
+order is **skills, courage, discipline** while the panel lists skills,
+discipline, courage. Rivera re-checks consistently under this order.
 """
 
 import logging
@@ -30,11 +35,14 @@ from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-# Panel order, top to bottom, matching low nibble -> high nibble.
-ATTRIBUTE_ORDER: List[str] = ["skills", "discipline", "courage"]
+# Packed order, low nibble -> high nibble. Confirmed by pilot 8 (see docstring).
+# Note this differs from the panel's display order (skills, discipline, courage).
+ATTRIBUTE_ORDER: List[str] = ["skills", "courage", "discipline"]
 
-# Flip to True once Funston's panel has confirmed discipline vs courage.
-ORDER_VERIFIED = False
+# Display order used by the game's own panels, top to bottom.
+DISPLAY_ORDER: List[str] = ["skills", "discipline", "courage"]
+
+ORDER_VERIFIED = True
 
 # The UI renders persLevel nibble + 1.
 DISPLAY_OFFSET = 1
@@ -81,6 +89,13 @@ class PilotAttributes:
     @property
     def courage(self) -> int:
         return self.levels["courage"]
+
+    def display_rows(self) -> List[Dict[str, int]]:
+        """Rows in the game's panel order, for a UI that mirrors it."""
+        return [{"name": name,
+                 "level": self.levels[name],
+                 "points": self.points[name]}
+                for name in DISPLAY_ORDER]
 
     def as_dict(self) -> Dict[str, Dict[str, int]]:
         return {

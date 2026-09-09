@@ -26,9 +26,23 @@ from typing import Dict, Optional
 logger = logging.getLogger(__name__)
 
 
-# Rollup keys that already contain other keys. Excluded from category sums so
-# nothing is counted twice.
-ROLLUP_KEYS = {"Aircraft"}
+# Rollup keys that already contain other keys. Counting a rollup *and* its
+# children double-counts, so exactly one side must be dropped.
+#
+#   Aircraft = airborne subtypes + StaticPlane
+#   Building = MilitaryFacility + AirfieldFacility + IndustrialBuilding
+#
+# Verified on three pilots, e.g. pilot 8: Building 60 = 54 + 3 + 3, and the
+# player: 549 = 500 + 30 + 19. RailwayStationFacility is NOT a child of
+# Building despite the name.
+ROLLUP_KEYS = {"Aircraft", "Building"}
+
+BUILDING_CHILDREN = {"MilitaryFacility", "AirfieldFacility", "IndustrialBuilding"}
+
+# Scenery clutter — crates, barrels, boxes. Recorded in killStats but excluded
+# from the game's own "GROUND TARGETS" figure. Dropping it is what makes the
+# totals match the pilot file exactly (pilot 8: 115, pilot 17: 102).
+CLUTTER_KEYS = {"Materiel"}
 
 # Aircraft subtypes seen in live data. Used for the air-kill breakdown only;
 # the airborne total is computed from the rollup, not from this set, so an
@@ -101,14 +115,35 @@ class KillStats:
     # -- ground -------------------------------------------------------------
 
     @property
-    def ground_total(self) -> int:
-        """Everything that is not an aircraft. Rollups excluded."""
+    def ground_targets(self) -> int:
+        """
+        The figure the game shows as GROUND TARGETS on the pilot file.
+
+        Counts the ``Building`` rollup rather than its children, includes
+        aircraft destroyed on the ground (a parked plane is a ground target),
+        and excludes scenery clutter. Matches the panel exactly for every
+        pilot checked.
+        """
         return sum(v for k, v in self.counts.items()
-                   if k not in ROLLUP_KEYS
-                   and k not in STATIC_AIR_KEYS
+                   if k != "Aircraft"
+                   and k not in BUILDING_CHILDREN
+                   and k not in CLUTTER_KEYS
+                   and k not in AIR_SUBTYPES)
+
+    @property
+    def ground_total(self) -> int:
+        """
+        Every non-airborne kill including clutter — a superset of
+        ``ground_targets``, useful for a full breakdown rather than the
+        headline number.
+        """
+        return sum(v for k, v in self.counts.items()
+                   if k != "Aircraft"
+                   and k not in BUILDING_CHILDREN
                    and k not in AIR_SUBTYPES)
 
     def category_totals(self) -> Dict[str, int]:
+        """Ground breakdown. Uses Building's children, so Building is skipped."""
         out = {name: 0 for name in GROUND_CATEGORIES}
         out["other"] = 0
         for key, value in self.counts.items():

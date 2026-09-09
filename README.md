@@ -25,8 +25,8 @@ that need decoding, and one — rank — the game's own UI gets wrong.
 | Thing | Where | Notes |
 |---|---|---|
 | Careers | `data/Career/*.db` | one file per career, unlike GB's single `cp.db` |
-| Kills | packed `killStats` string | `Aircraft` is a rollup **including** `StaticPlane`; airborne = `Aircraft - StaticPlane` |
-| Attributes | `pilot.persLevel` | nibble-packed, low first: skills, discipline, courage; UI shows value **+1** |
+| Kills | packed `killStats` string | two rollups (`Aircraft`, `Building`); airborne = `Aircraft - StaticPlane`; GROUND TARGETS excludes `Materiel` clutter |
+| Attributes | `pilot.persLevel` | nibble-packed, low first: skills, **courage, discipline** — not the panel's display order; UI shows value **+1** |
 | Attribute progress | `pilot.leadLevel` | same packing, shown as the purple "up" numbers |
 | Awards | `award` table + `scg/2/awards.cfg` | `isDeleted=1` means retired by a higher cluster, not deleted |
 | Award route | `event.missionId` | a real mission id = earned at debrief; `-1` = roster sweep |
@@ -57,9 +57,6 @@ per-mission, per-pilot attribution is available, not just cumulative counters.
 - **`pilot.persLevel` is 0 for the player** in the test career, so the
   commander's own attributes may be stored elsewhere. Unresolved.
 - Ten `event.type` values remain unidentified.
-- Attribute order: discipline vs courage is inferred from a single pilot whose
-  two nibbles are equal. `ORDER_VERIFIED` in `attributes.py` is `False` until
-  a pilot with differing values confirms it.
 
 ## Layout
 

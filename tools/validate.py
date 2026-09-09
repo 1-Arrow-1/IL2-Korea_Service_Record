@@ -133,6 +133,27 @@ def main(game_arg):
             else:
                 print("   [skip] pilot 17 rank name: ranks.locale not extracted")
 
+        funston = next((p for p in pilots if p["id"] == 8), None)
+        if funston is not None:
+            fa = PilotAttributes(funston["persLevel"], funston["leadLevel"])
+            # From the in-game panel: SKILLS 4, DISCIPLINE 5, COURAGE 4, ups 1/0/0.
+            # This pilot is what fixes the packed nibble order.
+            check("pilot 8 skills", fa.skills, 4)
+            check("pilot 8 discipline", fa.discipline, 5)
+            check("pilot 8 courage", fa.courage, 4)
+            check("pilot 8 up-points",
+                  [r["points"] for r in fa.display_rows()], [1, 0, 0])
+            fk = KillStats(funston["killStats"])
+            # Panel: AIR VICTORIES 0, GROUND TARGETS 115.
+            check("pilot 8 air victories", fk.airborne, 0)
+            check("pilot 8 ground targets", fk.ground_targets, 115)
+
+        if rivera is not None:
+            # Panel: AIR VICTORIES 1, GROUND TARGETS 102.
+            rk = KillStats(rivera["killStats"])
+            check("pilot 17 air victories", rk.airborne, 1)
+            check("pilot 17 ground targets", rk.ground_targets, 102)
+
         m50 = db.query_one(
             "SELECT * FROM sortie WHERE isPlayer=1 AND missionId=50")
         if m50 is not None:
