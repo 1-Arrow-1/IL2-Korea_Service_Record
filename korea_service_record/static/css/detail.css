@@ -412,13 +412,11 @@ table.roster td.photo-cell { padding: 0.2rem 0.4rem; }
 /* Status is a wound/KIA icon with the date on hover: "wounded until
    1951.06.11" was the widest thing in the table and told the reader little at
    a glance. */
-table.roster th.col-status, table.roster td.col-status {
-    width: 1%; text-align: center; padding-left: 0.9rem; padding-right: 0.9rem;
-}
+table.roster th.col-status, table.roster td.col-status { text-align: center; }
 .status-icon { width: 36px; height: 36px; display: inline-block; opacity: 0.85; }
 
 /* The award column was wide because of a leftover min-width, not the medal. */
-table.roster td.col-award, table.roster th.col-award { width: 104px; min-width: 0; }
+table.roster td.col-award, table.roster th.col-award { text-align: center; }
 
 table.roster tbody tr { cursor: pointer; }
 
@@ -461,12 +459,12 @@ table.roster tbody tr { cursor: pointer; }
    the browser spread the slack evenly and every number floated in space.
    Headings wrap over two lines, the numeric columns are pinned narrow, and the
    name column absorbs whatever is left. */
-/* Sized to its content and centred, rather than stretched across a 1860px
-   page. Pinning the numeric columns and letting the name column absorb the
-   slack only moved the emptiness into one conspicuous hole between the name
-   and the medal. */
-table.roster { width: auto; min-width: 100%; }
-.table-scroll { display: flex; justify-content: center; }
+/* Two earlier attempts both failed the same way: pin most columns and one
+   unpinned column swallows the leftover width — first the name column, then
+   the portrait column. Nothing is pinned now except the portrait, which has a
+   fixed image in it. The slack is spent on generous padding, so the columns
+   genuinely occupy the width instead of floating in it. */
+table.roster { width: 100%; }
 
 table.roster th {
     white-space: normal;
@@ -474,11 +472,12 @@ table.roster th {
     line-height: 1.2;
     hyphens: none;
 }
-table.roster th.num, table.roster td.num { width: 1%; white-space: nowrap; }
-table.roster th[data-sort="name"] { width: 1%; }
-table.roster td:nth-child(3) { white-space: nowrap; padding-right: 1.6rem; }
-table.roster th[data-sort="rank_id"], table.roster td.rank-cell { width: 1%; }
-table.roster td, table.roster th { padding-left: 0.55rem; padding-right: 0.55rem; }
+table.roster th.num, table.roster td.num { white-space: nowrap; }
+table.roster td:nth-child(3) { white-space: nowrap; }
+table.roster td, table.roster th {
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+}
 table.roster tr.is-player td { font-weight: bold; }
 
 
@@ -529,5 +528,6 @@ table.mission-roster th { cursor: default; }
 .status-badge.status-other { background: var(--border); }
 .status-icon { vertical-align: middle; }
 
-/* The award heading is two lines; the column only holds a narrow medal. */
-table.roster th.col-award { width: 1%; }
+/* Only the portrait column is fixed: it holds an image of a known size, and
+   left free it is the one that ends up absorbing the slack. */
+table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
