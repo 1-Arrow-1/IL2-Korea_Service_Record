@@ -11,6 +11,7 @@ usual Steam library drives, so the exe can be double-clicked with no setup.
 
 import logging
 import os
+import time
 import zlib
 from pathlib import Path
 from typing import Optional
@@ -45,6 +46,8 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
     app = Flask(__name__, static_folder="static", static_url_path="/static")
 
     resolved = resolve_game_dir(Path(game_dir)) if game_dir else autodetect_game_dir()
+    app.config["STARTED_AT"] = time.time()
+    app.config["STARTED"] = time.strftime("%Y-%m-%d %H:%M:%S")
     app.config["GAME_DIR"] = resolved
     app.config["AGGREGATOR"] = CareerAggregator(resolved) if resolved else None
     if resolved:
@@ -131,6 +134,8 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         game_dir = app.config.get("GAME_DIR")
         info = {
             "game_dir": str(game_dir) if game_dir else None,
+            "started": app.config.get("STARTED"),
+            "uptime_s": round(time.time() - app.config.get("STARTED_AT", time.time())),
             "locale_sources": agg.locale.sources() if agg else None,
             "award_definitions": len(agg.awards_cfg.definitions) if agg else 0,
             "rank_strings": len(agg.locale.ranks) if agg else 0,
