@@ -92,16 +92,30 @@
     // sort on them like any other column.
     function flatten(pilot) {
         const out = Object.assign({}, pilot);
+        // level is null for the commander; keep it null so the cell shows a dash
+        // and sorting treats him as unranked rather than as a level-1 pilot.
         (pilot.attributes || []).forEach((a) => { out[a.name] = a.level; });
         return out;
     }
 
-    function attributeBlock(attributes) {
-        return (attributes || []).map((attr) => {
+    const cell = (value) => (value === null || value === undefined) ? "&mdash;" : esc(value);
+
+    // The commander has no skill levels — the game shows him boosters only,
+    // with no bars. Rendering his zero nibbles as 1/1/1 would be a fiction.
+    function attributeBlock(attributes, hasLevels) {
+        const rows = (attributes || []).map((attr) => {
+            const points = `<span class="attr-points">&uarr;${esc(attr.points || 0)}</span>`;
+            if (!hasLevels) {
+                return `
+                    <div class="attr-row booster">
+                        <div class="attr-head">
+                            <span>${esc(attr.name)} booster</span>
+                            <span>${points}</span>
+                        </div>
+                    </div>`;
+            }
             const pips = Array.from({ length: 5 }, (_, i) =>
                 `<span class="attr-pip${i < attr.level ? " on" : ""}"></span>`).join("");
-            const points = attr.points
-                ? `<span class="attr-points">&uarr;${esc(attr.points)}</span>` : "";
             return `
                 <div class="attr-row">
                     <div class="attr-head">
@@ -111,6 +125,10 @@
                     <div class="attr-bar">${pips}</div>
                 </div>`;
         }).join("");
+        const note = hasLevels ? ""
+            : '<p class="panel-note">Squadron commander &mdash; contributes boosters ' +
+              'rather than a simulated skill level.</p>';
+        return rows + note;
     }
 
     function awardItem(award) {
@@ -171,9 +189,9 @@
                 <td class="num">${esc(p.flight_hours)}</td>
                 <td class="num">${esc(p.airborne)}</td>
                 <td class="num">${esc(p.ground_targets)}</td>
-                <td class="num">${esc(p.skills)}</td>
-                <td class="num">${esc(p.discipline)}</td>
-                <td class="num">${esc(p.courage)}</td>
+                <td class="num">${cell(p.skills)}</td>
+                <td class="num">${cell(p.discipline)}</td>
+                <td class="num">${cell(p.courage)}</td>
                 <td class="num">${esc(p.awards_held)}</td>
                 <td class="num">${p.awards_pending ? esc(p.awards_pending) : ""}</td>
             </tr>`;
@@ -200,7 +218,7 @@
                 ["Award points", d.award_points],
             ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
 
-            el("d-attributes").innerHTML = attributeBlock(p.attributes);
+            el("d-attributes").innerHTML = attributeBlock(p.attributes, p.has_levels);
             el("d-efficiency").innerHTML = `
                 <tr><th>Air victories</th><td>${esc(p.airborne)}</td></tr>
                 <tr><th>Ground targets</th><td>${esc(p.ground_targets)}</td></tr>

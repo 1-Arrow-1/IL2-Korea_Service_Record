@@ -81,6 +81,8 @@ class CareerAggregator:
             "airborne": kills.airborne,
             "ground_targets": kills.ground_targets,
             "attributes": attrs.display_rows(),
+            # False for the commander: he has boosters, not skill levels.
+            "has_levels": attrs.has_levels,
             "awards_held": sum(1 for a in held if not a["isPending"]),
             "awards_pending": sum(1 for a in held if a["isPending"]),
             "slot": row["slot"],

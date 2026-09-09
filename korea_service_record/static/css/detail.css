@@ -165,3 +165,8 @@ table.roster tr.is-kia td { color: #93796a; }
 .status-kia { background: var(--bad); }
 .status-wounded, .status-pow { background: var(--warn); }
 .status-other { background: var(--border); }
+
+/* The commander has boosters and no bars, so the row is just a labelled value. */
+.attr-row.booster { margin-bottom: 0.55rem; }
+.attr-row.booster .attr-head { font-size: 0.8rem; }
+.attr-row.booster .attr-points { font-size: 0.95rem; color: var(--accent-dark); }

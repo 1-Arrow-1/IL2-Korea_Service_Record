@@ -31,14 +31,31 @@ discipline, courage. Rivera re-checks consistently under this order, and so
 does the player, whose leadLevel 0x220 yields up-numbers 0 / 2 / 2 in panel
 order.
 
-The player character
---------------------
-The player's ``persLevel`` is 0, which decodes to the minimum 1 / 1 / 1. That
-looks wrong but is probably correct: the human at the controls supplies the
-skill, so the engine has no reason to simulate the player's. Every AI pilot
-checked has a non-zero ``persLevel``, including brand-new replacements
-(pilot 45 = 0x011 -> skills 2, courage 2, discipline 1). Treat a zero
-``persLevel`` as "not simulated" rather than as missing data.
+The commander has boosters, not levels
+--------------------------------------
+The player's ``persLevel`` is 0, and the game does not draw him any bars. His
+card lists **SKILLS BOOSTER / DISCIPLINE BOOSTER / COURAGE BOOSTER** with just
+the ``leadLevel`` values and no levels at all — the human at the controls
+supplies the flying, so the engine simulates leadership instead. Rendering his
+zero nibbles as "1 / 1 / 1" is wrong; ``has_levels`` is False for him.
+
+Every AI pilot has a non-zero ``persLevel``, including untested replacements
+(pilot 45 = 0x011 -> skills 2, courage 2, discipline 1).
+
+Verified against five pilots' panels::
+
+    pilot  4 MacMurphy  persLevel 0x243 -> 4 / 3 / 5   leadLevel 0x101 -> 1 / 1 / 0
+    pilot  8 Funston    persLevel 0x433 -> 4 / 5 / 4   leadLevel 0x001 -> 1 / 0 / 0
+    pilot 11 Hoffhines  persLevel 0x322 -> 3 / 4 / 3   leadLevel 0x110 -> 0 / 1 / 1
+    pilot 17 Rivera     persLevel 0x443 -> 4 / 5 / 5   leadLevel 0x22d -> 13 / 2 / 2
+    pilot 20 Zink       persLevel 0x000 -> commander   leadLevel 0x220 -> 0 / 2 / 2
+
+(shown in panel order: skills, discipline, courage)
+
+What the ``leadLevel`` numbers actually do is still open. On the commander they
+are labelled boosters, so they presumably feed the squadron; on an AI pilot
+they are not simply a copy of the commander's, since MacMurphy carries a skills
+1 where the commander's skills booster is 0.
 """
 
 import logging
@@ -101,10 +118,25 @@ class PilotAttributes:
     def courage(self) -> int:
         return self.levels["courage"]
 
+    @property
+    def has_levels(self) -> bool:
+        """
+        False for the squadron commander, who has boosters instead of skill.
+
+        A zero ``persLevel`` is the engine's way of saying "not simulated", not
+        a pilot with minimum ability — the game draws no bars for him at all.
+        """
+        return self.pers_level != 0
+
     def display_rows(self) -> List[Dict[str, int]]:
-        """Rows in the game's panel order, for a UI that mirrors it."""
+        """
+        Rows in the game's panel order, for a UI that mirrors it.
+
+        ``level`` is None for the commander so a caller cannot accidentally
+        render a bar for someone who has none.
+        """
         return [{"name": name,
-                 "level": self.levels[name],
+                 "level": self.levels[name] if self.has_levels else None,
                  "points": self.points[name]}
                 for name in DISPLAY_ORDER]
 

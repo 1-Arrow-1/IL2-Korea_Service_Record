@@ -155,6 +155,21 @@ def main(game_arg):
         # the only one whose skills nibble is zero.
         pa = PilotAttributes(player["persLevel"], player["leadLevel"])
         check("player up-points", [r["points"] for r in pa.display_rows()], [0, 2, 2])
+        # The commander's panel shows boosters and draws no bars at all.
+        check("player has no skill levels", pa.has_levels, False)
+        check("player levels are None",
+              [r["level"] for r in pa.display_rows()], [None, None, None])
+
+        for pid, levels, points in ((4, [4, 3, 5], [1, 1, 0]),
+                                    (11, [3, 4, 3], [0, 1, 1])):
+            row = next((p for p in pilots if p["id"] == pid), None)
+            if row is None:
+                continue
+            attrs = PilotAttributes(row["persLevel"], row["leadLevel"])
+            check(f"pilot {pid} levels",
+                  [r["level"] for r in attrs.display_rows()], levels)
+            check(f"pilot {pid} up-points",
+                  [r["points"] for r in attrs.display_rows()], points)
 
         m50 = db.query_one(
             "SELECT * FROM sortie WHERE isPlayer=1 AND missionId=50")
