@@ -23,6 +23,7 @@ result is cached on disk and rebuilt only when missing.
 
 import logging
 import re
+import urllib.parse
 from pathlib import Path
 from typing import Dict, NamedTuple, Optional
 
@@ -30,7 +31,7 @@ from .gamedata import loads_lenient
 
 logger = logging.getLogger(__name__)
 
-INDEX_VERSION = 2
+INDEX_VERSION = 3
 WORLDOBJECT_ROOT = "nsdata/assets/worldobjects"
 
 # Raw ids carry decoration the folder names do not.
@@ -55,8 +56,15 @@ def normalise(raw: str) -> str:
 
     ``Static_plane_Yak9P`` -> ``yak9p``; ``61K-onTruck-attach`` -> ``61k``;
     ``DShK-AA`` -> ``dshk-aa``, which is tried before falling back to ``dshk``.
+
+    Some ids arrive url-encoded a second time: mission.result is unquoted as a
+    whole, which leaves ``t34%2d85`` still holding an escaped hyphen. Those
+    were failing every lookup and being written off as scenery, which quietly
+    lost a T-34-85, a BM-13 Katyusha, the DShK guns and a locomotive from the
+    log. Unquoting again is safe for the ids that were only encoded once,
+    since none of them contain a percent sign.
     """
-    key = (raw or "").strip().lower()
+    key = urllib.parse.unquote(raw or "").strip().lower()
     for prefix in _PREFIXES:
         if key.startswith(prefix):
             key = key[len(prefix):]
@@ -65,6 +73,123 @@ def normalise(raw: str) -> str:
         if key.endswith(suffix):
             key = key[: -len(suffix)]
     return key
+
+
+# ---------------------------------------------------------------------------
+# Scenery
+# ---------------------------------------------------------------------------
+
+# Scenery has no info.locale entry, so the log used to print the engine id:
+# "Mil_ammoBoxes_02", "Static_munition_SU_FAB100Stack_Full_A". These stay
+# unnamed in the sense that matters — the game does not count them as targets
+# and neither do we — but a debrief a person reads should still say what was
+# hit. Keys are the id with its group prefix and its count/variant suffixes
+# stripped; anything missing falls through to a generic word-split.
+SCENERY_GROUPS = {
+    "arf": "Airfield",
+    "port_yard": "Dockside",
+    "rw": "Railway",
+    "ind": "",
+    "mil": "",
+}
+
+SCENERY_NOUNS = {
+    "boxes": "supply crates",
+    "ammoboxes": "ammunition crates",
+    "barrels": "fuel barrels",
+    "coil": "cable coils",
+    "coils": "cable coils",
+    "coils_barrels": "coils and barrels",
+    "tent": "tent",
+    "crane": "crane",
+    "hangar": "hangar",
+    "nissenhut": "Nissen hut",
+    "barrack": "barracks",
+    "dugout": "dugout",
+    "camonet": "camouflage netting",
+    "shower": "washhouse",
+    "warehouse": "warehouse",
+    "storage": "storage tank",
+    "reservoir": "reservoir",
+    "cistern": "fuel cistern",
+    "fuelcisterns": "fuel cisterns",
+    "fuelstorage": "fuel storage",
+    "watertower": "water tower",
+    "coaltower": "coal tower",
+    "lighttower": "signal tower",
+    "controltower": "control tower",
+    "crossing_cabin": "crossing cabin",
+    "tower": "tower",
+    "tower_auxiliary": "auxiliary tower",
+    "trailer_generator": "generator trailer",
+    "trailer_cistern": "tanker trailer",
+    "trailer_cargo": "cargo trailer",
+    "mine_office": "mine office",
+    "mine_warehouse": "mine warehouse",
+    "sawmill_logs": "log stack",
+    "sawmill_planks": "plank stack",
+    "cargocart_m5_ammo": "ammunition cart",
+    "bridge_rw_cptl": "railway bridge",
+    # munition dumps, named for what is stacked rather than the stack state
+    "fab100stack": "FAB-100 bomb stack",
+    "fueltank250stack": "fuel tank stack",
+    "fueltankstack": "drop tank stack",
+    # infantry: real enough to shoot at, but the game ships no name for them
+    "squad-rifle": "rifle squad",
+    "squad-mg": "machine-gun squad",
+    "squad-smg": "submachine-gun squad",
+}
+
+# _01, _2x, _05x, _4xA, _block_02, and the _Full/_Half/_Empty fill states.
+_DECORATION = re.compile(
+    r"(_block)?(_\d+)?(_\d*x[a-z]?)?(_(full|half|empty))?(_[a-z])?$", re.I)
+_NATIONS = {"prc": "PRC", "dprk": "DPRK", "su": "Soviet", "us": "US"}
+
+
+def humanise(raw: str) -> str:
+    """A readable label for an object the game ships no name for."""
+    key = urllib.parse.unquote(raw or "").strip()
+    key = re.sub(r"^static_(munition|car|equipment|plane)_", "", key, flags=re.I)
+
+    group = ""
+    for prefix, word in SCENERY_GROUPS.items():
+        if key.lower().startswith(prefix + "_"):
+            key = key[len(prefix) + 1:]
+            group = word
+            break
+
+    # Nation and year tags carried by the infantry ids: squad-rifle-1950-prc
+    nation = ""
+    parts = key.split("-")
+    if len(parts) > 2 and parts[-1].lower() in _NATIONS:
+        nation = _NATIONS[parts[-1].lower()]
+        key = "-".join(parts[:-1])
+    key = re.sub(r"-(19|20)\d\d$", "", key)
+    # SU/US tags on munition stacks: SU_FAB100Stack_Full
+    match = re.match(r"^(su|us)_(.*)$", key, re.I)
+    if match:
+        key = match.group(2)
+
+    # Decorations stack: "boxes_02_block_02" carries an index, a block tag and
+    # another index, so they come off one layer at a time.
+    stripped = key
+    for _ in range(4):
+        shorter = _DECORATION.sub("", stripped)
+        if shorter == stripped or not shorter:
+            break
+        stripped = shorter
+    noun = (SCENERY_NOUNS.get(stripped.lower())
+            or SCENERY_NOUNS.get(key.lower()))
+    if noun is None:
+        # Unknown: split Camel_case_01 into words rather than print the id.
+        words = re.sub(r"[_-]+", " ", stripped).strip()
+        words = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", words)
+        noun = words.lower() or raw
+
+    label = f"{group} {noun}".strip() if group else noun
+    if nation:
+        label = f"{label} ({nation})"
+    return label[:1].upper() + label[1:]
 
 
 class WorldObjectIndex:
@@ -165,7 +290,7 @@ class WorldObjectIndex:
         obj = self.lookup(raw)
         parked = (raw or "").lower().startswith("static_")
         if obj is None:
-            return {"named": False, "name": raw, "category": "scenery",
+            return {"named": False, "name": humanise(raw), "category": "scenery",
                     "parked": parked, "aircraft": False}
         return {"named": True, "name": obj.name, "category": obj.category,
                 "parked": parked, "aircraft": obj.is_aircraft}

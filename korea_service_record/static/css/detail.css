@@ -535,3 +535,5 @@ table.mission-roster th { cursor: default; }
 /* Only the portrait column is fixed: it holds an image of a known size, and
    left free it is the one that ends up absorbing the slack. */
 table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
+
+.log-count { color: var(--ink-muted); font-size: 0.85em; margin-left: 0.15rem; }
