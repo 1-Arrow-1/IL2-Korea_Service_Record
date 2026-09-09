@@ -35,6 +35,7 @@ from .attributes import PilotAttributes
 from .database import CareerFile, KoreaCareerDatabase, find_careers
 from .events import describe, is_award_event
 from .killstats import KillStats
+from .missionresult import MissionResult
 
 logger = logging.getLogger(__name__)
 
@@ -423,19 +424,38 @@ class CareerAggregator:
             mission = missions.get(sortie["missionId"])
             events = sorted(by_mission.get(sortie["missionId"], []),
                             key=lambda r: r["date"])
+            # mission.result carries the same kills with the victim's pilot
+            # name and the altitude, neither of which is in the event table.
+            # Only the player's kills can be attributed from it — an AI row's
+            # actor is the aircraft type, not a pilot — so the enrichment is
+            # matched per target type, in order, and only for the player.
+            extra = {}
+            if with_flight_log and mission is not None:
+                for e in MissionResult(mission["result"]).events():
+                    if e["victim"] or e["altitude"]:
+                        extra.setdefault(e["target"], []).append(e)
+
             log, scenery = [], 0
             for row in events:
                 info = self.objects.describe(row["tpar1"])
                 if not info["named"]:
                     scenery += 1
                     continue
-                log.append({
+                entry = {
                     "time": row["date"][11:19],
                     "target": info["name"],
                     "category": info["category"],
                     "air": info["aircraft"] and not info["parked"],
                     "parked": info["parked"],
-                })
+                    "victim": "",
+                    "altitude": None,
+                }
+                queue = extra.get(row["tpar1"])
+                if queue:
+                    found = queue.pop(0)
+                    entry["victim"] = found["victim"]
+                    entry["altitude"] = found["altitude"]
+                log.append(entry)
             k = KillStats(sortie["killStats"])
             # The flight log knows when the wheels left the ground and how the
             # sortie ended; the career DB knows neither.
@@ -461,6 +481,7 @@ class CareerAggregator:
                 "landing_time": _clock(sortie["date"][11:], flight.landing_s) if flight else "",
                 "landing": landing,
                 "aircraft": flight.plane if flight else "",
+                "mission_id": sortie["missionId"],
                 "mission_num": mission["missionNum"] if mission else None,
                 "date": sortie["date"][:10],
                 "time": sortie["date"][11:16],
@@ -509,6 +530,78 @@ class CareerAggregator:
                 "missions_flown": self._missions_flown(sorties),
             })
             return summary
+
+    def mission_detail(self, career_id: str, mission_id: int) -> Optional[Dict[str, Any]]:
+        """
+        The full debrief for one mission: briefing, objectives, who flew, and
+        every kill anyone scored, with altitudes and named opponents.
+
+        Kept off the career payload not for cost — parsing all fifty missions
+        takes 13 ms — but because it is only ever read one mission at a time.
+        """
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with KoreaCareerDatabase(meta.path) as db:
+            mission = db.query_one("SELECT * FROM mission WHERE id=?", (mission_id,))
+            if mission is None:
+                return None
+            result = MissionResult(mission["result"])
+
+            flown = []
+            for row in db.query(
+                    """SELECT s.*, p.name, p.lastName, p.isPlayer, p.avatarPath,
+                              p.country, p.rankId
+                       FROM sortie s JOIN pilot p ON p.id = s.pilotId
+                       WHERE s.missionId = ? AND s.isDeleted = 0
+                       ORDER BY p.isPlayer DESC, p.rankId DESC""", (mission_id,)):
+                kills = KillStats(row["killStats"])
+                flown.append({
+                    "pilot_id": row["pilotId"],
+                    "name": f"{row['name']} {row['lastName']}".strip(),
+                    "is_player": bool(row["isPlayer"]),
+                    "avatar": row["avatarPath"] or "",
+                    "rank": self.locale.rank_name(row["country"], row["rankId"]),
+                    "rank_key": f"{row['country']}{row['rankId']}",
+                    "airborne": kills.airborne,
+                    "ground_targets": kills.ground_targets,
+                    "flight_time": _hm(row["flightTime"]),
+                    "outcome": PLANE_OUTCOME.get(row["planeStatus"], "unknown"),
+                    "wounded": row["status"] == 4,
+                })
+
+            start = mission["startTime"][11:] if mission["startTime"] else ""
+            log = []
+            for e in result.events():
+                info = self.objects.describe(e["target"])
+                log.append({
+                    "time": _clock(start, e["tick"]),
+                    "target": info["name"] if info["named"] else e["target"],
+                    "named": info["named"],
+                    "air": info["aircraft"] and not e["target"].lower()
+                                                  .startswith("static_"),
+                    "victim": e["victim"],
+                    "altitude": e["altitude"],
+                    "actor": e["actor"],
+                })
+
+            briefing = urllib.parse.unquote(mission["briefing"] or "")
+            return {
+                "id": mission_id,
+                "number": mission["missionNum"],
+                "date": mission["date"],
+                "start": mission["startTime"],
+                "end": mission["endTime"],
+                "type": self.locale.mission_type_name(mission["type"]),
+                "briefing": briefing,
+                "duration": _hm(result.duration_s or 0),
+                "objectives": result.objectives(),
+                "coalitions": result.coalitions(),
+                "obj_success": mission["objSuccess"],
+                "obj_failure": mission["objFailure"],
+                "flown": flown,
+                "log": log,
+            }
 
     # -- detail page -------------------------------------------------------
 

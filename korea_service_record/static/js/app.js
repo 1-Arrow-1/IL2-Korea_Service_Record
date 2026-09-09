@@ -268,9 +268,13 @@
         if (d.wounded) flags.push("wounded");
         let log = d.log.map((k) => {
             const note = k.parked ? ' <span class="log-note">on the ground</span>' : "";
+            const who = k.victim
+                ? ' <span class="log-victim">' + esc(k.victim) + "</span>" : "";
+            const alt = k.altitude
+                ? ' <span class="log-alt">' + esc(k.altitude) + " m</span>" : "";
             return '<div class="log-row' + (k.air ? " air" : "") + '">' +
                 '<span class="log-time">' + esc(k.time) + "</span>" +
-                "<span>" + esc(k.target) + note + "</span></div>";
+                "<span>" + esc(k.target) + who + note + alt + "</span></div>";
         }).join("");
         if (d.scenery) {
             log += '<div class="log-row scenery"><span class="log-time"></span>' +
@@ -295,7 +299,9 @@
             : "";
         return '<article class="debrief"><header class="debrief-head">' +
             '<span class="debrief-no">Mission ' + esc(d.mission_num) + "</span>" +
-            '<span class="debrief-date">' + esc(d.date) + " " + esc(d.time) + "</span>" +
+            '<span class="debrief-date">' + esc(d.date) + " " + esc(d.time) +
+                ' <button class="link-btn" data-mission="' + esc(d.mission_id) +
+                '">Details</button></span>' +
             "</header>" +
             '<div class="debrief-type">' + esc(d.type) + "</div>" +
             flight +
@@ -330,7 +336,7 @@
                 (p.state_since ? " " + p.state_since : "");
             return '<tr class="' + cls + '" data-pilot="' + p.id + '">' +
                 '<td class="photo-cell"><img class="roster-photo" src="' +
-                    photoUrl(currentCareer, p.id, p.avatar, 96) +
+                    photoUrl(currentCareer, p.id, p.avatar, 162) +
                     '" alt="" onerror="this.style.display=&quot;none&quot;"></td>' +
                 '<td class="rank-cell">' +
                     (icon("rank", p.rank_key, 56, "rank-icon", p.rank) ||
@@ -452,6 +458,83 @@
                 '<p class="state-message">Could not open that career: ' +
                 esc(err.message) + "</p>";
         }
+    }
+
+    /* ----------------------------------------------------- mission modal -- */
+
+    // The game's briefing is a fragment of HTML. Rather than trust it, tags are
+    // stripped and the text rebuilt as paragraphs — the copy is the game's, but
+    // it still ends up on the page.
+    function briefingParagraphs(raw) {
+        const text = String(raw || "")
+            .replace(/<\s*br\s*\/?>/gi, "\n")
+            .replace(/<\/(h1|h2|p|div)>/gi, "\n\n")
+            .replace(/<[^>]*>/g, "")
+            .replace(/&nbsp;/gi, " ");
+        return text.split(/\n\s*\n/).map((t) => t.trim()).filter(Boolean);
+    }
+
+    async function openMission(careerId, missionId) {
+        const box = el("missionbox");
+        el("mb-body").innerHTML = '<p class="state-message">Loading\u2026</p>';
+        show(box);
+        document.body.classList.add("lightbox-open");
+        try {
+            const m = await getJSON("/api/mission/" + encodeURIComponent(careerId) +
+                                    "/" + missionId);
+            const brief = briefingParagraphs(m.briefing)
+                .map((t) => "<p>" + esc(t) + "</p>").join("") ||
+                '<p class="muted">No briefing recorded.</p>';
+
+            const flown = m.flown.map((f) =>
+                '<tr' + (f.is_player ? ' class="is-player"' : "") + ">" +
+                '<td class="photo-cell"><img class="roster-photo small" src="' +
+                    photoUrl(careerId, f.pilot_id, f.avatar, 120) +
+                    '" alt="" onerror="this.style.display=&quot;none&quot;"></td>' +
+                "<td>" + icon("rank", f.rank_key, 26, "rank-icon", f.rank) + "</td>" +
+                "<td>" + esc(f.name) + "</td>" +
+                '<td class="num">' + esc(f.airborne) + "</td>" +
+                '<td class="num">' + esc(f.ground_targets) + "</td>" +
+                '<td class="num">' + esc(f.flight_time) + "</td>" +
+                "<td>" + esc(f.outcome) + (f.wounded ? ", wounded" : "") + "</td>" +
+                "</tr>").join("");
+
+            const log = m.log.map((k) => {
+                const who = k.victim
+                    ? ' <span class="log-victim">' + esc(k.victim) + "</span>" : "";
+                const alt = k.altitude
+                    ? ' <span class="log-alt">' + esc(k.altitude) + " m</span>" : "";
+                return '<div class="log-row' + (k.air ? " air" : "") +
+                    (k.named ? "" : " scenery") + '">' +
+                    '<span class="log-time">' + esc(k.time) + "</span>" +
+                    "<span>" + esc(k.target) + who + alt + "</span>" +
+                    '<span class="log-actor">' + esc(k.actor) + "</span></div>";
+            }).join("");
+
+            el("mb-body").innerHTML =
+                "<h2>Mission " + esc(m.number) + " &middot; " + esc(m.type) + "</h2>" +
+                '<p class="lightbox-sub">' + esc(m.date) + " &middot; " +
+                    esc(m.duration) + " &middot; objectives " +
+                    esc(m.obj_success) + " met, " + esc(m.obj_failure) + " failed</p>" +
+                '<div class="mb-brief">' + brief + "</div>" +
+                "<h3>Pilots on this mission</h3>" +
+                '<table class="roster mission-roster"><thead><tr>' +
+                    "<th></th><th>Rank</th><th>Name</th>" +
+                    '<th class="num">Air</th><th class="num">Ground</th>' +
+                    '<th class="num">Time</th><th>Outcome</th>' +
+                "</tr></thead><tbody>" + flown + "</tbody></table>" +
+                "<h3>Combat log <span class=\"count\">(" + m.log.length + ")</span></h3>" +
+                '<div class="mb-log">' + log + "</div>";
+        } catch (err) {
+            el("mb-body").innerHTML =
+                '<p class="state-message">Could not open that mission: ' +
+                esc(err.message) + "</p>";
+        }
+    }
+
+    function closeMission() {
+        show(el("missionbox"), false);
+        document.body.classList.remove("lightbox-open");
     }
 
     /* ------------------------------------------------------- pilot modal -- */
@@ -691,6 +774,7 @@
 
     function route() {
         closePilot();
+        closeMission();
         const match = location.hash.match(/^#career\/(.+?)(?:\/pilot\/(\d+))?$/);
         const onDetail = Boolean(match);
         show(el("landing-page"), !onDetail);
@@ -729,6 +813,16 @@
             closePilot();
             return;
         }
+        if (event.target.closest && event.target.closest("[data-mission-close]")) {
+            closeMission();
+            return;
+        }
+        const detailsBtn = event.target.closest &&
+                           event.target.closest("button[data-mission]");
+        if (detailsBtn) {
+            openMission(currentCareer, Number(detailsBtn.dataset.mission));
+            return;
+        }
         const row = event.target.closest && event.target.closest("tr[data-pilot]");
         if (row && !(event.target.closest && event.target.closest("img.emblem"))) {
             openPilot(currentCareer, Number(row.dataset.pilot));
@@ -746,6 +840,7 @@
     document.addEventListener("keydown", (event) => {
         if (event.key !== "Escape") return;
         if (!el("cropper").hidden) closeCropper();
+        else if (!el("missionbox").hidden) closeMission();
         else if (!el("pilotbox").hidden) closePilot();
         else if (!el("lightbox").hidden) closeLightbox();
     });

@@ -146,17 +146,17 @@
                                         <th class="col-photo"></th>
                                         <th data-sort="rank_id">Rank</th>
                                         <th data-sort="name">Name</th>
-                                        <th data-sort="top_award" class="col-award">Award</th>
-                                        <th data-sort="state" class="col-status">St.</th>
-                                        <th data-sort="airborne" class="num">Air</th>
-                                        <th data-sort="ground_targets" class="num">Ground</th>
+                                        <th data-sort="top_award" class="col-award">Highest<br>Combat<br>Award</th>
+                                        <th data-sort="state" class="col-status">Status</th>
+                                        <th data-sort="airborne" class="num">Air<br>Victories</th>
+                                        <th data-sort="ground_targets" class="num">Ground<br>Targets</th>
                                         <th data-sort="sorties" class="num">Sorties</th>
-                                        <th data-sort="flight_hours" class="num">Hours</th>
-                                        <th data-sort="skills" class="num">Skl</th>
-                                        <th data-sort="discipline" class="num">Dis</th>
-                                        <th data-sort="courage" class="num">Cou</th>
+                                        <th data-sort="flight_hours" class="num">Flight<br>Hours</th>
+                                        <th data-sort="skills" class="num">Skill</th>
+                                        <th data-sort="discipline" class="num">Disci-<br>pline</th>
+                                        <th data-sort="courage" class="num">Cour-<br>age</th>
                                         <th data-sort="awards_held" class="num">Awards</th>
-                                        <th data-sort="awards_pending" class="num">Pend.</th>
+                                        <th data-sort="awards_pending" class="num">Award<br>Pending</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -175,6 +175,15 @@
             <span id="footer-note">Read-only. Nothing is written to your game files.</span>
         </div>
     </footer>
+
+    <!-- Full mission debrief -->
+    <div id="missionbox" class="lightbox" hidden>
+        <div class="lightbox-backdrop" data-mission-close></div>
+        <div class="lightbox-panel mission-panel" role="dialog" aria-modal="true">
+            <button class="lightbox-close" data-mission-close aria-label="Close">&times;</button>
+            <div id="mb-body"></div>
+        </div>
+    </div>
 
     <!-- Roster pilot summary -->
     <div id="pilotbox" class="lightbox" hidden>

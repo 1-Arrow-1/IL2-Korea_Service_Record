@@ -179,6 +179,17 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             return jsonify({"error": "career_not_found"}), 404
         return jsonify(detail)
 
+    @app.route("/api/mission/<path:career_id>/<int:mission_id>")
+    def api_mission(career_id: str, mission_id: int):
+        """Full debrief for one mission, including every pilot who flew."""
+        agg = aggregator()
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        detail = agg.mission_detail(career_id, mission_id)
+        if detail is None:
+            return jsonify({"error": "mission_not_found"}), 404
+        return jsonify(detail)
+
     @app.route("/api/pilot/<path:career_id>/<int:pilot_id>")
     def api_pilot(career_id: str, pilot_id: int):
         """Compact summary for the roster modal."""
