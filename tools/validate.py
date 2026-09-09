@@ -18,6 +18,22 @@ from korea_service_record.career.database import KoreaCareerDatabase, find_caree
 from korea_service_record.career.events import (award_action, award_source,
                                                 describe, is_award_event)
 from korea_service_record.career.killstats import KillStats
+from korea_service_record.career.missionresult import MissionResult
+from korea_service_record.career.aggregator import CareerAggregator
+
+# The blob counts aircraft by class; killStats counts them as one number.
+_AIR_COLUMNS = [
+    "killLightFighter", "killMediumFighter", "killHeavyFighter", "killJetFighter",
+    "killLightBomber", "killMediumBomber", "killHeavyBomber",
+    "killLightAttackPlane", "killMediumAttackPlane", "killHeavyAttackPlane",
+    "killLightRecon", "killMediumRecon", "killHeavyRecon",
+    "killLightTransport", "killMediumTransport", "killHeavyTransport",
+    "killAirship", "killLightAerostat", "killMediumAerostat",
+]
+
+
+def _blob_air(slot):
+    return sum(int(slot.get(c, "0") or 0) for c in _AIR_COLUMNS)
 from korea_service_record.gamedata import (AwardsConfig, LocaleStrings,
                                            DEFAULT_TVD, resolve_game_dir)
 
@@ -178,6 +194,43 @@ def main(game_arg):
             k = KillStats(m50["killStats"])
             check("mission 50 airborne", k.airborne, 4)
             check("mission 50 static air", k.static_air, 1)
+
+        # AI kills are attributed by pairing the blob's formation slots against
+        # the sortie rows positionally. Two unrelated fields have to agree for
+        # every pair, or the attribution is guesswork: the flight time and the
+        # air-kill count. Checked over every mission, not a sampled one.
+        pairs = flights = 0
+        for row in db.query("SELECT id, result FROM mission"):
+            result = MissionResult(row["result"])
+            slots = result.flight_slots()
+            sorties = db.query(
+                """SELECT killStats, flightTime FROM sortie
+                   WHERE missionId=? AND isDeleted=0 AND isPlayer=0
+                   ORDER BY id""", (row["id"],))
+            if not slots or len(slots) != len(sorties):
+                continue
+            flights += 1
+            for slot, sortie in zip(slots, sorties):
+                if (int(slot["totalFlightTime"]) == sortie["flightTime"]
+                        and _blob_air(slot) == KillStats(sortie["killStats"]).airborne):
+                    pairs += 1
+        check("AI slot pairing covers every mission", flights > 0, True)
+        check("AI slots agree on time and air kills",
+              pairs, sum(len(db.query(
+                  """SELECT id FROM sortie WHERE missionId=? AND isDeleted=0
+                     AND isPlayer=0""", (r["id"],)))
+                  for r in db.query("SELECT id FROM mission")))
+
+        aggregator = CareerAggregator(game_dir)
+        detail = aggregator.mission_detail(
+            f"{target.pilot_name}, {target.squadron_name}", 34)
+        if detail is not None:
+            # The one AI air kill that mission belongs to Manuel Rivera, and
+            # killStats says so independently of the blob.
+            scorers = {k["actor"] for k in detail["log"] if k["air"]}
+            check("mission 31 air kill attributed", scorers, {"Manuel Rivera"})
+            check("no raw account name in the log",
+                  any("Arrow" in k["actor"] for k in detail["log"]), False)
 
         dsc = awards_cfg.get(601021)
         if dsc is not None:

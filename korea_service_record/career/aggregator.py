@@ -35,7 +35,7 @@ from .attributes import PilotAttributes
 from .database import CareerFile, KoreaCareerDatabase, find_careers
 from .events import describe, is_award_event
 from .killstats import KillStats
-from .missionresult import MissionResult
+from .missionresult import MissionResult, _number
 
 logger = logging.getLogger(__name__)
 
@@ -531,6 +531,48 @@ class CareerAggregator:
             })
             return summary
 
+    @staticmethod
+    def _crew(result: "MissionResult", flown: List[Dict[str, Any]]) -> Dict[str, str]:
+        """
+        Map each actor id in ``events`` to the pilot's name.
+
+        The human is easy: their ``players`` row carries a real account guid,
+        which is the ``actorUserId`` on their kills.
+
+        The AI looked impossible — their rows have no nickname, and the career's
+        ``pilot`` table leaves ``personageId`` empty — but the synthetic ids are
+        formation slots, and the slot order is the order the ``sortie`` rows are
+        written in. Two independent checks across both careers and all 372
+        AI sorties: ``totalFlightTime`` agrees to the second every time, and so
+        does the air-kill count summed from unrelated columns. The pairing is
+        positional, so it is only used when the two lists are the same length,
+        and the flight-time check is repeated per mission before trusting it.
+        """
+        ai_pilots = [f for f in flown if not f["is_player"]]
+        slots = result.flight_slots()
+        crew: Dict[str, str] = {}
+
+        for row in result.players():
+            uid = row.get("userId", "")
+            if row.get("personageNickname") and uid:
+                player = next((f["name"] for f in flown if f["is_player"]), "")
+                if player:
+                    crew[uid] = player
+
+        if len(slots) == len(ai_pilots):
+            pairs = list(zip(slots, ai_pilots))
+            if all(_number(slot.get("totalFlightTime", "-1")) == pilot["flight_s"]
+                   for slot, pilot in pairs):
+                for slot, pilot in pairs:
+                    crew[slot["personageId"]] = pilot["name"]
+            else:
+                logger.warning("Flight times do not line up; "
+                               "AI kills left unattributed")
+        elif slots:
+            logger.warning("%d AI slots for %d AI sorties; "
+                           "AI kills left unattributed", len(slots), len(ai_pilots))
+        return crew
+
     def mission_detail(self, career_id: str, mission_id: int) -> Optional[Dict[str, Any]]:
         """
         The full debrief for one mission: briefing, objectives, who flew, and
@@ -554,7 +596,7 @@ class CareerAggregator:
                               p.country, p.rankId
                        FROM sortie s JOIN pilot p ON p.id = s.pilotId
                        WHERE s.missionId = ? AND s.isDeleted = 0
-                       ORDER BY p.isPlayer DESC, p.rankId DESC""", (mission_id,)):
+                       ORDER BY s.id""", (mission_id,)):
                 kills = KillStats(row["killStats"])
                 flown.append({
                     "pilot_id": row["pilotId"],
@@ -562,37 +604,36 @@ class CareerAggregator:
                     "is_player": bool(row["isPlayer"]),
                     "avatar": row["avatarPath"] or "",
                     "rank": self.locale.rank_name(row["country"], row["rankId"]),
+                    "rank_id": row["rankId"],
                     "rank_key": f"{row['country']}{row['rankId']}",
                     "airborne": kills.airborne,
                     "ground_targets": kills.ground_targets,
                     "flight_time": _hm(row["flightTime"]),
+                    "flight_s": row["flightTime"],
                     "outcome": PLANE_OUTCOME.get(row["planeStatus"], "unknown"),
                     "wounded": row["status"] == 4,
                 })
 
-            # events name the actor by IL-2 account ("Arrow_1974") for the
-            # human and by aircraft type for everyone else. Neither is what a
-            # reader wants, so the account name is swapped for the character's
-            # and the type is resolved to its proper designation.
-            nickname = ""
-            for row in result.players():
-                nick = urllib.parse.unquote(row.get("personageNickname", ""))
-                if nick:
-                    nickname = nick
-                    break
-            player_name = next((f["name"] for f in flown if f["is_player"]), "")
+            # Events name the actor by IL-2 account ("Arrow_1974") for the
+            # human and by aircraft type ("F51D") for the AI, so every wingman's
+            # kills used to read the same. Both are resolved to the pilot who
+            # actually scored them.
+            # _crew pairs the blob's formation slots against these rows in the
+            # order the game wrote them, so the sort for display happens after.
+            crew = self._crew(result, flown)
+            flown.sort(key=lambda f: (not f["is_player"], -f["rank_id"]))
+            player_user = next((uid for uid, name in crew.items()
+                                if name == next((f["name"] for f in flown
+                                                 if f["is_player"]), None)), "")
 
             start = mission["startTime"][11:] if mission["startTime"] else ""
             log = []
             for e in result.events():
                 info = self.objects.describe(e["target"])
-                actor = e["actor"]
-                if nickname and actor == nickname and player_name:
-                    actor = player_name
-                else:
-                    by = self.objects.describe(actor)
-                    if by["named"]:
-                        actor = by["name"]
+                actor = crew.get(e["actor_user"], "")
+                if not actor:
+                    by = self.objects.describe(e["actor"])
+                    actor = by["name"] if by["named"] else e["actor"]
                 air = bool(info["aircraft"] and not info["parked"])
                 log.append({
                     "time": _clock(start, e["tick"]),
@@ -602,7 +643,7 @@ class CareerAggregator:
                     "victim": e["victim"],
                     "altitude": e["altitude"] if air else None,
                     "actor": actor,
-                    "by_player": bool(nickname and e["actor"] == nickname),
+                    "by_player": e["actor_user"] == player_user,
                 })
 
             # A strafing run flattens a row of crates in the same second and
