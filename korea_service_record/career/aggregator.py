@@ -167,6 +167,50 @@ class CareerAggregator:
             "promotions": sum(1 for a in held if a["category"] == 1),
         }
 
+    def emblem_detail(self, kind: str, ident: str) -> Optional[Dict[str, Any]]:
+        """
+        Name, description and full-size art for one medal, rank or emblem.
+
+        Descriptions live beside the artwork in the archives:
+
+            awards      nsdata/assets/awards/<6xx>/<id>.locale=<lang>.txt
+            squadrons   nsdata/assets/squadrons/<601>/<id>.locale=<lang>.txt
+
+        Ranks have artwork but no description, so they return a name only.
+        """
+        # An id with no artwork is not a thing the user can click, so 404
+        # rather than returning an empty shell.
+        if not ident.isdigit() or not self.icons.has(kind, ident):
+            return None
+        name, vpath = "", ""
+        if kind == "award":
+            name = self.award_name(int(ident))
+            vpath = f"nsdata/assets/awards/{ident[0]}xx/{ident}.locale={self.lang}.txt"
+        elif kind == "squadron":
+            # The readable squadron name lives in the career file name, which
+            # this call has no access to; the caller supplies it and this is
+            # only the fallback.
+            name = f"Squadron {ident}"
+            vpath = (f"nsdata/assets/squadrons/{ident[:3]}/"
+                     f"{ident}.locale={self.lang}.txt")
+        elif kind == "rank":
+            # rank keys are <country><index>, e.g. 6013
+            try:
+                name = self.locale.rank_name(int(ident[:3]), int(ident[3:]))
+            except ValueError:
+                return None
+        else:
+            return None
+
+        text = self.resolver.read_text(vpath) if vpath else None
+        return {
+            "kind": kind,
+            "id": ident,
+            "name": name,
+            "description": (text or "").strip(),
+            "image": f"/api/icon/{kind}/{ident}",
+        }
+
     # -- landing page ------------------------------------------------------
 
     def list_careers(self) -> List[Dict[str, Any]]:

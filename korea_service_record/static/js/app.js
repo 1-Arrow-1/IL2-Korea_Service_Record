@@ -41,9 +41,57 @@
     const icon = (kind, ident, height, cls, title) =>
         (ident === null || ident === undefined || ident === "")
             ? ""
-            : '<img class="' + cls + '" src="/api/icon/' + kind + "/" +
+            : '<img class="' + cls + ' emblem" src="/api/icon/' + kind + "/" +
               encodeURIComponent(ident) + "?h=" + height + '" alt="" title="' +
-              esc(title || "") + '" onerror="this.style.display=&quot;none&quot;">';
+              esc(title || "") + '" data-kind="' + kind + '" data-id="' +
+              esc(ident) + '" data-title="' + esc(title || "") +
+              '" onerror="this.style.display=&quot;none&quot;">';
+
+    /* ----------------------------------------------------------- lightbox -- */
+
+    // Every icon is clickable: full-size art plus the game's own description.
+    // The name comes from the page rather than the API, because the page knows
+    // the squadron as "39th FIS USAF" while the id alone gives "Squadron 601039".
+    async function openLightbox(kind, ident, title) {
+        const box = el("lightbox");
+        el("lb-title").textContent = title || "";
+        el("lb-sub").textContent = "";
+        el("lb-desc").textContent = "Loading…";
+        el("lb-image").src = "/api/icon/" + kind + "/" + encodeURIComponent(ident);
+        el("lb-image").alt = title || "";
+        show(box);
+        document.body.classList.add("lightbox-open");
+        try {
+            const d = await getJSON("/api/emblem/" + kind + "/" + encodeURIComponent(ident));
+            if (!title) el("lb-title").textContent = d.name;
+            el("lb-sub").textContent = { award: "Award", rank: "Rank",
+                                         squadron: "Squadron" }[kind] || "";
+            // Descriptions are plain prose with blank-line paragraphs. Build
+            // them as text nodes so the game's copy cannot inject markup.
+            const desc = el("lb-desc");
+            desc.textContent = "";
+            const paragraphs = (d.description || "").split(/\n\s*\n/)
+                .map((t) => t.trim()).filter(Boolean);
+            if (!paragraphs.length) {
+                desc.appendChild(document.createTextNode(
+                    "No description in the game files."));
+            } else {
+                paragraphs.forEach((text) => {
+                    const node = document.createElement("p");
+                    node.textContent = text;
+                    desc.appendChild(node);
+                });
+            }
+        } catch (err) {
+            el("lb-desc").textContent = "Could not load details: " + err.message;
+        }
+    }
+
+    function closeLightbox() {
+        show(el("lightbox"), false);
+        document.body.classList.remove("lightbox-open");
+        el("lb-image").removeAttribute("src");
+    }
 
     const rows = (pairs) => pairs
         .map(([k, v]) => "<tr><th>" + esc(k) + "</th><td>" + esc(v) + "</td></tr>")
@@ -412,6 +460,22 @@
             else { sortKey = key; sortAsc = (key === "name" || key === "top_award"); }
             renderRoster();
         });
+    });
+
+    // One delegated listener: icons are rebuilt on every render, so binding
+    // per element would leak handlers.
+    document.addEventListener("click", (event) => {
+        const img = event.target.closest && event.target.closest("img.emblem");
+        if (img) {
+            openLightbox(img.dataset.kind, img.dataset.id, img.dataset.title);
+            return;
+        }
+        if (event.target.closest && event.target.closest("[data-close]")) {
+            closeLightbox();
+        }
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !el("lightbox").hidden) closeLightbox();
     });
 
     window.addEventListener("hashchange", route);

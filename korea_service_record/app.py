@@ -109,6 +109,17 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         return Response(data, mimetype="image/png",
                         headers={"Cache-Control": "public, max-age=31536000"})
 
+    @app.route("/api/emblem/<kind>/<ident>")
+    def api_emblem(kind: str, ident: str):
+        """Name, in-game description and full-size art, for the lightbox."""
+        agg = aggregator()
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        detail = agg.emblem_detail(kind, ident)
+        if detail is None:
+            return jsonify({"error": "not_found"}), 404
+        return jsonify(detail)
+
     # -- api ---------------------------------------------------------------
 
     @app.route("/api/careers")
