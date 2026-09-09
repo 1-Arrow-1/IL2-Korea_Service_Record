@@ -369,7 +369,7 @@
 
             el("d-name").textContent = p.name;
             el("d-subtitle").innerHTML =
-                icon("rank", p.rank_key, 44, "rank-icon", p.rank) +
+                icon("rank", p.rank_key, 56, "rank-icon", p.rank) +
                 "<span>" + esc(p.rank) + " · " + esc(d.squadron) + "</span>" +
                 icon("squadron", d.squadron_key, 96, "squadron-emblem", d.squadron);
             el("d-meta").innerHTML = [
@@ -450,8 +450,8 @@
     // Photographs are the user's own files, kept outside the game install. The
     // crop happens here in a canvas and the server stores the finished PNG, so
     // what lands on disk is exactly what was on screen when Save was pressed.
-    const PORTRAIT_W = 320;
-    const PORTRAIT_H = 392;
+    const PORTRAIT_W = 400;
+    const PORTRAIT_H = 490;
 
     let currentCareer = "";
     let currentPilot = null;

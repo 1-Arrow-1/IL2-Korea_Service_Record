@@ -291,7 +291,7 @@ table.roster tr.is-kia td { color: #93796a; }
 /* ------------------------------------------------------------- artwork -- */
 
 .record-sub { display: flex; align-items: center; gap: 0.7rem; }
-.record-sub .rank-icon { height: 44px; width: auto; }
+.record-sub .rank-icon { height: var(--rank-emblem-h); width: auto; }
 .squadron-emblem { height: 96px; width: auto; }
 .squadron-emblem.strip { height: 84px; margin-right: 1.4rem; align-self: center; }
 
@@ -304,14 +304,14 @@ table.roster tr.is-kia td { color: #93796a; }
     gap: 0.7rem;
     align-items: center;
 }
-.award-list .award-icon { max-height: 88px; max-width: 92px; display: block; margin: 0 auto; }
-.award-list .rank-icon { max-height: 56px; max-width: 92px; display: block; margin: 0 auto; }
+.award-list .award-icon { max-height: var(--award-emblem-h); max-width: 92px; display: block; margin: 0 auto; }
+.award-list .rank-icon { max-height: var(--rank-emblem-h); max-width: 92px; display: block; margin: 0 auto; }
 
-table.roster td.rank-cell .rank-icon { height: 56px; width: auto; display: block; }
+table.roster td.rank-cell .rank-icon { height: var(--rank-emblem-h); width: auto; display: block; margin: 0 auto; }
 table.roster td.award-cell { min-width: 60px; }
 /* Centred: a left-aligned medal in a wide column looks unanchored. */
 table.roster td.award-cell { text-align: center; }
-table.roster td.award-cell .award-icon { max-height: 88px; max-width: 92px;
+table.roster td.award-cell .award-icon { max-height: var(--award-emblem-h); max-width: 92px;
     display: inline-block; }
 
 .list-head { font-weight: bold; }
@@ -347,9 +347,22 @@ table.roster td.award-cell .award-icon { max-height: 88px; max-width: 92px;
 /* ------------------------------------------------------------- portrait -- */
 
 .portrait-block { margin-bottom: 1.2rem; text-align: center; }
-.portrait {
-    width: 160px; height: 196px;
+
+/* The frame is an overlay so the photograph is never cropped by it and the
+   two scale together. */
+.portrait-frame {
+    position: relative;
+    width: 200px;
+    height: 245px;
     margin: 0 auto 0.7rem;
+}
+.portrait-overlay {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
+.portrait {
+    width: 100%; height: 100%;
     border: 1px solid var(--border);
     border-radius: 4px;
     background: var(--paper-deep);
@@ -365,9 +378,11 @@ table.roster td.award-cell .award-icon { max-height: 88px; max-width: 92px;
 
 /* --------------------------------------------------------------- cropper -- */
 
-.cropper-panel { max-width: 460px; text-align: center; }
+.cropper-panel { max-width: 520px; text-align: center; }
 .cropper-panel h2 { font-size: 1.2rem; font-weight: normal; color: var(--ink-strong); }
-.crop-stage { margin: 1rem auto 0.8rem; width: 320px; }
+/* The canvas is 400x490 so the stored PNG is twice the display size
+   and stays crisp; it is shown 1:1 here so drag deltas need no scaling. */
+.crop-stage { margin: 1rem auto 0.8rem; width: 400px; }
 #crop-canvas {
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -376,5 +391,5 @@ table.roster td.award-cell .award-icon { max-height: 88px; max-width: 92px;
     touch-action: none;
 }
 #crop-canvas.dragging { cursor: grabbing; }
-.crop-zoom { width: 320px; margin-bottom: 1rem; accent-color: var(--accent-dark); }
+.crop-zoom { width: 400px; margin-bottom: 1rem; accent-color: var(--accent-dark); }
 .crop-actions { display: flex; gap: 0.6rem; justify-content: center; }

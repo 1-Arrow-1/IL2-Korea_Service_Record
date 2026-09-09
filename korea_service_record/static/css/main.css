@@ -22,6 +22,10 @@
     --bad: #8c3a2c;
     --warn: #8a6a1f;
     --shadow-soft: 0 6px 18px rgba(74, 52, 33, 0.18);
+    /* Emblem heights, shared by the CSS box and the height asked of
+       /api/icon. Kept here so the two cannot drift apart again. */
+    --award-emblem-h: 88px;
+    --rank-emblem-h: 56px;
     --page-max-width: 1860px;
     --page-content-padding: 2rem;
 }

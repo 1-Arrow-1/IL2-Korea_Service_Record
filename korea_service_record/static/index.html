@@ -69,8 +69,12 @@
                             <section class="panel">
                                 <h3>Pilot Information</h3>
                                 <div class="portrait-block">
-                                    <div id="d-portrait" class="portrait">
-                                        <span class="portrait-empty">No photograph</span>
+                                    <div class="portrait-frame">
+                                        <div id="d-portrait" class="portrait">
+                                            <span class="portrait-empty">No photograph</span>
+                                        </div>
+                                        <img class="portrait-overlay"
+                                             src="/static/images/photo-frame.svg" alt="">
                                     </div>
                                     <div class="portrait-actions">
                                         <button id="photo-pick" class="nav-btn small">Change photo</button>
@@ -179,7 +183,7 @@
             <h2>Position the photograph</h2>
             <p class="lightbox-sub">Drag to move &middot; scroll or use the slider to zoom</p>
             <div class="crop-stage">
-                <canvas id="crop-canvas" width="320" height="392"></canvas>
+                <canvas id="crop-canvas" width="400" height="490"></canvas>
             </div>
             <input id="crop-zoom" class="crop-zoom" type="range"
                    min="100" max="400" value="100">
