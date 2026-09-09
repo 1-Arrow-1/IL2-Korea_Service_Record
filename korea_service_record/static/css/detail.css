@@ -493,7 +493,13 @@ table.roster tr.is-player td { font-weight: bold; }
 }
 .mb-brief { font-size: 0.98rem; }
 .mb-brief p { margin-bottom: 0.6rem; }
-.mb-log { max-height: 380px; overflow-y: auto; font-size: 0.96rem; }
+/* The scrollbar is drawn inside the scroll box, on top of the last column, so
+   the actor names need clearance from the right edge or they read as clipped. */
+.mb-log {
+    max-height: 380px; overflow-y: auto; font-size: 0.96rem;
+    padding-right: 2.2rem;
+    scrollbar-gutter: stable;
+}
 /* The actor column was 7rem and right-aligned, which squeezed a
    full name into an unreadable sliver. */
 .mb-log .log-row { grid-template-columns: 5.6rem 1fr minmax(11rem, auto); }

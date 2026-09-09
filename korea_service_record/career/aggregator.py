@@ -454,7 +454,11 @@ class CareerAggregator:
                 if queue:
                     found = queue.pop(0)
                     entry["victim"] = found["victim"]
-                    entry["altitude"] = found["altitude"]
+                    # Absolute altitude, so on anything that was already on the
+                    # ground it is just the terrain height under it, repeated
+                    # down the whole strafing run.
+                    if entry["air"]:
+                        entry["altitude"] = found["altitude"]
                 log.append(entry)
             k = KillStats(sortie["killStats"])
             # The flight log knows when the wheels left the ground and how the
