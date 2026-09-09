@@ -114,7 +114,22 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
 
     @app.route("/api/photo/<path:career_id>/<int:pilot_id>", methods=["GET"])
     def api_photo(career_id: str, pilot_id: int):
+        """
+        A pilot's portrait: the user's upload if there is one, otherwise the
+        portrait the game itself ships for that pilot. ?avatar= carries the
+        pilot's avatarPath so this needs no database lookup of its own.
+        """
         data = app.config["PHOTOS"].read(career_id, pilot_id)
+        if data is None:
+            agg = aggregator()
+            avatar = request.args.get("avatar", "")
+            if agg is not None and avatar:
+                try:
+                    height = int(request.args.get("h", 0)) or None
+                except ValueError:
+                    height = None
+                data = agg.icons.image_png(
+                    f"nsdata/assets/pilotphotos/{avatar}.dds", height)
         if data is None:
             return ("", 404)
         return Response(data, mimetype="image/png",

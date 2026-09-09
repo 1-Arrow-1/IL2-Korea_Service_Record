@@ -324,21 +324,27 @@
                 ? "status-" + p.state : "status-other";
             const cls = [p.is_player ? "is-player" : "",
                          p.state === "kia" ? "is-kia" : ""].filter(Boolean).join(" ");
-            return '<tr class="' + cls + '">' +
+            const statusIcon = { kia: "kia", wounded: "wia" }[p.state];
+            const statusTitle = p.state +
+                (p.state_until ? " until " + p.state_until : "") +
+                (p.state_since ? " " + p.state_since : "");
+            return '<tr class="' + cls + '" data-pilot="' + p.id + '">' +
+                '<td class="photo-cell"><img class="roster-photo" src="' +
+                    photoUrl(currentCareer, p.id, p.avatar, 96) +
+                    '" alt="" onerror="this.style.display=&quot;none&quot;"></td>' +
                 '<td class="rank-cell">' +
                     (icon("rank", p.rank_key, 56, "rank-icon", p.rank) ||
                      esc(p.rank)) + "</td>" +
                 "<td>" + esc(p.name) + "</td>" +
-                '<td class="award-cell">' +
+                '<td class="award-cell col-award">' +
                     (icon("award", p.top_award_id, 88, "award-icon", p.top_award) ||
                      "&mdash;") + "</td>" +
-                '<td><span class="status-dot ' + dotClass + '"></span>' + esc(p.state) +
-                    (p.state_until
-                        ? ' <span class="until">until ' + esc(p.state_until) + "</span>"
-                        : "") +
-                    (p.state_since
-                        ? ' <span class="until">' + esc(p.state_since) + "</span>"
-                        : "") + "</td>" +
+                '<td class="col-status" title="' + esc(statusTitle) + '">' +
+                    (statusIcon
+                        ? '<img class="status-icon" src="/static/images/icons/' +
+                          statusIcon + '.png" alt="' + esc(p.state) + '">'
+                        : '<span class="status-dot ' + dotClass + '"></span>') +
+                    "</td>" +
                 '<td class="num">' + esc(p.airborne) + "</td>" +
                 '<td class="num">' + esc(p.ground_targets) + "</td>" +
                 '<td class="num">' + esc(p.sorties) + "</td>" +
@@ -365,7 +371,8 @@
 
             currentCareer = d.id;
             currentPilot = d.player_id;
-            showPortrait(currentCareer, currentPilot);
+            currentAvatar = p.avatar;
+            showPortrait(currentCareer, currentPilot, p.avatar);
 
             el("d-name").textContent = p.name;
             el("d-subtitle").innerHTML =
@@ -380,15 +387,16 @@
             ].map((kv) => "<div><dt>" + esc(kv[0]) + "</dt><dd>" +
                           esc(kv[1]) + "</dd></div>").join("");
 
-            el("d-info").innerHTML = rows([
-                ["Rank", p.rank],
+            const info = [["Rank", p.rank]];
+            if (p.birth_date) info.push(["Born", p.birth_date]);
+            el("d-info").innerHTML = rows(info.concat([
                 ["Squadron", d.squadron],
                 ["Status", p.state],
                 ["Health", p.health],
                 ["Air victories", p.airborne],
                 ["Ground targets", p.ground_targets],
                 ["Squadron efficiency", d.efficiency]
-            ]);
+            ]));
             el("d-attributes").innerHTML = attributeBlock(p.attributes, p.has_levels);
 
             el("d-incidences").innerHTML = d.incidences.length
@@ -455,15 +463,22 @@
 
     let currentCareer = "";
     let currentPilot = null;
+    let currentAvatar = "";
     const crop = { image: null, scale: 1, minScale: 1, x: 0, y: 0,
                    dragging: false, lastX: 0, lastY: 0 };
 
-    function photoUrl(careerId, pilotId) {
-        return "/api/photo/" + encodeURIComponent(careerId) + "/" + pilotId +
-               "?t=" + Date.now();
+    // One URL for every portrait. The endpoint serves the user's upload if
+    // there is one and falls back to the portrait the game ships for that
+    // pilot, so all 46 have a face without anybody uploading anything.
+    function photoUrl(careerId, pilotId, avatar, height, bust) {
+        let url = "/api/photo/" + encodeURIComponent(careerId) + "/" + pilotId +
+                  "?avatar=" + encodeURIComponent(avatar || "");
+        if (height) url += "&h=" + height;
+        if (bust) url += "&t=" + Date.now();
+        return url;
     }
 
-    function showPortrait(careerId, pilotId) {
+    function showPortrait(careerId, pilotId, avatar) {
         const box = el("d-portrait");
         const img = new Image();
         img.onload = () => {
@@ -476,7 +491,7 @@
             show(el("photo-clear"), false);
         };
         img.alt = "";
-        img.src = photoUrl(careerId, pilotId);
+        img.src = photoUrl(careerId, pilotId, avatar, 490, true);
     }
 
     function drawCrop() {
@@ -531,7 +546,7 @@
             const result = await response.json();
             if (result.error) throw new Error(result.error);
             closeCropper();
-            showPortrait(currentCareer, currentPilot);
+            showPortrait(currentCareer, currentPilot, currentAvatar);
         } catch (err) {
             window.alert("Could not save the photograph: " + err.message);
         }
@@ -547,7 +562,7 @@
         el("photo-clear").addEventListener("click", async () => {
             await fetch("/api/photo/" + encodeURIComponent(currentCareer) + "/" +
                         currentPilot, { method: "DELETE" });
-            showPortrait(currentCareer, currentPilot);
+            showPortrait(currentCareer, currentPilot, currentAvatar);
         });
         el("crop-save").addEventListener("click", saveCrop);
         document.addEventListener("click", (event) => {

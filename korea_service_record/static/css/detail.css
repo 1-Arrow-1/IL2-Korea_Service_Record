@@ -138,7 +138,7 @@
 .log-row.empty { font-style: italic; }
 .log-time { color: var(--ink-muted); font-weight: normal; }
 
-table.roster td.award-cell { white-space: normal; min-width: 200px; }
+table.roster td.award-cell { white-space: normal; }
 
 /* ------------------------------------------------------------ attributes -- */
 
@@ -308,7 +308,7 @@ table.roster tr.is-kia td { color: #93796a; }
 .award-list .rank-icon { max-height: var(--rank-emblem-h); max-width: 92px; display: block; margin: 0 auto; }
 
 table.roster td.rank-cell .rank-icon { height: var(--rank-emblem-h); width: auto; display: block; margin: 0 auto; }
-table.roster td.award-cell { min-width: 60px; }
+
 /* Centred: a left-aligned medal in a wide column looks unanchored. */
 table.roster td.award-cell { text-align: center; }
 table.roster td.award-cell .award-icon { max-height: var(--award-emblem-h); max-width: 92px;
@@ -395,3 +395,29 @@ table.roster td.award-cell .award-icon { max-height: var(--award-emblem-h); max-
 #crop-canvas.dragging { cursor: grabbing; }
 .crop-zoom { width: 360px; margin-bottom: 1rem; accent-color: var(--accent-dark); }
 .crop-actions { display: flex; gap: 0.6rem; justify-content: center; }
+
+
+/* ------------------------------------------------- roster: portraits etc -- */
+
+table.roster th.col-photo { width: 56px; }
+table.roster td.photo-cell { padding: 0.2rem 0.4rem; }
+.roster-photo {
+    width: 44px; height: 54px;
+    object-fit: cover;
+    display: block;
+    border: 1px solid var(--border);
+    background: var(--paper-deep);
+}
+
+/* Status is a wound/KIA icon with the date on hover: "wounded until
+   1951.06.11" was the widest thing in the table and told the reader little at
+   a glance. */
+table.roster th.col-status, table.roster td.col-status {
+    width: 34px; text-align: center;
+}
+.status-icon { width: 18px; height: 18px; display: inline-block; opacity: 0.85; }
+
+/* The award column was wide because of a leftover min-width, not the medal. */
+table.roster td.col-award, table.roster th.col-award { width: 104px; min-width: 0; }
+
+table.roster tbody tr { cursor: pointer; }

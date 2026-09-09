@@ -21,6 +21,7 @@ modules (killstats, attributes, events) so this file stays about assembly.
 
 import logging
 import re
+import urllib.parse
 from collections import Counter, OrderedDict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -76,6 +77,20 @@ def _top_combat_award(country: int, award_ids) -> Optional[int]:
     return max((a for a in award_ids if lo <= a <= hi), default=None)
 
 
+def _pilot_description(raw: str) -> Dict[str, str]:
+    """
+    Unpack pilot.description, which is url-encoded key=value pairs:
+
+        biographyId=601006&birthDate=1921%2e02%2e23
+    """
+    out = {}
+    for pair in urllib.parse.unquote(raw or "").split("&"):
+        key, _, value = pair.partition("=")
+        if key:
+            out[key] = value
+    return out
+
+
 def _humanise(key: str) -> str:
     """IndustrialBuilding -> Industrial Building; Raildoad -> Raildoad (sic)."""
     return re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', key)
@@ -129,6 +144,7 @@ class CareerAggregator:
         kills = KillStats(row["killStats"])
         attrs = PilotAttributes(row["persLevel"], row["leadLevel"])
         held = awards_by_pilot.get(row["id"], [])
+        described = _pilot_description(row["description"])
         medals = [a for a in held if a["category"] != 1 and not a["isPending"]]
         top = _top_combat_award(row["country"], (a["type"] for a in medals))
         return {
@@ -165,6 +181,11 @@ class CareerAggregator:
             # rank icon keys are rank<country><index>
             "rank_key": f"{row['country']}{row['rankId']}",
             "promotions": sum(1 for a in held if a["category"] == 1),
+            "slot": row["slot"],
+            "birth_date": described.get("birthDate", ""),
+            "biography_id": described.get("biographyId", ""),
+            # The game ships a portrait for every pilot; a user upload overrides it.
+            "avatar": row["avatarPath"] or "",
         }
 
     # A description file may redirect instead of holding text:

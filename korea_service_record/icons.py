@@ -170,6 +170,42 @@ class IconLibrary:
             logger.warning("Cannot cache icon %s: %s", cached, exc)
         return data
 
+    def image_png(self, vpath: str, height: Optional[int] = None) -> Optional[bytes]:
+        """
+        Any single image asset as PNG — used for the game's pilot portraits,
+        which are individual 512x512 DDS files rather than atlas crops.
+        """
+        cache = (self.resolver.cache_dir / "images" /
+                 (vpath.replace("/", "_") + (f"@{height}" if height else "") + ".png"))
+        if cache.is_file():
+            try:
+                return cache.read_bytes()
+            except OSError:
+                pass
+        data = self.resolver.read(vpath)
+        if data is None:
+            return None
+        try:
+            from PIL import Image
+            image = Image.open(io.BytesIO(data)).convert("RGBA")
+            if height and image.height > height:
+                width = max(1, round(image.width * height / image.height))
+                image = image.resize((width, height), Image.LANCZOS)
+        except Exception as exc:                    # noqa: BLE001
+            logger.warning("Cannot decode image %s: %s", vpath, exc)
+            return None
+        buffer = io.BytesIO()
+        image.save(buffer, format="PNG", optimize=True)
+        out = buffer.getvalue()
+        try:
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            tmp = cache.with_suffix(".part")
+            tmp.write_bytes(out)
+            tmp.replace(cache)
+        except OSError:
+            pass
+        return out
+
     def has(self, kind: str, ident: str) -> bool:
         sheet = self.sheet(kind)
         return bool(sheet and self._key(kind, ident) in sheet.crops)
