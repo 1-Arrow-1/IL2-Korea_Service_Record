@@ -137,25 +137,44 @@ class AwardsConfig:
 # ---------------------------------------------------------------------------
 
 class LocaleStrings:
-    """Award and rank display names, with graceful degradation."""
+    """
+    Award and rank display names.
 
-    def __init__(self, game_dir: Path, lang: str = DEFAULT_LANG):
+    Resolved through the asset layer, so a loose (modded) file wins over the
+    archive copy exactly as it does in game, and a stock install still gets
+    real names by extracting from the encrypted ``Interface.gtp``.
+    """
+
+    def __init__(self, game_dir: Path, lang: str = DEFAULT_LANG,
+                 resolver: Optional["AssetResolver"] = None):
         self.game_dir = Path(game_dir)
         self.lang = lang if lang in SUPPORTED_LANGS else DEFAULT_LANG
+        if resolver is None:
+            from .assets import AssetResolver
+            resolver = AssetResolver(self.game_dir)
+        self.resolver = resolver
         self.awards: Dict[str, str] = self._load("awards")
         self.ranks: Dict[str, str] = self._load("ranks")
 
+    def vpath(self, stem: str) -> str:
+        return f"nsdata/assets/locale/{stem}.locale={self.lang}.json"
+
     def _load(self, stem: str) -> Dict[str, str]:
-        path = (self.game_dir / "data" / "NSData" / "assets" / "locale"
-                / f"{stem}.locale={self.lang}.json")
-        if not path.is_file():
-            logger.info("Locale file not present (archive not extracted): %s", path)
+        vpath = self.vpath(stem)
+        text = self.resolver.read_text(vpath)
+        if text is None:
+            logger.info("Locale not found in loose files, cache or archives: %s", vpath)
             return {}
         try:
-            return json.loads(path.read_text(encoding="utf-8-sig"))
-        except (OSError, json.JSONDecodeError) as exc:
-            logger.warning("Cannot parse %s: %s", path, exc)
+            return json.loads(text)
+        except json.JSONDecodeError as exc:
+            logger.warning("Cannot parse %s: %s", vpath, exc)
             return {}
+
+    def sources(self) -> Dict[str, str]:
+        """Where each locale file came from — useful in a debug endpoint."""
+        return {stem: self.resolver.source_of(self.vpath(stem))
+                for stem in ("awards", "ranks")}
 
     @property
     def has_awards(self) -> bool:

@@ -30,7 +30,7 @@ that need decoding, and one — rank — the game's own UI gets wrong.
 | Attribute progress | `pilot.leadLevel` | same packing, shown as the purple "up" numbers |
 | Awards | `award` table + `scg/2/awards.cfg` | `isDeleted=1` means retired by a higher cluster, not deleted |
 | Award route | `event.missionId` | a real mission id = earned at debrief; `-1` = roster sweep |
-| Ranks | `pilot.rankId` + `ranks.locale` | see the warning below |
+| Ranks | `pilot.rankId` + `ranks.locale` | extracted from the encrypted `Interface.gtp`; see the warning below |
 | Events | `event.type` | 0 kill, 19 promotion, 20 award, 33 operation confirmed; 5/14/16 likely; ten more unidentified |
 
 ### The game's rank display is wrong — ours is not
@@ -49,11 +49,21 @@ one version assert — all 26 observed `AType` records parse, including `AType:3
 kills, `AType:10` plane init and `AType:12` object spawn with pilot names. So
 per-mission, per-pilot attribution is available, not just cumulative counters.
 
+## Encrypted assets
+
+Rank names, award names, `awards.xaml` and the medal atlases live inside
+`Interface.gtp`, which is AES-192-ECB encrypted with a per-file key derived
+from the file's own virtual path. The tracker decrypts what it needs on demand
+and caches it under `%LOCALAPPDATA%/IL2KoreaTracker`, so it works on a stock
+install with **no image pack to download** and nothing written into the game
+folder.
+
+A loose file always wins over the archive copy, matching the engine's own
+override behaviour — so on a modded install the tool shows the mod's medals and
+names.
+
 ## Known gaps
 
-- **Locale files are encrypted.** `awards.locale=*.json` and `ranks.locale=*.json`
-  live inside `Interface.gtp`. They are only loose on a modded install. The
-  extractor must be wired in before a stock install can show real names.
 - **`pilot.persLevel` is 0 for the player**, decoding to the minimum 1/1/1.
   Probably correct rather than missing — the human supplies the skill — but the
   player's bar values have not been read off the panel to confirm it.
@@ -64,6 +74,10 @@ per-mission, per-pilot attribution is available, not just cumulative counters.
 ```
 korea_service_record/
   gamedata.py            game dir resolution, awards.cfg, locale strings
+  assets.py              loose -> cache -> archive resolution
+  gtp/
+    crypto.py            AES-192 + key schedule (lifted from il2k_extract.py)
+    archive.py           gtpack container reader, bounded-memory FAT walk
   career/
     database.py          read-only SQLite wrapper + career discovery
     killstats.py         packed killStats parser

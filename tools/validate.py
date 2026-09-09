@@ -53,13 +53,10 @@ def main(game_arg):
     print(f"   awards.cfg definitions : {len(awards_cfg.definitions)}")
     print(f"   promotion awards       : "
           f"{sorted(d.award_id for d in awards_cfg.promotions())}")
-    print(f"   award locale loaded    : {locale.has_awards}")
-    print(f"   rank  locale loaded    : {bool(locale.ranks)}")
-    if not locale.has_awards or not locale.ranks:
-        print("   NOTE: locale files live inside the encrypted Interface.gtp. Any")
-        print("         that are loose are there because the install is modded, so")
-        print("         a stock install needs the extractor wired in before names")
-        print("         can be shown. Falling back to awards.cfg internal names.")
+    print(f"   award locale           : {len(locale.awards)} keys "
+          f"({locale.sources()['awards']})")
+    print(f"   rank  locale           : {len(locale.ranks)} keys "
+          f"({locale.sources()['ranks']})")
     dead = [d.award_id for d in awards_cfg.definitions.values()
             if not d.reachable_in_proc and not d.reachable_by_def and not d.required]
     print(f"   unobtainable awards    : {dead or 'none'}")
@@ -126,12 +123,11 @@ def main(game_arg):
             check("pilot 17 discipline", ra.discipline, 5)
             check("pilot 17 courage", ra.courage, 5)
             check("pilot 17 up-points", list(ra.points.values()), [13, 2, 2])
-            if locale.ranks:
-                check("pilot 17 rank name",
-                      locale.rank_name(rivera["country"], rivera["rankId"]),
-                      "First Lieutenant")
-            else:
-                print("   [skip] pilot 17 rank name: ranks.locale not extracted")
+            check("pilot 17 rank name",
+                  locale.rank_name(rivera["country"], rivera["rankId"]),
+                  "First Lieutenant")
+            check("player rank name",
+                  locale.rank_name(player["country"], player["rankId"]), "Major")
 
         funston = next((p for p in pilots if p["id"] == 8), None)
         if funston is not None:
