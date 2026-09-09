@@ -64,8 +64,11 @@
         try {
             const d = await getJSON("/api/emblem/" + kind + "/" + encodeURIComponent(ident));
             if (!title) el("lb-title").textContent = d.name;
-            el("lb-sub").textContent = { award: "Award", rank: "Rank",
-                                         squadron: "Squadron" }[kind] || "";
+            const label = { award: "Award", rank: "Rank",
+                            squadron: "Squadron" }[kind] || "";
+            el("lb-sub").textContent = d.inherited_from
+                ? label + " · citation of the " + d.inherited_from
+                : label;
             // Descriptions are plain prose with blank-line paragraphs. Build
             // them as text nodes so the game's copy cannot inject markup.
             const desc = el("lb-desc");
@@ -207,7 +210,7 @@
         const when = award.pending
             ? "awaiting award points" : "received " + esc(award.received);
         return '<li class="with-icon">' +
-            icon("award", award.type, 64, "award-icon", award.name) +
+            icon("award", award.type, 88, "award-icon", award.name) +
             "<div>" +
             '<span class="award-name">' + esc(award.name) + badge + "</span>" +
             '<span class="award-dates">earned ' + esc(award.earned) +
@@ -217,7 +220,7 @@
     function promotionItem(promotion) {
         const badge = promotion.pending ? '<span class="badge pending">pending</span>' : "";
         return '<li class="with-icon">' +
-            icon("rank", promotion.rank_key, 40, "rank-icon", promotion.rank) +
+            icon("rank", promotion.rank_key, 56, "rank-icon", promotion.rank) +
             "<div>" +
             '<span class="award-name">' + esc(promotion.rank) + badge + "</span>" +
             '<span class="award-dates">' + esc(promotion.date) + "</span></div></li>";
@@ -323,11 +326,11 @@
                          p.state === "kia" ? "is-kia" : ""].filter(Boolean).join(" ");
             return '<tr class="' + cls + '">' +
                 '<td class="rank-cell">' +
-                    (icon("rank", p.rank_key, 34, "rank-icon", p.rank) ||
+                    (icon("rank", p.rank_key, 56, "rank-icon", p.rank) ||
                      esc(p.rank)) + "</td>" +
                 "<td>" + esc(p.name) + "</td>" +
                 '<td class="award-cell">' +
-                    (icon("award", p.top_award_id, 56, "award-icon", p.top_award) ||
+                    (icon("award", p.top_award_id, 88, "award-icon", p.top_award) ||
                      "&mdash;") + "</td>" +
                 '<td><span class="status-dot ' + dotClass + '"></span>' + esc(p.state) +
                     (p.state_until
@@ -359,6 +362,10 @@
         try {
             const d = await getJSON("/api/career/" + encodeURIComponent(careerId));
             const p = d.player;
+
+            currentCareer = d.id;
+            currentPilot = d.player_id;
+            showPortrait(currentCareer, currentPilot);
 
             el("d-name").textContent = p.name;
             el("d-subtitle").innerHTML =
@@ -438,6 +445,158 @@
         }
     }
 
+    /* -------------------------------------------------------- portraits -- */
+
+    // Photographs are the user's own files, kept outside the game install. The
+    // crop happens here in a canvas and the server stores the finished PNG, so
+    // what lands on disk is exactly what was on screen when Save was pressed.
+    const PORTRAIT_W = 320;
+    const PORTRAIT_H = 392;
+
+    let currentCareer = "";
+    let currentPilot = null;
+    const crop = { image: null, scale: 1, minScale: 1, x: 0, y: 0,
+                   dragging: false, lastX: 0, lastY: 0 };
+
+    function photoUrl(careerId, pilotId) {
+        return "/api/photo/" + encodeURIComponent(careerId) + "/" + pilotId +
+               "?t=" + Date.now();
+    }
+
+    function showPortrait(careerId, pilotId) {
+        const box = el("d-portrait");
+        const img = new Image();
+        img.onload = () => {
+            box.innerHTML = "";
+            box.appendChild(img);
+            show(el("photo-clear"));
+        };
+        img.onerror = () => {
+            box.innerHTML = "<span class=\"portrait-empty\">No photograph</span>";
+            show(el("photo-clear"), false);
+        };
+        img.alt = "";
+        img.src = photoUrl(careerId, pilotId);
+    }
+
+    function drawCrop() {
+        const canvas = el("crop-canvas");
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (!crop.image) return;
+        const w = crop.image.width * crop.scale;
+        const h = crop.image.height * crop.scale;
+        // Keep the frame covered: no empty margins whatever the user drags.
+        crop.x = Math.min(0, Math.max(canvas.width - w, crop.x));
+        crop.y = Math.min(0, Math.max(canvas.height - h, crop.y));
+        ctx.drawImage(crop.image, crop.x, crop.y, w, h);
+    }
+
+    function openCropper(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                crop.image = img;
+                crop.minScale = Math.max(PORTRAIT_W / img.width,
+                                         PORTRAIT_H / img.height);
+                crop.scale = crop.minScale;
+                crop.x = (PORTRAIT_W - img.width * crop.scale) / 2;
+                crop.y = (PORTRAIT_H - img.height * crop.scale) / 2;
+                el("crop-zoom").value = 100;
+                show(el("cropper"));
+                document.body.classList.add("lightbox-open");
+                drawCrop();
+            };
+            img.onerror = () => window.alert("That file could not be read as an image.");
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function closeCropper() {
+        show(el("cropper"), false);
+        document.body.classList.remove("lightbox-open");
+        crop.image = null;
+    }
+
+    async function saveCrop() {
+        const canvas = el("crop-canvas");
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (!blob) return;
+        try {
+            const response = await fetch(
+                "/api/photo/" + encodeURIComponent(currentCareer) + "/" + currentPilot,
+                { method: "PUT", body: blob });
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
+            closeCropper();
+            showPortrait(currentCareer, currentPilot);
+        } catch (err) {
+            window.alert("Could not save the photograph: " + err.message);
+        }
+    }
+
+    function wirePortrait() {
+        el("photo-pick").addEventListener("click", () => el("photo-file").click());
+        el("photo-file").addEventListener("change", (event) => {
+            const file = event.target.files && event.target.files[0];
+            if (file) openCropper(file);
+            event.target.value = "";
+        });
+        el("photo-clear").addEventListener("click", async () => {
+            await fetch("/api/photo/" + encodeURIComponent(currentCareer) + "/" +
+                        currentPilot, { method: "DELETE" });
+            showPortrait(currentCareer, currentPilot);
+        });
+        el("crop-save").addEventListener("click", saveCrop);
+        document.addEventListener("click", (event) => {
+            if (event.target.closest && event.target.closest("[data-crop-close]")) {
+                closeCropper();
+            }
+        });
+
+        const canvas = el("crop-canvas");
+        canvas.addEventListener("pointerdown", (event) => {
+            crop.dragging = true;
+            crop.lastX = event.clientX;
+            crop.lastY = event.clientY;
+            canvas.classList.add("dragging");
+            canvas.setPointerCapture(event.pointerId);
+        });
+        canvas.addEventListener("pointermove", (event) => {
+            if (!crop.dragging) return;
+            crop.x += event.clientX - crop.lastX;
+            crop.y += event.clientY - crop.lastY;
+            crop.lastX = event.clientX;
+            crop.lastY = event.clientY;
+            drawCrop();
+        });
+        const stop = () => { crop.dragging = false; canvas.classList.remove("dragging"); };
+        canvas.addEventListener("pointerup", stop);
+        canvas.addEventListener("pointercancel", stop);
+        canvas.addEventListener("wheel", (event) => {
+            event.preventDefault();
+            const slider = el("crop-zoom");
+            slider.value = Math.min(400, Math.max(100,
+                Number(slider.value) - Math.sign(event.deltaY) * 10));
+            slider.dispatchEvent(new Event("input"));
+        }, { passive: false });
+
+        el("crop-zoom").addEventListener("input", (event) => {
+            if (!crop.image) return;
+            // Zoom about the frame centre so the subject does not drift.
+            const canvasEl = el("crop-canvas");
+            const cx = canvasEl.width / 2, cy = canvasEl.height / 2;
+            const next = crop.minScale * (Number(event.target.value) / 100);
+            const ratio = next / crop.scale;
+            crop.x = cx - (cx - crop.x) * ratio;
+            crop.y = cy - (cy - crop.y) * ratio;
+            crop.scale = next;
+            drawCrop();
+        });
+    }
+
     /* --------------------------------------------------------- navigation -- */
 
     function route() {
@@ -451,6 +610,7 @@
         else loadLanding();
     }
 
+    wirePortrait();
     el("back-btn").addEventListener("click", () => { location.hash = ""; });
     el("d-roster").querySelectorAll("th").forEach((th) => {
         th.addEventListener("click", () => {
@@ -475,7 +635,9 @@
         }
     });
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && !el("lightbox").hidden) closeLightbox();
+        if (event.key !== "Escape") return;
+        if (!el("cropper").hidden) closeCropper();
+        else if (!el("lightbox").hidden) closeLightbox();
     });
 
     window.addEventListener("hashchange", route);

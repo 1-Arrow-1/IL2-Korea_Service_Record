@@ -68,6 +68,17 @@
                         <div class="record-col">
                             <section class="panel">
                                 <h3>Pilot Information</h3>
+                                <div class="portrait-block">
+                                    <div id="d-portrait" class="portrait">
+                                        <span class="portrait-empty">No photograph</span>
+                                    </div>
+                                    <div class="portrait-actions">
+                                        <button id="photo-pick" class="nav-btn small">Change photo</button>
+                                        <button id="photo-clear" class="nav-btn small ghost" hidden>Remove</button>
+                                    </div>
+                                    <input id="photo-file" type="file"
+                                           accept="image/*" hidden>
+                                </div>
                                 <table class="mini-table" id="d-info"></table>
                                 <h3 class="panel-subhead">Characteristics</h3>
                                 <div id="d-attributes" class="attributes"></div>
@@ -159,6 +170,25 @@
             <span id="footer-note">Read-only. Nothing is written to your game files.</span>
         </div>
     </footer>
+
+    <!-- Crop dialog for pilot photographs -->
+    <div id="cropper" class="lightbox" hidden>
+        <div class="lightbox-backdrop" data-crop-close></div>
+        <div class="lightbox-panel cropper-panel" role="dialog" aria-modal="true">
+            <button class="lightbox-close" data-crop-close aria-label="Close">&times;</button>
+            <h2>Position the photograph</h2>
+            <p class="lightbox-sub">Drag to move &middot; scroll or use the slider to zoom</p>
+            <div class="crop-stage">
+                <canvas id="crop-canvas" width="320" height="392"></canvas>
+            </div>
+            <input id="crop-zoom" class="crop-zoom" type="range"
+                   min="100" max="400" value="100">
+            <div class="crop-actions">
+                <button id="crop-save" class="nav-btn">Save</button>
+                <button id="crop-cancel" class="nav-btn ghost" data-crop-close>Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Lightbox for medals, insignia and squadron emblems -->
     <div id="lightbox" class="lightbox" hidden>

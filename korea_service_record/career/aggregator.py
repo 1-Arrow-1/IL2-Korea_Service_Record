@@ -167,6 +167,29 @@ class CareerAggregator:
             "promotions": sum(1 for a in held if a["category"] == 1),
         }
 
+    # A description file may redirect instead of holding text:
+    #     #601002 // Использовать описание от другой награды
+    # ("use the description from another award"). 80 of the 99 USAF/Navy award
+    # descriptions are redirects — every cluster points at the base decoration,
+    # which is why they looked like untranslated Russian stubs.
+    _REDIRECT = re.compile(r'^\s*#(\d+)')
+
+    def award_description(self, award_id: int, depth: int = 0) -> Dict[str, Any]:
+        """Award description text, following redirects to the base decoration."""
+        ident = str(award_id)
+        vpath = f"nsdata/assets/awards/{ident[0]}xx/{ident}.locale={self.lang}.txt"
+        text = (self.resolver.read_text(vpath) or "").strip()
+        match = self._REDIRECT.match(text)
+        if match and depth < 5:
+            target = int(match.group(1))
+            if target != award_id:
+                inherited = self.award_description(target, depth + 1)
+                # Say whose text this is; the reader should not think the
+                # citation was written for the cluster.
+                inherited["inherited_from"] = self.award_name(target)
+                return inherited
+        return {"description": "" if match else text, "inherited_from": ""}
+
     def emblem_detail(self, kind: str, ident: str) -> Optional[Dict[str, Any]]:
         """
         Name, description and full-size art for one medal, rank or emblem.
@@ -182,10 +205,14 @@ class CareerAggregator:
         # rather than returning an empty shell.
         if not ident.isdigit() or not self.icons.has(kind, ident):
             return None
-        name, vpath = "", ""
+        name, vpath, inherited = "", "", ""
         if kind == "award":
             name = self.award_name(int(ident))
-            vpath = f"nsdata/assets/awards/{ident[0]}xx/{ident}.locale={self.lang}.txt"
+            found = self.award_description(int(ident))
+            text, inherited = found["description"], found["inherited_from"]
+            return {"kind": kind, "id": ident, "name": name,
+                    "description": text, "inherited_from": inherited,
+                    "image": f"/api/icon/{kind}/{ident}"}
         elif kind == "squadron":
             # The readable squadron name lives in the career file name, which
             # this call has no access to; the caller supplies it and this is
@@ -208,6 +235,7 @@ class CareerAggregator:
             "id": ident,
             "name": name,
             "description": (text or "").strip(),
+            "inherited_from": inherited,
             "image": f"/api/icon/{kind}/{ident}",
         }
 
@@ -468,6 +496,7 @@ class CareerAggregator:
 
             return {
                 "id": career_id,
+                "player_id": player["id"],
                 "squadron": meta.squadron_name,
                 "start_date": career["startDate"],
                 "current_date": career["currentDate"],

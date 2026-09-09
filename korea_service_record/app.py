@@ -20,6 +20,8 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 
 from .career.aggregator import CareerAggregator
 from .icons import SHEETS
+from .photos import PhotoStore
+from .assets import default_cache_dir
 from .gamedata import resolve_game_dir
 
 logger = logging.getLogger(__name__)
@@ -46,6 +48,7 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
     app = Flask(__name__, static_folder="static", static_url_path="/static")
 
     resolved = resolve_game_dir(Path(game_dir)) if game_dir else autodetect_game_dir()
+    app.config["PHOTOS"] = PhotoStore(default_cache_dir().parent / "photos")
     app.config["STARTED_AT"] = time.time()
     app.config["STARTED"] = time.strftime("%Y-%m-%d %H:%M:%S")
     app.config["GAME_DIR"] = resolved
@@ -108,6 +111,24 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             return ("", 404)
         return Response(data, mimetype="image/png",
                         headers={"Cache-Control": "public, max-age=31536000"})
+
+    @app.route("/api/photo/<path:career_id>/<int:pilot_id>", methods=["GET"])
+    def api_photo(career_id: str, pilot_id: int):
+        data = app.config["PHOTOS"].read(career_id, pilot_id)
+        if data is None:
+            return ("", 404)
+        return Response(data, mimetype="image/png",
+                        headers={"Cache-Control": "no-cache"})
+
+    @app.route("/api/photo/<path:career_id>/<int:pilot_id>", methods=["PUT", "DELETE"])
+    def api_photo_write(career_id: str, pilot_id: int):
+        store = app.config["PHOTOS"]
+        if request.method == "DELETE":
+            return jsonify({"deleted": store.delete(career_id, pilot_id)})
+        error = store.save(career_id, pilot_id, request.get_data())
+        if error:
+            return jsonify({"error": error}), 400
+        return jsonify({"saved": True})
 
     @app.route("/api/emblem/<kind>/<ident>")
     def api_emblem(kind: str, ident: str):
