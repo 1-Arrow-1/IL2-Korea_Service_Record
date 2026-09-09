@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IL-2 Korea Service Record</title>
+    <link rel="stylesheet" href="/static/css/main.css?v=1">
+    <link rel="stylesheet" href="/static/css/landing.css?v=1">
+    <link rel="stylesheet" href="/static/css/detail.css?v=1">
+</head>
+<body>
+<div id="app">
+
+    <header id="app-header">
+        <div class="page-container header-content">
+            <h1>IL-2 Korea Service Record</h1>
+            <nav id="header-nav">
+                <button id="back-btn" class="nav-btn" hidden>&larr; Back to Careers</button>
+            </nav>
+        </div>
+    </header>
+
+    <main id="app-main">
+        <div class="page-container">
+
+            <!-- ============ Landing ============ -->
+            <section id="landing-page" class="page">
+                <h2 class="section-title">Careers</h2>
+
+                <div id="careers-loading" class="state-block">
+                    <div class="spinner"></div>
+                    <p>Reading career files&hellip;</p>
+                </div>
+
+                <div id="careers-empty" class="state-block" hidden>
+                    <p class="state-message">
+                        No careers found.<br>
+                        <small>Start a career in IL-2 Korea, then reload this page.</small>
+                    </p>
+                </div>
+
+                <div id="careers-error" class="state-block error" hidden>
+                    <p class="state-message" id="careers-error-text"></p>
+                </div>
+
+                <div id="careers-list" class="careers-list" hidden></div>
+            </section>
+
+            <!-- ============ Detail ============ -->
+            <section id="detail-page" class="page" hidden>
+                <div id="detail-loading" class="state-block">
+                    <div class="spinner"></div>
+                    <p>Opening service record&hellip;</p>
+                </div>
+
+                <div id="detail-body" hidden>
+                    <header class="record-head">
+                        <div class="record-identity">
+                            <h2 id="d-name"></h2>
+                            <p id="d-subtitle" class="record-sub"></p>
+                        </div>
+                        <dl class="record-meta" id="d-meta"></dl>
+                    </header>
+
+                    <div class="record-grid">
+                        <section class="panel">
+                            <h3>Characteristics</h3>
+                            <div id="d-attributes" class="attributes"></div>
+                            <h3 class="panel-subhead">Efficiency</h3>
+                            <table class="mini-table" id="d-efficiency"></table>
+                        </section>
+
+                        <section class="panel">
+                            <h3>Awards</h3>
+                            <ul id="d-awards" class="award-list"></ul>
+                        </section>
+
+                        <section class="panel">
+                            <h3>Service Record</h3>
+                            <ol id="d-service" class="service-list"></ol>
+                        </section>
+                    </div>
+
+                    <section class="panel roster-panel">
+                        <h3>Squadron Roster <span id="d-roster-count" class="count"></span></h3>
+                        <div class="table-scroll">
+                            <table class="roster" id="d-roster">
+                                <thead>
+                                    <tr>
+                                        <th data-sort="name">Pilot</th>
+                                        <th data-sort="rank_id">Rank</th>
+                                        <th data-sort="state">Status</th>
+                                        <th data-sort="sorties" class="num">Sorties</th>
+                                        <th data-sort="flight_hours" class="num">Hours</th>
+                                        <th data-sort="airborne" class="num">Air</th>
+                                        <th data-sort="ground_targets" class="num">Ground</th>
+                                        <th data-sort="skills" class="num">Skl</th>
+                                        <th data-sort="discipline" class="num">Dis</th>
+                                        <th data-sort="courage" class="num">Cou</th>
+                                        <th data-sort="awards_held" class="num">Awards</th>
+                                        <th data-sort="awards_pending" class="num">Pend.</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <p class="panel-note" id="d-pending-note"></p>
+                    </section>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer id="app-footer">
+        <div class="page-container">
+            <span id="footer-note">Read-only. Nothing is written to your game files.</span>
+        </div>
+    </footer>
+
+</div>
+<script src="/static/js/app.js?v=1"></script>
+</body>
+</html>

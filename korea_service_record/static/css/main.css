@@ -1,0 +1,159 @@
+/**
+ * Global styles.
+ *
+ * Palette follows the IL-2 Campaign Service Record so the two trackers read as
+ * one product, and it happens to suit Korea's own cream-paper career screens.
+ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --ink: #2c2212;
+    --ink-muted: #4a3a24;
+    --ink-strong: #1f140a;
+    --paper: #f8f2e0;
+    --paper-deep: #efe4cc;
+    --paper-panel: #fbf6e9;
+    --accent: #8b6f4a;
+    --accent-dark: #5a4022;
+    --border: #cbb999;
+    --border-soft: #ddcdb0;
+    --good: #4a6b3a;
+    --bad: #8c3a2c;
+    --warn: #8a6a1f;
+    --shadow-soft: 0 6px 18px rgba(74, 52, 33, 0.18);
+    --page-max-width: 1500px;
+    --page-content-padding: 2rem;
+}
+
+html {
+    min-height: 100%;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background-color: var(--paper);
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: var(--paper);
+}
+
+* { scrollbar-width: thin; scrollbar-color: var(--accent-dark) var(--paper-deep); }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: var(--paper-deep); border-radius: 8px; }
+*::-webkit-scrollbar-thumb {
+    background: var(--accent-dark);
+    border-radius: 8px;
+    border: 2px solid var(--paper-deep);
+}
+
+/* ---------------------------------------------------------------- layout -- */
+
+.page-container {
+    max-width: var(--page-max-width);
+    margin: 0 auto;
+    padding: 0 var(--page-content-padding);
+}
+
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+#app-main { flex: 1; padding: 2rem 0 3rem; }
+
+#app-header {
+    background: var(--paper-deep);
+    border-bottom: 2px solid var(--border);
+    box-shadow: var(--shadow-soft);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.1rem;
+    padding-bottom: 1.1rem;
+}
+
+#app-header h1 {
+    font-size: 1.5rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-strong);
+    font-weight: normal;
+}
+
+#app-footer {
+    border-top: 1px solid var(--border-soft);
+    padding: 1rem 0;
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+}
+
+.section-title {
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: normal;
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --------------------------------------------------------------- controls -- */
+
+.nav-btn {
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--accent-dark);
+    color: #f6edd9;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.nav-btn:hover { background: #6d4f2b; }
+[hidden] { display: none !important; }
+
+/* ----------------------------------------------------------------- states -- */
+
+.state-block { text-align: center; padding: 3rem 1rem; color: var(--ink-muted); }
+.state-block.error .state-message { color: var(--bad); }
+.state-message small { color: var(--ink-muted); }
+
+.spinner {
+    width: 28px; height: 28px;
+    margin: 0 auto 1rem;
+    border: 3px solid var(--border-soft);
+    border-top-color: var(--accent-dark);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ----------------------------------------------------------------- panels -- */
+
+.panel {
+    background: var(--paper-panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem 1.4rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.panel h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: normal;
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 0.4rem;
+    margin-bottom: 1rem;
+}
+.panel-subhead { margin-top: 1.5rem; }
+.panel-note { margin-top: 0.9rem; font-size: 0.82rem; color: var(--ink-muted); }
+.count { color: var(--ink-muted); font-size: 0.8rem; letter-spacing: 0; }

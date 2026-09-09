@@ -1,0 +1,167 @@
+/**
+ * Career detail — player card, awards, service record, squadron roster.
+ */
+
+.record-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.record-identity h2 { font-size: 1.9rem; font-weight: normal; color: var(--ink-strong); }
+.record-sub { color: var(--ink-muted); font-style: italic; }
+
+.record-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(96px, max-content));
+    gap: 0.4rem 1.8rem;
+    text-align: right;
+}
+.record-meta dt {
+    font-size: 0.67rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+}
+.record-meta dd { font-size: 1.05rem; color: var(--ink-strong); margin-bottom: 0.3rem; }
+
+.record-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(280px, 1.2fr) minmax(300px, 1.4fr);
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+    align-items: start;
+}
+@media (max-width: 1100px) { .record-grid { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------ attributes -- */
+
+.attr-row { margin-bottom: 0.9rem; }
+.attr-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-bottom: 0.25rem;
+}
+.attr-value { color: var(--ink-strong); font-size: 1rem; }
+.attr-points { color: var(--accent); font-size: 0.75rem; margin-left: 0.4rem; }
+
+.attr-bar {
+    display: flex;
+    gap: 3px;
+    height: 9px;
+}
+.attr-pip { flex: 1; background: var(--paper-deep); border: 1px solid var(--border-soft); }
+.attr-pip.on { background: var(--accent-dark); border-color: var(--accent-dark); }
+
+.mini-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.mini-table th {
+    text-align: left;
+    font-weight: normal;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.3rem 0;
+}
+.mini-table td { text-align: right; color: var(--ink-strong); padding: 0.3rem 0; }
+
+/* ---------------------------------------------------------------- awards -- */
+
+.award-list { list-style: none; }
+.award-list li {
+    padding: 0.55rem 0;
+    border-bottom: 1px dotted var(--border-soft);
+}
+.award-list li:last-child { border-bottom: none; }
+.award-name { display: block; color: var(--ink-strong); }
+.award-dates { font-size: 0.78rem; color: var(--ink-muted); }
+.badge {
+    display: inline-block;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 0.05rem 0.4rem;
+    border-radius: 3px;
+    margin-left: 0.4rem;
+    vertical-align: 0.08em;
+}
+.badge.pending { background: #f0e2bd; color: var(--warn); border: 1px solid #d9c48c; }
+.badge.promotion { background: #dfe6d6; color: var(--good); border: 1px solid #b9c9a8; }
+
+/* -------------------------------------------------------- service record -- */
+
+.service-list { list-style: none; max-height: 420px; overflow-y: auto; }
+.service-list li {
+    display: grid;
+    grid-template-columns: 5.6rem 1fr;
+    gap: 0.6rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px dotted var(--border-soft);
+    font-size: 0.9rem;
+}
+.service-date { color: var(--ink-muted); font-size: 0.82rem; }
+.service-text { color: var(--ink-strong); }
+.service-route {
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-left: 0.35rem;
+}
+.kind-pilot_kia .service-text, .kind-plane_lost .service-text { color: var(--bad); }
+.kind-promotion .service-text { color: var(--good); }
+
+/* ---------------------------------------------------------------- roster -- */
+
+.roster-panel { margin-bottom: 2rem; }
+.table-scroll { overflow-x: auto; }
+
+table.roster { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+table.roster th {
+    text-align: left;
+    font-weight: normal;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--border);
+    padding: 0.45rem 0.6rem;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+}
+table.roster th:hover { color: var(--ink-strong); }
+table.roster th.num, table.roster td.num { text-align: right; }
+table.roster th.sorted::after { content: ' \25BC'; font-size: 0.6em; }
+table.roster th.sorted.asc::after { content: ' \25B2'; }
+
+table.roster td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px dotted var(--border-soft);
+    white-space: nowrap;
+}
+table.roster tbody tr:hover { background: var(--paper-deep); }
+table.roster tr.is-player td { background: #f2e8ce; font-weight: bold; }
+table.roster tr.is-kia td { color: #93796a; }
+
+.status-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-right: 0.4rem;
+    vertical-align: 0.05em;
+}
+.status-active { background: var(--good); }
+.status-kia { background: var(--bad); }
+.status-wounded, .status-pow { background: var(--warn); }
+.status-other { background: var(--border); }

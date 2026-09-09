@@ -1,0 +1,89 @@
+/**
+ * Landing page — one card per career database found in data/Career.
+ */
+
+.careers-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 1.25rem;
+}
+
+.career-card {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: var(--paper-panel);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--accent-dark);
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.career-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(74, 52, 33, 0.24);
+}
+
+.career-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.15rem;
+}
+
+.career-pilot {
+    font-size: 1.25rem;
+    color: var(--ink-strong);
+}
+
+.career-rank {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-dark);
+    white-space: nowrap;
+}
+
+.career-squadron {
+    font-size: 0.95rem;
+    color: var(--ink-muted);
+    font-style: italic;
+    margin-bottom: 0.9rem;
+}
+
+.career-dates {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    border-top: 1px solid var(--border-soft);
+    padding-top: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+
+.career-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.career-stat .value {
+    display: block;
+    font-size: 1.15rem;
+    color: var(--ink-strong);
+    line-height: 1.2;
+}
+
+.career-stat .label {
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ink-muted);
+}

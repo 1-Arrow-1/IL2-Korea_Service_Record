@@ -4,7 +4,7 @@ A pilot and unit tracker for **IL-2 Sturmovik: Korea**, in the spirit of the
 IL-2 Great Battles Campaign Tracker. Reads the game's own career databases and
 flight logs; never writes to them.
 
-Status: **data layer only.** No web UI yet.
+Status: **working web UI.** Career list -> career detail, read-only.
 
 ## Why
 
@@ -86,9 +86,23 @@ korea_service_record/
     killstats.py         packed killStats parser
     attributes.py        persLevel / leadLevel nibble decode
     events.py            event type map with confidence levels
+    aggregator.py        builds the API payloads
+  app.py                 Flask factory + JSON API
+  static/                index.html, css/, js/app.js
+run.py                   launcher
 tools/
   validate.py            checks every derived value against a live career
 ```
+
+## Run
+
+```
+pip install -r requirements.txt
+python run.py
+```
+
+Opens `http://127.0.0.1:5002/`. The game folder is auto-detected across the
+usual Steam drives; override with `--game` or `KOREA_GAME_DIR`.
 
 ## Validate
 
