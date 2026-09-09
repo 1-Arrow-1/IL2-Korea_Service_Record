@@ -31,7 +31,7 @@ that need decoding, and one — rank — the game's own UI gets wrong.
 | Awards | `award` table + `scg/2/awards.cfg` | `isDeleted=1` means retired by a higher cluster, not deleted |
 | Award route | `event.missionId` | a real mission id = earned at debrief; `-1` = roster sweep |
 | Ranks | `pilot.rankId` + `ranks.locale` | extracted from the encrypted `Interface.gtp`; see the warning below |
-| Events | `event.type` | 0 kill, 19 promotion, 20 award, 33 operation confirmed; 5/14/16 likely; ten more unidentified |
+| Events | `event.type` | 16 of 17 types identified — kills, aircraft lost, pilots KIA, wounds, hospital, repairs, deliveries, promotions, awards, operations |
 
 ### The game's rank display is wrong — ours is not
 
@@ -67,7 +67,10 @@ names.
 - **`pilot.persLevel` is 0 for the player**, decoding to the minimum 1/1/1.
   Probably correct rather than missing — the human supplies the skill — but the
   player's bar values have not been read off the panel to confirm it.
-- Ten `event.type` values remain unidentified.
+- One `event.type` remains unidentified: **13**, a single row for the player on
+  1951.05.15, a day the career skips. Three types (8, 25, 32) are single-row and
+  matched only to a UI string, so they are marked `likely` rather than
+  `confirmed`.
 
 ## Layout
 
