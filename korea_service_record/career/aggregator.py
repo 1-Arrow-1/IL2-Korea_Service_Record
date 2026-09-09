@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional
 
 from ..assets import AssetResolver
 from ..gamedata import AwardsConfig, LocaleStrings, DEFAULT_TVD, PLANE_TYPES
+from ..icons import IconLibrary
 from ..worldobjects import WorldObjectIndex
 from .attributes import PilotAttributes
 from .database import CareerFile, KoreaCareerDatabase, find_careers
@@ -97,6 +98,7 @@ class CareerAggregator:
         self.resolver = AssetResolver(self.game_dir)
         self.locale = LocaleStrings(self.game_dir, lang, resolver=self.resolver)
         self.objects = WorldObjectIndex(self.resolver, lang)
+        self.icons = IconLibrary(self.resolver)
         self.awards_cfg = AwardsConfig(
             self.game_dir / "data" / "scg" / str(DEFAULT_TVD) / "awards.cfg")
 
@@ -141,6 +143,9 @@ class CareerAggregator:
             "awards_held": len(medals),
             "awards_pending": sum(1 for a in held if a["isPending"]),
             "top_award": self.award_name(top) if top else "",
+            "top_award_id": top,
+            # rank icon keys are rank<country><index>
+            "rank_key": f"{row['country']}{row['rankId']}",
             "promotions": sum(1 for a in held if a["category"] == 1),
         }
 
@@ -237,14 +242,15 @@ class CareerAggregator:
             {"label": "Wounded in action", "value": wounded},
         ]
 
-    def _promotions_and_awards(self, awards) -> Dict[str, List]:
+    def _promotions_and_awards(self, awards, country: int = 601) -> Dict[str, List]:
         promotions, medals = [], []
         for row in awards:
             if row["category"] == 1:
                 rank_id = row["type"] - PROMOTION_BASE + 1
                 promotions.append({
-                    "rank": self.locale.rank_name(601, rank_id),
+                    "rank": self.locale.rank_name(country, rank_id),
                     "rank_id": rank_id,
+                    "rank_key": f"{country}{rank_id}",
                     "date": row["receivedDate"] if not row["isPending"]
                             else row["earnedDate"],
                     "pending": bool(row["isPending"]),
@@ -360,7 +366,7 @@ class CareerAggregator:
             sorties = db.sorties(pid)
             kill_events = db.events(pid, types=[0])
             player_awards = db.awards(pid)
-            groups = self._promotions_and_awards(player_awards)
+            groups = self._promotions_and_awards(player_awards, player['country'])
 
             # The rank on the earliest sortie is where the career began.
             starting_rank_id = sorties[0]["rankId"] if sorties else player["rankId"]
@@ -383,6 +389,8 @@ class CareerAggregator:
                 "current_date": career["currentDate"],
                 "award_points": squad["awardPoints"] if squad else 0,
                 "efficiency": squad["efficiency"] if squad else None,
+                # squadrons.xaml keys emblems by the squadron's configId
+                "squadron_key": str(squad["configId"]) if squad else "",
                 "player": self._pilot_row(player, awards_by_pilot),
                 "combat": self._combat_results(KillStats(player["killStats"])),
                 "air_kills_by_type": self._air_kills_by_type(kill_events),

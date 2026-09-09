@@ -95,7 +95,7 @@ body {
     font-size: 1.15rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    font-weight: normal;
+    font-weight: bold;
     color: var(--ink-muted);
     border-bottom: 1px solid var(--border);
     padding-bottom: 0.5rem;
@@ -148,7 +148,7 @@ body {
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    font-weight: normal;
+    font-weight: bold;
     color: var(--ink-muted);
     border-bottom: 1px solid var(--border-soft);
     padding-bottom: 0.4rem;

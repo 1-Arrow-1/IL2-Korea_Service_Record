@@ -49,6 +49,23 @@ one version assert — all 26 observed `AType` records parse, including `AType:3
 kills, `AType:10` plane init and `AType:12` object spawn with pilot names. So
 per-mission, per-pilot attribution is available, not just cumulative counters.
 
+## Artwork
+
+Medals, rank insignia and squadron emblems are sliced live out of the game's own
+atlases. Each resource dictionary declares its own atlas-to-DDS mapping, so
+nothing is hard-coded:
+
+```
+awards.xaml      3 atlases,  98 entries
+ranks.xaml       6 atlases,  36 entries
+squadrons.xaml  10 atlases,  73 entries
+```
+
+`/api/icon/<kind>/<id>?h=<px>` returns a PNG, cached per size — a rank insignia
+is 467x198 and 200 KB in the atlas but 3.7 KB at the 28 pixels the page uses.
+Because the asset layer prefers loose files, a modded install shows the modded
+medals.
+
 ## Encrypted assets
 
 Rank names, award names, `awards.xaml` and the medal atlases live inside

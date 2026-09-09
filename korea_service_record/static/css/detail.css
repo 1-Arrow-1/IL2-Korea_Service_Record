@@ -282,3 +282,28 @@ table.roster tr.is-kia td { color: #93796a; }
 /* Debrief log extras. */
 .log-row.scenery { font-style: italic; color: var(--ink-muted); }
 .log-note { color: var(--ink-muted); font-size: 0.9em; font-weight: normal; }
+
+/* ------------------------------------------------------------- artwork -- */
+
+.record-sub { display: flex; align-items: center; gap: 0.7rem; }
+.record-sub .rank-icon { height: 26px; width: auto; }
+.squadron-emblem { height: 64px; width: auto; }
+.squadron-emblem.strip { height: 56px; margin-right: 1rem; align-self: center; }
+
+#d-squadron-strip { display: flex; align-items: center; gap: 0.5rem; }
+#d-squadron-strip .stat-cell { flex: 1; }
+
+.award-list li.with-icon {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 0.7rem;
+    align-items: center;
+}
+.award-list .award-icon { max-height: 44px; max-width: 46px; display: block; margin: 0 auto; }
+.award-list .rank-icon { max-height: 26px; max-width: 46px; display: block; margin: 0 auto; }
+
+table.roster td.rank-cell .rank-icon { height: 22px; width: auto; display: block; }
+table.roster td.award-cell { min-width: 60px; }
+table.roster td.award-cell .award-icon { max-height: 40px; max-width: 44px; display: block; }
+
+.list-head { font-weight: bold; }

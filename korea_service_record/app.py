@@ -15,9 +15,10 @@ import zlib
 from pathlib import Path
 from typing import Optional
 
-from flask import Flask, Response, jsonify, send_from_directory
+from flask import Flask, Response, jsonify, request, send_from_directory
 
 from .career.aggregator import CareerAggregator
+from .icons import SHEETS
 from .gamedata import resolve_game_dir
 
 logger = logging.getLogger(__name__)
@@ -82,6 +83,29 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         return Response(html, mimetype="text/html",
                         headers={"Cache-Control": "no-store"})
 
+    @app.route("/api/icon/<kind>/<ident>")
+    def api_icon(kind: str, ident: str):
+        """
+        Medal, rank or squadron artwork sliced from the game's atlases.
+
+        ?h=<px> asks for a scaled variant. A missing icon is a 404 rather than
+        a placeholder, so the page falls back to text on its own.
+        """
+        agg = aggregator()
+        if agg is None or kind not in SHEETS:
+            return ("", 404)
+        try:
+            height = int(request.args.get("h", 0)) or None
+        except ValueError:
+            height = None
+        if height is not None and not (8 <= height <= 512):
+            height = None
+        data = agg.icons.png(kind, ident, height)
+        if data is None:
+            return ("", 404)
+        return Response(data, mimetype="image/png",
+                        headers={"Cache-Control": "public, max-age=31536000"})
+
     # -- api ---------------------------------------------------------------
 
     @app.route("/api/careers")
@@ -110,6 +134,8 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             "locale_sources": agg.locale.sources() if agg else None,
             "award_definitions": len(agg.awards_cfg.definitions) if agg else 0,
             "rank_strings": len(agg.locale.ranks) if agg else 0,
+            "icons": {k: len(agg.icons.sheet(k).crops) for k in SHEETS} if agg else {},
+            "world_objects": len(agg.objects.objects) if agg else 0,
             "award_strings": len(agg.locale.awards) if agg else 0,
         }
         return jsonify(info)

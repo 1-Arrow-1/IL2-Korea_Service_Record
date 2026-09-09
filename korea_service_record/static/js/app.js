@@ -36,6 +36,15 @@
         return esc(level) + boost;
     }
 
+    // Artwork sliced out of the game's own atlases. A missing icon 404s, and
+    // onerror hides it so the text beside it simply stands alone.
+    const icon = (kind, ident, height, cls, title) =>
+        (ident === null || ident === undefined || ident === "")
+            ? ""
+            : '<img class="' + cls + '" src="/api/icon/' + kind + "/" +
+              encodeURIComponent(ident) + "?h=" + height + '" alt="" title="' +
+              esc(title || "") + '" onerror="this.style.display=&quot;none&quot;">';
+
     const rows = (pairs) => pairs
         .map(([k, v]) => "<tr><th>" + esc(k) + "</th><td>" + esc(v) + "</td></tr>")
         .join("");
@@ -149,17 +158,21 @@
         const badge = award.pending ? '<span class="badge pending">pending</span>' : "";
         const when = award.pending
             ? "awaiting award points" : "received " + esc(award.received);
-        return "<li>" +
+        return '<li class="with-icon">' +
+            icon("award", award.type, 44, "award-icon", award.name) +
+            "<div>" +
             '<span class="award-name">' + esc(award.name) + badge + "</span>" +
             '<span class="award-dates">earned ' + esc(award.earned) +
-            " &middot; " + when + "</span></li>";
+            " &middot; " + when + "</span></div></li>";
     }
 
     function promotionItem(promotion) {
         const badge = promotion.pending ? '<span class="badge pending">pending</span>' : "";
-        return "<li>" +
+        return '<li class="with-icon">' +
+            icon("rank", promotion.rank_key, 26, "rank-icon", promotion.rank) +
+            "<div>" +
             '<span class="award-name">' + esc(promotion.rank) + badge + "</span>" +
-            '<span class="award-dates">' + esc(promotion.date) + "</span></li>";
+            '<span class="award-dates">' + esc(promotion.date) + "</span></div></li>";
     }
 
     function incidenceItem(entry) {
@@ -245,9 +258,13 @@
             const cls = [p.is_player ? "is-player" : "",
                          p.state === "kia" ? "is-kia" : ""].filter(Boolean).join(" ");
             return '<tr class="' + cls + '">' +
-                "<td>" + esc(p.rank) + "</td>" +
+                '<td class="rank-cell">' +
+                    (icon("rank", p.rank_key, 22, "rank-icon", p.rank) ||
+                     esc(p.rank)) + "</td>" +
                 "<td>" + esc(p.name) + "</td>" +
-                '<td class="award-cell">' + (esc(p.top_award) || "&mdash;") + "</td>" +
+                '<td class="award-cell">' +
+                    (icon("award", p.top_award_id, 40, "award-icon", p.top_award) ||
+                     "&mdash;") + "</td>" +
                 '<td><span class="status-dot ' + dotClass + '"></span>' + esc(p.state) +
                     (p.state_until
                         ? ' <span class="until">until ' + esc(p.state_until) + "</span>"
@@ -277,7 +294,10 @@
             const p = d.player;
 
             el("d-name").textContent = p.name;
-            el("d-subtitle").textContent = p.rank + " · " + d.squadron;
+            el("d-subtitle").innerHTML =
+                icon("rank", p.rank_key, 26, "rank-icon", p.rank) +
+                "<span>" + esc(p.rank) + " · " + esc(d.squadron) + "</span>" +
+                icon("squadron", d.squadron_key, 64, "squadron-emblem", d.squadron);
             el("d-meta").innerHTML = [
                 ["Career", d.start_date + " – " + d.current_date],
                 ["Sorties", p.sorties + " (" + p.good_sorties + " successful)"],
@@ -331,7 +351,9 @@
             el("d-debrief-count").textContent = "(" + d.debriefings.length + ")";
             el("d-debriefings").innerHTML = d.debriefings.map(debriefBlock).join("");
 
-            el("d-squadron-strip").innerHTML = statStrip(d.squadron_totals);
+            el("d-squadron-strip").innerHTML =
+                icon("squadron", d.squadron_key, 56, "squadron-emblem strip", d.squadron) +
+                statStrip(d.squadron_totals);
             rosterRows = d.roster.map(flatten);
             el("d-roster-count").textContent = "(" + rosterRows.length + ")";
             renderRoster();
