@@ -349,7 +349,7 @@
                     (statusIcon
                         ? '<img class="status-icon" src="/static/images/icons/' +
                           statusIcon + '.png" alt="' + esc(p.state) + '">'
-                        : '<span class="status-dot ' + dotClass + '"></span>') +
+                        : '<span class="status-badge ' + dotClass + '"></span>') +
                     "</td>" +
                 '<td class="num">' + esc(p.airborne) + "</td>" +
                 '<td class="num">' + esc(p.ground_targets) + "</td>" +
