@@ -88,14 +88,21 @@
   },
   "performance": {
     "heading": "Combat Efficiency",
-    "best_air_streak": "Best air victory streak",
-    "best_ground_streak": "Best ground streak",
     "in_one_sortie": "{count} in one sortie",
     "per_sortie": "Victories per sortie",
     "per_hour": "Victories per flight hour",
     "average_altitude": "Average victory altitude",
     "best_score": "Best mission score",
-    "career_score": "Career score"
+    "career_score": "Career score",
+    "best_air_sortie": "Best sortie, air victories",
+    "best_ground_sortie": "Best sortie, ground targets",
+    "best_air_sortie_hint": "The most enemy aircraft shot down in one sortie. Aircraft destroyed on the ground count as ground targets, not as victories.",
+    "best_ground_sortie_hint": "The most ground targets destroyed in one sortie, including aircraft caught on the ground.",
+    "per_sortie_hint": "Air victories divided by sorties flown.",
+    "per_hour_hint": "Air victories divided by hours flown.",
+    "average_altitude_hint": "The average altitude of the confirmed air victories.",
+    "best_score_hint": "The game's own score for a single mission — the highest of the career.",
+    "career_score_hint": "The game's own mission scores added together across every mission flown. It is how the career rates performance, not a count of anything."
   },
   "victories": {
     "heading": "Confirmed Victories"
@@ -159,7 +166,9 @@
     "outcome_lost": "lost",
     "aircraft_state": "aircraft {state}",
     "rank": "Rank",
-    "name": "Name"
+    "name": "Name",
+    "damage": "Damage",
+    "pilot_hurt": "pilot {percent}%"
   },
   "roster": {
     "heading": "Squadron Statistics",

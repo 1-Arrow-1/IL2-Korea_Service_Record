@@ -525,9 +525,23 @@
         // Combat efficiency and the victory roll. Both panels are hidden
         // outright when a pilot has nothing to put in them — an AI wingman
         // with no air kills should not get an empty "Confirmed Victories".
-        el("d-performance").innerHTML = (d.performance || []).map((row) =>
-            "<tr><th>" + esc(rowLabel(row)) + "</th><td>" +
-            esc(rowValue(row)) + "</td></tr>").join("");
+        // A figure is more useful next to the sortie that produced it, so the
+        // rows that name one open that debrief; the hint explains where a
+        // number comes from, which matters most for the score, which is the
+        // game's own and counts nothing recognisable.
+        el("d-performance").innerHTML = (d.performance || []).map((row) => {
+            const hint = row.hint_key ? T(row.hint_key) : "";
+            const linked = row.mission_id !== null && row.mission_id !== undefined;
+            return '<tr class="perf-row' + (linked ? " linked" : "") + '"' +
+                (linked ? ' data-mission="' + esc(row.mission_id) + '"' : "") +
+                (hint ? ' title="' + esc(hint) + '"' : "") + ">" +
+                "<th>" + esc(rowLabel(row)) + "</th><td>" + esc(rowValue(row)) +
+                (linked && row.mission_num
+                    ? ' <span class="perf-mission">' +
+                      esc(T("debrief.mission", {number: row.mission_num})) + "</span>"
+                    : "") +
+                "</td></tr>";
+        }).join("");
         show(el("d-performance-panel"), (d.performance || []).length > 0);
 
         const victories = d.victories || [];
@@ -606,6 +620,16 @@
                 '<td class="num">' + esc(f.flight_time) + "</td>" +
                 "<td>" + esc(T("debrief.outcome_" + f.outcome)) +
                     (f.wounded ? ", " + esc(T("debrief.wounded")) : "") + "</td>" +
+                '<td class="num damage-cell">' +
+                    (f.plane_damage === null || f.plane_damage === undefined
+                        ? "&mdash;"
+                        : esc(f.plane_damage) + "%" +
+                          (f.pilot_damage
+                              ? ' <span class="pilot-hurt">' +
+                                esc(T("debrief.pilot_hurt", {percent: f.pilot_damage})) +
+                                "</span>"
+                              : "")) +
+                "</td>" +
                 "</tr>").join("");
 
             const log = m.log.map((k) => {
@@ -639,6 +663,7 @@
                     '<th class="num">' + esc(T("debrief.ground")) + '</th>' +
                     '<th class="num">' + esc(T("debrief.time")) + "</th><th>" +
                     esc(T("debrief.outcome")) + "</th>" +
+                    '<th class="num">' + esc(T("debrief.damage")) + "</th>" +
                 "</tr></thead><tbody>" + flown + "</tbody></table>" +
                 "<h3>" + esc(T("debrief.combat_log")) +
                     ' <span class="count">(' + m.log.length + ")</span></h3>" +

@@ -88,14 +88,21 @@
   },
   "performance": {
     "heading": "Gefechtseffizienz",
-    "best_air_streak": "Beste Luftsiegserie",
-    "best_ground_streak": "Beste Bodenserie",
     "in_one_sortie": "{count} in einem Einsatz",
     "per_sortie": "Luftsiege je Einsatz",
     "per_hour": "Luftsiege je Flugstunde",
     "average_altitude": "Durchschnittliche Siegeshöhe",
     "best_score": "Beste Einsatzpunktzahl",
-    "career_score": "Karrierepunktzahl"
+    "career_score": "Karrierepunktzahl",
+    "best_air_sortie": "Bester Einsatz, Luftsiege",
+    "best_ground_sortie": "Bester Einsatz, Bodenziele",
+    "best_air_sortie_hint": "Die meisten in einem Einsatz abgeschossenen Flugzeuge. Am Boden zerstörte Flugzeuge zählen als Bodenziele, nicht als Luftsiege.",
+    "best_ground_sortie_hint": "Die meisten in einem Einsatz zerstörten Bodenziele, einschließlich am Boden erwischter Flugzeuge.",
+    "per_sortie_hint": "Luftsiege geteilt durch geflogene Einsätze.",
+    "per_hour_hint": "Luftsiege geteilt durch geflogene Stunden.",
+    "average_altitude_hint": "Die durchschnittliche Höhe der bestätigten Luftsiege.",
+    "best_score_hint": "Die spieleigene Punktzahl für einen einzelnen Einsatz — die höchste der Laufbahn.",
+    "career_score_hint": "Die spieleigenen Einsatzpunktzahlen aller geflogenen Einsätze zusammengezählt. So bewertet die Laufbahn die Leistung; es ist keine Anzahl von etwas."
   },
   "victories": {
     "heading": "Bestätigte Luftsiege"
@@ -159,7 +166,9 @@
     "outcome_lost": "verloren",
     "aircraft_state": "Flugzeug {state}",
     "rank": "Dienstgrad",
-    "name": "Name"
+    "name": "Name",
+    "damage": "Schäden",
+    "pilot_hurt": "Pilot {percent}%"
   },
   "roster": {
     "heading": "Staffelstatistik",

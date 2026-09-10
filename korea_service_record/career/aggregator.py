@@ -478,42 +478,78 @@ class CareerAggregator:
         38,091 in one mission read "explosion") and count damage events rather
         than bullets, so any hit rate would be authoritative-looking nonsense.
         """
-        best_air = best_ground = best_points = career_points = 0
-        for mission in db.missions():
+        # airKillStreak is NOT airborne victories. Proved on mission 31: the
+        # counter reads 5 for a sortie with no airborne kill at all and five
+        # aircraft strafed on their dispersal, and on mission 34 it reads 7
+        # for 4 airborne plus 3 parked. It counts every aircraft destroyed.
+        # Reporting it as an air-victory figure overstated the best sortie by
+        # nearly double, so the best sortie is taken from killStats instead —
+        # the same decoding the rest of the page counts victories with.
+        best_air = best_ground = 0
+        best_air_mission = best_ground_mission = None
+        best_points = career_points = 0
+        best_points_mission = None
+
+        missions = {m["id"]: m for m in db.missions()}
+        for sortie in db.query(
+                """SELECT missionId, killStats FROM sortie
+                   WHERE pilotId = ? AND isDeleted = 0""", (player["id"],)):
+            kills = KillStats(sortie["killStats"])
+            if kills.airborne > best_air:
+                best_air, best_air_mission = kills.airborne, sortie["missionId"]
+            if kills.ground_targets > best_ground:
+                best_ground, best_ground_mission = (kills.ground_targets,
+                                                    sortie["missionId"])
+
+        for mission in missions.values():
             for row in MissionResult(mission["result"]).players():
                 if not row.get("personageNickname"):
                     continue                      # AI rows carry no nickname
-                best_air = max(best_air, int(_number(row.get("airKillStreak", "0"))))
-                best_ground = max(best_ground,
-                                  int(_number(row.get("groundKillStreak", "0"))))
                 points = int(_number(row.get("pointsSumByMission", "0")))
-                best_points = max(best_points, points)
                 career_points += points
+                if points > best_points:
+                    best_points, best_points_mission = points, mission["id"]
 
         sorties = player["sorties"] or 0
         hours = (player["flightTime"] or 0) / 3600.0
         airborne = KillStats(player["killStats"]).airborne
         altitudes = [v["altitude"] for v in victories if v["altitude"]]
-
         average = round(sum(altitudes) / len(altitudes)) if altitudes else None
-        # value_key marks a value that is itself prose — "7 in one sortie" —
-        # and so has to be assembled in the reader's language, not here.
+
+        def number(mission_id):
+            row = missions.get(mission_id)
+            return row["missionNum"] if row else None
+
+        # mission_id makes a row clickable: the figure is only interesting
+        # alongside the sortie that produced it.
+        # value_key marks a value that is itself prose and so has to be
+        # assembled in the reader's language rather than here.
         return [
-            {"key": "performance.best_air_streak", "label": "Best air victory streak",
-             "value": best_air, "value_key": "performance.in_one_sortie"},
-            {"key": "performance.best_ground_streak", "label": "Best ground streak",
-             "value": best_ground, "value_key": "performance.in_one_sortie"},
+            {"key": "performance.best_air_sortie", "label": "Best sortie, air victories",
+             "value": best_air, "value_key": "performance.in_one_sortie",
+             "mission_id": best_air_mission, "mission_num": number(best_air_mission),
+             "hint_key": "performance.best_air_sortie_hint"},
+            {"key": "performance.best_ground_sortie", "label": "Best sortie, ground targets",
+             "value": best_ground, "value_key": "performance.in_one_sortie",
+             "mission_id": best_ground_mission, "mission_num": number(best_ground_mission),
+             "hint_key": "performance.best_ground_sortie_hint"},
             {"key": "performance.per_sortie", "label": "Victories per sortie",
-             "value": f"{airborne / sorties:.2f}" if sorties else "—"},
+             "value": f"{airborne / sorties:.2f}" if sorties else "—",
+             "hint_key": "performance.per_sortie_hint"},
             {"key": "performance.per_hour", "label": "Victories per flight hour",
-             "value": f"{airborne / hours:.1f}" if hours else "—"},
+             "value": f"{airborne / hours:.1f}" if hours else "—",
+             "hint_key": "performance.per_hour_hint"},
             {"key": "performance.average_altitude", "label": "Average victory altitude",
              "value": f"{average:,}" if average is not None else "—",
-             "value_key": "common.metres" if average is not None else None},
+             "value_key": "common.metres" if average is not None else None,
+             "hint_key": "performance.average_altitude_hint"},
             {"key": "performance.best_score", "label": "Best mission score",
-             "value": f"{best_points:,}"},
+             "value": f"{best_points:,}",
+             "mission_id": best_points_mission, "mission_num": number(best_points_mission),
+             "hint_key": "performance.best_score_hint"},
             {"key": "performance.career_score", "label": "Career score",
-             "value": f"{career_points:,}"},
+             "value": f"{career_points:,}",
+             "hint_key": "performance.career_score_hint"},
         ]
 
     def _debriefings(self, db, sorties, kill_events,
@@ -727,6 +763,14 @@ class CareerAggregator:
                 return None
             result = MissionResult(mission["result"])
 
+            # mission.result records how much of each aircraft and each pilot
+            # was lost, as fractions. The career database keeps the same two
+            # numbers for the player alone (planeHealth, health) and they
+            # agree — mission 46: plane 0.540 against planeHealth 46, pilot
+            # 0.098 against health 90 — so the blob is trusted for the rest of
+            # the flight, who have no row of their own anywhere.
+            harm = result.damages()
+
             flown = []
             for row in db.query(
                     """SELECT s.*, p.name, p.lastName, p.isPlayer, p.avatarPath,
@@ -749,6 +793,9 @@ class CareerAggregator:
                     "flight_s": row["flightTime"],
                     "outcome": PLANE_OUTCOME.get(row["planeStatus"], "unknown"),
                     "wounded": row["status"] == 4,
+                    # Filled in below, once the slots are paired to pilots.
+                    "plane_damage": None,
+                    "pilot_damage": None,
                 })
 
             # Events name the actor by IL-2 account ("Arrow_1974") for the
@@ -758,6 +805,29 @@ class CareerAggregator:
             # _crew pairs the blob's formation slots against these rows in the
             # order the game wrote them, so the sort for display happens after.
             crew = self._crew(result, flown)
+
+            # crew maps an actor id to a name; damages is keyed by the same
+            # ids, so the two join without another pairing pass.
+            by_name = {}
+            for actor_id, name in crew.items():
+                hurt = harm.get(actor_id)
+                if hurt:
+                    by_name[name] = hurt
+            # The human is the exception. crew keys him by userId, because that
+            # is what his kill events carry, but damages keys every row by
+            # personageId — the same id for the AI, a different one for him.
+            player_name = next((f["name"] for f in flown if f["is_player"]), "")
+            for row in result.players():
+                if row.get("personageNickname") and player_name:
+                    hurt = harm.get(row.get("personageId", ""))
+                    if hurt:
+                        by_name[player_name] = hurt
+            for pilot in flown:
+                hurt = by_name.get(pilot["name"])
+                if hurt:
+                    pilot["plane_damage"] = round(hurt["plane"] * 100)
+                    pilot["pilot_damage"] = round(hurt["pilot"] * 100)
+
             flown.sort(key=lambda f: (not f["is_player"], -f["rank_id"]))
             player_user = next((uid for uid, name in crew.items()
                                 if name == next((f["name"] for f in flown

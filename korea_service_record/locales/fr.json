@@ -88,14 +88,21 @@
   },
   "performance": {
     "heading": "Efficacité au combat",
-    "best_air_streak": "Meilleure série de victoires aériennes",
-    "best_ground_streak": "Meilleure série au sol",
     "in_one_sortie": "{count} en une sortie",
     "per_sortie": "Victoires par sortie",
     "per_hour": "Victoires par heure de vol",
     "average_altitude": "Altitude moyenne des victoires",
     "best_score": "Meilleur score de mission",
-    "career_score": "Score de carrière"
+    "career_score": "Score de carrière",
+    "best_air_sortie": "Meilleure sortie, victoires aériennes",
+    "best_ground_sortie": "Meilleure sortie, cibles au sol",
+    "best_air_sortie_hint": "Le plus grand nombre d'avions abattus en une sortie. Les appareils détruits au sol comptent comme cibles au sol, pas comme victoires.",
+    "best_ground_sortie_hint": "Le plus grand nombre de cibles au sol détruites en une sortie, y compris les avions surpris au sol.",
+    "per_sortie_hint": "Victoires aériennes divisées par le nombre de sorties.",
+    "per_hour_hint": "Victoires aériennes divisées par les heures de vol.",
+    "average_altitude_hint": "L'altitude moyenne des victoires aériennes homologuées.",
+    "best_score_hint": "Le score du jeu pour une mission — le meilleur de la carrière.",
+    "career_score_hint": "Les scores de mission du jeu additionnés sur toute la carrière. C'est ainsi que la carrière évalue les performances ; ce n'est pas un décompte."
   },
   "victories": {
     "heading": "Victoires homologuées"
@@ -159,7 +166,9 @@
     "outcome_lost": "perdu",
     "aircraft_state": "avion {state}",
     "rank": "Grade",
-    "name": "Nom"
+    "name": "Nom",
+    "damage": "Dégâts",
+    "pilot_hurt": "pilote {percent}%"
   },
   "roster": {
     "heading": "Statistiques de l'escadrille",

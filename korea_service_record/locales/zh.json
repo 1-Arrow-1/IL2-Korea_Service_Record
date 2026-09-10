@@ -88,14 +88,21 @@
   },
   "performance": {
     "heading": "战斗效率",
-    "best_air_streak": "最佳空战连胜",
-    "best_ground_streak": "最佳地面连胜",
     "in_one_sortie": "单次出击 {count}",
     "per_sortie": "每次出击战果",
     "per_hour": "每飞行小时战果",
     "average_altitude": "平均击落高度",
     "best_score": "最佳任务得分",
-    "career_score": "生涯总分"
+    "career_score": "生涯总分",
+    "best_air_sortie": "最佳出击（空战战果）",
+    "best_ground_sortie": "最佳出击（地面目标）",
+    "best_air_sortie_hint": "单次出击击落敌机的最高数量。在地面击毁的飞机计为地面目标，而非空战战果。",
+    "best_ground_sortie_hint": "单次出击摧毁地面目标的最高数量，包括在地面被击毁的飞机。",
+    "per_sortie_hint": "空战战果除以出击次数。",
+    "per_hour_hint": "空战战果除以飞行小时。",
+    "average_altitude_hint": "已确认空战战果的平均高度。",
+    "best_score_hint": "游戏对单次任务的评分——生涯最高。",
+    "career_score_hint": "游戏对全部任务评分的总和。这是生涯衡量表现的方式，并非任何计数。"
   },
   "victories": {
     "heading": "确认战果"
@@ -159,7 +166,9 @@
     "outcome_lost": "损失",
     "aircraft_state": "飞机{state}",
     "rank": "军衔",
-    "name": "姓名"
+    "name": "姓名",
+    "damage": "损伤",
+    "pilot_hurt": "飞行员 {percent}%"
   },
   "roster": {
     "heading": "中队统计",

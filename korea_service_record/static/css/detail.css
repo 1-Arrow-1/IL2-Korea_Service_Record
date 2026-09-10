@@ -659,3 +659,20 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     color: var(--ink-muted);
 }
 .victory-alt { color: var(--ink-muted); font-size: 0.86rem; white-space: nowrap; }
+
+
+/* Efficiency rows that name a sortie open it. */
+.perf-row.linked { cursor: pointer; }
+.perf-row.linked:hover { background: var(--paper-deep); }
+.perf-row[title] th { border-bottom: 1px dotted var(--border); }
+.perf-mission {
+    color: var(--ink-muted);
+    font-size: 0.84em;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+}
+
+
+/* How much of the aircraft, and of the man, did not come back. */
+.damage-cell { white-space: nowrap; }
+.pilot-hurt { color: var(--bad); font-size: 0.86em; }

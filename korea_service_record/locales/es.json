@@ -88,14 +88,21 @@
   },
   "performance": {
     "heading": "Eficacia en combate",
-    "best_air_streak": "Mejor racha de victorias aéreas",
-    "best_ground_streak": "Mejor racha en tierra",
     "in_one_sortie": "{count} en una salida",
     "per_sortie": "Victorias por salida",
     "per_hour": "Victorias por hora de vuelo",
     "average_altitude": "Altitud media de las victorias",
     "best_score": "Mejor puntuación de misión",
-    "career_score": "Puntuación de la carrera"
+    "career_score": "Puntuación de la carrera",
+    "best_air_sortie": "Mejor salida, victorias aéreas",
+    "best_ground_sortie": "Mejor salida, objetivos terrestres",
+    "best_air_sortie_hint": "El mayor número de aviones derribados en una salida. Los aviones destruidos en tierra cuentan como objetivos terrestres, no como victorias.",
+    "best_ground_sortie_hint": "El mayor número de objetivos terrestres destruidos en una salida, incluidos los aviones sorprendidos en tierra.",
+    "per_sortie_hint": "Victorias aéreas divididas entre las salidas realizadas.",
+    "per_hour_hint": "Victorias aéreas divididas entre las horas de vuelo.",
+    "average_altitude_hint": "La altitud media de las victorias aéreas confirmadas.",
+    "best_score_hint": "La puntuación propia del juego para una misión: la más alta de la carrera.",
+    "career_score_hint": "Las puntuaciones de misión del juego sumadas a lo largo de toda la carrera. Así valora la carrera el rendimiento; no es un recuento."
   },
   "victories": {
     "heading": "Victorias confirmadas"
@@ -159,7 +166,9 @@
     "outcome_lost": "perdido",
     "aircraft_state": "aeronave {state}",
     "rank": "Empleo",
-    "name": "Nombre"
+    "name": "Nombre",
+    "damage": "Daños",
+    "pilot_hurt": "piloto {percent}%"
   },
   "roster": {
     "heading": "Estadísticas del escuadrón",
