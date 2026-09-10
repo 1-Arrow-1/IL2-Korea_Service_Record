@@ -1,0 +1,175 @@
+[size=5][b]IL-2 Korea Service Record — a pilot's file for your career, plus an awards fix[/b][/size]
+
+Gentlemen,
+
+I have been flying careers in IL-2 Sturmovik: Korea and wanted the sort of record the
+paperwork would have kept: what my pilot shot down, who he shot down, what he was decorated
+for, and what the flak did to him on the way home. The game holds all of it and shows very
+little of it, so I built something that reads it out.
+
+It comes with a second thing I did not plan on. While chasing a medal that never arrived I
+found real bugs in the game's award definitions — six decorations that cannot be granted at
+all, one of them broken in two separate ways. The installer offers the fix as an optional
+component, and I would encourage you to take it. More on that below.
+
+[b]This is read-only.[/b] It never writes to a career file and cannot cost you a campaign.
+Careers only for now — scripted campaigns and single missions are not read.
+
+
+[size=4][b]What it shows[/b][/size]
+
+[b]The pilot[/b]
+[list]
+[*]Rank insignia, squadron badge, date of birth, status and health
+[*]Skill, discipline and courage, with their boosters — the characteristics the game tracks
+but only half shows
+[*]A portrait you can add yourself, cropped to a passport frame
+[/list]
+
+[b]Combat record[/b]
+[list]
+[*]Aircraft, vehicles, railroad, armaments, buildings and shipping, broken down by target type
+[*][b]Confirmed victories[/b] — every air-to-air kill of the career, numbered, with the
+opponent's aircraft, [i]his name[/i], the date and the altitude
+[*]Air kills by type, split between those shot down and those caught on the ground
+[*]Combat efficiency: best sortie, victories per sortie and per flight hour, average
+engagement altitude, mission and career score
+[/list]
+
+[b]Mission debriefings[/b]
+[list]
+[*]Take-off and landing times from the flight log, and how the sortie ended — landed, landed
+damaged, force-landed with the aircraft written off, bailed out, or failed to return
+[*]A combat log per sortie: what was destroyed, when, by whom, at what height
+[*][b]Battle damage in the same timeline[/b] — when you were hit, how many strikes in that
+pass, how much of the aircraft was gone by the end of it, and what did it where the game
+recorded that. Roughly nine times in ten the game logs no attacker, so I show nothing rather
+than invent one.
+[*]Every pilot on the mission, each with their own damage timeline
+[/list]
+
+[b]The squadron[/b]
+[list]
+[*]The full roster — portraits, rank, highest combat decoration, status, victories, sorties,
+hours and characteristics — sortable on every column
+[*]Click a pilot for his own record; click a medal for the full-size art and the game's own
+description
+[/list]
+
+
+[size=4][b]Install[/b][/size]
+
+[list=1]
+[*]Run the setup program. It asks for your language first — that becomes the application's
+language, and you can change it later from any page.
+[*]Choose [b]both[/b] components: the Service Record and the Awards Mod.
+[*]Point it at your IL-2 Korea folder. Setup usually finds it. It is the folder containing
+[i]data\Career[/i].
+[*][b]Enable modifications in the game[/b] — Settings, General, Enable modifications.
+Without this the game never looks at modded files and the awards mod does nothing at all.
+Setup warns you if it sees the setting switched off.
+[*]Fly a mission, then open the Service Record. The first launch takes a few seconds while it
+reads the game's art and text; after that it is instant.
+[/list]
+
+Uninstalling removes both cleanly. The mod is additions only — nothing in your game is
+overwritten or replaced, so deleting the files simply returns the game to reading its own
+archives. Your careers and the medals already in them are untouched either way.
+
+Note that verifying game files in Steam removes loose mod files. If your medals stop
+appearing after a game update, run setup again.
+
+
+[size=4][b]Why the awards fix matters[/b][/size]
+
+Short version: [b]in the stock game you can never be decorated twice for the same kind of
+action[/b], and the first decoration comes down to a dice roll rather than the sortie that
+earned it.
+
+The game evaluates awards down two separate paths, [i]AwardInProc[/i] and [i]AwardByDef[/i].
+Six USAF decorations are dead on both:
+
+[list]
+[*]Silver Star, 2nd award
+[*]Silver Star, 3rd award
+[*]Distinguished Service Cross, 2nd through 5th award
+[/list]
+
+Their [i]AwardInProc[/i] carries a condition, [i]noAwards=1[/i], that never becomes true in a
+career, and their [i]AwardByDef[/i] is [i]RND<0[/i], which never fires by design. Neither route
+can ever grant them.
+
+[b]One of them is broken a second time, independently.[/b] The Silver Star's 2nd award
+requires that you already hold the Silver Star — but the file names the wrong one:
+
+[code]
+601019   RequiredAward = "603018"      should be 601018
+601020   AwardRemove   = "(ExAw=603019)"   should be 601019
+[/code]
+
+601 is the Air Force ladder; [b]603 is the Marine Corps[/b]. So the Air Force's second Silver
+Star waits on the Marines' Silver Star Medal — and those ids have names in the locale files
+but [b]no award definitions at all[/b], so the prerequisite points at nothing. Either fault
+alone is fatal. I confirmed it the slow way: a controlled test with three clean airborne kills
+and no competing award, and nothing was granted.
+
+The base Silver Star and the Distinguished Service Cross [i]do[/i] arrive in the stock game,
+but only through [i]AwardByDef[/i] — a 10% roll against your career total, not against the
+sortie you actually flew. In my own career the Silver Star landed on a 10% roll the day my
+career total first reached three victories, while the sortie that earned it was ignored. The
+Medal of Honor is not guarded and works as intended; it simply asks a great deal — six
+airborne victories in one sortie, or five while wounded.
+
+[b]What the mod changes[/b]
+[list]
+[*]Removes the [i]noAwards[/i] condition from the affected USAF valour awards, so the sortie
+you flew is what decorates you
+[*]Corrects the two 603 references to 601
+[*]Bands the valour tiers by score, so one outstanding sortie awards one appropriate medal
+rather than three at once
+[*]Makes two decorations reachable that exist in the stock file but had no route at all
+[/list]
+
+The communist ladders have [i]noAwards[/i] in places too, but always inside an OR, so they are
+harmless and I have left them alone.
+
+[b]Three decorations added[/b]
+[list]
+[*]Senior Pilot Wings and Command Pilot Wings — the qualification badges the stock game leaves out
+[*]Medal of Honor with Oak Leaf Cluster, for the second award
+[*]A missing promotion step, so rank progression no longer skips a rung
+[/list]
+
+New artwork is drawn into the game's own award atlas, and every decoration carries a name and
+description in all six languages.
+
+
+[size=4][b]Languages[/b][/size]
+
+English, Deutsch, Español, Français, Русский and 中文 — the same six the game ships. Medals,
+ranks, mission types and target names come from the game's own files, so they read exactly as
+they do in the career screens next door.
+
+Each career can also be set to its own language, independently of the application. A German
+player flying a USAF career can read that man's record in English — his medals, his rank, his
+mission types — while everything else stays German.
+
+
+[size=4][b]Requirements and notes[/b][/size]
+
+[list]
+[*]Windows, and IL-2 Sturmovik: Korea installed. No Python or other runtime needed.
+[*]The Service Record never writes to your game. Pilot photographs and its own settings live
+under %LOCALAPPDATA%\IL2KoreaTracker.
+[*]The application ships [b]no game content[/b]. It reads the art and text it needs from your
+own installation each time.
+[*]The awards mod is an ordinary set of loose files. If you would rather install it by hand,
+the full list and destinations are in [i]Awards mod - manual install.txt[/i].
+[/list]
+
+
+Feedback, bug reports and requests are all welcome — particularly from anyone flying a
+communist career, since this has had far more hours against a USAF one. And if you manage a
+Medal of Honor, I would like to hear about it. I have not managed it yet.
+
+Clear skies.
