@@ -11,7 +11,40 @@
     border-bottom: 1px solid var(--border);
     padding-bottom: 1rem;
     margin-bottom: 1.5rem;
+    position: relative;
 }
+
+/* The squadron's Mustang, in the gap the name and the statistics leave.
+   The generator gave it a flat cream field rather than an alpha channel, and
+   relying on multiply to hide that field printed a faint rectangle on the
+   page — the two creams differ by a couple of values. The background is cut
+   out into real transparency instead, which also survives whatever the page
+   grows behind it later. Multiply is kept for the aircraft itself so it
+   darkens the paper like ink rather than sitting on top of it. Absolutely
+   positioned to stay out of the flex flow, and inert to the pointer so it
+   never eats a click meant for the emblems. */
+.record-head::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(620px, 34%);
+    aspect-ratio: 1100 / 412;
+    background: url("../images/mustang-banner.png") center / contain no-repeat;
+    mix-blend-mode: multiply;
+    opacity: 0.62;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Narrower than this the gap closes and the propeller starts overlapping the
+   squadron emblem, so the art is dropped rather than squeezed. 1500px is where
+   the record grid already falls back to two columns. */
+@media (max-width: 1500px) { .record-head::before { display: none; } }
+
+/* The text has to sit above the art, not behind it. */
+.record-identity, .record-meta { position: relative; z-index: 1; }
 
 .record-identity h2 { font-size: 1.9rem; font-weight: normal; color: var(--ink-strong); }
 .record-sub { color: var(--ink-muted); font-style: italic; }
