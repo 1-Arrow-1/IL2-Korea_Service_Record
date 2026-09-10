@@ -623,3 +623,39 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     z-index: 2;
 }
 @media (max-width: 1180px) { .record-head::after { display: none; } }
+
+
+/* ------------------------------------------------------------ victories -- */
+
+/* The roll is the longest thing in the middle column by design: it is what
+   closes the 935px the column was short. Capped and scrolled anyway, so a
+   sixty-victory career cannot push the page past the other two columns. */
+.victory-roll { max-height: 760px; overflow-y: auto; padding-right: 0.4rem; }
+
+.victory {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr auto;
+    gap: 0.6rem;
+    align-items: baseline;
+    padding: 0.32rem 0.4rem;
+    margin: 0 -0.4rem;
+    border-bottom: 1px dotted var(--border-soft);
+    cursor: pointer;
+    transition: background 90ms ease-in;
+}
+.victory:last-child { border-bottom: none; }
+.victory:hover { background: var(--paper-deep); }
+
+.victory-no {
+    color: var(--ink-muted);
+    font-size: 0.84rem;
+    text-align: right;
+}
+.victory-type { color: var(--ink-strong); font-weight: bold; }
+.victory-victim { font-style: italic; }
+.victory-when {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+}
+.victory-alt { color: var(--ink-muted); font-size: 0.86rem; white-space: nowrap; }

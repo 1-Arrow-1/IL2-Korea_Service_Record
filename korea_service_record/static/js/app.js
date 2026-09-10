@@ -477,6 +477,33 @@
                 : "none");
         }
 
+        // Combat efficiency and the victory roll. Both panels are hidden
+        // outright when a pilot has nothing to put in them — an AI wingman
+        // with no air kills should not get an empty "Confirmed Victories".
+        el("d-performance").innerHTML = (d.performance || []).map((row) =>
+            "<tr><th>" + esc(row.label) + "</th><td>" +
+            esc(row.value) + "</td></tr>").join("");
+        show(el("d-performance-panel"), (d.performance || []).length > 0);
+
+        const victories = d.victories || [];
+        el("d-victory-count").textContent = victories.length
+            ? "(" + victories.length + ")" : "";
+        el("d-victories").innerHTML = victories.map((v) =>
+            '<div class="victory" data-mission="' + esc(v.mission_id) + '">' +
+                '<span class="victory-no">' + esc(v.number) + "</span>" +
+                "<span>" +
+                    '<span class="victory-type">' + esc(v.type) + "</span>" +
+                    (v.victim
+                        ? ' <span class="victory-victim">' + esc(v.victim) + "</span>"
+                        : "") +
+                    '<span class="victory-when">' + esc(v.date) + " &middot; " +
+                        esc(v.time) + "</span>" +
+                "</span>" +
+                '<span class="victory-alt">' +
+                    (v.altitude ? esc(v.altitude) + " m" : "") + "</span>" +
+            "</div>").join("");
+        show(el("d-victories-panel"), victories.length > 0);
+
         rosterRows = d.roster.map(flatten);
             el("d-roster-count").textContent = "(" + rosterRows.length + ")";
             renderRoster();
@@ -854,8 +881,11 @@
             closeMission();
             return;
         }
+        // Any element carrying data-mission opens that debrief: the Details
+        // button, and a row of the victory roll, which is the natural way to
+        // ask "what else happened that sortie".
         const detailsBtn = event.target.closest &&
-                           event.target.closest("button[data-mission]");
+                           event.target.closest("[data-mission]");
         if (detailsBtn) {
             openMission(currentCareer, Number(detailsBtn.dataset.mission));
             return;

@@ -405,6 +405,85 @@ class CareerAggregator:
         out.reverse()
         return out
 
+    @staticmethod
+    def _victory_roll(debriefings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Every air-to-air victory of the career, newest first.
+
+        A fighter pilot's record is built around this list and the page had no
+        equivalent: the debriefings answer "what happened on mission 43", never
+        "what has this man shot down". Airborne only — a parked aircraft
+        strafed on its dispersal is a ground target, and the game scores it
+        that way too.
+        """
+        out = []
+        for debrief in debriefings:
+            for kill in debrief["log"]:
+                if not kill.get("air"):
+                    continue
+                out.append({
+                    "date": debrief["date"],
+                    "time": kill["time"],
+                    "mission_id": debrief["mission_id"],
+                    "mission_num": debrief["mission_num"],
+                    "type": kill["target"],
+                    "victim": kill["victim"],
+                    "altitude": kill["altitude"],
+                })
+        # The debriefings run newest mission first but each log inside one runs
+        # in time order, so the raw concatenation numbers a sortie's kills
+        # backwards. Sorting the whole roll by date and clock fixes it.
+        out.sort(key=lambda v: (v["date"], v["time"]), reverse=True)
+        total = len(out)
+        for index, victory in enumerate(out):
+            victory["number"] = total - index
+        return out
+
+    def _performance(self, db, player, victories: List[Dict[str, Any]]
+                     ) -> List[Dict[str, Any]]:
+        """
+        The counters the career keeps for itself.
+
+        mission.result carries a streak and a points tally per pilot per
+        mission that nothing in the game's own UI shows. Six neighbouring
+        counters — assists, friendly kills, the three objective tallies and the
+        eject flag — are zero in all 31 missions of a real career, so they are
+        left out rather than rendered as a column of noughts.
+
+        There is deliberately no accuracy figure. Nothing records rounds
+        fired: the flight log's hit records carry no ammunition type (all
+        38,091 in one mission read "explosion") and count damage events rather
+        than bullets, so any hit rate would be authoritative-looking nonsense.
+        """
+        best_air = best_ground = best_points = career_points = 0
+        for mission in db.missions():
+            for row in MissionResult(mission["result"]).players():
+                if not row.get("personageNickname"):
+                    continue                      # AI rows carry no nickname
+                best_air = max(best_air, int(_number(row.get("airKillStreak", "0"))))
+                best_ground = max(best_ground,
+                                  int(_number(row.get("groundKillStreak", "0"))))
+                points = int(_number(row.get("pointsSumByMission", "0")))
+                best_points = max(best_points, points)
+                career_points += points
+
+        sorties = player["sorties"] or 0
+        hours = (player["flightTime"] or 0) / 3600.0
+        airborne = KillStats(player["killStats"]).airborne
+        altitudes = [v["altitude"] for v in victories if v["altitude"]]
+
+        rows = [
+            ("Best air victory streak", f"{best_air} in one sortie"),
+            ("Best ground streak", f"{best_ground} in one sortie"),
+            ("Victories per sortie", f"{airborne / sorties:.2f}" if sorties else "—"),
+            ("Victories per flight hour", f"{airborne / hours:.1f}" if hours else "—"),
+            ("Average victory altitude",
+             f"{round(sum(altitudes) / len(altitudes)):,} m" if altitudes else "—"),
+            ("Best mission score", f"{best_points:,}"),
+            ("Career score", f"{career_points:,}"),
+        ]
+        return [{"label": label, "value": value} for label, value in rows]
+
     def _debriefings(self, db, sorties, kill_events,
                      with_flight_log: bool = True) -> List[Dict[str, Any]]:
         """
@@ -757,6 +836,12 @@ class CareerAggregator:
                 described = self.objects.describe(stem)
                 aircraft_flown = described["name"] if described["named"] else stem
 
+            # Built once: the victory roll is derived from the same enriched
+            # logs the debriefings render, rather than re-reading the results.
+            debriefings = self._debriefings(db, sorties, kill_events,
+                                            with_flight_log=is_player)
+            victories = self._victory_roll(debriefings)
+
             return {
                 "id": career_id,
                 "player_id": player["id"],
@@ -780,8 +865,9 @@ class CareerAggregator:
                 "promotions": groups["promotions"],
                 "awards": groups["awards"],
                 "incidences": self._incidences(db.events(pid), aircraft_flown),
-                "debriefings": self._debriefings(db, sorties, kill_events,
-                                                 with_flight_log=is_player),
+                "debriefings": debriefings,
+                "victories": victories,
+                "performance": self._performance(db, player, victories),
                 "subject_id": pid,
                 "is_player": is_player,
                 "progression": {
