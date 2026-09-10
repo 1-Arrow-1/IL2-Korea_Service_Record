@@ -1,0 +1,173 @@
+{
+  "app": {
+    "title": "IL-2 朝鲜 服役档案",
+    "back": "返回生涯列表",
+    "readonly": "只读。不会写入任何游戏文件。",
+    "language": "语言"
+  },
+  "landing": {
+    "heading": "飞行生涯",
+    "loading": "正在读取生涯…",
+    "empty": "未找到生涯。请在 IL-2 朝鲜中开始一段生涯，它将显示在此处。",
+    "error": "无法读取生涯：{reason}",
+    "sorties": "出击",
+    "hours": "小时",
+    "air": "空中",
+    "ground": "地面",
+    "awards": "勋章"
+  },
+  "record": {
+    "loading": "正在打开服役档案…",
+    "error": "无法加载详情：{reason}",
+    "career": "生涯",
+    "sorties": "出击",
+    "sorties_value": "{total}（成功 {good}）",
+    "flight_time": "飞行时间",
+    "award_points": "勋章点数"
+  },
+  "pilot": {
+    "heading": "飞行员信息",
+    "change_photo": "更换照片",
+    "remove_photo": "移除",
+    "rank": "军衔",
+    "born": "出生日期",
+    "squadron": "中队",
+    "status": "状态",
+    "health": "健康",
+    "air_victories": "空战战果",
+    "ground_targets": "地面目标",
+    "squadron_efficiency": "中队效率",
+    "characteristics": "个人特质",
+    "commander_note": "中队长——提供加成，而非模拟技能等级。",
+    "booster": "{attribute}加成",
+    "skills": "技术",
+    "discipline": "纪律",
+    "courage": "勇气"
+  },
+  "state": {
+    "active": "现役",
+    "wounded": "负伤",
+    "kia": "阵亡",
+    "until": "至 {date}",
+    "unknown": "未知"
+  },
+  "combat": {
+    "heading": "战斗成果",
+    "aircraft": "飞机",
+    "vehicles": "车辆",
+    "rail": "铁路",
+    "armaments": "武器",
+    "buildings": "建筑",
+    "naval": "舰船",
+    "air_kills": "空战战果（按机型）",
+    "destroyed_on_ground": "地面击毁"
+  },
+  "missions": {
+    "heading": "已执行任务",
+    "completed": "完成任务数",
+    "flight_time": "飞行时间",
+    "average_flight_time": "平均飞行时间",
+    "returned": "返航飞机",
+    "damaged": "受损飞机",
+    "lost": "损失飞机",
+    "wounded": "作战负伤"
+  },
+  "progression": {
+    "heading": "生涯进程",
+    "starting_rank": "初始军衔",
+    "current_rank": "当前军衔",
+    "promotions": "晋升",
+    "awards": "勋章"
+  },
+  "performance": {
+    "heading": "战斗效率",
+    "best_air_streak": "最佳空战连胜",
+    "best_ground_streak": "最佳地面连胜",
+    "in_one_sortie": "单次出击 {count}",
+    "per_sortie": "每次出击战果",
+    "per_hour": "每飞行小时战果",
+    "average_altitude": "平均击落高度",
+    "best_score": "最佳任务得分",
+    "career_score": "生涯总分"
+  },
+  "victories": {
+    "heading": "确认战果"
+  },
+  "awards": {
+    "heading": "晋升与勋章",
+    "promotions": "晋升",
+    "awards": "勋章",
+    "none_yet": "暂无。",
+    "pending": "待颁",
+    "awaiting_points": "等待勋章点数",
+    "earned": "{date} 获得资格",
+    "received": "{date} 颁发",
+    "no_description": "游戏文件中没有说明。"
+  },
+  "incidences": {
+    "heading": "其他事件",
+    "none": "无记录。",
+    "returned_to_duty": "归队",
+    "hospital": "住院",
+    "wounded_in_action": "作战负伤",
+    "aircraft_lost": "损失飞机",
+    "joined": "加入中队",
+    "health": "健康 {value}",
+    "unknown": "未知（{code}）"
+  },
+  "debrief": {
+    "heading": "任务总结",
+    "mission": "第 {number} 次任务",
+    "details": "详情",
+    "took_off": "起飞",
+    "landed": "已着陆",
+    "landed_damaged": "已着陆，飞机受损",
+    "bailed_out": "跳伞",
+    "did_not_return": "未返航",
+    "summary": "{duration} · 空中 {air} · 地面 {ground}",
+    "wounded": "负伤",
+    "on_the_ground": "地面",
+    "more_destroyed": "+ 另摧毁 {count} 处建筑与物资",
+    "no_kills": "无战果记录。",
+    "pilots_on_mission": "参与本次任务的飞行员",
+    "combat_log": "战斗记录",
+    "objectives": "目标：完成 {met}，失败 {failed}",
+    "no_briefing": "无任务简报记录。",
+    "could_not_open": "无法打开该任务：{reason}",
+    "outcome": "结果",
+    "air": "空中",
+    "ground": "地面",
+    "time": "时长"
+  },
+  "roster": {
+    "heading": "中队统计",
+    "rank": "军衔",
+    "name": "姓名",
+    "top_award": "最高战斗勋章",
+    "status": "状态",
+    "air_victories": "空战战果",
+    "ground_targets": "地面目标",
+    "sorties": "出击",
+    "flight_hours": "飞行小时",
+    "skill": "技术",
+    "discipline": "纪律",
+    "courage": "勇气",
+    "awards": "勋章",
+    "awards_pending": "待颁勋章"
+  },
+  "photo": {
+    "heading": "飞行员照片",
+    "instructions": "拖动调整位置，滚动缩放。",
+    "choose": "选择文件",
+    "save": "保存",
+    "cancel": "取消",
+    "not_an_image": "该文件无法作为图像读取。",
+    "save_failed": "无法保存照片：{reason}"
+  },
+  "common": {
+    "loading": "加载中…",
+    "close": "关闭",
+    "none": "—",
+    "metres": "{value} 米"
+  }
+}

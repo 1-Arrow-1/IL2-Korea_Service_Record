@@ -20,7 +20,9 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 
 from .career.aggregator import CareerAggregator
 from .icons import SHEETS
+from .i18n import available as available_languages, game_code, normalise, ui_strings
 from .photos import PhotoStore
+from .settings import Settings
 from .assets import default_cache_dir
 from .gamedata import resolve_game_dir
 
@@ -49,17 +51,39 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
 
     resolved = resolve_game_dir(Path(game_dir)) if game_dir else autodetect_game_dir()
     app.config["PHOTOS"] = PhotoStore(default_cache_dir().parent / "photos")
+    app.config["SETTINGS"] = Settings(default_cache_dir().parent)
     app.config["STARTED_AT"] = time.time()
     app.config["STARTED"] = time.strftime("%Y-%m-%d %H:%M:%S")
     app.config["GAME_DIR"] = resolved
-    app.config["AGGREGATOR"] = CareerAggregator(resolved) if resolved else None
+    # One aggregator per language, built on demand and kept. LocaleStrings and
+    # WorldObjectIndex each hold a single language's names, and a career with a
+    # detail-page override needs a *different* language from the rest of the
+    # application at the same time — so these cannot be one mutable instance.
+    # Building is cheap after the first time: the world-object index is cached
+    # on disk per language.
+    app.config["AGGREGATORS"] = {}
     if resolved:
         logger.info("Game directory: %s", resolved)
     else:
         logger.warning("No IL-2 Korea installation found")
 
-    def aggregator() -> Optional[CareerAggregator]:
-        return app.config.get("AGGREGATOR")
+    def aggregator(career_id: Optional[str] = None) -> Optional[CareerAggregator]:
+        """
+        The aggregator for the language this request should render in.
+
+        Pass a career id wherever the answer is that career's own detail page:
+        an override there must reach the game's names too, not only the
+        tracker's labels, or the medals come back in the wrong language.
+        """
+        if resolved is None:
+            return None
+        language = app.config["SETTINGS"].resolve(career_id)
+        cache = app.config["AGGREGATORS"]
+        if language not in cache:
+            cache[language] = CareerAggregator(resolved, lang=game_code(language))
+            logger.info("Built aggregator for %s (game locale %s)",
+                        language, game_code(language))
+        return cache[language]
 
     # -- views -------------------------------------------------------------
 
@@ -158,6 +182,58 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
 
     # -- api ---------------------------------------------------------------
 
+    @app.route("/api/settings", methods=["GET", "POST"])
+    def api_settings():
+        """
+        Read or change the user's preferences.
+
+        A language change rebuilds the aggregator, because the game's own
+        names — medals, ranks, mission types, what a target is called — come
+        from per-language files rather than from anything the front end can
+        translate.
+        """
+        settings = app.config["SETTINGS"]
+        if request.method == "POST":
+            payload = request.get_json(silent=True) or {}
+            chosen = settings.set_language(payload.get("language", ""))
+            logger.info("Global language set to %s (game locale %s)",
+                        chosen, game_code(chosen))
+        return jsonify({
+            "language": settings.language,
+            "languages": available_languages(),
+            "overrides": settings.career_overrides(),
+        })
+
+    @app.route("/api/settings/career/<path:career_id>", methods=["GET", "POST"])
+    def api_career_settings(career_id: str):
+        """
+        The detail-page language for one career.
+
+        An empty language clears the override, which is what "Default" means in
+        the picker: follow the global setting, including when it later changes.
+        """
+        settings = app.config["SETTINGS"]
+        if request.method == "POST":
+            payload = request.get_json(silent=True) or {}
+            settings.set_career_language(career_id, payload.get("language") or None)
+        return jsonify({
+            "career": career_id,
+            "language": settings.career_language(career_id) or "",
+            "resolved": settings.resolve(career_id),
+            "languages": available_languages(),
+        })
+
+    @app.route("/locales/<code>.json")
+    def api_locale(code: str):
+        """
+        The tracker's own UI strings for one language.
+
+        Served from a route rather than as a static file so an unknown code
+        answers with English instead of a 404 the front end would have to
+        special-case.
+        """
+        return jsonify(ui_strings(normalise(code)))
+
     @app.route("/api/careers")
     def api_careers():
         agg = aggregator()
@@ -167,7 +243,7 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
 
     @app.route("/api/career/<path:career_id>")
     def api_career(career_id: str):
-        agg = aggregator()
+        agg = aggregator(career_id)
         if agg is None:
             return jsonify({"error": "game_not_found"}), 404
         try:
@@ -177,12 +253,15 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         detail = agg.career_detail(career_id, pilot_id)
         if detail is None:
             return jsonify({"error": "career_not_found"}), 404
+        settings = app.config["SETTINGS"]
+        detail["language"] = settings.resolve(career_id)
+        detail["language_override"] = settings.career_language(career_id) or ""
         return jsonify(detail)
 
     @app.route("/api/mission/<path:career_id>/<int:mission_id>")
     def api_mission(career_id: str, mission_id: int):
         """Full debrief for one mission, including every pilot who flew."""
-        agg = aggregator()
+        agg = aggregator(career_id)
         if agg is None:
             return jsonify({"error": "game_not_found"}), 404
         detail = agg.mission_detail(career_id, mission_id)
@@ -193,7 +272,7 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
     @app.route("/api/pilot/<path:career_id>/<int:pilot_id>")
     def api_pilot(career_id: str, pilot_id: int):
         """Compact summary for the roster modal."""
-        agg = aggregator()
+        agg = aggregator(career_id)
         if agg is None:
             return jsonify({"error": "game_not_found"}), 404
         summary = agg.pilot_summary(career_id, pilot_id)

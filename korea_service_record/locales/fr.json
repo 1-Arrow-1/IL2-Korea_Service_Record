@@ -1,0 +1,173 @@
+{
+  "app": {
+    "title": "IL-2 Corée — État de service",
+    "back": "Retour aux carrières",
+    "readonly": "Lecture seule. Aucune écriture dans vos fichiers de jeu.",
+    "language": "Langue"
+  },
+  "landing": {
+    "heading": "Carrières",
+    "loading": "Lecture des carrières…",
+    "empty": "Aucune carrière trouvée. Commencez-en une dans IL-2 Corée et elle apparaîtra ici.",
+    "error": "Impossible de lire les carrières : {reason}",
+    "sorties": "Sorties",
+    "hours": "Heures",
+    "air": "Air",
+    "ground": "Sol",
+    "awards": "Décorations"
+  },
+  "record": {
+    "loading": "Ouverture de l'état de service…",
+    "error": "Impossible de charger les détails : {reason}",
+    "career": "Carrière",
+    "sorties": "Sorties",
+    "sorties_value": "{total} ({good} réussies)",
+    "flight_time": "Temps de vol",
+    "award_points": "Points de décoration"
+  },
+  "pilot": {
+    "heading": "Informations sur le pilote",
+    "change_photo": "Changer la photo",
+    "remove_photo": "Supprimer",
+    "rank": "Grade",
+    "born": "Né le",
+    "squadron": "Escadrille",
+    "status": "Statut",
+    "health": "Santé",
+    "air_victories": "Victoires aériennes",
+    "ground_targets": "Cibles au sol",
+    "squadron_efficiency": "Efficacité de l'escadrille",
+    "characteristics": "Caractéristiques",
+    "commander_note": "Commandant d'escadrille — apporte des bonus plutôt qu'un niveau de compétence simulé.",
+    "booster": "Bonus de {attribute}",
+    "skills": "Compétences",
+    "discipline": "Discipline",
+    "courage": "Courage"
+  },
+  "state": {
+    "active": "en service",
+    "wounded": "blessé",
+    "kia": "mort au combat",
+    "until": "jusqu'au {date}",
+    "unknown": "inconnu"
+  },
+  "combat": {
+    "heading": "Résultats au combat",
+    "aircraft": "Avions",
+    "vehicles": "Véhicules",
+    "rail": "Chemin de fer",
+    "armaments": "Armements",
+    "buildings": "Bâtiments",
+    "naval": "Naval",
+    "air_kills": "Victoires aériennes par type",
+    "destroyed_on_ground": "Détruits au sol"
+  },
+  "missions": {
+    "heading": "Missions effectuées",
+    "completed": "Missions accomplies",
+    "flight_time": "Temps de vol",
+    "average_flight_time": "Temps de vol moyen",
+    "returned": "Avions revenus",
+    "damaged": "Avions endommagés",
+    "lost": "Avions perdus",
+    "wounded": "Blessé au combat"
+  },
+  "progression": {
+    "heading": "Progression de carrière",
+    "starting_rank": "Grade initial",
+    "current_rank": "Grade actuel",
+    "promotions": "Promotions",
+    "awards": "Décorations"
+  },
+  "performance": {
+    "heading": "Efficacité au combat",
+    "best_air_streak": "Meilleure série de victoires aériennes",
+    "best_ground_streak": "Meilleure série au sol",
+    "in_one_sortie": "{count} en une sortie",
+    "per_sortie": "Victoires par sortie",
+    "per_hour": "Victoires par heure de vol",
+    "average_altitude": "Altitude moyenne des victoires",
+    "best_score": "Meilleur score de mission",
+    "career_score": "Score de carrière"
+  },
+  "victories": {
+    "heading": "Victoires homologuées"
+  },
+  "awards": {
+    "heading": "Promotions et décorations",
+    "promotions": "Promotions",
+    "awards": "Décorations",
+    "none_yet": "Aucune pour l'instant.",
+    "pending": "en attente",
+    "awaiting_points": "en attente de points de décoration",
+    "earned": "méritée le {date}",
+    "received": "remise le {date}",
+    "no_description": "Aucune description dans les fichiers du jeu."
+  },
+  "incidences": {
+    "heading": "Autres faits",
+    "none": "Rien à signaler.",
+    "returned_to_duty": "Retour au service",
+    "hospital": "Hôpital",
+    "wounded_in_action": "Blessé au combat",
+    "aircraft_lost": "Avion perdu",
+    "joined": "Affecté à l'escadrille",
+    "health": "santé {value}",
+    "unknown": "Inconnu ({code})"
+  },
+  "debrief": {
+    "heading": "Comptes rendus de mission",
+    "mission": "Mission {number}",
+    "details": "Détails",
+    "took_off": "décollage",
+    "landed": "atterri",
+    "landed_damaged": "atterri, avion endommagé",
+    "bailed_out": "évacué en parachute",
+    "did_not_return": "non revenu",
+    "summary": "{duration} · air {air} · sol {ground}",
+    "wounded": "blessé",
+    "on_the_ground": "au sol",
+    "more_destroyed": "+ {count} structures et matériels détruits",
+    "no_kills": "Aucune victoire enregistrée.",
+    "pilots_on_mission": "Pilotes de cette mission",
+    "combat_log": "Journal de combat",
+    "objectives": "objectifs : {met} atteints, {failed} manqués",
+    "no_briefing": "Aucun briefing enregistré.",
+    "could_not_open": "Impossible d'ouvrir cette mission : {reason}",
+    "outcome": "Issue",
+    "air": "Air",
+    "ground": "Sol",
+    "time": "Durée"
+  },
+  "roster": {
+    "heading": "Statistiques de l'escadrille",
+    "rank": "Grade",
+    "name": "Nom",
+    "top_award": "Plus haute décoration de combat",
+    "status": "Statut",
+    "air_victories": "Victoires aériennes",
+    "ground_targets": "Cibles au sol",
+    "sorties": "Sorties",
+    "flight_hours": "Heures de vol",
+    "skill": "Compétence",
+    "discipline": "Discipline",
+    "courage": "Courage",
+    "awards": "Décorations",
+    "awards_pending": "Décorations en attente"
+  },
+  "photo": {
+    "heading": "Photographie du pilote",
+    "instructions": "Faites glisser pour positionner, molette pour zoomer.",
+    "choose": "Choisir un fichier",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "not_an_image": "Ce fichier n'a pas pu être lu comme une image.",
+    "save_failed": "Impossible d'enregistrer la photographie : {reason}"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "close": "Fermer",
+    "none": "—",
+    "metres": "{value} m"
+  }
+}

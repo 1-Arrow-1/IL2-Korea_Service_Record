@@ -1,0 +1,173 @@
+{
+  "app": {
+    "title": "IL-2 Korea Dienstakte",
+    "back": "Zurück zur Übersicht",
+    "readonly": "Nur Lesezugriff. Es wird nichts in Ihre Spieldateien geschrieben.",
+    "language": "Sprache"
+  },
+  "landing": {
+    "heading": "Karrieren",
+    "loading": "Karrieren werden gelesen …",
+    "empty": "Keine Karriere gefunden. Starten Sie eine in IL-2 Korea, dann erscheint sie hier.",
+    "error": "Karrieren konnten nicht gelesen werden: {reason}",
+    "sorties": "Einsätze",
+    "hours": "Stunden",
+    "air": "Luft",
+    "ground": "Boden",
+    "awards": "Auszeichnungen"
+  },
+  "record": {
+    "loading": "Dienstakte wird geöffnet …",
+    "error": "Details konnten nicht geladen werden: {reason}",
+    "career": "Karriere",
+    "sorties": "Einsätze",
+    "sorties_value": "{total} ({good} erfolgreich)",
+    "flight_time": "Flugzeit",
+    "award_points": "Auszeichnungspunkte"
+  },
+  "pilot": {
+    "heading": "Angaben zum Piloten",
+    "change_photo": "Foto ändern",
+    "remove_photo": "Entfernen",
+    "rank": "Dienstgrad",
+    "born": "Geboren",
+    "squadron": "Staffel",
+    "status": "Status",
+    "health": "Gesundheit",
+    "air_victories": "Luftsiege",
+    "ground_targets": "Bodenziele",
+    "squadron_efficiency": "Staffeleffizienz",
+    "characteristics": "Eigenschaften",
+    "commander_note": "Staffelkapitän — steuert Boni bei statt einer simulierten Fertigkeitsstufe.",
+    "booster": "{attribute}-Bonus",
+    "skills": "Fertigkeiten",
+    "discipline": "Disziplin",
+    "courage": "Mut"
+  },
+  "state": {
+    "active": "aktiv",
+    "wounded": "verwundet",
+    "kia": "gefallen",
+    "until": "bis {date}",
+    "unknown": "unbekannt"
+  },
+  "combat": {
+    "heading": "Gefechtsergebnisse",
+    "aircraft": "Flugzeuge",
+    "vehicles": "Fahrzeuge",
+    "rail": "Eisenbahn",
+    "armaments": "Waffen",
+    "buildings": "Gebäude",
+    "naval": "See",
+    "air_kills": "Luftsiege nach Typ",
+    "destroyed_on_ground": "Am Boden zerstört"
+  },
+  "missions": {
+    "heading": "Geflogene Einsätze",
+    "completed": "Abgeschlossene Einsätze",
+    "flight_time": "Flugzeit",
+    "average_flight_time": "Durchschnittliche Flugzeit",
+    "returned": "Flugzeuge zurückgekehrt",
+    "damaged": "Flugzeuge beschädigt",
+    "lost": "Flugzeuge verloren",
+    "wounded": "Im Einsatz verwundet"
+  },
+  "progression": {
+    "heading": "Karriereverlauf",
+    "starting_rank": "Anfangsdienstgrad",
+    "current_rank": "Aktueller Dienstgrad",
+    "promotions": "Beförderungen",
+    "awards": "Auszeichnungen"
+  },
+  "performance": {
+    "heading": "Gefechtseffizienz",
+    "best_air_streak": "Beste Luftsiegserie",
+    "best_ground_streak": "Beste Bodenserie",
+    "in_one_sortie": "{count} in einem Einsatz",
+    "per_sortie": "Luftsiege je Einsatz",
+    "per_hour": "Luftsiege je Flugstunde",
+    "average_altitude": "Durchschnittliche Siegeshöhe",
+    "best_score": "Beste Einsatzpunktzahl",
+    "career_score": "Karrierepunktzahl"
+  },
+  "victories": {
+    "heading": "Bestätigte Luftsiege"
+  },
+  "awards": {
+    "heading": "Beförderungen & Auszeichnungen",
+    "promotions": "Beförderungen",
+    "awards": "Auszeichnungen",
+    "none_yet": "Noch keine.",
+    "pending": "ausstehend",
+    "awaiting_points": "wartet auf Auszeichnungspunkte",
+    "earned": "erworben am {date}",
+    "received": "verliehen am {date}",
+    "no_description": "Keine Beschreibung in den Spieldateien."
+  },
+  "incidences": {
+    "heading": "Weitere Vorkommnisse",
+    "none": "Nichts vermerkt.",
+    "returned_to_duty": "Zum Dienst zurückgekehrt",
+    "hospital": "Lazarett",
+    "wounded_in_action": "Im Einsatz verwundet",
+    "aircraft_lost": "Flugzeug verloren",
+    "joined": "Zur Staffel versetzt",
+    "health": "Gesundheit {value}",
+    "unknown": "Unbekannt ({code})"
+  },
+  "debrief": {
+    "heading": "Einsatzberichte",
+    "mission": "Einsatz {number}",
+    "details": "Details",
+    "took_off": "gestartet",
+    "landed": "gelandet",
+    "landed_damaged": "gelandet, Flugzeug beschädigt",
+    "bailed_out": "ausgestiegen",
+    "did_not_return": "nicht zurückgekehrt",
+    "summary": "{duration} · Luft {air} · Boden {ground}",
+    "wounded": "verwundet",
+    "on_the_ground": "am Boden",
+    "more_destroyed": "+ {count} Bauwerke und Material zerstört",
+    "no_kills": "Keine Abschüsse vermerkt.",
+    "pilots_on_mission": "Piloten dieses Einsatzes",
+    "combat_log": "Gefechtsprotokoll",
+    "objectives": "Ziele: {met} erreicht, {failed} verfehlt",
+    "no_briefing": "Keine Einsatzbesprechung vermerkt.",
+    "could_not_open": "Dieser Einsatz konnte nicht geöffnet werden: {reason}",
+    "outcome": "Ergebnis",
+    "air": "Luft",
+    "ground": "Boden",
+    "time": "Zeit"
+  },
+  "roster": {
+    "heading": "Staffelstatistik",
+    "rank": "Dienstgrad",
+    "name": "Name",
+    "top_award": "Höchste Gefechtsauszeichnung",
+    "status": "Status",
+    "air_victories": "Luftsiege",
+    "ground_targets": "Bodenziele",
+    "sorties": "Einsätze",
+    "flight_hours": "Flugstunden",
+    "skill": "Fertigkeit",
+    "discipline": "Disziplin",
+    "courage": "Mut",
+    "awards": "Auszeichnungen",
+    "awards_pending": "Ausstehende Auszeichnungen"
+  },
+  "photo": {
+    "heading": "Pilotenfoto",
+    "instructions": "Zum Verschieben ziehen, zum Zoomen scrollen.",
+    "choose": "Datei auswählen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "not_an_image": "Diese Datei konnte nicht als Bild gelesen werden.",
+    "save_failed": "Das Foto konnte nicht gespeichert werden: {reason}"
+  },
+  "common": {
+    "loading": "Wird geladen …",
+    "close": "Schließen",
+    "none": "—",
+    "metres": "{value} m"
+  }
+}

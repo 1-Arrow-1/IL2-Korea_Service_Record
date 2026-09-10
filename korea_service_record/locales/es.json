@@ -1,0 +1,173 @@
+{
+  "app": {
+    "title": "IL-2 Corea — Hoja de servicios",
+    "back": "Volver a las carreras",
+    "readonly": "Solo lectura. No se escribe nada en los archivos del juego.",
+    "language": "Idioma"
+  },
+  "landing": {
+    "heading": "Carreras",
+    "loading": "Leyendo las carreras…",
+    "empty": "No se ha encontrado ninguna carrera. Empiece una en IL-2 Corea y aparecerá aquí.",
+    "error": "No se pudieron leer las carreras: {reason}",
+    "sorties": "Salidas",
+    "hours": "Horas",
+    "air": "Aire",
+    "ground": "Tierra",
+    "awards": "Condecoraciones"
+  },
+  "record": {
+    "loading": "Abriendo la hoja de servicios…",
+    "error": "No se pudieron cargar los detalles: {reason}",
+    "career": "Carrera",
+    "sorties": "Salidas",
+    "sorties_value": "{total} ({good} con éxito)",
+    "flight_time": "Horas de vuelo",
+    "award_points": "Puntos de condecoración"
+  },
+  "pilot": {
+    "heading": "Datos del piloto",
+    "change_photo": "Cambiar foto",
+    "remove_photo": "Quitar",
+    "rank": "Empleo",
+    "born": "Nacido el",
+    "squadron": "Escuadrón",
+    "status": "Estado",
+    "health": "Salud",
+    "air_victories": "Victorias aéreas",
+    "ground_targets": "Objetivos terrestres",
+    "squadron_efficiency": "Eficacia del escuadrón",
+    "characteristics": "Características",
+    "commander_note": "Comandante del escuadrón: aporta bonificaciones en lugar de un nivel de habilidad simulado.",
+    "booster": "Bonificación de {attribute}",
+    "skills": "Habilidad",
+    "discipline": "Disciplina",
+    "courage": "Valor"
+  },
+  "state": {
+    "active": "en activo",
+    "wounded": "herido",
+    "kia": "caído en combate",
+    "until": "hasta el {date}",
+    "unknown": "desconocido"
+  },
+  "combat": {
+    "heading": "Resultados en combate",
+    "aircraft": "Aeronaves",
+    "vehicles": "Vehículos",
+    "rail": "Ferrocarril",
+    "armaments": "Armamento",
+    "buildings": "Edificios",
+    "naval": "Naval",
+    "air_kills": "Victorias aéreas por tipo",
+    "destroyed_on_ground": "Destruidos en tierra"
+  },
+  "missions": {
+    "heading": "Misiones realizadas",
+    "completed": "Misiones completadas",
+    "flight_time": "Horas de vuelo",
+    "average_flight_time": "Duración media de vuelo",
+    "returned": "Aeronaves regresadas",
+    "damaged": "Aeronaves dañadas",
+    "lost": "Aeronaves perdidas",
+    "wounded": "Herido en combate"
+  },
+  "progression": {
+    "heading": "Progresión de la carrera",
+    "starting_rank": "Empleo inicial",
+    "current_rank": "Empleo actual",
+    "promotions": "Ascensos",
+    "awards": "Condecoraciones"
+  },
+  "performance": {
+    "heading": "Eficacia en combate",
+    "best_air_streak": "Mejor racha de victorias aéreas",
+    "best_ground_streak": "Mejor racha en tierra",
+    "in_one_sortie": "{count} en una salida",
+    "per_sortie": "Victorias por salida",
+    "per_hour": "Victorias por hora de vuelo",
+    "average_altitude": "Altitud media de las victorias",
+    "best_score": "Mejor puntuación de misión",
+    "career_score": "Puntuación de la carrera"
+  },
+  "victories": {
+    "heading": "Victorias confirmadas"
+  },
+  "awards": {
+    "heading": "Ascensos y condecoraciones",
+    "promotions": "Ascensos",
+    "awards": "Condecoraciones",
+    "none_yet": "Ninguna todavía.",
+    "pending": "pendiente",
+    "awaiting_points": "a la espera de puntos de condecoración",
+    "earned": "merecida el {date}",
+    "received": "entregada el {date}",
+    "no_description": "Sin descripción en los archivos del juego."
+  },
+  "incidences": {
+    "heading": "Otras incidencias",
+    "none": "Nada registrado.",
+    "returned_to_duty": "Reincorporado al servicio",
+    "hospital": "Hospital",
+    "wounded_in_action": "Herido en combate",
+    "aircraft_lost": "Aeronave perdida",
+    "joined": "Destinado al escuadrón",
+    "health": "salud {value}",
+    "unknown": "Desconocido ({code})"
+  },
+  "debrief": {
+    "heading": "Informes de misión",
+    "mission": "Misión {number}",
+    "details": "Detalles",
+    "took_off": "despegue",
+    "landed": "aterrizó",
+    "landed_damaged": "aterrizó, aeronave dañada",
+    "bailed_out": "se lanzó en paracaídas",
+    "did_not_return": "no regresó",
+    "summary": "{duration} · aire {air} · tierra {ground}",
+    "wounded": "herido",
+    "on_the_ground": "en tierra",
+    "more_destroyed": "+ {count} estructuras y material destruidos",
+    "no_kills": "Sin derribos registrados.",
+    "pilots_on_mission": "Pilotos de esta misión",
+    "combat_log": "Registro de combate",
+    "objectives": "objetivos: {met} cumplidos, {failed} fallidos",
+    "no_briefing": "Sin instrucciones registradas.",
+    "could_not_open": "No se pudo abrir esa misión: {reason}",
+    "outcome": "Resultado",
+    "air": "Aire",
+    "ground": "Tierra",
+    "time": "Tiempo"
+  },
+  "roster": {
+    "heading": "Estadísticas del escuadrón",
+    "rank": "Empleo",
+    "name": "Nombre",
+    "top_award": "Máxima condecoración de combate",
+    "status": "Estado",
+    "air_victories": "Victorias aéreas",
+    "ground_targets": "Objetivos terrestres",
+    "sorties": "Salidas",
+    "flight_hours": "Horas de vuelo",
+    "skill": "Habilidad",
+    "discipline": "Disciplina",
+    "courage": "Valor",
+    "awards": "Condecoraciones",
+    "awards_pending": "Condecoraciones pendientes"
+  },
+  "photo": {
+    "heading": "Fotografía del piloto",
+    "instructions": "Arrastre para colocar, use la rueda para acercar.",
+    "choose": "Elegir un archivo",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "not_an_image": "Ese archivo no se pudo leer como imagen.",
+    "save_failed": "No se pudo guardar la fotografía: {reason}"
+  },
+  "common": {
+    "loading": "Cargando…",
+    "close": "Cerrar",
+    "none": "—",
+    "metres": "{value} m"
+  }
+}

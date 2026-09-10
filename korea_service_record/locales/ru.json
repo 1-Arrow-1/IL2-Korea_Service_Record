@@ -1,0 +1,173 @@
+{
+  "app": {
+    "title": "IL-2 Корея — Послужной список",
+    "back": "Назад к карьерам",
+    "readonly": "Только чтение. В файлы игры ничего не записывается.",
+    "language": "Язык"
+  },
+  "landing": {
+    "heading": "Карьеры",
+    "loading": "Чтение карьер…",
+    "empty": "Карьеры не найдены. Начните карьеру в IL-2 Корея, и она появится здесь.",
+    "error": "Не удалось прочитать карьеры: {reason}",
+    "sorties": "Вылеты",
+    "hours": "Часы",
+    "air": "Воздух",
+    "ground": "Земля",
+    "awards": "Награды"
+  },
+  "record": {
+    "loading": "Открытие послужного списка…",
+    "error": "Не удалось загрузить подробности: {reason}",
+    "career": "Карьера",
+    "sorties": "Вылеты",
+    "sorties_value": "{total} ({good} успешных)",
+    "flight_time": "Налёт",
+    "award_points": "Наградные очки"
+  },
+  "pilot": {
+    "heading": "Сведения о лётчике",
+    "change_photo": "Заменить фото",
+    "remove_photo": "Удалить",
+    "rank": "Звание",
+    "born": "Дата рождения",
+    "squadron": "Эскадрилья",
+    "status": "Состояние",
+    "health": "Здоровье",
+    "air_victories": "Воздушные победы",
+    "ground_targets": "Наземные цели",
+    "squadron_efficiency": "Эффективность эскадрильи",
+    "characteristics": "Характеристики",
+    "commander_note": "Командир эскадрильи — даёт бонусы вместо смоделированного уровня навыка.",
+    "booster": "Бонус: {attribute}",
+    "skills": "Навыки",
+    "discipline": "Дисциплина",
+    "courage": "Отвага"
+  },
+  "state": {
+    "active": "в строю",
+    "wounded": "ранен",
+    "kia": "погиб в бою",
+    "until": "до {date}",
+    "unknown": "неизвестно"
+  },
+  "combat": {
+    "heading": "Боевые результаты",
+    "aircraft": "Самолёты",
+    "vehicles": "Техника",
+    "rail": "Железная дорога",
+    "armaments": "Вооружение",
+    "buildings": "Постройки",
+    "naval": "Флот",
+    "air_kills": "Воздушные победы по типам",
+    "destroyed_on_ground": "Уничтожено на земле"
+  },
+  "missions": {
+    "heading": "Выполненные задания",
+    "completed": "Заданий выполнено",
+    "flight_time": "Налёт",
+    "average_flight_time": "Средняя продолжительность вылета",
+    "returned": "Самолётов вернулось",
+    "damaged": "Самолётов повреждено",
+    "lost": "Самолётов потеряно",
+    "wounded": "Ранен в бою"
+  },
+  "progression": {
+    "heading": "Ход карьеры",
+    "starting_rank": "Начальное звание",
+    "current_rank": "Текущее звание",
+    "promotions": "Повышения",
+    "awards": "Награды"
+  },
+  "performance": {
+    "heading": "Боевая эффективность",
+    "best_air_streak": "Лучшая серия воздушных побед",
+    "best_ground_streak": "Лучшая серия наземных целей",
+    "in_one_sortie": "{count} за один вылет",
+    "per_sortie": "Побед за вылет",
+    "per_hour": "Побед за час налёта",
+    "average_altitude": "Средняя высота победы",
+    "best_score": "Лучший результат за задание",
+    "career_score": "Результат за карьеру"
+  },
+  "victories": {
+    "heading": "Подтверждённые победы"
+  },
+  "awards": {
+    "heading": "Повышения и награды",
+    "promotions": "Повышения",
+    "awards": "Награды",
+    "none_yet": "Пока нет.",
+    "pending": "ожидается",
+    "awaiting_points": "ожидает наградных очков",
+    "earned": "заслужена {date}",
+    "received": "вручена {date}",
+    "no_description": "В файлах игры нет описания."
+  },
+  "incidences": {
+    "heading": "Прочие события",
+    "none": "Записей нет.",
+    "returned_to_duty": "Вернулся в строй",
+    "hospital": "Госпиталь",
+    "wounded_in_action": "Ранен в бою",
+    "aircraft_lost": "Потерян самолёт",
+    "joined": "Зачислен в эскадрилью",
+    "health": "здоровье {value}",
+    "unknown": "Неизвестно ({code})"
+  },
+  "debrief": {
+    "heading": "Отчёты о заданиях",
+    "mission": "Задание {number}",
+    "details": "Подробности",
+    "took_off": "взлёт",
+    "landed": "приземлился",
+    "landed_damaged": "приземлился, самолёт повреждён",
+    "bailed_out": "покинул самолёт",
+    "did_not_return": "не вернулся",
+    "summary": "{duration} · воздух {air} · земля {ground}",
+    "wounded": "ранен",
+    "on_the_ground": "на земле",
+    "more_destroyed": "+ {count} строений и техники уничтожено",
+    "no_kills": "Побед не зафиксировано.",
+    "pilots_on_mission": "Лётчики в этом задании",
+    "combat_log": "Журнал боя",
+    "objectives": "цели: {met} выполнено, {failed} провалено",
+    "no_briefing": "Постановка задачи не сохранена.",
+    "could_not_open": "Не удалось открыть это задание: {reason}",
+    "outcome": "Итог",
+    "air": "Воздух",
+    "ground": "Земля",
+    "time": "Время"
+  },
+  "roster": {
+    "heading": "Статистика эскадрильи",
+    "rank": "Звание",
+    "name": "Имя",
+    "top_award": "Высшая боевая награда",
+    "status": "Состояние",
+    "air_victories": "Воздушные победы",
+    "ground_targets": "Наземные цели",
+    "sorties": "Вылеты",
+    "flight_hours": "Часы налёта",
+    "skill": "Навык",
+    "discipline": "Дисциплина",
+    "courage": "Отвага",
+    "awards": "Награды",
+    "awards_pending": "Награды в ожидании"
+  },
+  "photo": {
+    "heading": "Фотография лётчика",
+    "instructions": "Перетащите для смещения, колесо — масштаб.",
+    "choose": "Выбрать файл",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "not_an_image": "Этот файл не удалось прочитать как изображение.",
+    "save_failed": "Не удалось сохранить фотографию: {reason}"
+  },
+  "common": {
+    "loading": "Загрузка…",
+    "close": "Закрыть",
+    "none": "—",
+    "metres": "{value} м"
+  }
+}

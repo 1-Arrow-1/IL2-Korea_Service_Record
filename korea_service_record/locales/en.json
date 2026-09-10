@@ -1,0 +1,173 @@
+{
+  "app": {
+    "title": "IL-2 Korea Service Record",
+    "back": "Back to Careers",
+    "readonly": "Read-only. Nothing is written to your game files.",
+    "language": "Language"
+  },
+  "landing": {
+    "heading": "Careers",
+    "loading": "Reading your careers…",
+    "empty": "No careers found. Start one in IL-2 Korea and it will appear here.",
+    "error": "Could not read careers: {reason}",
+    "sorties": "Sorties",
+    "hours": "Hours",
+    "air": "Air",
+    "ground": "Ground",
+    "awards": "Awards"
+  },
+  "record": {
+    "loading": "Opening service record…",
+    "error": "Could not load details: {reason}",
+    "career": "Career",
+    "sorties": "Sorties",
+    "sorties_value": "{total} ({good} successful)",
+    "flight_time": "Flight Time",
+    "award_points": "Award Points"
+  },
+  "pilot": {
+    "heading": "Pilot Information",
+    "change_photo": "Change photo",
+    "remove_photo": "Remove",
+    "rank": "Rank",
+    "born": "Born",
+    "squadron": "Squadron",
+    "status": "Status",
+    "health": "Health",
+    "air_victories": "Air Victories",
+    "ground_targets": "Ground Targets",
+    "squadron_efficiency": "Squadron Efficiency",
+    "characteristics": "Characteristics",
+    "commander_note": "Squadron commander — contributes boosters rather than a simulated skill level.",
+    "booster": "{attribute} booster",
+    "skills": "Skills",
+    "discipline": "Discipline",
+    "courage": "Courage"
+  },
+  "state": {
+    "active": "active",
+    "wounded": "wounded",
+    "kia": "killed in action",
+    "until": "until {date}",
+    "unknown": "unknown"
+  },
+  "combat": {
+    "heading": "Combat Results",
+    "aircraft": "Aircraft",
+    "vehicles": "Vehicles",
+    "rail": "Railroad",
+    "armaments": "Armaments",
+    "buildings": "Buildings",
+    "naval": "Marine",
+    "air_kills": "Air Kills by Type",
+    "destroyed_on_ground": "Destroyed on the ground"
+  },
+  "missions": {
+    "heading": "Missions Flown",
+    "completed": "Missions completed",
+    "flight_time": "Flight time",
+    "average_flight_time": "Average flight time",
+    "returned": "Aircraft returned",
+    "damaged": "Aircraft damaged",
+    "lost": "Aircraft lost",
+    "wounded": "Wounded in action"
+  },
+  "progression": {
+    "heading": "Career Progression",
+    "starting_rank": "Starting rank",
+    "current_rank": "Current rank",
+    "promotions": "Promotions",
+    "awards": "Awards"
+  },
+  "performance": {
+    "heading": "Combat Efficiency",
+    "best_air_streak": "Best air victory streak",
+    "best_ground_streak": "Best ground streak",
+    "in_one_sortie": "{count} in one sortie",
+    "per_sortie": "Victories per sortie",
+    "per_hour": "Victories per flight hour",
+    "average_altitude": "Average victory altitude",
+    "best_score": "Best mission score",
+    "career_score": "Career score"
+  },
+  "victories": {
+    "heading": "Confirmed Victories"
+  },
+  "awards": {
+    "heading": "Promotions & Awards",
+    "promotions": "Promotions",
+    "awards": "Awards",
+    "none_yet": "None yet.",
+    "pending": "pending",
+    "awaiting_points": "awaiting award points",
+    "earned": "earned {date}",
+    "received": "received {date}",
+    "no_description": "No description in the game files."
+  },
+  "incidences": {
+    "heading": "Other Incidences",
+    "none": "Nothing on record.",
+    "returned_to_duty": "Returned to duty",
+    "hospital": "Hospital",
+    "wounded_in_action": "Wounded in action",
+    "aircraft_lost": "Aircraft lost",
+    "joined": "Joined the squadron",
+    "health": "health {value}",
+    "unknown": "Unknown ({code})"
+  },
+  "debrief": {
+    "heading": "Mission Debriefings",
+    "mission": "Mission {number}",
+    "details": "Details",
+    "took_off": "took off",
+    "landed": "landed",
+    "landed_damaged": "landed, aircraft damaged",
+    "bailed_out": "bailed out",
+    "did_not_return": "did not return",
+    "summary": "{duration} · air {air} · ground {ground}",
+    "wounded": "wounded",
+    "on_the_ground": "on the ground",
+    "more_destroyed": "+ {count} structures and materiel destroyed",
+    "no_kills": "No kills recorded.",
+    "pilots_on_mission": "Pilots on this mission",
+    "combat_log": "Combat log",
+    "objectives": "objectives {met} met, {failed} failed",
+    "no_briefing": "No briefing recorded.",
+    "could_not_open": "Could not open that mission: {reason}",
+    "outcome": "Outcome",
+    "air": "Air",
+    "ground": "Ground",
+    "time": "Time"
+  },
+  "roster": {
+    "heading": "Squadron Statistics",
+    "rank": "Rank",
+    "name": "Name",
+    "top_award": "Highest Combat Award",
+    "status": "Status",
+    "air_victories": "Air Victories",
+    "ground_targets": "Ground Targets",
+    "sorties": "Sorties",
+    "flight_hours": "Flight Hours",
+    "skill": "Skill",
+    "discipline": "Discipline",
+    "courage": "Courage",
+    "awards": "Awards",
+    "awards_pending": "Awards Pending"
+  },
+  "photo": {
+    "heading": "Pilot photograph",
+    "instructions": "Drag to position, scroll to zoom.",
+    "choose": "Choose a file",
+    "save": "Save",
+    "cancel": "Cancel",
+    "not_an_image": "That file could not be read as an image.",
+    "save_failed": "Could not save the photograph: {reason}"
+  },
+  "common": {
+    "loading": "Loading…",
+    "close": "Close",
+    "none": "—",
+    "metres": "{value} m"
+  }
+}
