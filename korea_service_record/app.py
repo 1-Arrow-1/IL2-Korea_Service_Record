@@ -20,7 +20,9 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 
 from .career.aggregator import CareerAggregator
 from .icons import SHEETS
-from .i18n import available as available_languages, game_code, normalise, ui_strings
+from .gamedata import loads_lenient
+from .i18n import (apply_game_strings, available as available_languages,
+                   game_code, normalise, ui_strings)
 from .photos import PhotoStore
 from .settings import Settings
 from .assets import default_cache_dir
@@ -232,7 +234,14 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         answers with English instead of a 404 the front end would have to
         special-case.
         """
-        return jsonify(ui_strings(normalise(code)))
+        bundle = ui_strings(normalise(code))
+        # The game already names courage, flight hours and the rest in all six
+        # languages, and its wording is what the player sees one screen away.
+        agg = app.config["AGGREGATORS"].get(app.config["SETTINGS"].language)             or aggregator()
+        if agg is not None:
+            apply_game_strings(bundle, normalise(code),
+                               agg.resolver.read_text, loads_lenient)
+        return jsonify(bundle)
 
     @app.route("/api/careers")
     def api_careers():

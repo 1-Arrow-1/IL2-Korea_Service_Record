@@ -46,7 +46,10 @@
     "skills": "技术",
     "discipline": "纪律",
     "courage": "勇气",
-    "no_photograph": "暂无照片"
+    "no_photograph": "暂无照片",
+    "skills_booster": "技术加成",
+    "discipline_booster": "纪律加成",
+    "courage_booster": "勇气加成"
   },
   "state": {
     "active": "现役",
@@ -112,12 +115,20 @@
     "heading": "其他事件",
     "none": "无记录。",
     "returned_to_duty": "归队",
-    "hospital": "住院",
-    "wounded_in_action": "作战负伤",
-    "aircraft_lost": "损失飞机",
-    "joined": "加入中队",
     "health": "健康 {value}",
-    "unknown": "未知（{code}）"
+    "plane_lost": "损失飞机",
+    "pilot_kia": "飞行员阵亡",
+    "wounded": "作战负伤",
+    "commander_assigned": "任命为中队长",
+    "reported": "报到入列",
+    "plane_delivered": "飞机交付",
+    "medical": "住院",
+    "plane_repair": "飞机维修",
+    "efficiency": "中队效率变化",
+    "request_points": "获得申请点数",
+    "emergency_mission": "临时任务",
+    "resources_destroyed": "机场物资被毁",
+    "operation": "战役"
   },
   "debrief": {
     "heading": "任务总结",

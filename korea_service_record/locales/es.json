@@ -46,7 +46,10 @@
     "skills": "Habilidad",
     "discipline": "Disciplina",
     "courage": "Valor",
-    "no_photograph": "Sin fotografía"
+    "no_photograph": "Sin fotografía",
+    "skills_booster": "Bonificación de habilidad",
+    "discipline_booster": "Bonificación de disciplina",
+    "courage_booster": "Bonificación de valor"
   },
   "state": {
     "active": "en activo",
@@ -112,12 +115,20 @@
     "heading": "Otras incidencias",
     "none": "Nada registrado.",
     "returned_to_duty": "Reincorporado al servicio",
-    "hospital": "Hospital",
-    "wounded_in_action": "Herido en combate",
-    "aircraft_lost": "Aeronave perdida",
-    "joined": "Destinado al escuadrón",
     "health": "salud {value}",
-    "unknown": "Desconocido ({code})"
+    "plane_lost": "Aeronave perdida",
+    "pilot_kia": "Piloto caído en combate",
+    "wounded": "Herido en combate",
+    "commander_assigned": "Nombrado comandante",
+    "reported": "Incorporado al servicio",
+    "plane_delivered": "Aeronave entregada",
+    "medical": "Hospital",
+    "plane_repair": "Reparación de aeronave",
+    "efficiency": "Eficacia del escuadrón modificada",
+    "request_points": "Puntos de solicitud concedidos",
+    "emergency_mission": "Misión no programada",
+    "resources_destroyed": "Recursos del aeródromo destruidos",
+    "operation": "Operación"
   },
   "debrief": {
     "heading": "Informes de misión",

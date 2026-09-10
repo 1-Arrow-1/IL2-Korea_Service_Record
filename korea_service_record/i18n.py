@@ -104,3 +104,85 @@ def available() -> List[Dict[str, str]]:
         if (LOCALES_DIR / f"{lang.code}.json").is_file():
             out.append({"code": lang.code, "il2": lang.il2, "name": lang.name})
     return out
+
+
+# ---------------------------------------------------------------------------
+# The game's own words, wherever it has them
+# ---------------------------------------------------------------------------
+#
+# Most of what this tracker shows is its own invention — the three-column
+# service record is not a game screen — but a good deal of the vocabulary is
+# not: the game already names courage, discipline, flight hours and awards, in
+# all six languages, and its wording is what the player sees in the career
+# screens next door. Using ours instead would be both redundant and subtly
+# wrong: "Fertigkeit" against the game's "Fähigkeiten" reads as a different
+# concept even when it is the same number.
+#
+# So the shipped locale files are the base, and every entry below is replaced
+# at serve time by the game's own string for the requested language. A key with
+# no game equivalent, and any language where the lookup misses, simply keeps
+# what we wrote.
+GAME_STRINGS = {
+    # nsdata/assets/locale/career.locale=<lang>.json
+    "pilot.skills": "carPilotCharacteristics_Skill",
+    "pilot.discipline": "carPilotCharacteristics_Discipline",
+    "pilot.courage": "carPilotCharacteristics_Courage",
+    "pilot.air_victories": "carDossier_FB_AirVictories",
+    "pilot.born": "carCreateCharacterBithday",
+    "pilot.squadron": "carSquadrons",
+    "pilot.squadron_efficiency": "carDossier_Efficiency_Header",
+    "roster.skill": "carPilotCharacteristics_Skill",
+    "roster.discipline": "carPilotCharacteristics_Discipline",
+    "roster.courage": "carPilotCharacteristics_Courage",
+    "roster.air_victories": "carDossier_FB_AirVictories",
+    "roster.flight_hours": "carDossier_Stats_FlightHours",
+    "roster.awards": "carDossier_Category_Awards",
+    "awards.awards": "carDossier_Category_Awards",
+    "progression.awards": "carDossier_Category_Awards",
+    "landing.awards": "carDossier_Category_Awards",
+    "record.award_points": "carAwards_AwardPoints",
+    "missions.completed": "carSquadDetails_CompletedMissions",
+    "missions.lost": "carSummaryStat_PlanesLost",
+    "missions.damaged": "carAutoMissionDamaged_Header",
+    "incidences.plane_lost": "carSummaryStat_PlanesLost",
+    "incidences.pilot_kia": "carCharacterDetails_KIA",
+    "state.kia": "carCharacterDetails_KIA",
+    # Assembling "<attribute> booster" from two strings works in English and
+    # falls apart elsewhere — German compounds it into one word. The game
+    # ships each phrase whole, so use those.
+    "pilot.skills_booster": "carPilotCharacteristics_SkillBooster",
+    "pilot.discipline_booster": "carPilotCharacteristics_DisciplineBooster",
+    "pilot.courage_booster": "carPilotCharacteristics_CourageBooster",
+}
+
+GAME_LOCALE_FILE = "nsdata/assets/locale/career.locale={lang}.json"
+
+
+def _assign(bundle, dotted, value):
+    section, _, key = dotted.partition(".")
+    if key:
+        bundle.setdefault(section, {})[key] = value
+
+
+def apply_game_strings(bundle, code, read_text, parse):
+    """
+    Overlay the game's own vocabulary onto our strings, in place.
+
+    ``read_text`` and ``parse`` are passed in rather than imported so this
+    module stays free of the asset layer — it is also what lets the caller
+    supply whichever language's archive it already has open.
+    """
+    try:
+        raw = read_text(GAME_LOCALE_FILE.format(lang=game_code(code)))
+        game = parse(raw or "{}") if raw else {}
+    except Exception as exc:                      # a missing archive is not fatal
+        logger.warning("No game locale for %s: %s", code, exc)
+        return bundle
+    replaced = 0
+    for dotted, game_key in GAME_STRINGS.items():
+        value = game.get(game_key)
+        if isinstance(value, str) and value.strip():
+            _assign(bundle, dotted, value.strip())
+            replaced += 1
+    logger.debug("%s: %d strings taken from the game", code, replaced)
+    return bundle

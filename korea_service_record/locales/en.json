@@ -46,7 +46,10 @@
     "skills": "Skills",
     "discipline": "Discipline",
     "courage": "Courage",
-    "no_photograph": "No photograph"
+    "no_photograph": "No photograph",
+    "skills_booster": "Skills booster",
+    "discipline_booster": "Discipline booster",
+    "courage_booster": "Courage booster"
   },
   "state": {
     "active": "active",
@@ -112,12 +115,20 @@
     "heading": "Other Incidences",
     "none": "Nothing on record.",
     "returned_to_duty": "Returned to duty",
-    "hospital": "Hospital",
-    "wounded_in_action": "Wounded in action",
-    "aircraft_lost": "Aircraft lost",
-    "joined": "Joined the squadron",
     "health": "health {value}",
-    "unknown": "Unknown ({code})"
+    "plane_lost": "Aircraft lost",
+    "pilot_kia": "Pilot killed in action",
+    "wounded": "Wounded in action",
+    "commander_assigned": "Commander assigned",
+    "reported": "Reported for duty",
+    "plane_delivered": "Aircraft delivered",
+    "medical": "Hospital",
+    "plane_repair": "Aircraft repair",
+    "efficiency": "Squadron efficiency changed",
+    "request_points": "Request points awarded",
+    "emergency_mission": "Unscheduled mission",
+    "resources_destroyed": "Airfield resources destroyed",
+    "operation": "Operation"
   },
   "debrief": {
     "heading": "Mission Debriefings",

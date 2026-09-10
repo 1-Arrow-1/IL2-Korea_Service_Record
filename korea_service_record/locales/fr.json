@@ -46,7 +46,10 @@
     "skills": "Compétences",
     "discipline": "Discipline",
     "courage": "Courage",
-    "no_photograph": "Aucune photographie"
+    "no_photograph": "Aucune photographie",
+    "skills_booster": "Bonus de compétences",
+    "discipline_booster": "Bonus de discipline",
+    "courage_booster": "Bonus de courage"
   },
   "state": {
     "active": "en service",
@@ -112,12 +115,20 @@
     "heading": "Autres faits",
     "none": "Rien à signaler.",
     "returned_to_duty": "Retour au service",
-    "hospital": "Hôpital",
-    "wounded_in_action": "Blessé au combat",
-    "aircraft_lost": "Avion perdu",
-    "joined": "Affecté à l'escadrille",
     "health": "santé {value}",
-    "unknown": "Inconnu ({code})"
+    "plane_lost": "Avion perdu",
+    "pilot_kia": "Pilote tué au combat",
+    "wounded": "Blessé au combat",
+    "commander_assigned": "Nommé commandant",
+    "reported": "Présenté au service",
+    "plane_delivered": "Avion livré",
+    "medical": "Hôpital",
+    "plane_repair": "Réparation d'avion",
+    "efficiency": "Efficacité de l'escadrille modifiée",
+    "request_points": "Points de demande accordés",
+    "emergency_mission": "Mission imprévue",
+    "resources_destroyed": "Ressources du terrain détruites",
+    "operation": "Opération"
   },
   "debrief": {
     "heading": "Comptes rendus de mission",

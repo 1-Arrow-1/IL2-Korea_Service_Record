@@ -22,6 +22,14 @@
     // capturing one. Callers set the locale, then render.
     const T = (key, params) => i18n.t(key, params);
 
+    // Rows from the server carry a translation key where one exists and English
+    // prose where it does not — a game category name such as "Military
+    // Facility" comes out of killStats and has no key of ours.
+    const rowLabel = (row) => (row.key ? T(row.key) : row.label);
+    const rowValue = (row) => (row.value_key
+        ? T(row.value_key, {count: row.value, value: row.value})
+        : row.value);
+
     let settings = {language: "en", languages: []};
 
     // Escape anything that reaches innerHTML. Pilot names come from the game's
@@ -209,7 +217,7 @@
                 esc(attr.points || 0) + "</span>";
             if (!hasLevels) {
                 return '<div class="attr-row booster"><div class="attr-head">' +
-                    "<span>" + esc(attr.name) + " booster</span>" +
+                    "<span>" + esc(T("pilot." + attr.name + "_booster")) + "</span>" +
                     "<span>" + points + "</span></div></div>";
             }
             let pips = "";
@@ -217,14 +225,13 @@
                 pips += '<span class="attr-pip' + (i < attr.level ? " on" : "") + '"></span>';
             }
             return '<div class="attr-row"><div class="attr-head">' +
-                "<span>" + esc(attr.name) + "</span>" +
+                "<span>" + esc(T("pilot." + attr.name)) + "</span>" +
                 '<span><span class="attr-value">' + esc(attr.level) + "</span>" +
                 points + "</span></div>" +
                 '<div class="attr-bar">' + pips + "</div></div>";
         }).join("");
         const note = hasLevels ? "" :
-            '<p class="panel-note">Squadron commander &mdash; contributes boosters ' +
-            "rather than a simulated skill level.</p>";
+            '<p class="panel-note">' + esc(T("pilot.commander_note")) + "</p>";
         return body + note;
     }
 
@@ -250,10 +257,14 @@
     }
 
     function incidenceItem(entry) {
-        const detail = entry.detail ? " &mdash; " + esc(entry.detail) : "";
+        const detailText = entry.detail_key
+            ? T(entry.detail_key, {value: entry.detail_value})
+            : entry.detail;
+        const detail = detailText ? " &mdash; " + esc(detailText) : "";
         return '<li class="kind-' + esc(entry.kind) + '">' +
             '<span class="service-date">' + esc(entry.date) + "</span>" +
-            '<span class="service-text">' + esc(entry.label) + detail + "</span></li>";
+            '<span class="service-text">' + esc(rowLabel(entry)) + detail +
+            "</span></li>";
     }
 
     // Category pictograms, reused from the Great Battles tracker so the two
@@ -273,7 +284,8 @@
                 : "";
             return '<div class="stat-cell">' + img +
                 '<span class="stat-value">' + esc(item.value) + "</span>" +
-                '<span class="stat-label">' + esc(item.label) + "</span></div>";
+                '<span class="stat-label">' +
+                esc(item.key ? T("combat." + item.key) : item.label) + "</span></div>";
         }).join("");
     }
 
@@ -468,18 +480,19 @@
             const air = d.air_kills_by_type;
             let airHtml = rows(air.airborne.map((a) => [a.name, a.value]));
             if (air.parked.length) {
-                airHtml += '<tr><th class="group">Destroyed on the ground</th><td></td></tr>' +
+                airHtml += '<tr><th class="group">' +
+                    esc(T("combat.destroyed_on_ground")) + "</th><td></td></tr>" +
                            rows(air.parked.map((a) => [a.name, a.value]));
             }
             el("d-air-kills").innerHTML = airHtml;
 
             el("d-missions").innerHTML =
-                rows(d.missions_flown.map((m) => [m.label, m.value]));
+                rows(d.missions_flown.map((m) => [rowLabel(m), m.value]));
             el("d-progression").innerHTML = rows([
-                ["Starting rank", d.progression.starting_rank],
-                ["Current rank", d.progression.current_rank],
-                ["Promotions", d.progression.promotions],
-                ["Awards", d.progression.awards]
+                [T("progression.starting_rank"), d.progression.starting_rank],
+                [T("progression.current_rank"), d.progression.current_rank],
+                [T("progression.promotions"), d.progression.promotions],
+                [T("progression.awards"), d.progression.awards]
             ]);
 
             el("d-debrief-count").textContent = "(" + d.debriefings.length + ")";
@@ -505,8 +518,8 @@
         // outright when a pilot has nothing to put in them — an AI wingman
         // with no air kills should not get an empty "Confirmed Victories".
         el("d-performance").innerHTML = (d.performance || []).map((row) =>
-            "<tr><th>" + esc(row.label) + "</th><td>" +
-            esc(row.value) + "</td></tr>").join("");
+            "<tr><th>" + esc(rowLabel(row)) + "</th><td>" +
+            esc(rowValue(row)) + "</td></tr>").join("");
         show(el("d-performance-panel"), (d.performance || []).length > 0);
 
         const victories = d.victories || [];
@@ -683,7 +696,7 @@
                     "<div><h3>Characteristics</h3>" +
                         attributeBlock(p.attributes, p.has_levels) + "</div>" +
                     "<div><h3>Missions Flown</h3><table class=\"mini-table\">" +
-                        rows(p.missions_flown.map((m) => [m.label, m.value])) +
+                        rows(p.missions_flown.map((m) => [rowLabel(m), m.value])) +
                         "</table></div>" +
                 "</div>" +
                 "<h3>Promotions</h3><div class=\"pb-emblems\">" + promos + "</div>" +

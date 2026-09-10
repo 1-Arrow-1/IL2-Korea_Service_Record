@@ -46,7 +46,10 @@
     "skills": "Fertigkeiten",
     "discipline": "Disziplin",
     "courage": "Mut",
-    "no_photograph": "Kein Foto"
+    "no_photograph": "Kein Foto",
+    "skills_booster": "Fertigkeiten-Bonus",
+    "discipline_booster": "Disziplin-Bonus",
+    "courage_booster": "Mut-Bonus"
   },
   "state": {
     "active": "aktiv",
@@ -112,12 +115,20 @@
     "heading": "Weitere Vorkommnisse",
     "none": "Nichts vermerkt.",
     "returned_to_duty": "Zum Dienst zurückgekehrt",
-    "hospital": "Lazarett",
-    "wounded_in_action": "Im Einsatz verwundet",
-    "aircraft_lost": "Flugzeug verloren",
-    "joined": "Zur Staffel versetzt",
     "health": "Gesundheit {value}",
-    "unknown": "Unbekannt ({code})"
+    "plane_lost": "Flugzeug verloren",
+    "pilot_kia": "Pilot gefallen",
+    "wounded": "Im Einsatz verwundet",
+    "commander_assigned": "Zum Kommandeur ernannt",
+    "reported": "Zum Dienst gemeldet",
+    "plane_delivered": "Flugzeug geliefert",
+    "medical": "Lazarett",
+    "plane_repair": "Flugzeugreparatur",
+    "efficiency": "Staffeleffizienz geändert",
+    "request_points": "Anforderungspunkte erhalten",
+    "emergency_mission": "Außerplanmäßiger Einsatz",
+    "resources_destroyed": "Flugplatzbestände zerstört",
+    "operation": "Operation"
   },
   "debrief": {
     "heading": "Einsatzberichte",

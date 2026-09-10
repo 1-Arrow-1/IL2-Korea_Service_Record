@@ -46,7 +46,10 @@
     "skills": "Навыки",
     "discipline": "Дисциплина",
     "courage": "Отвага",
-    "no_photograph": "Нет фотографии"
+    "no_photograph": "Нет фотографии",
+    "skills_booster": "Бонус мастерства",
+    "discipline_booster": "Бонус дисциплины",
+    "courage_booster": "Бонус отваги"
   },
   "state": {
     "active": "в строю",
@@ -112,12 +115,20 @@
     "heading": "Прочие события",
     "none": "Записей нет.",
     "returned_to_duty": "Вернулся в строй",
-    "hospital": "Госпиталь",
-    "wounded_in_action": "Ранен в бою",
-    "aircraft_lost": "Потерян самолёт",
-    "joined": "Зачислен в эскадрилью",
     "health": "здоровье {value}",
-    "unknown": "Неизвестно ({code})"
+    "plane_lost": "Потерян самолёт",
+    "pilot_kia": "Лётчик погиб в бою",
+    "wounded": "Ранен в бою",
+    "commander_assigned": "Назначен командиром",
+    "reported": "Прибыл для прохождения службы",
+    "plane_delivered": "Получен самолёт",
+    "medical": "Госпиталь",
+    "plane_repair": "Ремонт самолёта",
+    "efficiency": "Изменилась эффективность эскадрильи",
+    "request_points": "Начислены очки заявок",
+    "emergency_mission": "Внеплановый вылет",
+    "resources_destroyed": "Уничтожены запасы аэродрома",
+    "operation": "Операция"
   },
   "debrief": {
     "heading": "Отчёты о заданиях",

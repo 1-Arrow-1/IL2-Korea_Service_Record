@@ -19,6 +19,7 @@ from korea_service_record.career.events import (award_action, award_source,
                                                 describe, is_award_event)
 from korea_service_record.career.killstats import KillStats
 from korea_service_record.career.missionresult import MissionResult
+import korea_service_record
 from korea_service_record.career.aggregator import CareerAggregator
 
 # The blob counts aircraft by class; killStats counts them as one number.
@@ -231,6 +232,48 @@ def main(game_arg):
             check("mission 31 air kill attributed", scorers, {"Manuel Rivera"})
             check("no raw account name in the log",
                   any("Arrow" in k["actor"] for k in detail["log"]), False)
+
+        # --- i18n ---------------------------------------------------------
+        # A locale that drifts from English fails silently: the front end falls
+        # back key by key, so a missing string looks like an English label
+        # rather than an error. Same for a placeholder lost in translation —
+        # {reason} becomes literal text instead of the message.
+        import json as _json
+        import re as _re
+        loc_dir = Path(korea_service_record.__file__).parent / "locales"
+
+        def _flat(obj, prefix=""):
+            out = {}
+            for k, v in obj.items():
+                out.update(_flat(v, prefix + k + ".") if isinstance(v, dict)
+                           else {prefix + k: v})
+            return out
+
+        english = _flat(_json.loads((loc_dir / "en.json").read_text(encoding="utf-8")))
+        for other in sorted(loc_dir.glob("*.json")):
+            if other.stem == "en":
+                continue
+            strings = _flat(_json.loads(other.read_text(encoding="utf-8")))
+            check(f"{other.stem}.json has every key", set(english) - set(strings), set())
+            check(f"{other.stem}.json has no stray key", set(strings) - set(english), set())
+            holes = [k for k in set(english) & set(strings)
+                     if set(_re.findall(r"\{(\w+)\}", english[k]))
+                     != set(_re.findall(r"\{(\w+)\}", strings[k]))]
+            check(f"{other.stem}.json keeps its placeholders", holes, [])
+
+        # Every key the payload asks the front end to translate must exist, or
+        # the reader sees "incidences.plane_lost" on the page.
+        detail = aggregator.career_detail(
+            f"{target.pilot_name}, {target.squadron_name}", None)
+        if detail is not None:
+            asked = set()
+            for row in (detail["incidences"] + detail["missions_flown"]
+                        + detail["performance"]):
+                asked.update(v for v in (row.get("key"), row.get("value_key"),
+                                         row.get("detail_key")) if v)
+            asked.update("combat." + item["key"] for item in detail["combat"]["headline"])
+            check("every key the server emits exists in en.json",
+                  sorted(asked - set(english)), [])
 
         dsc = awards_cfg.get(601021)
         if dsc is not None:

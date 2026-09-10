@@ -347,13 +347,23 @@ class CareerAggregator:
         wounded = sum(1 for s in sorties if s["status"] == 4)
         count = len(sorties) or 1
         return [
-            {"label": "Missions completed", "value": len(sorties)},
-            {"label": "Flight time", "value": _hm(total_time)},
-            {"label": "Average flight time", "value": _hm(total_time // count)},
-            {"label": "Aircraft returned", "value": outcomes.get("returned", 0)},
-            {"label": "Aircraft damaged", "value": outcomes.get("damaged", 0)},
-            {"label": "Aircraft lost", "value": outcomes.get("lost", 0)},
-            {"label": "Wounded in action", "value": wounded},
+            # Every row carries a key as well as the English. The front end
+            # prefers the key; the prose stays as a fallback for anything the
+            # locale files have not caught up with.
+            {"key": "missions.completed",
+             "label": "Missions completed", "value": len(sorties)},
+            {"key": "missions.flight_time",
+             "label": "Flight time", "value": _hm(total_time)},
+            {"key": "missions.average_flight_time",
+             "label": "Average flight time", "value": _hm(total_time // count)},
+            {"key": "missions.returned",
+             "label": "Aircraft returned", "value": outcomes.get("returned", 0)},
+            {"key": "missions.damaged",
+             "label": "Aircraft damaged", "value": outcomes.get("damaged", 0)},
+            {"key": "missions.lost",
+             "label": "Aircraft lost", "value": outcomes.get("lost", 0)},
+            {"key": "missions.wounded",
+             "label": "Wounded in action", "value": wounded},
         ]
 
     def _promotions_and_awards(self, awards, country: int = 601) -> Dict[str, List]:
@@ -388,6 +398,10 @@ class CareerAggregator:
                 continue
             entry = {"date": row["date"][:10], "kind": info.key,
                      "label": info.label, "confidence": info.confidence}
+            # A key only where a translation exists: an unmapped event code
+            # would otherwise print "incidences.unknown_13" at the reader.
+            if not info.key.startswith("unknown"):
+                entry["key"] = "incidences." + info.key
             if info.key == "plane_lost":
                 # tpar1 is the aircraft type for AI pilots but the player's own
                 # account name for the player, which is neither useful nor
@@ -398,9 +412,12 @@ class CareerAggregator:
             elif info.key in ("wounded", "medical"):
                 if info.key == "medical" and row["ipar1"] == 1:
                     entry["label"] = "Returned to duty"
+                    entry["key"] = "incidences.returned_to_duty"
                     entry["kind"] = "recovered"
                 else:
                     entry["detail"] = f"health {row['ipar2']}"
+                    entry["detail_key"] = "incidences.health"
+                    entry["detail_value"] = row["ipar2"]
             out.append(entry)
         out.reverse()
         return out
@@ -472,17 +489,26 @@ class CareerAggregator:
         airborne = KillStats(player["killStats"]).airborne
         altitudes = [v["altitude"] for v in victories if v["altitude"]]
 
-        rows = [
-            ("Best air victory streak", f"{best_air} in one sortie"),
-            ("Best ground streak", f"{best_ground} in one sortie"),
-            ("Victories per sortie", f"{airborne / sorties:.2f}" if sorties else "—"),
-            ("Victories per flight hour", f"{airborne / hours:.1f}" if hours else "—"),
-            ("Average victory altitude",
-             f"{round(sum(altitudes) / len(altitudes)):,} m" if altitudes else "—"),
-            ("Best mission score", f"{best_points:,}"),
-            ("Career score", f"{career_points:,}"),
+        average = round(sum(altitudes) / len(altitudes)) if altitudes else None
+        # value_key marks a value that is itself prose — "7 in one sortie" —
+        # and so has to be assembled in the reader's language, not here.
+        return [
+            {"key": "performance.best_air_streak", "label": "Best air victory streak",
+             "value": best_air, "value_key": "performance.in_one_sortie"},
+            {"key": "performance.best_ground_streak", "label": "Best ground streak",
+             "value": best_ground, "value_key": "performance.in_one_sortie"},
+            {"key": "performance.per_sortie", "label": "Victories per sortie",
+             "value": f"{airborne / sorties:.2f}" if sorties else "—"},
+            {"key": "performance.per_hour", "label": "Victories per flight hour",
+             "value": f"{airborne / hours:.1f}" if hours else "—"},
+            {"key": "performance.average_altitude", "label": "Average victory altitude",
+             "value": f"{average:,}" if average is not None else "—",
+             "value_key": "common.metres" if average is not None else None},
+            {"key": "performance.best_score", "label": "Best mission score",
+             "value": f"{best_points:,}"},
+            {"key": "performance.career_score", "label": "Career score",
+             "value": f"{career_points:,}"},
         ]
-        return [{"label": label, "value": value} for label, value in rows]
 
     def _debriefings(self, db, sorties, kill_events,
                      with_flight_log: bool = True) -> List[Dict[str, Any]]:
