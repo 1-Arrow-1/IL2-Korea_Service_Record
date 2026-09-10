@@ -138,12 +138,38 @@ Source: "payload\tracker\*"; DestDir: "{app}"; Components: tracker; \
     Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; --- The awards mod, into the folder chosen on the custom page. ---
+; The files live flat in mod\assets — that folder is the mod, committed and
+; reviewable — and are placed here, which is the only place their destination
+; is written down in an executable form. mod\README.txt says the same for
+; anyone installing by hand.
+;
 ; Additions to data\, which the game reads in preference to the archives while
 ; modifications are enabled. Inno records each one and removes it on uninstall,
 ; which is the whole of the cleanup: with the files gone the game finds nothing
-; loose and reads the archive again.
-Source: "payload\mod\data\*"; DestDir: "{code:GetIL2Dir}\data"; Components: mod; \
-    Flags: ignoreversion recursesubdirs createallsubdirs uninsremovereadonly
+; loose and reads the archives again.
+Source: "mod\assets\awards.cfg"; DestDir: "{code:GetIL2Dir}\data\scg\2"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
+
+Source: "mod\assets\awards.xaml"; DestDir: "{code:GetIL2Dir}\data\nsdata\assets\images"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
+Source: "mod\assets\awards6xx.dds"; DestDir: "{code:GetIL2Dir}\data\nsdata\assets\images"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
+Source: "mod\assets\awards6xx2.dds"; DestDir: "{code:GetIL2Dir}\data\nsdata\assets\images"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
+
+; The six locale dictionaries carrying the new decorations' names.
+Source: "mod\assets\awards.locale=*.json"; \
+    DestDir: "{code:GetIL2Dir}\data\nsdata\assets\locale"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
+
+; The description texts for the added decorations, six languages each.
+Source: "mod\assets\6*.locale=*.txt"; \
+    DestDir: "{code:GetIL2Dir}\data\nsdata\assets\awards\6xx"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
+
+; Manual-install instructions, kept beside the tracker.
+Source: "mod\README.txt"; DestDir: "{app}"; DestName: "Awards mod - manual install.txt"; \
+    Components: mod; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

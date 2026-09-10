@@ -1,54 +1,52 @@
 """
-Assemble everything the installer ships into one folder.
+Assemble what the installer ships, and keep the mod's source in the repo.
 
-    python tools/stage_release.py            # uses the autodetected game folder
-    python tools/stage_release.py --game "E:/SteamLibrary/steamapps/common/IL2Series"
+    python tools/stage_release.py                 # stage the tracker for packaging
+    python tools/stage_release.py --refresh-mod   # re-copy the mod out of the game
 
-Produces ``installer/payload``::
-
-    payload/tracker/     the PyInstaller output, installed to {app}
-    payload/mod/data/    the awards mod, installed into the user's game folder
-
-Two very different kinds of thing, which is why they are staged apart.
+Two payloads, kept apart because they are different kinds of thing.
 
 **The tracker ships no game data at all.** It reads what it needs out of the
 user's own installation at runtime, decrypting Interface.gtp as it goes, and
-caches the results under %LOCALAPPDATA%. Verified by deleting the whole 35 MB
-cache and running the packaged exe cold: medals, insignia, briefings and names
-all came back. So nothing of 1C's is redistributed.
+caches the result under %LOCALAPPDATA%. Verified by deleting the whole 35 MB
+cache and running the packaged exe cold. So nothing of 1C's is redistributed,
+and the build output is simply copied into installer/payload/tracker.
 
-**The mod is the opposite** — it is precisely a set of modified game files, and
-they only work as loose files because the resolver (and the engine) prefer
-loose over archive. They have to be copied into ``<game>\\data\\``.
+**The mod is the opposite** — it is exactly a set of modified game files. Those
+live in ``installer/mod/assets`` and are committed, so the release is
+reproducible and the history shows when a decoration changed. Flat, because
+there are no name collisions and the destination is the installer's business,
+not the folder's; ``installer/mod/README.txt`` records where each one goes for
+anyone installing by hand.
 
-The mod is staged from the *game folder*, not from the extract in
-IL2Korea-Modding: that extract has drifted badly — 11 of these 28 files are
-missing from it and 9 more differ, because edits were made in place and never
-mirrored back. What the user actually plays with is the truth.
+``--refresh-mod`` is the only way files enter that folder, and it reads the
+*game* folder rather than the extract in IL2Korea-Modding — that extract has
+drifted badly, missing 11 of these 28 files and differing on 9 more, because
+edits were made in place and never mirrored back.
 """
 
 import argparse
 import shutil
-import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 PAYLOAD = REPO / "installer" / "payload"
+MOD_ASSETS = REPO / "installer" / "mod" / "assets"
 
-# Every file the awards mod adds or replaces, relative to <game>/data.
-# Deliberately explicit: a glob over data/ would sweep up the player's own
+# Every file the awards mod adds, and where the game expects it. Explicit
+# rather than a glob over data\: a glob would sweep up the player's own
 # UserData settings and the .bak files left by earlier edits.
-MOD_FILES = [
-    "scg/2/awards.cfg",
-    "nsdata/assets/images/awards.xaml",
-    "nsdata/assets/images/awards6xx.dds",
-    "nsdata/assets/images/awards6xx2.dds",
-]
+MOD_FILES = {
+    "awards.cfg": "scg/2",
+    "awards.xaml": "nsdata/assets/images",
+    "awards6xx.dds": "nsdata/assets/images",
+    "awards6xx2.dds": "nsdata/assets/images",
+}
 for award in ("601027", "601040", "601041"):
     for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
-        MOD_FILES.append(f"nsdata/assets/awards/6xx/{award}.locale={lang}.txt")
+        MOD_FILES[f"{award}.locale={lang}.txt"] = "nsdata/assets/awards/6xx"
 for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
-    MOD_FILES.append(f"nsdata/assets/locale/awards.locale={lang}.json")
+    MOD_FILES[f"awards.locale={lang}.json"] = "nsdata/assets/locale"
 
 
 def autodetect() -> Path:
@@ -57,6 +55,46 @@ def autodetect() -> Path:
         if (candidate / "data" / "Career").is_dir():
             return candidate
     raise SystemExit("No IL-2 Korea installation found; pass --game")
+
+
+def refresh_mod(game: Path) -> int:
+    """Pull the current mod files out of the game folder into the repo."""
+    MOD_ASSETS.mkdir(parents=True, exist_ok=True)
+    copied = 0
+    for name, where in MOD_FILES.items():
+        src = game / "data" / where / name
+        if not src.is_file():
+            print(f"  missing from the game folder: {where}/{name}")
+            continue
+        shutil.copy2(src, MOD_ASSETS / name)
+        copied += 1
+    write_manifest()
+    return copied
+
+
+def write_manifest() -> None:
+    """Where each file goes, for anyone installing the mod by hand."""
+    lines = [
+        "IL-2 Korea Awards Mod",
+        "=====================",
+        "",
+        "Copy each file below into the folder shown, under your IL-2 Korea",
+        "installation. Enable modifications in the game first:",
+        "",
+        "    Settings -> General -> Enable modifications",
+        "",
+        "With modifications enabled the game reads these files in preference to",
+        "the .gtp archives. To uninstall, delete them: the game finds nothing",
+        "loose and goes back to the archives on its own. Nothing else changes.",
+        "",
+    ]
+    for where in sorted(set(MOD_FILES.values())):
+        names = sorted(n for n, w in MOD_FILES.items() if w == where)
+        lines.append(f"<IL-2 Korea>\\data\\{where.replace('/', chr(92))}\\")
+        lines.extend(f"    {n}" for n in names)
+        lines.append("")
+    (MOD_ASSETS.parent / "README.txt").write_text(
+        "\r\n".join(lines), encoding="utf-8")
 
 
 def stage_tracker() -> int:
@@ -70,38 +108,27 @@ def stage_tracker() -> int:
     return sum(1 for p in target.rglob("*") if p.is_file())
 
 
-def stage_mod(game: Path) -> int:
-    source = game / "data"
-    target = PAYLOAD / "mod" / "data"
-    if target.exists():
-        shutil.rmtree(target)
-    copied = 0
-    for relative in MOD_FILES:
-        src = source / relative
-        if not src.is_file():
-            print(f"  missing from the game folder: {relative}")
-            continue
-        dst = target / relative
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
-        copied += 1
-    return copied
-
-
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--game", help="path to the IL-2 Korea installation")
+    parser.add_argument("--refresh-mod", action="store_true",
+                        help="re-copy the mod files out of the game folder")
     args = parser.parse_args()
-    game = Path(args.game) if args.game else autodetect()
+
+    if args.refresh_mod:
+        game = Path(args.game) if args.game else autodetect()
+        copied = refresh_mod(game)
+        print(f"  mod  : {copied} of {len(MOD_FILES)} files -> installer/mod/assets")
+        return 0 if copied == len(MOD_FILES) else 1
 
     PAYLOAD.mkdir(parents=True, exist_ok=True)
     tracker = stage_tracker()
-    mod = stage_mod(game)
-
     print(f"  tracker : {tracker} files -> installer/payload/tracker")
-    print(f"  mod     : {mod} of {len(MOD_FILES)} files -> installer/payload/mod/data")
-    if mod != len(MOD_FILES):
-        print("  WARNING: the mod is incomplete; the installer would ship a broken mod")
+
+    have = sum(1 for name in MOD_FILES if (MOD_ASSETS / name).is_file())
+    print(f"  mod     : {have} of {len(MOD_FILES)} files in installer/mod/assets")
+    if have != len(MOD_FILES):
+        print("  WARNING: run --refresh-mod; the installer would ship a broken mod")
         return 1
     return 0
 
