@@ -676,3 +676,8 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 /* How much of the aircraft, and of the man, did not come back. */
 .damage-cell { white-space: nowrap; }
 .pilot-hurt { color: var(--bad); font-size: 0.86em; }
+
+
+/* Damage taken reads as an interruption in the kill list, not another kill. */
+.log-row.hurt { color: var(--bad); }
+.hurt-total { color: var(--ink-muted); font-size: 0.9em; }

@@ -168,7 +168,10 @@
     "rank": "Звание",
     "name": "Имя",
     "damage": "Повреждения",
-    "pilot_hurt": "лётчик {percent}%"
+    "pilot_hurt": "лётчик {percent}%",
+    "hit_burst": "попаданий: {hits}",
+    "hit_total": "самолёт повреждён на {total}%",
+    "damage_tiny": "менее 1%"
   },
   "roster": {
     "heading": "Статистика эскадрильи",

@@ -168,7 +168,10 @@
     "rank": "Dienstgrad",
     "name": "Name",
     "damage": "Schäden",
-    "pilot_hurt": "Pilot {percent}%"
+    "pilot_hurt": "Pilot {percent}%",
+    "hit_burst": "{hits}× getroffen",
+    "hit_total": "Flugzeug zu {total}% beschädigt",
+    "damage_tiny": "unter 1%"
   },
   "roster": {
     "heading": "Staffelstatistik",

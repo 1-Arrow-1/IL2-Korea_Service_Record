@@ -168,7 +168,10 @@
     "rank": "Grade",
     "name": "Nom",
     "damage": "Dégâts",
-    "pilot_hurt": "pilote {percent}%"
+    "pilot_hurt": "pilote {percent}%",
+    "hit_burst": "touché {hits}×",
+    "hit_total": "avion endommagé à {total}%",
+    "damage_tiny": "moins de 1%"
   },
   "roster": {
     "heading": "Statistiques de l'escadrille",

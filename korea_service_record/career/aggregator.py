@@ -618,6 +618,28 @@ class CareerAggregator:
             flight = (self.flightlogs.for_sortie(sortie["date"][:10],
                                                  sortie["date"][11:16])
                       if with_flight_log else None)
+            # Damage taken, folded into the same timeline as the kills: what a
+            # reader wants is the order things happened in, not two lists.
+            if flight is not None and flight.damage:
+                start = sortie["date"][11:]
+                for burst in flight.damage:
+                    log.append({
+                        "time": _clock(start, burst.at_s),
+                        "target": "",
+                        "category": "",
+                        "air": False,
+                        "parked": False,
+                        "victim": "",
+                        "altitude": None,
+                        "hurt": {
+                            "hits": burst.hits,
+                            "amount": round(burst.amount * 100),
+                            "total": round(burst.total * 100),
+                            "attacker": burst.attacker,
+                        },
+                    })
+                log.sort(key=lambda row: row["time"])
+
             outcome = PLANE_OUTCOME.get(sortie["planeStatus"], "unknown")
             # A key rather than prose: the front end renders it in whichever
             # language this record belongs to.

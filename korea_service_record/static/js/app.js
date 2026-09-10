@@ -306,6 +306,16 @@
         }
         if (d.wounded) flags.push(T("debrief.wounded"));
         let log = d.log.map((k) => {
+            if (k.hurt) {
+                // Damage taken, in the same timeline as the kills so the
+                // sortie reads in the order it happened.
+                return '<div class="log-row hurt">' +
+                    '<span class="log-time">' + esc(k.time) + "</span>" +
+                    "<span>" + esc(T("debrief.hit_burst", {hits: k.hurt.hits})) +
+                    ' <span class="hurt-total">' +
+                    esc(T("debrief.hit_total", {total: k.hurt.total})) +
+                    "</span></span></div>";
+            }
             const note = k.parked
                 ? ' <span class="log-note">' + esc(T("debrief.on_the_ground")) + "</span>" : "";
             const who = k.victim
@@ -623,7 +633,8 @@
                 '<td class="num damage-cell">' +
                     (f.plane_damage === null || f.plane_damage === undefined
                         ? "&mdash;"
-                        : esc(f.plane_damage) + "%" +
+                        : esc(f.plane_damage > 0 ? f.plane_damage + "%"
+                                                 : T("debrief.damage_tiny")) +
                           (f.pilot_damage
                               ? ' <span class="pilot-hurt">' +
                                 esc(T("debrief.pilot_hurt", {percent: f.pilot_damage})) +

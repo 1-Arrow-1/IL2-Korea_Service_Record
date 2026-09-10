@@ -168,7 +168,10 @@
     "rank": "军衔",
     "name": "姓名",
     "damage": "损伤",
-    "pilot_hurt": "飞行员 {percent}%"
+    "pilot_hurt": "飞行员 {percent}%",
+    "hit_burst": "中弹 {hits} 次",
+    "hit_total": "飞机受损 {total}%",
+    "damage_tiny": "不足 1%"
   },
   "roster": {
     "heading": "中队统计",

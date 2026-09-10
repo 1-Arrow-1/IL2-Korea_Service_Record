@@ -168,7 +168,10 @@
     "rank": "Rank",
     "name": "Name",
     "damage": "Damage",
-    "pilot_hurt": "pilot {percent}%"
+    "pilot_hurt": "pilot {percent}%",
+    "hit_burst": "hit {hits}×",
+    "hit_total": "aircraft {total}% damaged",
+    "damage_tiny": "under 1%"
   },
   "roster": {
     "heading": "Squadron Statistics",

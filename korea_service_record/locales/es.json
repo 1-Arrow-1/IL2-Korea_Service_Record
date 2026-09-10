@@ -168,7 +168,10 @@
     "rank": "Empleo",
     "name": "Nombre",
     "damage": "Daños",
-    "pilot_hurt": "piloto {percent}%"
+    "pilot_hurt": "piloto {percent}%",
+    "hit_burst": "alcanzado {hits}×",
+    "hit_total": "aeronave dañada al {total}%",
+    "damage_tiny": "menos del 1%"
   },
   "roster": {
     "heading": "Estadísticas del escuadrón",

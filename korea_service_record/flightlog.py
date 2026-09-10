@@ -42,7 +42,22 @@ logger = logging.getLogger(__name__)
 TICKS_PER_SECOND = 50.0
 HEADER = struct.Struct("<LBH")
 
-WANTED = {0, 5, 6, 10, 18}
+WANTED = {0, 2, 5, 6, 10, 12, 18}
+
+# A burst is a run of damage records with no longer pause than this between
+# them. Cannon fire arrives as several records in the same tenth of a second
+# and a sortie's worth of them, listed one by one, says nothing a reader can
+# use; the two passes a Mustang actually took were 505 seconds apart.
+BURST_GAP_S = 15.0
+
+
+class DamageBurst(NamedTuple):
+    """One pass, however many records the log split it into."""
+    at_s: float                     # when the burst ended
+    hits: int
+    amount: float                   # inflicted in this burst, 0..1
+    total: float                    # of the aircraft lost by the end of it
+    attacker: str                   # "" when the log never named it
 
 
 class SortieLog(NamedTuple):
@@ -53,6 +68,7 @@ class SortieLog(NamedTuple):
     landing_s: Optional[float]
     ejected: bool
     plane: str
+    damage: List["DamageBurst"] = []
 
     @property
     def outcome(self) -> str:
@@ -122,6 +138,11 @@ def read_log(path: Path) -> Optional[SortieLog]:
     player_bot: Optional[int] = None
     takeoff = landing = None
     ejected = False
+    # AType 2 is [float amount][attacker][target][x][y][z]. Collected for
+    # everyone because the player's own object id is not known until the
+    # AType 10 that names him, which need not come first.
+    harm: List[Tuple[int, float, int, int]] = []
+    named: Dict[int, str] = {}
 
     for tick, atype, payload in _records(path):
         try:
@@ -151,6 +172,17 @@ def read_log(path: Path) -> Optional[SortieLog]:
                         takeoff = seconds
                     elif atype == 6:
                         landing = seconds
+            elif atype == 2 and len(payload) >= 12:
+                amount, attacker, target = struct.unpack_from("<fII", payload, 0)
+                harm.append((tick, amount, attacker, target))
+            elif atype == 12 and len(payload) > 12:
+                r = _Reader(payload)
+                oid = r.int32()
+                r.string()                      # type
+                r.string()                      # country
+                who = r.string()
+                if who:
+                    named[oid] = who
             elif atype == 18 and player_bot is not None:
                 if _Reader(payload).int32() == player_bot:
                     ejected = True
@@ -159,7 +191,38 @@ def read_log(path: Path) -> Optional[SortieLog]:
 
     if not date:
         return None
-    return SortieLog(path, date, time, takeoff, landing, ejected, plane)
+    return SortieLog(path, date, time, takeoff, landing, ejected, plane,
+                     _bursts(harm, player_plid, named))
+
+
+def _bursts(harm, target_id: Optional[int],
+            named: Dict[int, str]) -> List[DamageBurst]:
+    """
+    Group the damage done to one aircraft into the passes that caused it.
+
+    The running total is what the reader wants — "half the aircraft gone by
+    the second pass" — rather than each record's own fraction, and it is
+    checkable: the total after the last burst equals the figure mission.result
+    stores for that pilot. Verified at 0.5398 on the sortie that brought the
+    Mustang home on 1951.06.01.
+    """
+    if target_id is None:
+        return []
+    mine = sorted((t, a, who) for t, a, who, tgt in harm if tgt == target_id)
+    out: List[DamageBurst] = []
+    total = 0.0
+    for tick, amount, attacker in mine:
+        seconds = tick / TICKS_PER_SECOND
+        total += amount
+        if out and seconds - out[-1].at_s <= BURST_GAP_S:
+            last = out[-1]
+            out[-1] = DamageBurst(seconds, last.hits + 1,
+                                  last.amount + amount, total,
+                                  last.attacker or named.get(attacker, ""))
+        else:
+            out.append(DamageBurst(seconds, 1, amount, total,
+                                   named.get(attacker, "")))
+    return out
 
 
 class FlightLogIndex:
