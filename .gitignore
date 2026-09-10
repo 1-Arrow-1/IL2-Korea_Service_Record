@@ -5,3 +5,7 @@ dist/
 *.spec.bak
 .venv/
 *.log
+
+# Installer staging and output
+installer/payload/
+installer/Output/
