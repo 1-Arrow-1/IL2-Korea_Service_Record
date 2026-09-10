@@ -607,7 +607,10 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     content: "";
     position: absolute;
     top: -1.5rem;
-    right: 0.5rem;
+    /* Sat squarely on top of the dates. The career figures are right-aligned
+       against blank paper, so moving the impression left puts it on that blank
+       and lets only its trailing edge catch the first character or two. */
+    right: 10.5rem;
     width: 196px;
     aspect-ratio: 39 / 22;
     background: var(--classification, none) center / contain no-repeat;
