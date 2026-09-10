@@ -148,8 +148,23 @@ class AwardsConfig:
 
     _BLOCK_RE = re.compile(r'\[Award=(\d+)\](.*?)\[end\]', re.S)
 
-    def __init__(self, path: Path):
+    # Where the file lives inside Missions.gtp, and on disk once a mod has
+    # placed a loose copy over it.
+    VPATH = "scg/2/awards.cfg"
+
+    def __init__(self, path: Path, resolver: Optional["AssetResolver"] = None):
+        """
+        ``resolver`` makes this work on a stock installation.
+
+        A direct path only finds the file when something has already written a
+        loose copy — which is true on a machine with the awards mod installed
+        and false on every other one. The game keeps awards.cfg inside
+        Missions.gtp, so a stock install read nothing and every award
+        definition came back empty. The resolver checks loose first, exactly as
+        the engine does, so a modded install still sees the mod's awards.
+        """
         self.path = Path(path)
+        self.resolver = resolver
         self.definitions: Dict[int, AwardDefinition] = {}
         self._load()
 
@@ -158,11 +173,17 @@ class AwardsConfig:
         return match.group(1) if match else ""
 
     def _load(self) -> None:
-        try:
-            text = self.path.read_text(encoding="utf-8-sig", errors="replace")
-        except OSError as exc:
-            logger.warning("Cannot read awards.cfg at %s: %s", self.path, exc)
-            return
+        text = None
+        if self.resolver is not None:
+            text = self.resolver.read_text(self.VPATH)
+        if text is None:
+            try:
+                text = self.path.read_text(encoding="utf-8-sig", errors="replace")
+            except OSError as exc:
+                logger.warning("Cannot read awards.cfg at %s: %s", self.path, exc)
+                return
+        self.source = ("loose or archive" if self.resolver is not None
+                       else str(self.path))
 
         for order, match in enumerate(self._BLOCK_RE.finditer(text)):
             award_id = int(match.group(1))

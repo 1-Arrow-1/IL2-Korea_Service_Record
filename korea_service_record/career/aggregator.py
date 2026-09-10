@@ -131,8 +131,11 @@ class CareerAggregator:
         self.icons = IconLibrary(self.resolver)
         self.flightlogs = FlightLogIndex(self.game_dir)
         self.descriptions = MissionDescriptions(self.resolver, lang, DEFAULT_TVD)
+        # Through the resolver: a stock installation keeps awards.cfg inside
+        # Missions.gtp and has no loose copy to read.
         self.awards_cfg = AwardsConfig(
-            self.game_dir / "data" / "scg" / str(DEFAULT_TVD) / "awards.cfg")
+            self.game_dir / "data" / "scg" / str(DEFAULT_TVD) / "awards.cfg",
+            resolver=self.resolver)
 
     # -- helpers -----------------------------------------------------------
 

@@ -20,6 +20,7 @@ from korea_service_record.career.events import (award_action, award_source,
 from korea_service_record.career.killstats import KillStats
 from korea_service_record.career.missionresult import MissionResult
 import korea_service_record
+from korea_service_record.assets import AssetResolver
 from korea_service_record.career.aggregator import CareerAggregator
 
 # The blob counts aircraft by class; killStats counts them as one number.
@@ -64,7 +65,14 @@ def main(game_arg):
         return 1
 
     cfg_path = game_dir / "data" / "scg" / str(DEFAULT_TVD) / "awards.cfg"
-    awards_cfg = AwardsConfig(cfg_path)
+    resolver = AssetResolver(game_dir)
+    awards_cfg = AwardsConfig(cfg_path, resolver=resolver)
+    # A stock installation has no loose awards.cfg — the game keeps it inside
+    # Missions.gtp. Reading the direct path alone returned nothing there, so
+    # every award definition was empty on any machine without the mod.
+    from_archive = AwardsConfig(game_dir / "nope.cfg", resolver=resolver)
+    check("awards.cfg loads without a loose copy",
+          len(from_archive.definitions) > 0, True)
     locale = LocaleStrings(game_dir)
     print(f"\n=== game data ===")
     print(f"   awards.cfg definitions : {len(awards_cfg.definitions)}")
