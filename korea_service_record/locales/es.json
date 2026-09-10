@@ -109,7 +109,8 @@
     "awaiting_points": "a la espera de puntos de condecoración",
     "earned": "merecida el {date}",
     "received": "entregada el {date}",
-    "no_description": "Sin descripción en los archivos del juego."
+    "no_description": "Sin descripción en los archivos del juego.",
+    "pending_note": "{count} condecoraciones esperan puntos; usted tiene {points}."
   },
   "incidences": {
     "heading": "Otras incidencias",
@@ -143,7 +144,7 @@
     "wounded": "herido",
     "on_the_ground": "en tierra",
     "more_destroyed": "+ {count} estructuras y material destruidos",
-    "no_kills": "Sin derribos registrados.",
+    "no_kills": "Sin derribos confirmados.",
     "pilots_on_mission": "Pilotos de esta misión",
     "combat_log": "Registro de combate",
     "objectives": "objetivos: {met} cumplidos, {failed} fallidos",
@@ -152,7 +153,13 @@
     "outcome": "Resultado",
     "air": "Aire",
     "ground": "Tierra",
-    "time": "Tiempo"
+    "time": "Tiempo",
+    "outcome_returned": "regresó",
+    "outcome_damaged": "dañado",
+    "outcome_lost": "perdido",
+    "aircraft_state": "aeronave {state}",
+    "rank": "Empleo",
+    "name": "Nombre"
   },
   "roster": {
     "heading": "Estadísticas del escuadrón",

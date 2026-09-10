@@ -238,12 +238,13 @@
     function awardItem(award) {
         const badge = award.pending ? '<span class="badge pending">pending</span>' : "";
         const when = award.pending
-            ? "awaiting award points" : "received " + esc(award.received);
+            ? T("awards.awaiting_points")
+            : T("awards.received", {date: award.received});
         return '<li class="with-icon">' +
             icon("award", award.type, 88, "award-icon", award.name) +
             "<div>" +
             '<span class="award-name">' + esc(award.name) + badge + "</span>" +
-            '<span class="award-dates">earned ' + esc(award.earned) +
+            '<span class="award-dates">' + esc(T("awards.earned", {date: award.earned})) +
             " &middot; " + when + "</span></div></li>";
     }
 
@@ -299,10 +300,14 @@
     // log rebuilt from the timestamped kill events.
     function debriefBlock(d) {
         const flags = [];
-        if (d.outcome !== "returned") flags.push("aircraft " + esc(d.outcome));
-        if (d.wounded) flags.push("wounded");
+        if (d.outcome !== "returned") {
+            flags.push(T("debrief.aircraft_state",
+                         {state: T("debrief.outcome_" + d.outcome)}));
+        }
+        if (d.wounded) flags.push(T("debrief.wounded"));
         let log = d.log.map((k) => {
-            const note = k.parked ? ' <span class="log-note">on the ground</span>' : "";
+            const note = k.parked
+                ? ' <span class="log-note">' + esc(T("debrief.on_the_ground")) + "</span>" : "";
             const who = k.victim
                 ? ' <span class="log-victim">' + esc(k.victim) + "</span>" : "";
             const alt = k.altitude
@@ -313,10 +318,11 @@
         }).join("");
         if (d.scenery) {
             log += '<div class="log-row scenery"><span class="log-time"></span>' +
-                "<span>+ " + esc(d.scenery) +
-                " structures and materiel destroyed</span></div>";
+                "<span>" + esc(T("debrief.more_destroyed", {count: d.scenery})) +
+                "</span></div>";
         }
-        if (!log) log = '<div class="log-row empty">No confirmed kills.</div>';
+        if (!log) log = '<div class="log-row empty">' +
+            esc(T("debrief.no_kills")) + "</div>";
         // Take-off, landing and how it ended come from the flight log; the
         // career DB has none of the three.
         const flight = (d.takeoff || d.landing_time)
@@ -325,23 +331,25 @@
               (d.landing_time ? "&darr; " + esc(d.landing_time) : "") +
               (d.landing
                   ? ' <span class="debrief-landing' +
-                    (d.landing === "landed" ? "" : " bad") + '">' +
-                    esc(d.landing) + "</span>"
+                    (d.landing_key === "landed" ? "" : " bad") + '">' +
+                    esc(T("debrief." + d.landing_key)) + "</span>"
                   : "") +
               (d.aircraft ? ' <span class="debrief-plane">' + esc(d.aircraft) +
                             "</span>" : "") +
               "</div>"
             : "";
         return '<article class="debrief"><header class="debrief-head">' +
-            '<span class="debrief-no">Mission ' + esc(d.mission_num) + "</span>" +
+            '<span class="debrief-no">' +
+                esc(T("debrief.mission", {number: d.mission_num})) + "</span>" +
             '<span class="debrief-date">' + esc(d.date) + " " + esc(d.time) +
                 ' <button class="link-btn" data-mission="' + esc(d.mission_id) +
-                '">Details</button></span>' +
+                '">' + esc(T("debrief.details")) + "</button></span>" +
             "</header>" +
             '<div class="debrief-type">' + esc(d.type) + "</div>" +
             flight +
-            '<div class="debrief-meta">' + esc(d.duration) + " &middot; air " +
-                esc(d.airborne) + " &middot; ground " + esc(d.ground_targets) +
+            '<div class="debrief-meta">' +
+                esc(T("debrief.summary", {duration: d.duration, air: d.airborne,
+                                          ground: d.ground_targets})) +
                 (flags.length
                     ? ' &middot; <span class="debrief-flag">' + flags.join(", ") + "</span>"
                     : "") +
@@ -545,8 +553,8 @@
             el("d-roster-count").textContent = "(" + rosterRows.length + ")";
             renderRoster();
             el("d-pending-note").textContent = d.pending_total
-                ? d.pending_total + " awards are waiting on award points; you have " +
-                  d.award_points + "."
+                ? T("awards.pending_note", {count: d.pending_total,
+                                            points: d.award_points})
                 : "";
 
             fillPicker(el("career-lang-select"), d.language_override || "", true);
@@ -596,7 +604,8 @@
                 '<td class="num">' + esc(f.airborne) + "</td>" +
                 '<td class="num">' + esc(f.ground_targets) + "</td>" +
                 '<td class="num">' + esc(f.flight_time) + "</td>" +
-                "<td>" + esc(f.outcome) + (f.wounded ? ", wounded" : "") + "</td>" +
+                "<td>" + esc(T("debrief.outcome_" + f.outcome)) +
+                    (f.wounded ? ", " + esc(T("debrief.wounded")) : "") + "</td>" +
                 "</tr>").join("");
 
             const log = m.log.map((k) => {
@@ -615,18 +624,24 @@
             }).join("");
 
             el("mb-body").innerHTML =
-                "<h2>Mission " + esc(m.number) + " &middot; " + esc(m.type) + "</h2>" +
+                "<h2>" + esc(T("debrief.mission", {number: m.number})) +
+                    " &middot; " + esc(m.type) + "</h2>" +
                 '<p class="lightbox-sub">' + esc(m.date) + " &middot; " +
-                    esc(m.duration) + " &middot; objectives " +
-                    esc(m.obj_success) + " met, " + esc(m.obj_failure) + " failed</p>" +
+                    esc(m.duration) + " &middot; " +
+                    esc(T("debrief.objectives", {met: m.obj_success,
+                                                 failed: m.obj_failure})) + "</p>" +
                 '<div class="mb-brief">' + brief + "</div>" +
-                "<h3>Pilots on this mission</h3>" +
+                "<h3>" + esc(T("debrief.pilots_on_mission")) + "</h3>" +
                 '<table class="roster mission-roster"><thead><tr>' +
-                    "<th></th><th>Rank</th><th>Name</th>" +
-                    '<th class="num">Air</th><th class="num">Ground</th>' +
-                    '<th class="num">Time</th><th>Outcome</th>' +
+                    "<th></th><th>" + esc(T("debrief.rank")) + "</th><th>" +
+                    esc(T("debrief.name")) + "</th>" +
+                    '<th class="num">' + esc(T("debrief.air")) + '</th>' +
+                    '<th class="num">' + esc(T("debrief.ground")) + '</th>' +
+                    '<th class="num">' + esc(T("debrief.time")) + "</th><th>" +
+                    esc(T("debrief.outcome")) + "</th>" +
                 "</tr></thead><tbody>" + flown + "</tbody></table>" +
-                "<h3>Combat log <span class=\"count\">(" + m.log.length + ")</span></h3>" +
+                "<h3>" + esc(T("debrief.combat_log")) +
+                    ' <span class="count">(' + m.log.length + ")</span></h3>" +
                 '<div class="mb-log">' + log + "</div>";
         } catch (err) {
             el("mb-body").innerHTML =

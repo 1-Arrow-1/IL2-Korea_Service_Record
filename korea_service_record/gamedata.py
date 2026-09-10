@@ -228,6 +228,10 @@ class LocaleStrings:
         # exactly as the save data keys them.
         self.stat_objects: Dict[str, str] = self._load_at(
             f"nsdata/assets/worldobjects/statobjects.locale={self.lang}.json")
+        # 659 designations keyed by the same folder names the kill events use:
+        # yak9p -> "Yak-9P". Without it the air-kill panel prints the raw key.
+        self.stat_names: Dict[str, str] = self._load_at(
+            f"nsdata/assets/worldobjects/statnames.locale={self.lang}.json")
 
     def vpath(self, stem: str) -> str:
         return f"nsdata/assets/locale/{stem}.locale={self.lang}.json"
@@ -263,6 +267,11 @@ class LocaleStrings:
         typo (``Raildoad``); those fall back to splitting the camel case.
         """
         name = self.stat_objects.get("kill" + category)
+        return name.strip() if isinstance(name, str) and name.strip() else ""
+
+    def plane_name(self, key: str) -> str:
+        """The game's designation for an aircraft — "yak9p" -> "Yak-9P"."""
+        name = self.stat_names.get((key or "").strip().lower())
         return name.strip() if isinstance(name, str) and name.strip() else ""
 
     def mission_type_name(self, type_id: int) -> str:

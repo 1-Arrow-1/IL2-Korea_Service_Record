@@ -338,8 +338,10 @@ class CareerAggregator:
             elif low in PLANE_TYPES:
                 airborne[name] += 1
         return {
-            "airborne": [{"name": n, "value": v} for n, v in airborne.most_common()],
-            "parked": [{"name": n, "value": v} for n, v in parked.most_common()],
+            "airborne": [{"name": self.locale.plane_name(n) or n, "value": v}
+                         for n, v in airborne.most_common()],
+            "parked": [{"name": self.locale.plane_name(n) or n, "value": v}
+                       for n, v in parked.most_common()],
         }
 
     def _missions_flown(self, sorties) -> List[Dict[str, Any]]:
@@ -579,20 +581,23 @@ class CareerAggregator:
                                                  sortie["date"][11:16])
                       if with_flight_log else None)
             outcome = PLANE_OUTCOME.get(sortie["planeStatus"], "unknown")
-            landing = ""
+            # A key rather than prose: the front end renders it in whichever
+            # language this record belongs to.
+            landing = landing_key = ""
             if flight is not None:
                 if flight.ejected:
-                    landing = "bailed out"
+                    landing, landing_key = "bailed out", "bailed_out"
                 elif flight.landing_s is None:
-                    landing = "did not return"
+                    landing, landing_key = "did not return", "did_not_return"
                 elif outcome == "damaged":
-                    landing = "landed, aircraft damaged"
+                    landing, landing_key = "landed, aircraft damaged", "landed_damaged"
                 else:
-                    landing = "landed"
+                    landing, landing_key = "landed", "landed"
             out.append({
                 "takeoff": _clock(sortie["date"][11:], flight.takeoff_s) if flight else "",
                 "landing_time": _clock(sortie["date"][11:], flight.landing_s) if flight else "",
                 "landing": landing,
+                "landing_key": landing_key,
                 "aircraft": flight.plane if flight else "",
                 "mission_id": sortie["missionId"],
                 "mission_num": mission["missionNum"] if mission else None,

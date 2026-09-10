@@ -109,7 +109,8 @@
     "awaiting_points": "en attente de points de décoration",
     "earned": "méritée le {date}",
     "received": "remise le {date}",
-    "no_description": "Aucune description dans les fichiers du jeu."
+    "no_description": "Aucune description dans les fichiers du jeu.",
+    "pending_note": "{count} décorations attendent des points ; vous en avez {points}."
   },
   "incidences": {
     "heading": "Autres faits",
@@ -143,7 +144,7 @@
     "wounded": "blessé",
     "on_the_ground": "au sol",
     "more_destroyed": "+ {count} structures et matériels détruits",
-    "no_kills": "Aucune victoire enregistrée.",
+    "no_kills": "Aucune victoire confirmée.",
     "pilots_on_mission": "Pilotes de cette mission",
     "combat_log": "Journal de combat",
     "objectives": "objectifs : {met} atteints, {failed} manqués",
@@ -152,7 +153,13 @@
     "outcome": "Issue",
     "air": "Air",
     "ground": "Sol",
-    "time": "Durée"
+    "time": "Durée",
+    "outcome_returned": "revenu",
+    "outcome_damaged": "endommagé",
+    "outcome_lost": "perdu",
+    "aircraft_state": "avion {state}",
+    "rank": "Grade",
+    "name": "Nom"
   },
   "roster": {
     "heading": "Statistiques de l'escadrille",

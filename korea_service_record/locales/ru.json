@@ -109,7 +109,8 @@
     "awaiting_points": "ожидает наградных очков",
     "earned": "заслужена {date}",
     "received": "вручена {date}",
-    "no_description": "В файлах игры нет описания."
+    "no_description": "В файлах игры нет описания.",
+    "pending_note": "{count} наград ожидают наградных очков; у вас {points}."
   },
   "incidences": {
     "heading": "Прочие события",
@@ -143,7 +144,7 @@
     "wounded": "ранен",
     "on_the_ground": "на земле",
     "more_destroyed": "+ {count} строений и техники уничтожено",
-    "no_kills": "Побед не зафиксировано.",
+    "no_kills": "Подтверждённых побед нет.",
     "pilots_on_mission": "Лётчики в этом задании",
     "combat_log": "Журнал боя",
     "objectives": "цели: {met} выполнено, {failed} провалено",
@@ -152,7 +153,13 @@
     "outcome": "Итог",
     "air": "Воздух",
     "ground": "Земля",
-    "time": "Время"
+    "time": "Время",
+    "outcome_returned": "вернулся",
+    "outcome_damaged": "повреждён",
+    "outcome_lost": "потерян",
+    "aircraft_state": "самолёт {state}",
+    "rank": "Звание",
+    "name": "Имя"
   },
   "roster": {
     "heading": "Статистика эскадрильи",

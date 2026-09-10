@@ -109,7 +109,8 @@
     "awaiting_points": "wartet auf Auszeichnungspunkte",
     "earned": "erworben am {date}",
     "received": "verliehen am {date}",
-    "no_description": "Keine Beschreibung in den Spieldateien."
+    "no_description": "Keine Beschreibung in den Spieldateien.",
+    "pending_note": "{count} Auszeichnungen warten auf Auszeichnungspunkte; Sie haben {points}."
   },
   "incidences": {
     "heading": "Weitere Vorkommnisse",
@@ -143,7 +144,7 @@
     "wounded": "verwundet",
     "on_the_ground": "am Boden",
     "more_destroyed": "+ {count} Bauwerke und Material zerstört",
-    "no_kills": "Keine Abschüsse vermerkt.",
+    "no_kills": "Keine bestätigten Abschüsse.",
     "pilots_on_mission": "Piloten dieses Einsatzes",
     "combat_log": "Gefechtsprotokoll",
     "objectives": "Ziele: {met} erreicht, {failed} verfehlt",
@@ -152,7 +153,13 @@
     "outcome": "Ergebnis",
     "air": "Luft",
     "ground": "Boden",
-    "time": "Zeit"
+    "time": "Zeit",
+    "outcome_returned": "zurückgekehrt",
+    "outcome_damaged": "beschädigt",
+    "outcome_lost": "verloren",
+    "aircraft_state": "Flugzeug {state}",
+    "rank": "Dienstgrad",
+    "name": "Name"
   },
   "roster": {
     "heading": "Staffelstatistik",

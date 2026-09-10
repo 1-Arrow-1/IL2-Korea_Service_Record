@@ -109,7 +109,8 @@
     "awaiting_points": "等待勋章点数",
     "earned": "{date} 获得资格",
     "received": "{date} 颁发",
-    "no_description": "游戏文件中没有说明。"
+    "no_description": "游戏文件中没有说明。",
+    "pending_note": "{count} 项勋章正在等待勋章点数；您当前有 {points} 点。"
   },
   "incidences": {
     "heading": "其他事件",
@@ -143,7 +144,7 @@
     "wounded": "负伤",
     "on_the_ground": "地面",
     "more_destroyed": "+ 另摧毁 {count} 处建筑与物资",
-    "no_kills": "无战果记录。",
+    "no_kills": "无确认战果。",
     "pilots_on_mission": "参与本次任务的飞行员",
     "combat_log": "战斗记录",
     "objectives": "目标：完成 {met}，失败 {failed}",
@@ -152,7 +153,13 @@
     "outcome": "结果",
     "air": "空中",
     "ground": "地面",
-    "time": "时长"
+    "time": "时长",
+    "outcome_returned": "返航",
+    "outcome_damaged": "受损",
+    "outcome_lost": "损失",
+    "aircraft_state": "飞机{state}",
+    "rank": "军衔",
+    "name": "姓名"
   },
   "roster": {
     "heading": "中队统计",

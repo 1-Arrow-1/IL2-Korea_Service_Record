@@ -109,7 +109,8 @@
     "awaiting_points": "awaiting award points",
     "earned": "earned {date}",
     "received": "received {date}",
-    "no_description": "No description in the game files."
+    "no_description": "No description in the game files.",
+    "pending_note": "{count} awards are waiting on award points; you have {points}."
   },
   "incidences": {
     "heading": "Other Incidences",
@@ -143,7 +144,7 @@
     "wounded": "wounded",
     "on_the_ground": "on the ground",
     "more_destroyed": "+ {count} structures and materiel destroyed",
-    "no_kills": "No kills recorded.",
+    "no_kills": "No confirmed kills.",
     "pilots_on_mission": "Pilots on this mission",
     "combat_log": "Combat log",
     "objectives": "objectives {met} met, {failed} failed",
@@ -152,7 +153,13 @@
     "outcome": "Outcome",
     "air": "Air",
     "ground": "Ground",
-    "time": "Time"
+    "time": "Time",
+    "outcome_returned": "returned",
+    "outcome_damaged": "damaged",
+    "outcome_lost": "lost",
+    "aircraft_state": "aircraft {state}",
+    "rank": "Rank",
+    "name": "Name"
   },
   "roster": {
     "heading": "Squadron Statistics",
