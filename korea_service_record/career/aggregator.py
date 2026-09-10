@@ -305,7 +305,9 @@ class CareerAggregator:
         headline = [{"key": key, "label": label,
                      "value": sum(cats.get(s, 0) for s in sources)}
                     for key, (label, sources) in COMBAT_CATEGORIES.items()]
-        breakdown = [{"label": _humanise(k), "value": v}
+        # The game names these itself in every language it ships; _humanise is
+        # only the fallback for the rollups it has no category for.
+        breakdown = [{"label": self.locale.stat_name(k) or _humanise(k), "value": v}
                      for k, v in sorted(kills.counts.items(), key=lambda x: -x[1])
                      if k != "Aircraft" and v]
         return {

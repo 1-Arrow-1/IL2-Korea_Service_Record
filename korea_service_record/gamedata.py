@@ -223,9 +223,21 @@ class LocaleStrings:
         self.awards: Dict[str, str] = self._load("awards")
         self.ranks: Dict[str, str] = self._load("ranks")
         self.mission_types: Dict[str, str] = self._load("missiontypes")
+        # Not under assets/locale with the others, and easy to miss: the game
+        # names every killStats category here, in all six languages, keyed
+        # exactly as the save data keys them.
+        self.stat_objects: Dict[str, str] = self._load_at(
+            f"nsdata/assets/worldobjects/statobjects.locale={self.lang}.json")
 
     def vpath(self, stem: str) -> str:
         return f"nsdata/assets/locale/{stem}.locale={self.lang}.json"
+
+    def _load_at(self, vpath: str) -> Dict[str, str]:
+        text = self.resolver.read_text(vpath)
+        if text is None:
+            logger.info("Locale not found: %s", vpath)
+            return {}
+        return loads_lenient(text)
 
     def _load(self, stem: str) -> Dict[str, str]:
         vpath = self.vpath(stem)
@@ -239,6 +251,19 @@ class LocaleStrings:
         """Where each locale file came from — useful in a debug endpoint."""
         return {stem: self.resolver.source_of(self.vpath(stem))
                 for stem in ("awards", "ranks", "missiontypes")}
+
+    def stat_name(self, category: str) -> str:
+        """
+        The game's own name for a killStats category.
+
+        killStats keys the categories bare — ``LightFlak``, ``StaticPlane`` —
+        and statobjects keys them with a ``kill`` prefix. A few have no entry
+        because they are rollups the tracker computes rather than categories
+        the game counts (``Building``, ``Aircraft``), and one is the game's own
+        typo (``Raildoad``); those fall back to splitting the camel case.
+        """
+        name = self.stat_objects.get("kill" + category)
+        return name.strip() if isinstance(name, str) and name.strip() else ""
 
     def mission_type_name(self, type_id: int) -> str:
         """
