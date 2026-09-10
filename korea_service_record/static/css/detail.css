@@ -606,7 +606,9 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 .record-head::after {
     content: "";
     position: absolute;
-    top: -1.5rem;
+    /* Centred a third of the way down the header rather than pinned to its
+       top edge, so it keeps that position if the header ever changes height. */
+    top: 33%;
     /* Sat squarely on top of the dates. The career figures are right-aligned
        against blank paper, so moving the impression left puts it on that blank
        and lets only its trailing edge catch the first character or two. */
@@ -614,7 +616,7 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     width: 196px;
     aspect-ratio: 39 / 22;
     background: var(--classification, none) center / contain no-repeat;
-    transform: rotate(-7deg);
+    transform: translateY(-50%) rotate(-7deg);
     opacity: 0.72;
     mix-blend-mode: multiply;
     pointer-events: none;
