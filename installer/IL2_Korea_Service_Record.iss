@@ -9,6 +9,15 @@
 ; tracker. They ship together because the same person made both and the folder
 ; the mod needs is the folder this installer already asks for.
 ;
+; How IL-2 modding actually works, which shapes the whole install and uninstall:
+; with modifications enabled, the game looks for a file under data\ first and
+; only falls back to the .gtp archive when there is none. With modifications
+; disabled it goes straight to the archive and ignores data\ entirely. So every
+; file this mod ships is an *addition* to a folder tree that is otherwise empty
+; of it — nothing is replaced, there is nothing to back up, and uninstalling is
+; simply deleting what was added. The game then finds nothing loose and reads
+; the archive again, exactly as it did before.
+;
 ; Build:  pyinstaller korea_service_record.spec --noconfirm
 ;         python tools/stage_release.py
 ;         iscc installer\IL2_Korea_Service_Record.iss
@@ -27,9 +36,8 @@ AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 ; Per-user by default, which is what {localappdata} means. Running elevated
 ; would resolve {localappdata} to the *administrator's* profile and install the
-; tracker where the player cannot see it — Inno warns about exactly this. The
-; override lets Windows offer elevation for the one case that needs it: a game
-; folder under Program Files, which the mod has to write into.
+; tracker where the player cannot see it. The override lets Windows offer
+; elevation for the one case that needs it: a game folder under Program Files.
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 DefaultDirName={localappdata}\{#MyAppName}
@@ -58,9 +66,7 @@ english.IL2PagePrompt=Choose the folder IL-2 Sturmovik: Korea is installed in.
 english.InvalidIL2Folder=That folder does not look like an IL-2 Korea installation.%n%nExpected to find data\Career inside it.%n%nPlease choose the game's main folder.
 english.ComponentTracker=Service Record (the tracker application)
 english.ComponentMod=Awards mod (adds decorations to the career)
-english.ModOverwriteTitle=The awards mod will replace files in your game folder.
-english.ModOverwriteText=A copy of each original is kept alongside it as *.stock, and uninstalling puts them back.%n%nContinue?
-english.RemoveModTitle=Remove the awards mod from your game folder?%n%nYour careers, medals already earned and the game itself are untouched either way.%n%nYES restores the original files.%nNO leaves the mod installed.
+english.ModsDisabled=Modifications are currently switched off in IL-2 Korea.%n%nThe awards mod will be installed, but the game will ignore it until you turn modifications on:%n%n    Settings  ->  General  ->  Enable modifications%n%nInstall it anyway?
 english.RemovePhotosTitle=Also remove your pilot photographs and settings?%n%nLocation: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nYES deletes them.%nNO keeps them for a future install.
 english.CreateDesktopIcon=Create a &desktop icon
 
@@ -70,9 +76,7 @@ german.IL2PagePrompt=Wählen Sie den Ordner, in dem IL-2 Sturmovik: Korea instal
 german.InvalidIL2Folder=Dieser Ordner scheint keine IL-2 Korea Installation zu sein.%n%nErwartet wurde der Unterordner data\Career.%n%nBitte wählen Sie das Hauptverzeichnis des Spiels.
 german.ComponentTracker=Dienstakte (die Tracker-Anwendung)
 german.ComponentMod=Auszeichnungs-Mod (ergänzt Orden in der Karriere)
-german.ModOverwriteTitle=Der Auszeichnungs-Mod ersetzt Dateien in Ihrem Spielordner.
-german.ModOverwriteText=Von jeder Originaldatei wird eine Kopie als *.stock daneben abgelegt; die Deinstallation stellt sie wieder her.%n%nFortfahren?
-german.RemoveModTitle=Auszeichnungs-Mod aus dem Spielordner entfernen?%n%nIhre Karrieren, bereits verliehene Orden und das Spiel selbst bleiben in jedem Fall unberührt.%n%nJA stellt die Originaldateien wieder her.%nNEIN belässt den Mod.
+german.ModsDisabled=Modifikationen sind in IL-2 Korea derzeit ausgeschaltet.%n%nDer Auszeichnungs-Mod wird installiert, das Spiel ignoriert ihn jedoch, bis Sie Modifikationen einschalten:%n%n    Einstellungen  ->  Allgemein  ->  Modifikationen aktivieren%n%nTrotzdem installieren?
 german.RemovePhotosTitle=Auch Ihre Pilotenfotos und Einstellungen entfernen?%n%nSpeicherort: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nJA löscht sie.%nNEIN behält sie für eine spätere Installation.
 german.CreateDesktopIcon=&Desktop-Symbol erstellen
 
@@ -82,9 +86,7 @@ french.IL2PagePrompt=Choisissez le dossier où IL-2 Sturmovik: Korea est install
 french.InvalidIL2Folder=Ce dossier ne semble pas être une installation d'IL-2 Corée.%n%nLe sous-dossier data\Career est attendu.%n%nVeuillez choisir le dossier principal du jeu.
 french.ComponentTracker=État de service (l'application)
 french.ComponentMod=Mod de décorations (ajoute des décorations à la carrière)
-french.ModOverwriteTitle=Le mod de décorations va remplacer des fichiers du jeu.
-french.ModOverwriteText=Une copie de chaque original est conservée en *.stock, et la désinstallation les restaure.%n%nContinuer ?
-french.RemoveModTitle=Retirer le mod de décorations du dossier du jeu ?%n%nVos carrières, les décorations déjà obtenues et le jeu lui-même ne sont pas touchés.%n%nOUI restaure les fichiers d'origine.%nNON conserve le mod.
+french.ModsDisabled=Les modifications sont actuellement désactivées dans IL-2 Corée.%n%nLe mod sera installé, mais le jeu l'ignorera tant que vous n'aurez pas activé les modifications :%n%n    Paramètres  ->  Général  ->  Activer les modifications%n%nInstaller quand même ?
 french.RemovePhotosTitle=Supprimer aussi vos photographies de pilote et vos réglages ?%n%nEmplacement : %%LOCALAPPDATA%%\IL2KoreaTracker%n%nOUI les supprime.%nNON les conserve.
 french.CreateDesktopIcon=Créer une icône sur le &Bureau
 
@@ -94,9 +96,7 @@ spanish.IL2PagePrompt=Elija la carpeta donde está instalado IL-2 Sturmovik: Kor
 spanish.InvalidIL2Folder=Esa carpeta no parece una instalación de IL-2 Corea.%n%nSe esperaba encontrar data\Career dentro.%n%nElija la carpeta principal del juego.
 spanish.ComponentTracker=Hoja de servicios (la aplicación)
 spanish.ComponentMod=Mod de condecoraciones (añade condecoraciones a la carrera)
-spanish.ModOverwriteTitle=El mod de condecoraciones reemplazará archivos del juego.
-spanish.ModOverwriteText=Se conserva una copia de cada original como *.stock, y la desinstalación los restaura.%n%n¿Continuar?
-spanish.RemoveModTitle=¿Quitar el mod de condecoraciones de la carpeta del juego?%n%nSus carreras, las condecoraciones ya obtenidas y el juego no se ven afectados.%n%nSÍ restaura los archivos originales.%nNO deja el mod instalado.
+spanish.ModsDisabled=Las modificaciones están desactivadas en IL-2 Corea.%n%nEl mod se instalará, pero el juego lo ignorará hasta que active las modificaciones:%n%n    Ajustes  ->  General  ->  Activar modificaciones%n%n¿Instalar de todos modos?
 spanish.RemovePhotosTitle=¿Eliminar también sus fotografías de piloto y ajustes?%n%nUbicación: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nSÍ los elimina.%nNO los conserva.
 spanish.CreateDesktopIcon=Crear un icono en el &escritorio
 
@@ -106,9 +106,7 @@ russian.IL2PagePrompt=Укажите папку, в которую устано�
 russian.InvalidIL2Folder=Эта папка не похожа на установку IL-2 Корея.%n%nОжидалась подпапка data\Career.%n%nВыберите основную папку игры.
 russian.ComponentTracker=Послужной список (приложение)
 russian.ComponentMod=Мод наград (добавляет награды в карьеру)
-russian.ModOverwriteTitle=Мод наград заменит файлы в папке игры.
-russian.ModOverwriteText=Копия каждого оригинала сохраняется рядом как *.stock, удаление вернёт их на место.%n%nПродолжить?
-russian.RemoveModTitle=Удалить мод наград из папки игры?%n%nВаши карьеры, уже полученные награды и сама игра не пострадают.%n%nДА восстановит исходные файлы.%nНЕТ оставит мод.
+russian.ModsDisabled=Модификации в IL-2 Корея сейчас отключены.%n%nМод будет установлен, но игра не увидит его, пока вы не включите модификации:%n%n    Настройки  ->  Общие  ->  Включить модификации%n%nВсё равно установить?
 russian.RemovePhotosTitle=Удалить также фотографии лётчиков и настройки?%n%nРасположение: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nДА удалит их.%nНЕТ сохранит.
 russian.CreateDesktopIcon=Создать значок на &рабочем столе
 
@@ -118,9 +116,7 @@ chinesesimplified.IL2PagePrompt=请选择 IL-2 Sturmovik: Korea 的安装文件�
 chinesesimplified.InvalidIL2Folder=该文件夹似乎不是 IL-2 朝鲜 的安装位置。%n%n应包含 data\Career 子文件夹。%n%n请选择游戏主文件夹。
 chinesesimplified.ComponentTracker=服役档案（主程序）
 chinesesimplified.ComponentMod=勋章模组（为生涯增加勋章）
-chinesesimplified.ModOverwriteTitle=勋章模组将替换游戏文件夹中的文件。
-chinesesimplified.ModOverwriteText=每个原始文件都会以 *.stock 保留副本，卸载时将还原。%n%n是否继续？
-chinesesimplified.RemoveModTitle=从游戏文件夹中移除勋章模组？%n%n您的生涯、已获得的勋章以及游戏本身均不受影响。%n%n是：还原原始文件。%n否：保留模组。
+chinesesimplified.ModsDisabled=IL-2 朝鲜 当前已关闭模组功能。%n%n模组仍会安装，但在您启用模组之前游戏不会读取它：%n%n    设置  ->  常规  ->  启用模组%n%n仍要安装吗？
 chinesesimplified.RemovePhotosTitle=同时删除您的飞行员照片与设置？%n%n位置：%%LOCALAPPDATA%%\IL2KoreaTracker%n%n是：删除。%n否：保留以备将来安装。
 chinesesimplified.CreateDesktopIcon=创建桌面图标(&D)
 
@@ -142,8 +138,10 @@ Source: "payload\tracker\*"; DestDir: "{app}"; Components: tracker; \
     Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; --- The awards mod, into the folder chosen on the custom page. ---
-; These are modified game files and only take effect as loose files, which the
-; engine (and the tracker) prefer over the archive copy.
+; Additions to data\, which the game reads in preference to the archives while
+; modifications are enabled. Inno records each one and removes it on uninstall,
+; which is the whole of the cleanup: with the files gone the game finds nothing
+; loose and reads the archive again.
 Source: "payload\mod\data\*"; DestDir: "{code:GetIL2Dir}\data"; Components: mod; \
     Flags: ignoreversion recursesubdirs createallsubdirs uninsremovereadonly
 
@@ -153,12 +151,16 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 
 [Registry]
-; The uninstaller needs the game folder to put the stock files back, and it
-; cannot ask the user again at that point.
+; Remembered so a reinstall prefills the same folder.
 Root: HKA; Subkey: "Software\{#MyAppName}"; ValueType: string; \
     ValueName: "IL2Path"; ValueData: "{code:GetIL2Dir}"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\{#MyAppName}"; ValueType: string; \
-    ValueName: "ModInstalled"; ValueData: "{code:GetModFlag}"; Flags: uninsdeletekey
+
+[UninstallDelete]
+; Inno removes the files it installed; these are the folders it created for
+; them, which would otherwise be left behind empty. Only ever the mod's own
+; folder — never data\nsdata\assets, which the game itself uses.
+Type: dirifempty; Name: "{code:GetIL2Dir}\data\nsdata\assets\awards\6xx"
+Type: dirifempty; Name: "{code:GetIL2Dir}\data\nsdata\assets\awards"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "Open the Service Record"; \
@@ -173,6 +175,31 @@ begin
   { data\Career is where the game keeps the .db files the tracker reads, and it
     exists in every installation that has ever been played. }
   Result := DirExists(AddBackslash(Dir) + 'data\Career');
+end;
+
+function ModificationsEnabled(const Root: string): Boolean;
+var
+  Settings: string;
+  Contents: AnsiString;
+  Marker: Integer;
+  Tail: string;
+begin
+  { data\nsdata\UserData\UserSettings.json holds game.enableModifications. With
+    it off the game never looks in data\ at all, so the mod installs correctly
+    and does nothing — a confusing result worth warning about rather than
+    silently producing. Assume enabled if the file cannot be read: a false
+    warning is worse than none. }
+  Result := True;
+  Settings := AddBackslash(Root) + 'data\nsdata\UserData\UserSettings.json';
+  if not FileExists(Settings) then
+    Exit;
+  if not LoadStringFromFile(Settings, Contents) then
+    Exit;
+  Marker := Pos('enableModifications', String(Contents));
+  if Marker = 0 then
+    Exit;
+  Tail := Lowercase(Copy(String(Contents), Marker, 40));
+  Result := Pos('true', Tail) > 0;
 end;
 
 function GetStoredIL2Path(): string;
@@ -190,11 +217,6 @@ begin
     Result := GetStoredIL2Path();
 end;
 
-function GetModFlag(Param: string): string;
-begin
-  if WizardIsComponentSelected('mod') then Result := '1' else Result := '0';
-end;
-
 procedure PrefillIL2Dir();
 var
   Stored: string;
@@ -208,7 +230,7 @@ begin
     IL2Page.Values[0] := Stored;
     Exit;
   end;
-  { Same drive sweep the tracker itself does, so the common case needs no
+  { The same drive sweep the tracker itself does, so the common case needs no
     typing: a Steam library on any of the usual letters. }
   Drives := 'CDEFGH';
   for I := 1 to Length(Drives) do
@@ -237,75 +259,6 @@ begin
     False, '');
   IL2Page.Add('');
   PrefillIL2Dir();
-end;
-
-function BackupName(const FileName: string): string;
-begin
-  Result := FileName + '.stock';
-end;
-
-procedure BackupOriginal(const FileName: string);
-begin
-  { Only ever taken once. A second install must not overwrite the stock copy
-    with the modded one already sitting there. }
-  if FileExists(FileName) and (not FileExists(BackupName(FileName))) then
-    CopyFile(FileName, BackupName(FileName), False);
-end;
-
-procedure BackupModTargets(const Root: string);
-var
-  Data: string;
-  Awards: string;
-  Langs: TArrayOfString;
-  I: Integer;
-begin
-  Data := AddBackslash(Root) + 'data\';
-  BackupOriginal(Data + 'scg\2\awards.cfg');
-  BackupOriginal(Data + 'nsdata\assets\images\awards.xaml');
-  BackupOriginal(Data + 'nsdata\assets\images\awards6xx.dds');
-  BackupOriginal(Data + 'nsdata\assets\images\awards6xx2.dds');
-  Awards := Data + 'nsdata\assets\locale\awards.locale=';
-  Langs := ['chs', 'eng', 'fra', 'ger', 'rus', 'spa'];
-  for I := 0 to GetArrayLength(Langs) - 1 do
-    BackupOriginal(Awards + Langs[I] + '.json');
-end;
-
-procedure RestoreOriginal(const FileName: string);
-begin
-  if FileExists(BackupName(FileName)) then
-  begin
-    DeleteFile(FileName);
-    RenameFile(BackupName(FileName), FileName);
-  end
-  else
-    { No stock copy means the game had no loose file here before the mod, so
-      deleting ours returns the engine to the archive copy. }
-    DeleteFile(FileName);
-end;
-
-procedure RestoreModTargets(const Root: string);
-var
-  Data: string;
-  Awards: string;
-  Langs: TArrayOfString;
-  Ids: TArrayOfString;
-  I, J: Integer;
-begin
-  Data := AddBackslash(Root) + 'data\';
-  RestoreOriginal(Data + 'scg\2\awards.cfg');
-  RestoreOriginal(Data + 'nsdata\assets\images\awards.xaml');
-  RestoreOriginal(Data + 'nsdata\assets\images\awards6xx.dds');
-  RestoreOriginal(Data + 'nsdata\assets\images\awards6xx2.dds');
-  Langs := ['chs', 'eng', 'fra', 'ger', 'rus', 'spa'];
-  Awards := Data + 'nsdata\assets\locale\awards.locale=';
-  for I := 0 to GetArrayLength(Langs) - 1 do
-    RestoreOriginal(Awards + Langs[I] + '.json');
-  { The description texts are additions, not replacements — nothing to restore. }
-  Ids := ['601027', '601040', '601041'];
-  for I := 0 to GetArrayLength(Ids) - 1 do
-    for J := 0 to GetArrayLength(Langs) - 1 do
-      DeleteFile(Data + 'nsdata\assets\awards\6xx\' + Ids[I] + '.locale=' +
-                 Langs[J] + '.txt');
 end;
 
 function GetInstallerLocaleCode(): string;
@@ -337,43 +290,26 @@ begin
       Result := False;
       Exit;
     end;
-    if WizardIsComponentSelected('mod') then
-      if MsgBox(CustomMessage('ModOverwriteTitle') + #13#10#13#10 +
-                CustomMessage('ModOverwriteText'),
-                mbConfirmation, MB_YESNO) = IDNO then
+    if WizardIsComponentSelected('mod') and
+       (not ModificationsEnabled(IL2Page.Values[0])) then
+      if MsgBox(CustomMessage('ModsDisabled'), mbConfirmation, MB_YESNO) = IDNO then
         Result := False;
   end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  if CurStep = ssInstall then
-  begin
-    if WizardIsComponentSelected('mod') then
-      BackupModTargets(GetIL2Dir(''));
-  end
-  else if CurStep = ssPostInstall then
+  if CurStep = ssPostInstall then
     WriteInstallerLocale();
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
-var
-  Root: string;
-  ModFlag: string;
 begin
-  if CurUninstallStep <> usUninstall then
-    Exit;
-
-  Root := GetStoredIL2Path();
-  if not RegQueryStringValue(HKA, 'Software\{#MyAppName}', 'ModInstalled', ModFlag) then
-    ModFlag := '0';
-
-  if (ModFlag = '1') and (Root <> '') and LooksLikeIL2Root(Root) then
-    if MsgBox(CustomMessage('RemoveModTitle'), mbConfirmation, MB_YESNO) = IDYES then
-      RestoreModTargets(Root);
-
-  { Photographs and settings live outside both folders and outlive the app on
-    purpose, so removing them is always a separate, explicit answer. }
-  if MsgBox(CustomMessage('RemovePhotosTitle'), mbConfirmation, MB_YESNO) = IDYES then
-    DelTree(ExpandConstant('{localappdata}\IL2KoreaTracker'), True, True, True);
+  { The mod's files need no special handling: Inno removes what it installed,
+    and with them gone the game falls back to the archives by itself.
+    Photographs and settings are different — they live outside both folders,
+    they are the user's own, and they outlive the application on purpose. }
+  if CurUninstallStep = usUninstall then
+    if MsgBox(CustomMessage('RemovePhotosTitle'), mbConfirmation, MB_YESNO) = IDYES then
+      DelTree(ExpandConstant('{localappdata}\IL2KoreaTracker'), True, True, True);
 end;
