@@ -146,8 +146,20 @@ _DECORATION = re.compile(
 _NATIONS = {"prc": "PRC", "dprk": "DPRK", "su": "Soviet", "us": "US"}
 
 
-def humanise(raw: str) -> str:
-    """A readable label for an object the game ships no name for."""
+def slug(label: str) -> str:
+    """The locale key for a scenery label: "Airfield crane" -> airfield_crane."""
+    return re.sub(r"[^a-z0-9]+", "_", (label or "").lower()).strip("_")
+
+
+def humanise(raw: str, strings: Optional[Dict[str, str]] = None) -> str:
+    """
+    A readable label for an object the game ships no name for.
+
+    ``strings`` translates the finished label rather than its parts. Assembling
+    a translation from "airfield" plus "crane" works in English and nowhere
+    else — German writes Flugplatzkran as one word — so the lookup is keyed on
+    the whole English phrase and each language supplies its own.
+    """
     key = urllib.parse.unquote(raw or "").strip()
     key = re.sub(r"^static_(munition|car|equipment|plane)_", "", key, flags=re.I)
 
@@ -189,7 +201,10 @@ def humanise(raw: str) -> str:
     label = f"{group} {noun}".strip() if group else noun
     if nation:
         label = f"{label} ({nation})"
-    return label[:1].upper() + label[1:]
+    label = label[:1].upper() + label[1:]
+    if strings:
+        return strings.get(slug(label), label)
+    return label
 
 
 class WorldObjectIndex:
@@ -203,7 +218,27 @@ class WorldObjectIndex:
         self.resolver = resolver
         self.lang = lang
         self.objects: Dict[str, WorldObject] = {}
+        self.scenery: Dict[str, str] = self._scenery_words(lang)
         self._load()
+        self._unhyphenated = {k.replace("-", ""): v for k, v in self.objects.items()}
+
+    @staticmethod
+    def _scenery_words(lang: str) -> Dict[str, str]:
+        """
+        Our own words for the things the game does not name.
+
+        Unlike every other name on the page these are not the game's — it
+        ships nothing for crates, tents or windsocks, which is precisely how
+        scenery is told apart from a real target — so they come from the
+        tracker's own locale files.
+        """
+        from .i18n import BY_IL2, ui_strings
+        entry = BY_IL2.get(lang)
+        if entry is None:
+            return {}
+        bundle = ui_strings(entry.code)
+        words = bundle.get("scenery")
+        return words if isinstance(words, dict) else {}
 
     # -- build / cache -----------------------------------------------------
 
@@ -270,9 +305,24 @@ class WorldObjectIndex:
 
     # -- lookup ------------------------------------------------------------
 
+    # Static placements drop the hyphens the folder names carry, and sometimes
+    # the model designation with them: Static_car_StudebakerRefueler is the
+    # game's own studebakerus6-refueler. Left unmatched these fall through to
+    # the scenery path and print as "Gmccckwrefueler".
+    ALIASES = {"studebakerrefueler": "studebakerus6-refueler",
+               "studebakertanker": "studebakerus6-tanker",
+               "studebakerbm13": "studebakerus6-bm13"}
+
     def lookup(self, raw: str) -> Optional[WorldObject]:
         key = normalise(raw)
         hit = self.objects.get(key)
+        if hit is not None:
+            return hit
+        hit = self.objects.get(self.ALIASES.get(key, ""))
+        if hit is not None:
+            return hit
+        # gmccckw -> gmc-cckw: the same name with the hyphens taken out.
+        hit = self._unhyphenated.get(key)
         if hit is not None:
             return hit
         # "DShK-AA" has no folder of its own; fall back to the base weapon.
@@ -290,7 +340,8 @@ class WorldObjectIndex:
         obj = self.lookup(raw)
         parked = (raw or "").lower().startswith("static_")
         if obj is None:
-            return {"named": False, "name": humanise(raw), "category": "scenery",
+            return {"named": False, "name": humanise(raw, self.scenery),
+                    "category": "scenery",
                     "parked": parked, "aircraft": False}
         return {"named": True, "name": obj.name, "category": obj.category,
                 "parked": parked, "aircraft": obj.is_aircraft}
