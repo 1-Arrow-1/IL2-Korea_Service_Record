@@ -385,6 +385,24 @@ class MissionDescriptions:
                 continue
         return ""
 
+    @staticmethod
+    def _repair(text: str) -> str:
+        r"""
+        Undo the stray escaping in the French files.
+
+        Only French carries backslashes — 23 of them across 12 files. Twenty-one
+        are an escaped apostrophe, written for a format that never needed one;
+        the other two are "d\être" and "d\endommager", where the backslash has
+        replaced the apostrophe outright rather than escaping it. Both resolve
+        the same way, so the rule is: a backslash before an apostrophe goes, and
+        a backslash before a letter becomes one.
+
+        Deliberately not a general unescape — nothing else in these files uses
+        a backslash, so there is no \n or \t to protect.
+        """
+        text = text.replace("\\'", "'")
+        return re.sub(r"\\(?=[^\W\d_])", "'", text)
+
     def objective(self, mission_type: Optional[int]) -> str:
         """The primary-objective text, or "" when the game has none."""
         if mission_type is None:
@@ -402,6 +420,7 @@ class MissionDescriptions:
             # The first line carries the slot index the generator writes it
             # into — "3: Your target ..." — which is not part of the briefing.
             body = re.sub(r"^\s*\d+\s*:\s*", "", body)
+            body = self._repair(body)
             if body:
                 text = body
                 break
