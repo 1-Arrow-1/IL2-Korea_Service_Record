@@ -220,3 +220,40 @@ body.lightbox-open { overflow: hidden; }
     color: var(--accent-dark); margin-bottom: 0.9rem;
 }
 .lightbox-desc p { margin-bottom: 0.8rem; text-align: justify; }
+
+
+/* ---------------------------------------------------------------- language -- */
+
+.header-content nav { display: flex; align-items: center; gap: 1.2rem; }
+
+.lang-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+}
+.lang-picker select {
+    font-family: inherit;
+    font-size: 0.92rem;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    background: var(--paper-panel);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.15rem 0.35rem;
+}
+.lang-picker select:hover { border-color: var(--accent); }
+
+/* The per-career override sits with the record it belongs to, not in the
+   chrome, because that is the scope it applies to. */
+.record-tools {
+    display: flex;
+    justify-content: flex-end;
+    margin: -0.75rem 0 1rem;
+}
+.lang-picker.small { font-size: 0.76rem; }
+.lang-picker.small select { font-size: 0.86rem; }

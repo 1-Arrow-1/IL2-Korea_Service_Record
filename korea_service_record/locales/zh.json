@@ -3,18 +3,21 @@
     "title": "IL-2 朝鲜 服役档案",
     "back": "返回生涯列表",
     "readonly": "只读。不会写入任何游戏文件。",
-    "language": "语言"
+    "language": "语言",
+    "detail_language": "档案页语言",
+    "language_default": "默认"
   },
   "landing": {
     "heading": "飞行生涯",
     "loading": "正在读取生涯…",
-    "empty": "未找到生涯。请在 IL-2 朝鲜中开始一段生涯，它将显示在此处。",
+    "empty": "未找到生涯。",
     "error": "无法读取生涯：{reason}",
     "sorties": "出击",
     "hours": "小时",
     "air": "空中",
     "ground": "地面",
-    "awards": "勋章"
+    "awards": "勋章",
+    "empty_hint": "请在 IL-2 朝鲜中开始一段生涯，然后重新加载本页。"
   },
   "record": {
     "loading": "正在打开服役档案…",
@@ -42,7 +45,8 @@
     "booster": "{attribute}加成",
     "skills": "技术",
     "discipline": "纪律",
-    "courage": "勇气"
+    "courage": "勇气",
+    "no_photograph": "暂无照片"
   },
   "state": {
     "active": "现役",
@@ -156,8 +160,8 @@
     "awards_pending": "待颁勋章"
   },
   "photo": {
-    "heading": "飞行员照片",
-    "instructions": "拖动调整位置，滚动缩放。",
+    "heading": "调整照片位置",
+    "instructions": "拖动移动 · 滚轮或滑块缩放",
     "choose": "选择文件",
     "save": "保存",
     "cancel": "取消",

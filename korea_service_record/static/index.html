@@ -13,9 +13,15 @@
 
     <header id="app-header">
         <div class="page-container header-content">
-            <h1>IL-2 Korea Service Record</h1>
+            <h1 data-i18n="app.title">IL-2 Korea Service Record</h1>
             <nav id="header-nav">
-                <button id="back-btn" class="nav-btn" hidden>&larr; Back to Careers</button>
+                <label class="lang-picker">
+                    <span data-i18n="app.language">Language</span>
+                    <select id="lang-select"></select>
+                </label>
+                <button id="back-btn" class="nav-btn" hidden>
+                    &larr; <span data-i18n="app.back">Back to Careers</span>
+                </button>
             </nav>
         </div>
     </header>
@@ -25,17 +31,18 @@
 
             <!-- ============ Landing ============ -->
             <section id="landing-page" class="page">
-                <h2 class="section-title">Careers</h2>
+                <h2 class="section-title" data-i18n="landing.heading">Careers</h2>
 
                 <div id="careers-loading" class="state-block">
                     <div class="spinner"></div>
-                    <p>Reading career files&hellip;</p>
+                    <p data-i18n="landing.loading">Reading career files&hellip;</p>
                 </div>
 
                 <div id="careers-empty" class="state-block" hidden>
                     <p class="state-message">
-                        No careers found.<br>
-                        <small>Start a career in IL-2 Korea, then reload this page.</small>
+                        <span data-i18n="landing.empty">No careers found.</span><br>
+                        <small data-i18n="landing.empty_hint">Start a career in IL-2 Korea,
+                            then reload this page.</small>
                     </p>
                 </div>
 
@@ -50,7 +57,7 @@
             <section id="detail-page" class="page" hidden>
                 <div id="detail-loading" class="state-block">
                     <div class="spinner"></div>
-                    <p>Opening service record&hellip;</p>
+                    <p data-i18n="record.loading">Opening service record&hellip;</p>
                 </div>
 
                 <div id="detail-body" hidden>
@@ -62,42 +69,52 @@
                         <dl class="record-meta" id="d-meta"></dl>
                     </header>
 
+                    <!-- Per-career override: this record only, so a player can
+                         read a foreign air force's paperwork in its own
+                         language while the application stays in his. -->
+                    <div class="record-tools">
+                        <label class="lang-picker small">
+                            <span data-i18n="app.detail_language">Detail page language</span>
+                            <select id="career-lang-select"></select>
+                        </label>
+                    </div>
+
                     <div class="record-grid">
 
                         <!-- left: who he is -->
                         <div class="record-col">
                             <section class="panel">
-                                <h3>Pilot Information</h3>
+                                <h3 data-i18n="pilot.heading">Pilot Information</h3>
                                 <div class="portrait-block">
                                     <div class="portrait-frame">
                                         <div id="d-portrait" class="portrait">
-                                            <span class="portrait-empty">No photograph</span>
+                                            <span class="portrait-empty" data-i18n="pilot.no_photograph">No photograph</span>
                                         </div>
                                         <img class="portrait-overlay"
                                              src="/static/images/photo-frame.svg" alt="">
                                     </div>
                                     <div class="portrait-actions">
-                                        <button id="photo-pick" class="nav-btn small">Change photo</button>
-                                        <button id="photo-clear" class="nav-btn small ghost" hidden>Remove</button>
+                                        <button id="photo-pick" class="nav-btn small" data-i18n="pilot.change_photo">Change photo</button>
+                                        <button id="photo-clear" class="nav-btn small ghost" hidden data-i18n="pilot.remove_photo">Remove</button>
                                     </div>
                                     <input id="photo-file" type="file"
                                            accept="image/*" hidden>
                                 </div>
                                 <table class="mini-table" id="d-info"></table>
-                                <h3 class="panel-subhead">Characteristics</h3>
+                                <h3 class="panel-subhead" data-i18n="pilot.characteristics">Characteristics</h3>
                                 <div id="d-attributes" class="attributes"></div>
                             </section>
 
                             <section class="panel">
-                                <h3>Other Incidences</h3>
+                                <h3 data-i18n="incidences.heading">Other Incidences</h3>
                                 <ol id="d-incidences" class="service-list"></ol>
                             </section>
 
                             <section class="panel">
-                                <h3>Promotions &amp; Awards</h3>
-                                <h4 class="list-head">Promotions</h4>
+                                <h3 data-i18n="awards.heading">Promotions &amp; Awards</h3>
+                                <h4 class="list-head" data-i18n="awards.promotions">Promotions</h4>
                                 <ul id="d-promotions" class="award-list"></ul>
-                                <h4 class="list-head">Awards</h4>
+                                <h4 class="list-head" data-i18n="awards.awards">Awards</h4>
                                 <ul id="d-awards" class="award-list"></ul>
                             </section>
                         </div>
@@ -105,33 +122,33 @@
                         <!-- middle: what he did -->
                         <div class="record-col">
                             <section class="panel">
-                                <h3>Combat Results</h3>
+                                <h3 data-i18n="combat.heading">Combat Results</h3>
                                 <div id="d-combat-strip" class="stat-strip"></div>
                                 <div id="d-combat-breakdown" class="breakdown"></div>
                             </section>
 
                             <section class="panel">
-                                <h3>Air Kills by Type</h3>
+                                <h3 data-i18n="combat.air_kills">Air Kills by Type</h3>
                                 <table class="mini-table" id="d-air-kills"></table>
                             </section>
 
                             <section class="panel">
-                                <h3>Missions Flown</h3>
+                                <h3 data-i18n="missions.heading">Missions Flown</h3>
                                 <table class="mini-table" id="d-missions"></table>
                             </section>
 
                             <section class="panel">
-                                <h3>Career Progression</h3>
+                                <h3 data-i18n="progression.heading">Career Progression</h3>
                                 <table class="mini-table" id="d-progression"></table>
                             </section>
 
                             <section class="panel" id="d-performance-panel">
-                                <h3>Combat Efficiency</h3>
+                                <h3 data-i18n="performance.heading">Combat Efficiency</h3>
                                 <table class="mini-table" id="d-performance"></table>
                             </section>
 
                             <section class="panel" id="d-victories-panel">
-                                <h3>Confirmed Victories
+                                <h3><span data-i18n="victories.heading">Confirmed Victories</span>
                                     <span id="d-victory-count" class="count"></span></h3>
                                 <div id="d-victories" class="victory-roll"></div>
                             </section>
@@ -140,7 +157,7 @@
                         <!-- right: mission by mission -->
                         <div class="record-col">
                             <section class="panel">
-                                <h3>Mission Debriefings <span id="d-debrief-count" class="count"></span></h3>
+                                <h3><span data-i18n="debrief.heading">Mission Debriefings</span> <span id="d-debrief-count" class="count"></span></h3>
                                 <div id="d-debriefings" class="debriefings"></div>
                             </section>
                         </div>
@@ -148,26 +165,26 @@
                     </div>
 
                     <section class="panel roster-panel">
-                        <h3>Squadron Statistics <span id="d-roster-count" class="count"></span></h3>
+                        <h3><span data-i18n="roster.heading">Squadron Statistics</span> <span id="d-roster-count" class="count"></span></h3>
                         <div id="d-squadron-strip" class="stat-strip"></div>
                         <div class="table-scroll">
                             <table class="roster" id="d-roster">
                                 <thead>
                                     <tr>
                                         <th class="col-photo"></th>
-                                        <th data-sort="rank_id">Rank</th>
-                                        <th data-sort="name">Name</th>
-                                        <th data-sort="top_award" class="col-award">Highest<br>Combat Award</th>
-                                        <th data-sort="state" class="col-status">Status</th>
-                                        <th data-sort="airborne" class="num">Air<br>Victories</th>
-                                        <th data-sort="ground_targets" class="num">Ground<br>Targets</th>
-                                        <th data-sort="sorties" class="num">Sorties</th>
-                                        <th data-sort="flight_hours" class="num">Flight<br>Hours</th>
-                                        <th data-sort="skills" class="num">Skill</th>
-                                        <th data-sort="discipline" class="num">Discipline</th>
-                                        <th data-sort="courage" class="num">Courage</th>
-                                        <th data-sort="awards_held" class="num">Awards</th>
-                                        <th data-sort="awards_pending" class="num">Awards<br>Pending</th>
+                                        <th data-sort="rank_id" data-i18n="roster.rank">Rank</th>
+                                        <th data-sort="name" data-i18n="roster.name">Name</th>
+                                        <th data-sort="top_award" class="col-award" data-i18n="roster.top_award">Highest<br>Combat Award</th>
+                                        <th data-sort="state" class="col-status" data-i18n="roster.status">Status</th>
+                                        <th data-sort="airborne" class="num" data-i18n="roster.air_victories">Air<br>Victories</th>
+                                        <th data-sort="ground_targets" class="num" data-i18n="roster.ground_targets">Ground<br>Targets</th>
+                                        <th data-sort="sorties" class="num" data-i18n="roster.sorties">Sorties</th>
+                                        <th data-sort="flight_hours" class="num" data-i18n="roster.flight_hours">Flight<br>Hours</th>
+                                        <th data-sort="skills" class="num" data-i18n="roster.skill">Skill</th>
+                                        <th data-sort="discipline" class="num" data-i18n="roster.discipline">Discipline</th>
+                                        <th data-sort="courage" class="num" data-i18n="roster.courage">Courage</th>
+                                        <th data-sort="awards_held" class="num" data-i18n="roster.awards">Awards</th>
+                                        <th data-sort="awards_pending" class="num" data-i18n="roster.awards_pending">Awards<br>Pending</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -183,7 +200,7 @@
 
     <footer id="app-footer">
         <div class="page-container">
-            <span id="footer-note">Read-only. Nothing is written to your game files.</span>
+            <span id="footer-note" data-i18n="app.readonly">Read-only. Nothing is written to your game files.</span>
         </div>
     </footer>
 
@@ -191,7 +208,7 @@
     <div id="missionbox" class="lightbox" hidden>
         <div class="lightbox-backdrop" data-mission-close></div>
         <div class="lightbox-panel mission-panel" role="dialog" aria-modal="true">
-            <button class="lightbox-close" data-mission-close aria-label="Close">&times;</button>
+            <button class="lightbox-close" data-mission-close aria-label="Close" data-i18n-title="common.close">&times;</button>
             <div id="mb-body"></div>
         </div>
     </div>
@@ -201,7 +218,7 @@
         <div class="lightbox-backdrop" data-pilot-close></div>
         <div class="lightbox-panel pilot-panel" role="dialog" aria-modal="true"
              aria-labelledby="pb-name">
-            <button class="lightbox-close" data-pilot-close aria-label="Close">&times;</button>
+            <button class="lightbox-close" data-pilot-close aria-label="Close" data-i18n-title="common.close">&times;</button>
             <div id="pb-body" class="pilot-body"></div>
         </div>
     </div>
@@ -210,17 +227,17 @@
     <div id="cropper" class="lightbox" hidden>
         <div class="lightbox-backdrop" data-crop-close></div>
         <div class="lightbox-panel cropper-panel" role="dialog" aria-modal="true">
-            <button class="lightbox-close" data-crop-close aria-label="Close">&times;</button>
-            <h2>Position the photograph</h2>
-            <p class="lightbox-sub">Drag to move &middot; scroll or use the slider to zoom</p>
+            <button class="lightbox-close" data-crop-close aria-label="Close" data-i18n-title="common.close">&times;</button>
+            <h2 data-i18n="photo.heading">Position the photograph</h2>
+            <p class="lightbox-sub" data-i18n="photo.instructions">Drag to move &middot; scroll or use the slider to zoom</p>
             <div class="crop-stage">
                 <canvas id="crop-canvas" width="360" height="450"></canvas>
             </div>
             <input id="crop-zoom" class="crop-zoom" type="range"
                    min="100" max="400" value="100">
             <div class="crop-actions">
-                <button id="crop-save" class="nav-btn">Save</button>
-                <button id="crop-cancel" class="nav-btn ghost" data-crop-close>Cancel</button>
+                <button id="crop-save" class="nav-btn" data-i18n="photo.save">Save</button>
+                <button id="crop-cancel" class="nav-btn ghost" data-crop-close data-i18n="photo.cancel">Cancel</button>
             </div>
         </div>
     </div>
@@ -230,7 +247,7 @@
         <div class="lightbox-backdrop" data-close></div>
         <div class="lightbox-panel" role="dialog" aria-modal="true"
              aria-labelledby="lb-title">
-            <button class="lightbox-close" data-close aria-label="Close">&times;</button>
+            <button class="lightbox-close" data-close aria-label="Close" data-i18n-title="common.close">&times;</button>
             <div class="lightbox-body">
                 <img id="lb-image" class="lightbox-image" alt="">
                 <div class="lightbox-text">
@@ -243,6 +260,7 @@
     </div>
 
 </div>
+<script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
 <script src="/static/js/app.js?v=__ASSET_VERSION__"></script>
 </body>
 </html>

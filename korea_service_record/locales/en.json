@@ -3,18 +3,21 @@
     "title": "IL-2 Korea Service Record",
     "back": "Back to Careers",
     "readonly": "Read-only. Nothing is written to your game files.",
-    "language": "Language"
+    "language": "Language",
+    "detail_language": "Detail page language",
+    "language_default": "Default"
   },
   "landing": {
     "heading": "Careers",
     "loading": "Reading your careers…",
-    "empty": "No careers found. Start one in IL-2 Korea and it will appear here.",
+    "empty": "No careers found.",
     "error": "Could not read careers: {reason}",
     "sorties": "Sorties",
     "hours": "Hours",
     "air": "Air",
     "ground": "Ground",
-    "awards": "Awards"
+    "awards": "Awards",
+    "empty_hint": "Start a career in IL-2 Korea, then reload this page."
   },
   "record": {
     "loading": "Opening service record…",
@@ -42,7 +45,8 @@
     "booster": "{attribute} booster",
     "skills": "Skills",
     "discipline": "Discipline",
-    "courage": "Courage"
+    "courage": "Courage",
+    "no_photograph": "No photograph"
   },
   "state": {
     "active": "active",
@@ -156,8 +160,8 @@
     "awards_pending": "Awards Pending"
   },
   "photo": {
-    "heading": "Pilot photograph",
-    "instructions": "Drag to position, scroll to zoom.",
+    "heading": "Position the photograph",
+    "instructions": "Drag to move · scroll or use the slider to zoom",
     "choose": "Choose a file",
     "save": "Save",
     "cancel": "Cancel",

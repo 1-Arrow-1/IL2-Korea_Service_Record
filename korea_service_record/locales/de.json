@@ -3,18 +3,21 @@
     "title": "IL-2 Korea Dienstakte",
     "back": "Zurück zur Übersicht",
     "readonly": "Nur Lesezugriff. Es wird nichts in Ihre Spieldateien geschrieben.",
-    "language": "Sprache"
+    "language": "Sprache",
+    "detail_language": "Sprache der Detailseite",
+    "language_default": "Standard"
   },
   "landing": {
     "heading": "Karrieren",
     "loading": "Karrieren werden gelesen …",
-    "empty": "Keine Karriere gefunden. Starten Sie eine in IL-2 Korea, dann erscheint sie hier.",
+    "empty": "Keine Karriere gefunden.",
     "error": "Karrieren konnten nicht gelesen werden: {reason}",
     "sorties": "Einsätze",
     "hours": "Stunden",
     "air": "Luft",
     "ground": "Boden",
-    "awards": "Auszeichnungen"
+    "awards": "Auszeichnungen",
+    "empty_hint": "Starten Sie eine Karriere in IL-2 Korea und laden Sie diese Seite neu."
   },
   "record": {
     "loading": "Dienstakte wird geöffnet …",
@@ -42,7 +45,8 @@
     "booster": "{attribute}-Bonus",
     "skills": "Fertigkeiten",
     "discipline": "Disziplin",
-    "courage": "Mut"
+    "courage": "Mut",
+    "no_photograph": "Kein Foto"
   },
   "state": {
     "active": "aktiv",
@@ -156,8 +160,8 @@
     "awards_pending": "Ausstehende Auszeichnungen"
   },
   "photo": {
-    "heading": "Pilotenfoto",
-    "instructions": "Zum Verschieben ziehen, zum Zoomen scrollen.",
+    "heading": "Foto ausrichten",
+    "instructions": "Ziehen zum Verschieben · scrollen oder Regler zum Zoomen",
     "choose": "Datei auswählen",
     "save": "Speichern",
     "cancel": "Abbrechen",

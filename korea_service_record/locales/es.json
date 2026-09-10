@@ -3,18 +3,21 @@
     "title": "IL-2 Corea — Hoja de servicios",
     "back": "Volver a las carreras",
     "readonly": "Solo lectura. No se escribe nada en los archivos del juego.",
-    "language": "Idioma"
+    "language": "Idioma",
+    "detail_language": "Idioma de la hoja",
+    "language_default": "Predeterminado"
   },
   "landing": {
     "heading": "Carreras",
     "loading": "Leyendo las carreras…",
-    "empty": "No se ha encontrado ninguna carrera. Empiece una en IL-2 Corea y aparecerá aquí.",
+    "empty": "No se ha encontrado ninguna carrera.",
     "error": "No se pudieron leer las carreras: {reason}",
     "sorties": "Salidas",
     "hours": "Horas",
     "air": "Aire",
     "ground": "Tierra",
-    "awards": "Condecoraciones"
+    "awards": "Condecoraciones",
+    "empty_hint": "Empiece una carrera en IL-2 Corea y vuelva a cargar esta página."
   },
   "record": {
     "loading": "Abriendo la hoja de servicios…",
@@ -42,7 +45,8 @@
     "booster": "Bonificación de {attribute}",
     "skills": "Habilidad",
     "discipline": "Disciplina",
-    "courage": "Valor"
+    "courage": "Valor",
+    "no_photograph": "Sin fotografía"
   },
   "state": {
     "active": "en activo",
@@ -156,8 +160,8 @@
     "awards_pending": "Condecoraciones pendientes"
   },
   "photo": {
-    "heading": "Fotografía del piloto",
-    "instructions": "Arrastre para colocar, use la rueda para acercar.",
+    "heading": "Encuadrar la fotografía",
+    "instructions": "Arrastre para mover · rueda o control deslizante para acercar",
     "choose": "Elegir un archivo",
     "save": "Guardar",
     "cancel": "Cancelar",

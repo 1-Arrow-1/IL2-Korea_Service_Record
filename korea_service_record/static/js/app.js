@@ -16,6 +16,14 @@
     const el = (id) => document.getElementById(id);
     const show = (node, on = true) => { node.hidden = !on; };
 
+    // Shorthand for the translator. Two languages can be live at once — the
+    // chrome in the user's own, a career's record in whatever that record is
+    // overridden to — so T() always reads i18n's *current* locale rather than
+    // capturing one. Callers set the locale, then render.
+    const T = (key, params) => i18n.t(key, params);
+
+    let settings = {language: "en", languages: []};
+
     // Escape anything that reaches innerHTML. Pilot names come from the game's
     // own name tables, but they are still third-party strings.
     function esc(value) {
@@ -56,7 +64,7 @@
         const box = el("lightbox");
         el("lb-title").textContent = title || "";
         el("lb-sub").textContent = "";
-        el("lb-desc").textContent = "Loading…";
+        el("lb-desc").textContent = T("common.loading");
         el("lb-image").src = "/api/icon/" + kind + "/" + encodeURIComponent(ident);
         el("lb-image").alt = title || "";
         show(box);
@@ -64,8 +72,8 @@
         try {
             const d = await getJSON("/api/emblem/" + kind + "/" + encodeURIComponent(ident));
             if (!title) el("lb-title").textContent = d.name;
-            const label = { award: "Award", rank: "Rank",
-                            squadron: "Squadron" }[kind] || "";
+            const label = { award: T("awards.awards"), rank: T("pilot.rank"),
+                            squadron: T("pilot.squadron") }[kind] || "";
             el("lb-sub").textContent = d.inherited_from
                 ? label + " · citation of the " + d.inherited_from
                 : label;
@@ -86,7 +94,7 @@
                 });
             }
         } catch (err) {
-            el("lb-desc").textContent = "Could not load details: " + err.message;
+            el("lb-desc").textContent = T("record.error", {reason: err.message});
         }
     }
 
@@ -102,6 +110,16 @@
 
     async function getJSON(url) {
         const response = await fetch(url);
+        if (!response.ok) throw new Error(response.status + " " + response.statusText);
+        return response.json();
+    }
+
+    async function postJSON(url, body) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(body),
+        });
         if (!response.ok) throw new Error(response.status + " " + response.statusText);
         return response.json();
     }
@@ -126,11 +144,11 @@
             '<div class="career-dates">' + esc(career.start_date) + " &rarr; " +
                 esc(career.current_date) + "</div>" +
             '<div class="career-stats">' +
-                stat(career.sorties, "Sorties") +
-                stat(career.flight_hours, "Hours") +
-                stat(career.airborne, "Air") +
-                stat(career.ground_targets, "Ground") +
-                stat(career.awards, "Awards") +
+                stat(career.sorties, T("landing.sorties")) +
+                stat(career.flight_hours, T("landing.hours")) +
+                stat(career.airborne, T("landing.air")) +
+                stat(career.ground_targets, T("landing.ground")) +
+                stat(career.awards, T("landing.awards")) +
             "</div></button>";
     }
 
@@ -160,7 +178,7 @@
             show(list);
         } catch (err) {
             show(el("careers-loading"), false);
-            el("careers-error-text").textContent = "Could not read careers: " + err.message;
+            el("careers-error-text").textContent = T("landing.error", {reason: err.message});
             show(el("careers-error"));
         }
     }
@@ -395,6 +413,11 @@
         try {
             const d = await getJSON("/api/career/" + encodeURIComponent(careerId) +
                                     (pilotId ? "?pilot=" + pilotId : ""));
+            // The server already resolved which language this record belongs
+            // in — global, or this career's override — and rendered the game's
+            // own names accordingly. The labels have to follow, so the locale
+            // is switched before anything is drawn.
+            await i18n.setLocale(d.language || settings.language);
             const p = d.player;
 
             currentCareer = d.id;
@@ -408,35 +431,36 @@
                 "<span>" + esc(p.rank) + " · " + esc(d.squadron) + "</span>" +
                 icon("squadron", d.squadron_key, 96, "squadron-emblem", d.squadron);
             el("d-meta").innerHTML = [
-                ["Career", d.start_date + " – " + d.current_date],
-                ["Sorties", p.sorties + " (" + p.good_sorties + " successful)"],
-                ["Flight time", p.flight_time],
-                ["Award points", d.award_points]
+                [T("record.career"), d.start_date + " – " + d.current_date],
+                [T("record.sorties"), T("record.sorties_value",
+                    {total: p.sorties, good: p.good_sorties})],
+                [T("record.flight_time"), p.flight_time],
+                [T("record.award_points"), d.award_points]
             ].map((kv) => "<div><dt>" + esc(kv[0]) + "</dt><dd>" +
                           esc(kv[1]) + "</dd></div>").join("");
 
-            const info = [["Rank", p.rank]];
-            if (p.birth_date) info.push(["Born", p.birth_date]);
+            const info = [[T("pilot.rank"), p.rank]];
+            if (p.birth_date) info.push([T("pilot.born"), p.birth_date]);
             el("d-info").innerHTML = rows(info.concat([
-                ["Squadron", d.squadron],
-                ["Status", p.state],
-                ["Health", p.health],
-                ["Air victories", p.airborne],
-                ["Ground targets", p.ground_targets],
-                ["Squadron efficiency", d.efficiency]
+                [T("pilot.squadron"), d.squadron],
+                [T("pilot.status"), T("state." + p.state)],
+                [T("pilot.health"), p.health],
+                [T("pilot.air_victories"), p.airborne],
+                [T("pilot.ground_targets"), p.ground_targets],
+                [T("pilot.squadron_efficiency"), d.efficiency]
             ]));
             el("d-attributes").innerHTML = attributeBlock(p.attributes, p.has_levels);
 
             el("d-incidences").innerHTML = d.incidences.length
                 ? d.incidences.map(incidenceItem).join("")
-                : '<li class="muted">Nothing recorded.</li>';
+                : '<li class="muted">' + esc(T("incidences.none")) + "</li>";
 
             el("d-promotions").innerHTML = d.promotions.length
                 ? d.promotions.map(promotionItem).join("")
-                : '<li class="muted">None yet.</li>';
+                : '<li class="muted">' + esc(T("awards.none_yet")) + "</li>";
             el("d-awards").innerHTML = d.awards.length
                 ? d.awards.map(awardItem).join("")
-                : '<li class="muted">None yet.</li>';
+                : '<li class="muted">' + esc(T("awards.none_yet")) + "</li>";
 
             el("d-combat-strip").innerHTML = statStrip(d.combat.headline);
             el("d-combat-breakdown").innerHTML = breakdown(d.combat.breakdown);
@@ -512,6 +536,8 @@
                   d.award_points + "."
                 : "";
 
+            fillPicker(el("career-lang-select"), d.language_override || "", true);
+            i18n.apply(el("detail-page"));
             show(el("detail-loading"), false);
             show(el("detail-body"));
         } catch (err) {
@@ -770,7 +796,7 @@
             closeCropper();
             showPortrait(currentCareer, currentPilot, currentAvatar);
         } catch (err) {
-            window.alert("Could not save the photograph: " + err.message);
+            window.alert(T("photo.save_failed", {reason: err.message}));
         }
     }
 
@@ -836,6 +862,42 @@
 
     /* --------------------------------------------------------- navigation -- */
 
+    /* ---------------------------------------------------------- language -- */
+
+    function fillPicker(select, current, withDefault) {
+        const options = withDefault
+            ? ['<option value="">' + esc(T("app.language_default")) + "</option>"]
+            : [];
+        settings.languages.forEach((lang) => {
+            options.push('<option value="' + esc(lang.code) + '"' +
+                (lang.code === current ? " selected" : "") + ">" +
+                esc(lang.name) + "</option>");
+        });
+        select.innerHTML = options.join("");
+        if (withDefault && !current) select.value = "";
+    }
+
+    // The chrome is always in the global language. The detail page may not be,
+    // so it is translated separately, after its own locale is set.
+    async function applyChrome() {
+        await i18n.setLocale(settings.language);
+        i18n.apply(document);
+        fillPicker(el("lang-select"), settings.language, false);
+    }
+
+    async function changeLanguage(code) {
+        settings = await postJSON("/api/settings", {language: code});
+        await applyChrome();
+        route();
+    }
+
+    async function changeCareerLanguage(code) {
+        if (!currentCareer) return;
+        await postJSON("/api/settings/career/" + encodeURIComponent(currentCareer),
+                       {language: code});
+        loadDetail(currentCareer, currentPilot);
+    }
+
     function route() {
         closePilot();
         closeMission();
@@ -845,11 +907,16 @@
         show(el("detail-page"), onDetail);
         show(el("back-btn"), onDetail);
         window.scrollTo(0, 0);
-        if (!onDetail) { loadLanding(); return; }
+        if (!onDetail) {
+            i18n.setLocale(settings.language).then(() => {
+                i18n.apply(document);
+                loadLanding();
+            });
+            return;
+        }
         const careerId = decodeURIComponent(match[1]);
         const pilotId = match[2] ? Number(match[2]) : null;
-        el("back-btn").textContent = pilotId
-            ? "\u2190 Back to the Career" : "\u2190 Back to Careers";
+        el("back-btn").innerHTML = "← <span>" + esc(T("app.back")) + "</span>";
         loadDetail(careerId, pilotId);
     }
 
@@ -912,6 +979,25 @@
         else if (!el("lightbox").hidden) closeLightbox();
     });
 
+    el("lang-select").addEventListener("change", (event) => {
+        changeLanguage(event.target.value);
+    });
+    el("career-lang-select").addEventListener("change", (event) => {
+        changeCareerLanguage(event.target.value);
+    });
+
     window.addEventListener("hashchange", route);
-    route();
+
+    // Nothing renders until the strings are in: a first paint in English that
+    // then flips to German is worse than a few hundred milliseconds of blank.
+    (async function boot() {
+        try {
+            settings = await getJSON("/api/settings");
+        } catch (err) {
+            console.warn("[app] settings unavailable, staying with English", err);
+        }
+        await i18n.init(settings.language);
+        await applyChrome();
+        route();
+    })();
 })();

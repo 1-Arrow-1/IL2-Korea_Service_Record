@@ -3,18 +3,21 @@
     "title": "IL-2 Corée — État de service",
     "back": "Retour aux carrières",
     "readonly": "Lecture seule. Aucune écriture dans vos fichiers de jeu.",
-    "language": "Langue"
+    "language": "Langue",
+    "detail_language": "Langue de la fiche",
+    "language_default": "Par défaut"
   },
   "landing": {
     "heading": "Carrières",
     "loading": "Lecture des carrières…",
-    "empty": "Aucune carrière trouvée. Commencez-en une dans IL-2 Corée et elle apparaîtra ici.",
+    "empty": "Aucune carrière trouvée.",
     "error": "Impossible de lire les carrières : {reason}",
     "sorties": "Sorties",
     "hours": "Heures",
     "air": "Air",
     "ground": "Sol",
-    "awards": "Décorations"
+    "awards": "Décorations",
+    "empty_hint": "Commencez une carrière dans IL-2 Corée, puis rechargez cette page."
   },
   "record": {
     "loading": "Ouverture de l'état de service…",
@@ -42,7 +45,8 @@
     "booster": "Bonus de {attribute}",
     "skills": "Compétences",
     "discipline": "Discipline",
-    "courage": "Courage"
+    "courage": "Courage",
+    "no_photograph": "Aucune photographie"
   },
   "state": {
     "active": "en service",
@@ -156,8 +160,8 @@
     "awards_pending": "Décorations en attente"
   },
   "photo": {
-    "heading": "Photographie du pilote",
-    "instructions": "Faites glisser pour positionner, molette pour zoomer.",
+    "heading": "Positionner la photographie",
+    "instructions": "Glisser pour déplacer · molette ou curseur pour zoomer",
     "choose": "Choisir un fichier",
     "save": "Enregistrer",
     "cancel": "Annuler",
