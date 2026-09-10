@@ -636,7 +636,18 @@
                 '<td class="num">' + esc(f.flight_time) + "</td>" +
                 "<td>" + esc(T("debrief.outcome_" + f.outcome)) +
                     (f.wounded ? ", " + esc(T("debrief.wounded")) : "") + "</td>" +
-                '<td class="num damage-cell">' +
+                // The timeline hangs off the cell rather than expanding the
+                // table: eight pilots each with their own burst list would
+                // bury the flight it is meant to summarise.
+                '<td class="num damage-cell' +
+                    ((f.damage_log || []).length ? " has-log" : "") + '"' +
+                    ((f.damage_log || []).length
+                        ? ' title="' + esc(f.damage_log.map((b) =>
+                            b.time + "  " + T("debrief.hit_burst", {hits: b.hits}) +
+                            (b.attacker ? " — " + b.attacker : "") +
+                            "  → " + b.total + "%").join("
+")) + '"'
+                        : "") + ">" +
                     (f.plane_damage === null || f.plane_damage === undefined
                         ? "&mdash;"
                         : esc(f.plane_damage > 0 ? f.plane_damage + "%"

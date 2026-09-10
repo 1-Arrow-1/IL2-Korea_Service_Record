@@ -683,3 +683,6 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 .hurt-total { color: var(--ink-muted); font-size: 0.9em; }
 
 .hurt-by { color: var(--ink-strong); font-style: italic; }
+
+/* A cell that has a timeline behind it says so. */
+.damage-cell.has-log { cursor: help; border-bottom: 1px dotted var(--border); }

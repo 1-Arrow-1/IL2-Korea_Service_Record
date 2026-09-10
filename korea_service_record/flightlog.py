@@ -69,6 +69,7 @@ class SortieLog(NamedTuple):
     ejected: bool
     plane: str
     damage: List["DamageBurst"] = []
+    damage_by_pilot: Dict[str, List["DamageBurst"]] = {}
 
     @property
     def outcome(self) -> str:
@@ -142,6 +143,10 @@ def read_log(path: Path) -> Optional[SortieLog]:
     # everyone because the player's own object id is not known until the
     # AType 10 that names him, which need not come first.
     harm: List[Tuple[int, float, int, int]] = []
+    # object id -> pilot name, for every aircraft the log spawns. AType 12
+    # names them all, so a wingman's punishment is as reconstructible as the
+    # player's; the modal shows a whole flight at once.
+    crew: Dict[int, str] = {}
     # id -> object type. Type rather than pilot name: nine tenths of what
     # damages a career pilot is anti-aircraft fire, which has no pilot, and
     # "a KS-19" is the useful answer anyway.
@@ -183,9 +188,11 @@ def read_log(path: Path) -> Optional[SortieLog]:
                 oid = r.int32()
                 kind = r.string()
                 r.string()                      # country
-                r.string()                      # pilot name, unused here
+                who = _pilot_name(r.string())
                 if kind:
                     named[oid] = kind
+                if who:
+                    crew[oid] = who
             elif atype == 18 and player_bot is not None:
                 if _Reader(payload).int32() == player_bot:
                     ejected = True
@@ -194,8 +201,32 @@ def read_log(path: Path) -> Optional[SortieLog]:
 
     if not date:
         return None
+    by_pilot = {}
+    for oid, who in crew.items():
+        bursts = _bursts(harm, oid, named)
+        if bursts:
+            by_pilot[who] = bursts
     return SortieLog(path, date, time, takeoff, landing, ejected, plane,
-                     _bursts(harm, player_plid, named))
+                     _bursts(harm, player_plid, named), by_pilot)
+
+
+def _pilot_name(raw: str) -> str:
+    """
+    The pilot out of a spawn record's name field.
+
+    Three shapes occur. The player's own flight is "Travis Gibb" — a
+    leading byte holding the formation slot, the same numbering the debrief
+    blob uses for its synthetic ids. Everyone else is
+    "Fernley Martin,601012,0": name, squadron, slot. Scenery is "BlocksArray",
+    "NOICON" or "noname", which is not a pilot at all.
+    """
+    text = (raw or "").lstrip("".join(chr(c) for c in range(32)))
+    text = text.split(",")[0].strip()
+    if not text or text in ("BlocksArray", "NOICON", "noname"):
+        return ""
+    if text.startswith("BotPlane") or " " not in text:
+        return ""                       # bot placeholders carry no real name
+    return text
 
 
 def _bursts(harm, target_id: Optional[int],

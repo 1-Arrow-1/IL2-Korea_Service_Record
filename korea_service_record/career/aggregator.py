@@ -800,6 +800,19 @@ class CareerAggregator:
             # the flight, who have no row of their own anywhere.
             harm = result.damages()
 
+            # The flight log carries the same totals but with timings, and for
+            # every pilot rather than only the human — AType 12 names them all.
+            # The blob still supplies the figure, because it is always there;
+            # the log supplies when the aircraft was hit.
+            player_sortie = db.query_one(
+                """SELECT date FROM sortie
+                   WHERE missionId = ? AND isPlayer = 1 AND isDeleted = 0""",
+                (mission_id,))
+            flight_log = None
+            if player_sortie:
+                flight_log = self.flightlogs.for_sortie(
+                    player_sortie["date"][:10], player_sortie["date"][11:16])
+
             flown = []
             for row in db.query(
                     """SELECT s.*, p.name, p.lastName, p.isPlayer, p.avatarPath,
@@ -856,6 +869,15 @@ class CareerAggregator:
                 if hurt:
                     pilot["plane_damage"] = round(hurt["plane"] * 100)
                     pilot["pilot_damage"] = round(hurt["pilot"] * 100)
+                bursts = ((flight_log.damage_by_pilot or {}).get(pilot["name"], [])
+                          if flight_log else [])
+                start = player_sortie["date"][11:] if player_sortie else ""
+                pilot["damage_log"] = [
+                    {"time": _clock(start, b.at_s), "hits": b.hits,
+                     "total": round(b.total * 100),
+                     "attacker": (self.objects.describe(b.attacker)["name"]
+                                  if b.attacker else "")}
+                    for b in bursts]
 
             flown.sort(key=lambda f: (not f["is_player"], -f["rank_id"]))
             player_user = next((uid for uid, name in crew.items()
