@@ -36,6 +36,11 @@ STRENGTH = 0.38
 SCRATCHES = 4
 CREASES = 1
 
+# Per-pixel gaussian grain, on top of the fractal octaves. Independent noise
+# needs no periodicity treatment — neighbouring pixels are uncorrelated
+# everywhere, so the tile boundary looks like any other boundary.
+GRAIN = 0.22
+
 DARK = (74, 52, 33)      # grime, in the palette's shadow brown
 LIGHT = (255, 250, 238)  # a fibre catching the light
 
@@ -89,7 +94,10 @@ def main() -> int:
     mottle = (0.62 * periodic_noise(SIZE, 2.6, rng)
               + 0.38 * periodic_noise(SIZE, 1.5, rng))
     grain = periodic_noise(SIZE, 0.6, rng)
-    field = 0.78 * mottle + 0.22 * grain
+    # Clipped at three sigma: a handful of extreme pixels would read as dust
+    # specks rather than as grain.
+    speckle = np.clip(rng.normal(0.0, 1.0, (SIZE, SIZE)), -3, 3) / 3.0
+    field = (1.0 - GRAIN) * (0.78 * mottle + 0.22 * grain) + GRAIN * speckle
 
     scratches = np.zeros((SIZE, SIZE), dtype=np.float64)
     for _ in range(SCRATCHES):
