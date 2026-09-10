@@ -635,7 +635,14 @@ class CareerAggregator:
                             "hits": burst.hits,
                             "amount": round(burst.amount * 100),
                             "total": round(burst.total * 100),
-                            "attacker": burst.attacker,
+                            # The log gives an object type; the index turns it
+                            # into the game's own name, in the reader's
+                            # language. Empty stays empty — 91% of the damage a
+                            # career pilot takes records no attacker at all,
+                            # and "unknown" beside every hit says nothing.
+                            "attacker": (
+                                self.objects.describe(burst.attacker)["name"]
+                                if burst.attacker else ""),
                         },
                     })
                 log.sort(key=lambda row: row["time"])

@@ -681,3 +681,5 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 /* Damage taken reads as an interruption in the kill list, not another kill. */
 .log-row.hurt { color: var(--bad); }
 .hurt-total { color: var(--ink-muted); font-size: 0.9em; }
+
+.hurt-by { color: var(--ink-strong); font-style: italic; }

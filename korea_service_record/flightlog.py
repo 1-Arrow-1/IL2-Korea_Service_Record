@@ -57,7 +57,7 @@ class DamageBurst(NamedTuple):
     hits: int
     amount: float                   # inflicted in this burst, 0..1
     total: float                    # of the aircraft lost by the end of it
-    attacker: str                   # "" when the log never named it
+    attacker: str                   # object type, "" when the log recorded none
 
 
 class SortieLog(NamedTuple):
@@ -142,6 +142,9 @@ def read_log(path: Path) -> Optional[SortieLog]:
     # everyone because the player's own object id is not known until the
     # AType 10 that names him, which need not come first.
     harm: List[Tuple[int, float, int, int]] = []
+    # id -> object type. Type rather than pilot name: nine tenths of what
+    # damages a career pilot is anti-aircraft fire, which has no pilot, and
+    # "a KS-19" is the useful answer anyway.
     named: Dict[int, str] = {}
 
     for tick, atype, payload in _records(path):
@@ -178,11 +181,11 @@ def read_log(path: Path) -> Optional[SortieLog]:
             elif atype == 12 and len(payload) > 12:
                 r = _Reader(payload)
                 oid = r.int32()
-                r.string()                      # type
+                kind = r.string()
                 r.string()                      # country
-                who = r.string()
-                if who:
-                    named[oid] = who
+                r.string()                      # pilot name, unused here
+                if kind:
+                    named[oid] = kind
             elif atype == 18 and player_bot is not None:
                 if _Reader(payload).int32() == player_bot:
                     ejected = True
@@ -205,10 +208,21 @@ def _bursts(harm, target_id: Optional[int],
     checkable: the total after the last burst equals the figure mission.result
     stores for that pilot. Verified at 0.5398 on the sortie that brought the
     Mustang home on 1951.06.01.
+
+    The attacker is usually absent. Across 93 logs, 91% of the damage aimed at
+    the player carries 0xFFFFFFFF where the object id should be — the log's
+    "nobody recorded" value — and the 9% that does resolve is anti-aircraft
+    fire. So the field is filled where the game filled it and left empty
+    otherwise, rather than inventing an "unknown" to print.
     """
+    NO_OBJECT = 0xFFFFFFFF
     if target_id is None:
         return []
-    mine = sorted((t, a, who) for t, a, who, tgt in harm if tgt == target_id)
+    mine = sorted((t, a, who) for t, a, who, tgt in harm
+                  if tgt == target_id and who != NO_OBJECT)
+    mine += sorted((t, a, 0) for t, a, who, tgt in harm
+                   if tgt == target_id and who == NO_OBJECT)
+    mine.sort()
     out: List[DamageBurst] = []
     total = 0.0
     for tick, amount, attacker in mine:

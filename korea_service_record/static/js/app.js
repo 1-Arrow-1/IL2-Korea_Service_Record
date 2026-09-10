@@ -309,10 +309,16 @@
             if (k.hurt) {
                 // Damage taken, in the same timeline as the kills so the
                 // sortie reads in the order it happened.
+                // The attacker is shown only where the log recorded one —
+                // most of what hits a career pilot is flak the log leaves
+                // anonymous, and "by unknown" on every line is noise.
+                const by = k.hurt.attacker
+                    ? ' <span class="hurt-by">' + esc(k.hurt.attacker) + "</span>"
+                    : "";
                 return '<div class="log-row hurt">' +
                     '<span class="log-time">' + esc(k.time) + "</span>" +
                     "<span>" + esc(T("debrief.hit_burst", {hits: k.hurt.hits})) +
-                    ' <span class="hurt-total">' +
+                    by + ' <span class="hurt-total">' +
                     esc(T("debrief.hit_total", {total: k.hurt.total})) +
                     "</span></span></div>";
             }

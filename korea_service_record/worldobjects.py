@@ -321,8 +321,11 @@ class WorldObjectIndex:
         hit = self.objects.get(self.ALIASES.get(key, ""))
         if hit is not None:
             return hit
-        # gmccckw -> gmc-cckw: the same name with the hyphens taken out.
-        hit = self._unhyphenated.get(key)
+        # Hyphens differ in both directions: the save writes Static_car_GMCCCKW
+        # for the folder gmc-cckw, and the flight log writes IL-10 and 61-K for
+        # the folders il10 and 61k. Comparing both sides without hyphens
+        # settles either case.
+        hit = self._unhyphenated.get(key.replace("-", ""))
         if hit is not None:
             return hit
         # "DShK-AA" has no folder of its own; fall back to the base weapon.
