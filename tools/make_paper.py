@@ -28,6 +28,14 @@ OUT = (Path(__file__).resolve().parent.parent
 SIZE = 512
 SEED = 20260910
 
+# One knob for the whole texture. The first attempt ran at 1.0 and read as
+# damage on the screen rather than age in the paper — the long scratches in
+# particular caught the eye across an otherwise quiet page. Background texture
+# only works when you have to look for it.
+STRENGTH = 0.38
+SCRATCHES = 4
+CREASES = 1
+
 DARK = (74, 52, 33)      # grime, in the palette's shadow brown
 LIGHT = (255, 250, 238)  # a fibre catching the light
 
@@ -84,9 +92,9 @@ def main() -> int:
     field = 0.78 * mottle + 0.22 * grain
 
     scratches = np.zeros((SIZE, SIZE), dtype=np.float64)
-    for _ in range(14):
+    for _ in range(SCRATCHES):
         draw_streak(scratches, rng, (0.25, 0.8), 1.0, 0.35)
-    for _ in range(3):                         # longer, softer creases
+    for _ in range(CREASES):                   # longer, softer creases
         draw_streak(scratches, rng, (0.9, 1.4), 0.75, 0.12)
     scratches = np.asarray(
         Image.fromarray((np.clip(scratches, 0, 3) * 85).astype(np.uint8))
@@ -94,8 +102,8 @@ def main() -> int:
 
     # Dark side and light side kept apart: grime is browner and stronger than
     # the highlights, which are barely there.
-    dark = np.clip(-field, 0, 1) * 0.30 + scratches * 0.34
-    light = np.clip(field, 0, 1) * 0.13
+    dark = (np.clip(-field, 0, 1) * 0.30 + scratches * 0.20) * STRENGTH
+    light = np.clip(field, 0, 1) * 0.13 * STRENGTH
 
     rgba = np.zeros((SIZE, SIZE, 4), dtype=np.float64)
     total = dark + light
