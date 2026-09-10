@@ -4,7 +4,9 @@
 
 .careers-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    /* Wide enough for the longest label set. German runs half again the
+       length of English here — AUSZEICHNUNGEN against AWARDS. */
+    grid-template-columns: repeat(auto-fill, minmax(530px, 1fr));
     gap: 1.25rem;
 }
 
@@ -80,8 +82,15 @@
 
 .career-stats {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.5rem;
+    /* Content-width columns, not five equal fifths: with 1fr the longest
+       label gets the same room as "AIR" and is squeezed against the card
+       edge no matter how wide the card is. */
+    grid-template-columns: repeat(5, auto);
+    /* space-around rather than space-between: the latter pins the outermost
+       column flush against the padding, so the longest label still reads as
+       jammed into the corner however wide the card is. */
+    justify-content: space-around;
+    gap: 0.5rem 0.9rem;
     text-align: center;
 }
 
