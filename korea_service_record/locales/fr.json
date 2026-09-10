@@ -171,7 +171,9 @@
     "pilot_hurt": "pilote {percent}%",
     "hit_burst": "touché {hits}×",
     "hit_total": "avion endommagé à {total}%",
-    "damage_tiny": "moins de 1%"
+    "damage_tiny": "moins de 1%",
+    "force_landed": "atterrissage forcé",
+    "force_landed_long": "atterri, avion irrécupérable"
   },
   "roster": {
     "heading": "Statistiques de l'escadrille",

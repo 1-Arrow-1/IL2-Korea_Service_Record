@@ -171,7 +171,9 @@
     "pilot_hurt": "piloto {percent}%",
     "hit_burst": "alcanzado {hits}×",
     "hit_total": "aeronave dañada al {total}%",
-    "damage_tiny": "menos del 1%"
+    "damage_tiny": "menos del 1%",
+    "force_landed": "aterrizaje forzoso",
+    "force_landed_long": "aterrizó, aeronave siniestro total"
   },
   "roster": {
     "heading": "Estadísticas del escuadrón",

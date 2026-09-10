@@ -171,7 +171,9 @@
     "pilot_hurt": "лётчик {percent}%",
     "hit_burst": "попаданий: {hits}",
     "hit_total": "самолёт повреждён на {total}%",
-    "damage_tiny": "менее 1%"
+    "damage_tiny": "менее 1%",
+    "force_landed": "вынужденная посадка",
+    "force_landed_long": "сел, самолёт списан"
   },
   "roster": {
     "heading": "Статистика эскадрильи",

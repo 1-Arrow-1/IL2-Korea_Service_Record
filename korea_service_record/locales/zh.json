@@ -171,7 +171,9 @@
     "pilot_hurt": "飞行员 {percent}%",
     "hit_burst": "中弹 {hits} 次",
     "hit_total": "飞机受损 {total}%",
-    "damage_tiny": "不足 1%"
+    "damage_tiny": "不足 1%",
+    "force_landed": "迫降",
+    "force_landed_long": "着陆，飞机报废"
   },
   "roster": {
     "heading": "中队统计",

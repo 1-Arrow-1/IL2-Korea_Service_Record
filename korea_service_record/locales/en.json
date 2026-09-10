@@ -171,7 +171,9 @@
     "pilot_hurt": "pilot {percent}%",
     "hit_burst": "hit {hits}×",
     "hit_total": "aircraft {total}% damaged",
-    "damage_tiny": "under 1%"
+    "damage_tiny": "under 1%",
+    "force_landed": "force-landed",
+    "force_landed_long": "landed, aircraft written off"
   },
   "roster": {
     "heading": "Squadron Statistics",

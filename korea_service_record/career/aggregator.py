@@ -656,6 +656,12 @@ class CareerAggregator:
                     landing, landing_key = "bailed out", "bailed_out"
                 elif flight.landing_s is None:
                     landing, landing_key = "did not return", "did_not_return"
+                elif outcome == "lost":
+                    # The aircraft was written off but the pilot put it down and
+                    # walked away. Reported as a plain landing until now, which
+                    # made the two write-offs of this career look routine.
+                    landing, landing_key = ("landed, aircraft written off",
+                                            "force_landed_long")
                 elif outcome == "damaged":
                     landing, landing_key = "landed, aircraft damaged", "landed_damaged"
                 else:
