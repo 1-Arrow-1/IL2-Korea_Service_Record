@@ -448,7 +448,17 @@
             el("d-squadron-strip").innerHTML =
                 icon("squadron", d.squadron_key, 84, "squadron-emblem strip", d.squadron) +
                 statStrip(d.squadron_totals);
-            rosterRows = d.roster.map(flatten);
+            // The header art is whatever the squadron flies. Set as a custom
+        // property so the CSS keeps ownership of size, opacity and blending,
+        // and an aircraft with no picture yet simply shows nothing.
+        const head = document.querySelector(".record-head");
+        if (head) {
+            head.style.setProperty("--plane-art", d.plane
+                ? 'url("/static/images/planes/' + d.plane + '.png")'
+                : "none");
+        }
+
+        rosterRows = d.roster.map(flatten);
             el("d-roster-count").textContent = "(" + rosterRows.length + ")";
             renderRoster();
             el("d-pending-note").textContent = d.pending_total

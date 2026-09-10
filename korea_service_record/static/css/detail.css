@@ -31,7 +31,7 @@
     transform: translate(-50%, -50%);
     width: min(620px, 34%);
     aspect-ratio: 1100 / 412;
-    background: url("../images/mustang-banner.png") center / contain no-repeat;
+    background: var(--plane-art, none) center / contain no-repeat;
     mix-blend-mode: multiply;
     opacity: 0.62;
     pointer-events: none;

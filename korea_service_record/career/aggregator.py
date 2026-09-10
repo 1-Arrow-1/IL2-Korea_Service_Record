@@ -23,7 +23,7 @@ import logging
 import re
 import urllib.parse
 from collections import Counter, OrderedDict
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Any, Dict, List, Optional
 
 from ..assets import AssetResolver
@@ -538,6 +538,23 @@ class CareerAggregator:
             return summary
 
     @staticmethod
+    def _squadron_plane(db) -> str:
+        """
+        The squadron's current aircraft, as the game's own plane key.
+
+        plane.config is a path — "luascripts/worldobjects/planes/f51d.txt" —
+        and its stem is the same key the world-object index and the artwork
+        file names use. The most common type on strength wins, so a handful of
+        replacements arriving early during a conversion cannot flip the page.
+        """
+        rows = db.query("SELECT config FROM plane WHERE isDeleted = 0")
+        if not rows:
+            return ""
+        counts = Counter(PurePath(r["config"]).stem.lower() for r in rows
+                         if r["config"])
+        return counts.most_common(1)[0][0] if counts else ""
+
+    @staticmethod
     def _crew(result: "MissionResult", flown: List[Dict[str, Any]]) -> Dict[str, str]:
         """
         Map each actor id in ``events`` to the pilot's name.
@@ -750,6 +767,11 @@ class CareerAggregator:
                 "efficiency": squad["efficiency"] if squad else None,
                 # squadrons.xaml keys emblems by the squadron's configId
                 "squadron_key": str(squad["configId"]) if squad else "",
+                # What the squadron actually flies, for the header artwork.
+                # squadrons.cfg also has this, but per *period* — twelve
+                # squadrons re-equip mid-war — so the aircraft on strength now
+                # is the honest answer and it follows a conversion for free.
+                "plane": self._squadron_plane(db),
                 "player": self._pilot_row(player, awards_by_pilot),
                 "combat": self._combat_results(KillStats(player["killStats"])),
                 "air_kills_by_type": self._air_kills_by_type(kill_events),
