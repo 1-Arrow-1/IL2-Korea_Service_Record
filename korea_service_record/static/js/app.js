@@ -645,8 +645,7 @@
                         ? ' title="' + esc(f.damage_log.map((b) =>
                             b.time + "  " + T("debrief.hit_burst", {hits: b.hits}) +
                             (b.attacker ? " — " + b.attacker : "") +
-                            "  → " + b.total + "%").join("
-")) + '"'
+                            "  → " + b.total + "%").join("\n")) + '"'
                         : "") + ">" +
                     (f.plane_damage === null || f.plane_damage === undefined
                         ? "&mdash;"
