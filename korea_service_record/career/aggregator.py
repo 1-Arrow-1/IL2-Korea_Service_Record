@@ -28,7 +28,8 @@ from typing import Any, Dict, List, Optional
 
 from ..assets import AssetResolver
 from ..flightlog import FlightLogIndex
-from ..gamedata import COUNTRY_FLAGS, COUNTRY_NAMES, COUNTRY_STAMPS, AwardsConfig, LocaleStrings, DEFAULT_TVD, PLANE_TYPES
+from ..gamedata import (COUNTRY_FLAGS, COUNTRY_NAMES, COUNTRY_STAMPS, AwardsConfig,
+                        LocaleStrings, MissionDescriptions, DEFAULT_TVD, PLANE_TYPES)
 from ..icons import IconLibrary
 from ..worldobjects import WorldObjectIndex
 from .attributes import PilotAttributes
@@ -129,6 +130,7 @@ class CareerAggregator:
         self.objects = WorldObjectIndex(self.resolver, lang)
         self.icons = IconLibrary(self.resolver)
         self.flightlogs = FlightLogIndex(self.game_dir)
+        self.descriptions = MissionDescriptions(self.resolver, lang, DEFAULT_TVD)
         self.awards_cfg = AwardsConfig(
             self.game_dir / "data" / "scg" / str(DEFAULT_TVD) / "awards.cfg")
 
@@ -798,7 +800,12 @@ class CareerAggregator:
                 merged.append(entry)
             log = merged
 
-            briefing = urllib.parse.unquote(mission["briefing"] or "")
+            # The stored briefing is frozen in the language the mission was
+            # generated in. The generator's own objective text is not, so it is
+            # preferred wherever the game ships one, and the stored prose is
+            # the fallback.
+            briefing = (self.descriptions.objective(mission["type"])
+                        or urllib.parse.unquote(mission["briefing"] or ""))
             return {
                 "id": mission_id,
                 "number": mission["missionNum"],

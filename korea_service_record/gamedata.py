@@ -337,3 +337,73 @@ COUNTRY_STAMPS = {
     602: "eng",
     603: "eng",
 }
+
+
+# ---------------------------------------------------------------------------
+# Mission objectives, in every language the game ships
+# ---------------------------------------------------------------------------
+
+class MissionDescriptions:
+    """
+    The briefing objective for a mission type, translated.
+
+    The career database stores the briefing as finished prose — airfield,
+    unit, crew list, weather and objective, rendered when the mission was
+    generated and in whatever language the game was running at the time. That
+    text cannot be re-rendered, so a German reader was stuck with an English
+    briefing for every mission flown before he switched.
+
+    The generator's own sources survive that, though, and this is where they
+    live::
+
+        scg/<tvd>/blocks_career/localisation/descriptions/
+            <missiontype>_primary-action_v1.<lang>
+
+    62 mission types, seven languages each, UTF-16 with a leading slot index
+    on the first line. Nothing found them by grep because of the encoding.
+
+    Only the objective is taken. The rest of the stored briefing is either
+    shown elsewhere on the page already — the crew is a table in the same
+    modal — or is weather detail that reads as padding beside it.
+    """
+
+    DIR = "scg/{tvd}/blocks_career/localisation/descriptions"
+    VARIANTS = ("{type}_primary-action_v1", "{type}_primary-action_night_v1")
+
+    def __init__(self, resolver, lang: str = DEFAULT_LANG, tvd: int = DEFAULT_TVD):
+        self.resolver = resolver
+        self.lang = lang if lang in SUPPORTED_LANGS else DEFAULT_LANG
+        self.tvd = tvd
+        self._cache: Dict[int, str] = {}
+
+    def _decode(self, raw: bytes) -> str:
+        # UTF-16 with a BOM; the fallbacks are for a modded file saved otherwise.
+        for encoding in ("utf-16", "utf-8-sig", "utf-8"):
+            try:
+                return raw.decode(encoding)
+            except (UnicodeDecodeError, ValueError):
+                continue
+        return ""
+
+    def objective(self, mission_type: Optional[int]) -> str:
+        """The primary-objective text, or "" when the game has none."""
+        if mission_type is None:
+            return ""
+        if mission_type in self._cache:
+            return self._cache[mission_type]
+        text = ""
+        for pattern in self.VARIANTS:
+            stem = pattern.format(type=mission_type)
+            vpath = f"{self.DIR.format(tvd=self.tvd)}/{stem}.{self.lang}"
+            raw = self.resolver.read(vpath)
+            if not raw:
+                continue
+            body = self._decode(raw).strip()
+            # The first line carries the slot index the generator writes it
+            # into — "3: Your target ..." — which is not part of the briefing.
+            body = re.sub(r"^\s*\d+\s*:\s*", "", body)
+            if body:
+                text = body
+                break
+        self._cache[mission_type] = text
+        return text
