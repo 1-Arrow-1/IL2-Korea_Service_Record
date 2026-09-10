@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional
 
 from ..assets import AssetResolver
 from ..flightlog import FlightLogIndex
-from ..gamedata import COUNTRY_FLAGS, COUNTRY_NAMES, AwardsConfig, LocaleStrings, DEFAULT_TVD, PLANE_TYPES
+from ..gamedata import COUNTRY_FLAGS, COUNTRY_NAMES, COUNTRY_STAMPS, AwardsConfig, LocaleStrings, DEFAULT_TVD, PLANE_TYPES
 from ..icons import IconLibrary
 from ..worldobjects import WorldObjectIndex
 from .attributes import PilotAttributes
@@ -772,6 +772,7 @@ class CareerAggregator:
                 # squadrons re-equip mid-war — so the aircraft on strength now
                 # is the honest answer and it follows a conversion for free.
                 "plane": self._squadron_plane(db),
+                "classification": COUNTRY_STAMPS.get(player["country"], "eng"),
                 "player": self._pilot_row(player, awards_by_pilot),
                 "combat": self._combat_results(KillStats(player["killStats"])),
                 "air_kills_by_type": self._air_kills_by_type(kill_events),

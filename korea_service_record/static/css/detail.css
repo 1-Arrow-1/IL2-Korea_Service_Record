@@ -452,6 +452,19 @@ table.roster td.photo-cell { padding: 0.2rem 0.4rem; }
    1951.06.11" was the widest thing in the table and told the reader little at
    a glance. */
 table.roster th.col-status, table.roster td.col-status { text-align: center; }
+
+/* A stamped word needs far more room than the 36px icon it replaces, and the
+   tilt needs vertical headroom or the corners clip into the row above. */
+.status-stamp {
+    /* The word fills only about 40% of the impression's height, so the image
+       has to be nearly as tall as the rank insignia for it to read. */
+    height: 52px;
+    width: auto;
+    max-width: none;
+    display: block;
+    margin: 0 auto;
+}
+table.roster td.col-status { padding-top: 0.5rem; padding-bottom: 0.5rem; }
 .status-icon { width: 36px; height: 36px; display: inline-block; opacity: 0.85; }
 
 /* The award column was wide because of a leftover min-width, not the medal. */
@@ -582,3 +595,26 @@ table.mission-roster th { cursor: default; }
 table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 
 .log-count { color: var(--ink-muted); font-size: 0.85em; margin-left: 0.15rem; }
+
+
+/* --------------------------------------------------------- classification -- */
+
+/* Pressed across the corner of the career figures, in the language of the air
+   force the pilot serves in. It sits above the text on purpose — a stamp that
+   politely avoided the data would not look stamped — but stays light enough
+   to read straight through. */
+.record-head::after {
+    content: "";
+    position: absolute;
+    top: -1.5rem;
+    right: 0.5rem;
+    width: 196px;
+    aspect-ratio: 39 / 22;
+    background: var(--classification, none) center / contain no-repeat;
+    transform: rotate(-7deg);
+    opacity: 0.72;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 2;
+}
+@media (max-width: 1180px) { .record-head::after { display: none; } }

@@ -291,3 +291,15 @@ COUNTRY_NAMES = {
     602: "United States",
     603: "United States",
 }
+
+
+# Which language the classification stamp is impressed in. The record belongs
+# to the air force the pilot serves in, so it follows the country, not the UI.
+COUNTRY_STAMPS = {
+    501: "rus",     # СЕКРЕТНО
+    502: "chi",     # 機密
+    503: "kor",     # 비밀
+    601: "eng",
+    602: "eng",
+    603: "eng",
+}

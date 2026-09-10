@@ -319,6 +319,21 @@
             '<div class="debrief-log">' + log + "</div></article>";
     }
 
+    // A stamp squared up to the pixel looks printed, not pressed, so each is
+    // tilted. The angle is derived from the pilot's id rather than drawn at
+    // random: Math.random() would give every row a fresh angle on each sort,
+    // and the whole column would twitch each time a heading was clicked.
+    const STAMPED = ["active", "wounded", "kia"];
+
+    function stampAngle(seed) {
+        let h = 0;
+        const text = String(seed);
+        for (let i = 0; i < text.length; i += 1) {
+            h = (h * 31 + text.charCodeAt(i)) | 0;
+        }
+        return (Math.abs(h) % 25) - 12;      // -12deg .. +12deg
+    }
+
     function renderRoster() {
         const body = el("d-roster").querySelector("tbody");
         const sorted = rosterRows.slice().sort((a, b) => {
@@ -351,9 +366,10 @@
                     (icon("award", p.top_award_id, 88, "award-icon", p.top_award) ||
                      "&mdash;") + "</td>" +
                 '<td class="col-status" title="' + esc(statusTitle) + '">' +
-                    (statusIcon
-                        ? '<img class="status-icon" src="/static/images/icons/' +
-                          statusIcon + '.png" alt="' + esc(p.state) + '">'
+                    (STAMPED.indexOf(p.state) >= 0
+                        ? '<img class="status-stamp" src="/static/images/stamps/' +
+                          esc(p.state) + '.png" alt="' + esc(p.state) +
+                          '" style="transform:rotate(' + stampAngle(p.id) + 'deg)">'
                         : '<span class="status-badge ' + dotClass + '"></span>') +
                     "</td>" +
                 '<td class="num">' + esc(p.airborne) + "</td>" +
@@ -455,6 +471,9 @@
         if (head) {
             head.style.setProperty("--plane-art", d.plane
                 ? 'url("/static/images/planes/' + d.plane + '.png")'
+                : "none");
+            head.style.setProperty("--classification", d.classification
+                ? 'url("/static/images/stamps/' + d.classification + '.png")'
                 : "none");
         }
 
