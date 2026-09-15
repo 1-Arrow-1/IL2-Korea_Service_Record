@@ -15,10 +15,13 @@ package directory, and ``i18n.LOCALES_DIR`` is ``Path(__file__).parent /
 "locales"``. Both therefore have to land *inside* korea_service_record/ in the
 bundle, not at its root, or the app starts and then serves nothing.
 
-Console stays on. The exe is the application — there is no launcher in front of
-it — so the window that prints "Serving: http://127.0.0.1:5002/" is how the
-user knows it is running and how they stop it. It also means a first-release
-bug report arrives with a traceback attached.
+Console off. A black terminal behind the browser window looks like a mistake to
+anyone who did not build it, so the exe is windowed — but the console was doing
+real work, and run.py replaces each part of it: a tray icon to show the server
+is up and to quit it, a log file under %LOCALAPPDATA% so bug reports still
+carry a traceback, and a check on startup that catches a second launch. See its
+module docstring. Run it under Python, or pass --console, to get the terminal
+back for development.
 """
 
 from pathlib import Path
@@ -33,6 +36,9 @@ datas = [
     # UI strings for the six languages. The game's own locale files are read
     # from the installation at runtime and are deliberately not bundled.
     (str(package / "locales"), "korea_service_record/locales"),
+    # The tray icon loads this at runtime. The copy Windows shows on the exe
+    # itself is embedded separately, below.
+    (str(base / "installer" / "IL2_Korea_Service_Record.ico"), "."),
 ]
 
 hiddenimports = [
@@ -45,6 +51,11 @@ hiddenimports = [
     # The rank, award and squadron artwork is BC7 inside DX10 DDS atlases;
     # without this plugin every emblem 404s and the page looks unstyled.
     "PIL.DdsImagePlugin",
+    # The tray icon. pystray picks its backend at import time by platform, so
+    # the Windows one is never reachable by static analysis.
+    "pystray",
+    "pystray._win32",
+    "PIL.IcoImagePlugin",
 ]
 
 excludes = [
@@ -83,11 +94,15 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=False,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    # Drawn by tools/make_icon.py. Windows reads the sizes it wants straight
+    # out of the exe, so the Start Menu shortcut and the taskbar get it
+    # without the installer having to point at anything.
+    icon=str(base / "installer" / "IL2_Korea_Service_Record.ico"),
 )
 
 coll = COLLECT(

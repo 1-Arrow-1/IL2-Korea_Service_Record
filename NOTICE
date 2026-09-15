@@ -1,0 +1,41 @@
+IL-2 Korea Service Record — third-party and game-derived material
+===================================================================
+
+The application source code in this repository is licensed under the MIT
+License (see LICENSE). The following are NOT covered by that licence.
+
+Game-derived files (installer/mod/assets)
+-----------------------------------------
+The optional "awards mod" consists of loose files that IL-2 Sturmovik: Korea
+reads in place of its own archives when modifications are enabled:
+
+  * awards.cfg / awards.stock.cfg  — the game's award definitions with the
+    corrections and additions described in README.md (text, derived from
+    the game's own file);
+  * awards.xaml, ranks.xaml         — resource dictionaries mapping artwork;
+  * Awards6xx.dds, Awards6xx2.dds, Ranks5xx.dds, Ranks6xx.dds — texture
+    atlases that contain the game's original decoration and rank-insignia
+    artwork, extended with additional tiles drawn for this mod;
+  * *.locale=*.json, *.locale=*.txt — names and descriptions, partly the
+    game's own strings and partly written for this mod, in six languages.
+
+The original artwork and text in those files are the property of the
+developers and publisher of IL-2 Sturmovik: Korea and are reproduced here
+solely so that the mod can be installed into a legitimately owned copy of
+the game. They are not licensed for any other use. If the rights holder
+objects to their presence in this repository, they will be removed.
+
+The application itself ships no game content: at runtime it reads the
+artwork, names and descriptions it displays from the user's own
+installation.
+
+Bundled third-party software
+----------------------------
+  * Leaflet 1.9.4 (korea_service_record/static/vendor/leaflet)
+    Copyright (c) 2010-2023 Volodymyr Agafonkin, BSD 2-Clause License —
+    see the LICENSE file in that folder.
+
+Runtime dependencies (installed from PyPI, licences per package): Flask
+(BSD-3-Clause), Pillow (MIT-CMU), pystray (LGPL-3.0). The Windows build is
+produced with PyInstaller (GPL with bootloader exception) and packaged with
+Inno Setup (Inno Setup License).

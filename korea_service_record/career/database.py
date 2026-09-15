@@ -158,7 +158,28 @@ class KoreaCareerDatabase:
         return self.query(sql + " ORDER BY slot, id")
 
     def player(self) -> Optional[sqlite3.Row]:
-        return self.query_one("SELECT * FROM pilot WHERE isPlayer=1 AND isDeleted=0")
+        """
+        The pilot the player is currently flying as: ``career.playerId``.
+
+        When the player's character is killed the game carries the career on
+        with a replacement, and a forum report found the record still showing
+        the dead predecessor. Proven 1951.07.08 by killing one: the game
+        leaves the predecessor's ``isPlayer=1`` in place (he is moved to slot
+        5000, state 2), inserts the successor with ``isPlayer=1`` too, writes
+        a type-22 event for him and moves ``career.playerId``. So the flag
+        means "a human flew this man", and the pointer says which one now.
+        The ORDER BY is the fallback for a career row without a pointer.
+        """
+        career = self.career()
+        if career is not None and career["playerId"] is not None:
+            row = self.query_one(
+                "SELECT * FROM pilot WHERE id=? AND isDeleted=0",
+                (career["playerId"],))
+            if row is not None:
+                return row
+        return self.query_one(
+            """SELECT * FROM pilot WHERE isPlayer=1 AND isDeleted=0
+               ORDER BY (state = 0) DESC, id DESC""")
 
     def pilot(self, pilot_id: int) -> Optional[sqlite3.Row]:
         return self.query_one("SELECT * FROM pilot WHERE id=?", (pilot_id,))

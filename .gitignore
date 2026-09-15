@@ -9,3 +9,10 @@ dist/
 # Installer staging and output
 installer/payload/
 installer/Output/
+
+# Local only
+_s.cfg
+signed/
+*.db
+*.part
+.claude/

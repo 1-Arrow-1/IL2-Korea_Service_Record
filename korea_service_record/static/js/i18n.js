@@ -45,9 +45,14 @@ const i18n = {
         const wanted = code || this.fallback;
         if (wanted !== this.fallback && !(await this.load(wanted))) {
             this.locale = this.fallback;
-            return this.locale;
+        } else {
+            this.locale = wanted;
         }
-        this.locale = wanted;
+        // The document's language, not just its strings: it picks the CJK
+        // font for Chinese, tells a screen reader how to pronounce the page,
+        // and is what hyphenation and quotation marks key on. index.html
+        // hard-codes "en" and this is the only place it is ever corrected.
+        document.documentElement.lang = this.locale;
         return this.locale;
     },
 
@@ -65,6 +70,12 @@ const i18n = {
      * empty string — a visible "roster.status" in the UI is a bug report;
      * a blank cell is a mystery.
      */
+    /** Whether a key exists in the current locale or the fallback. */
+    has(key) {
+        return this._lookup(this.loaded[this.locale], key) !== null
+            || this._lookup(this.loaded[this.fallback], key) !== null;
+    },
+
     t(key, params) {
         let text = this._lookup(this.loaded[this.locale], key);
         if (text === null) text = this._lookup(this.loaded[this.fallback], key);

@@ -264,6 +264,85 @@ table.roster td.award-cell { white-space: normal; }
 /* ---------------------------------------------------------------- roster -- */
 
 .roster-panel { margin-bottom: 2rem; }
+
+/* ---------------------------------------------------------------- aircraft -- */
+
+/* The squadron's aircraft, above the roster: five figures in a row, then the
+   repair queue, the deliveries on their way, and the stores side by side. */
+.aircraft-panel { margin-bottom: 1.25rem; }
+.aircraft-panel > h3 { font-size: 1.05rem; letter-spacing: 0.14em; }
+.aircraft-panel .stat-strip { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.aircraft-panel .stat-value { font-size: 1.55rem; }
+.aircraft-panel .stat-label { font-size: 0.78rem; }
+.aircraft-panel .stat-icon { width: 52px; height: 52px; }
+.aircraft-cols {
+    display: grid;
+    grid-template-columns: 1.4fr 1.2fr 0.8fr;
+    gap: 0 2.5rem;
+}
+.aircraft-col { min-width: 0; }
+.aircraft-col .panel-subhead { margin-top: 0; }
+.aircraft-col .service-list { margin-top: 0.4rem; }
+
+/* Inline line glyphs: ink strokes, a ring, in the weight of the category
+   pictograms. `.fill` shapes are solid silhouettes, `.bad` the write-off
+   stroke, `.dim` the retired airframe behind it. */
+.glyph { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.glyph .fill { fill: var(--ink); stroke: none; }
+.glyph .dim { opacity: 0.45; }
+.glyph .bad { stroke: var(--bad); stroke-width: 3.2; }
+.with-glyph { display: flex; align-items: center; gap: 0.45rem; }
+.h-glyph { display: inline-flex; }
+.h-icon { width: 24px; height: 24px; stroke-width: 3; }
+/* Whatever sits under a glyph heading lines up with the heading's text,
+   not with the glyph: the column is indented and the heading hangs out. */
+.aircraft-col { padding-left: calc(24px + 0.45rem); }
+.aircraft-col > .with-glyph { margin-left: calc(-24px - 0.45rem); }
+
+/* The repair queue is a service list like Incoming: due date on the left,
+   then the airframe, a condition bar and the wait. */
+.repair-health { display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap; margin-left: 0.5rem; }
+.repair-health .bar { display: inline-block; width: 64px; height: 7px; border: 1px solid var(--border); background: var(--paper-deep); vertical-align: middle; }
+.repair-health .bar > span { display: block; height: 100%; background: var(--accent); }
+
+/* The airframe table, folded under the panel. Rows take the roster's
+   rules; write-offs are greyed like the dead on the roster. */
+.airframes { margin-top: 1.4rem; border-top: 1px solid var(--border-soft); padding-top: 0.8rem; }
+.airframes > summary {
+    cursor: pointer;
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--accent-dark);
+}
+.airframes > summary:hover { color: var(--ink-strong); }
+.airframes .table-scroll { margin-top: 0.8rem; }
+table.airframe-table { font-size: 0.95rem; }
+table.airframe-table td { padding: 0.45rem 0.6rem; }
+table.airframe-table .code-cell { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--ink-strong); }
+table.airframe-table .fate-cell { white-space: nowrap; }
+table.airframe-table tr.is-written_off td { color: var(--ink-muted); }
+table.airframe-table tr.is-repair .code-cell { color: var(--bad); }
+table.airframe-table .pilot-link {
+    padding: 0; margin: 0; border: 0; border-radius: 0;
+    font: inherit; color: var(--ink-strong);
+    text-decoration: underline dotted var(--border);
+    text-underline-offset: 0.2em;
+}
+table.airframe-table .pilot-link:hover { background: none; color: var(--accent-dark); }
+
+/* The sortie's manifest line under the flight line. */
+.debrief-loadout { font-size: 0.86rem; color: var(--ink-muted); margin-top: 0.1rem; }
+.mission-roster .name-cell { white-space: normal; max-width: 17rem; }
+.mission-roster .loadout-line { display: block; font-size: 0.82rem; color: var(--ink-muted); line-height: 1.3; margin-top: 0.1rem; font-weight: normal; white-space: normal; }
+/* Outcome and damage wrap rather than widening the table. */
+.mission-roster td:nth-child(7), .mission-roster td:nth-child(8) { white-space: normal; }
+.mission-roster .airframe-no { white-space: nowrap; color: var(--ink-strong); }
+@media (max-width: 1100px) { .aircraft-cols { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px) {
+    .aircraft-cols { grid-template-columns: 1fr; gap: 1.2rem 0; }
+    .aircraft-panel .stat-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 0.8rem; }
+}
 .table-scroll { overflow-x: auto; }
 
 table.roster { width: 100%; border-collapse: collapse; font-size: 1.01rem; }
@@ -281,7 +360,10 @@ table.roster th {
     user-select: none;
 }
 table.roster th:hover { color: var(--ink-strong); }
-table.roster th.num, table.roster td.num { text-align: right; }
+table.roster th.num, table.roster td.num { text-align: center; }
+/* Centred columns lose the right edge that used to line the digits up, so the
+   figures carry their own even widths instead. */
+table.roster td.num { font-variant-numeric: tabular-nums; }
 table.roster th.sorted::after { content: ' \25BC'; font-size: 0.6em; }
 table.roster th.sorted.asc::after { content: ' \25B2'; }
 
@@ -293,6 +375,27 @@ table.roster td {
 table.roster tbody tr:hover { background: var(--paper-deep); }
 table.roster tr.is-player td { background: #f2e8ce; font-weight: bold; }
 table.roster tr.is-kia td { color: #93796a; }
+/* The reserve pool: on strength but not in the line-up. Lighter than the
+   line-up, not as faded as the dead — they are coming back. */
+table.roster tr.is-reserve td { color: var(--ink-muted); }
+table.roster tr.is-reserve .roster-photo { filter: saturate(0.6); opacity: 0.85; }
+
+/* A state with no stamp drawn for it, said in words so the cell is never
+   blank. Reserve is the common case; an unmapped "state N" also lands here,
+   which is deliberate — the number in a screenshot is how the next state
+   gets identified. */
+.status-word {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.15rem 0.45rem;
+    background: var(--paper-panel);
+}
+.status-word.status-reserve { border-style: dashed; }
 
 .status-dot {
     display: inline-block;
@@ -304,6 +407,9 @@ table.roster tr.is-kia td { color: #93796a; }
 .status-active { background: var(--good); }
 .status-kia { background: var(--bad); }
 .status-wounded, .status-pow { background: var(--warn); }
+/* Missing is a permanent loss like a death, but not a death — hollow rather
+   than filled, so the roster reads "gone" without reading "killed". */
+.status-missing { background: var(--paper); border: 2px solid var(--bad); }
 .status-other { background: var(--border); }
 
 /* The commander has boosters and no bars, so the row is just a labelled value. */
@@ -333,6 +439,29 @@ table.roster tr.is-kia td { color: #93796a; }
 .record-sub .rank-icon { height: var(--rank-emblem-h); width: auto; }
 .squadron-emblem { height: 96px; width: auto; }
 .squadron-emblem.strip { height: 84px; margin-right: 1.4rem; align-self: center; }
+
+/* Decorations to the unit, under the stat strip and above the roster. The
+   Distinguished Unit Citation is a ribbon bar rather than a medal, so the
+   icon is wide and short; the strip lays out like a row of ribbon bars on a
+   tunic, label first, each citation with its name and date beside it. */
+.citation-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1.6rem;
+    padding-bottom: 0.9rem;
+    margin-bottom: 0.9rem;
+    border-bottom: 1px solid var(--border-soft);
+}
+.citation-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ink-muted);
+}
+.citation { display: inline-flex; align-items: center; gap: 0.7rem; }
+.citation-icon { height: 40px; width: auto; }
+.citation-text { display: flex; flex-direction: column; line-height: 1.25; }
 
 #d-squadron-strip { display: flex; align-items: center; gap: 0.5rem; }
 #d-squadron-strip .stat-cell { flex: 1; }
@@ -411,6 +540,24 @@ table.roster td.award-cell .award-icon { max-height: var(--award-emblem-h); max-
     box-shadow: inset 0 0 0 1px rgba(44, 34, 18, 0.18);
 }
 .portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* The authentication seal, struck across the photograph's top-left corner the
+   way a clerk would have done it: about a third of the disc off the print and
+   onto the paper, which is what makes it read as applied rather than pasted.
+   Sized and placed in percentages of the frame so the small frame in the pilot
+   modal gets the same composition for free. Multiply blends the ink into the
+   photograph instead of sitting on top of it. */
+.portrait-seal {
+    position: absolute;
+    width: 62%;
+    left: -46%;
+    top: -7%;
+    transform: rotate(-11deg);
+    mix-blend-mode: multiply;
+    opacity: 0.92;
+    pointer-events: none;
+    z-index: 2;
+}
 .portrait-empty { font-size: 0.84rem; color: var(--ink-muted); font-style: italic; }
 .portrait-actions { display: flex; gap: 0.5rem; justify-content: center; }
 .nav-btn.small { font-size: 0.84rem; padding: 0.3rem 0.7rem; }
@@ -522,13 +669,27 @@ table.roster th {
     white-space: normal;
     vertical-align: bottom;
     line-height: 1.2;
-    hyphens: none;
+    /* manual, not none: the German and Spanish headings carry soft hyphens
+       (U+00AD) at the points a long word may break — GEFECHTS-AUSZEICHNUNG,
+       CONDECORA-CIONES. Invisible unless the column is too narrow, and the
+       break lands where the translator put it rather than where a browser's
+       dictionary guesses. `none` would ignore them. */
+    hyphens: manual;
 }
-table.roster th.num, table.roster td.num { white-space: nowrap; }
+/* Headings wrap, values do not. "Awards Pending" and "Ground Targets" held on
+   one line forced the table wider than the page and the last column was cut
+   off; a number broken across two lines would be far worse, so only the
+   heading is allowed to fold. */
+table.roster td.num { white-space: nowrap; }
+table.roster th.num { white-space: normal; }
 table.roster td:nth-child(3) { white-space: nowrap; }
+/* Measured, not guessed (tools/measure_roster.py): at 1.1rem a side the
+   English table was 1742px, exactly the box at 2072 and 150px over it on a
+   1920 monitor; German was 251px over even on the ultrawide. Fourteen columns
+   make padding the biggest lever — 0.4rem a side is 180px across the row. */
 table.roster td, table.roster th {
-    padding-left: 1.1rem;
-    padding-right: 1.1rem;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
 }
 table.roster tr.is-player td { font-weight: bold; }
 
@@ -587,6 +748,7 @@ table.mission-roster th { cursor: default; }
 }
 .status-badge.status-active { background: var(--good); opacity: 0.75; }
 .status-badge.status-wounded, .status-badge.status-pow { background: var(--warn); }
+.status-badge.status-missing { background: var(--paper); border: 3px solid var(--bad); }
 .status-badge.status-other { background: var(--border); }
 .status-icon { vertical-align: middle; }
 
@@ -664,6 +826,17 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 /* Efficiency rows that name a sortie open it. */
 .perf-row.linked { cursor: pointer; }
 .perf-row.linked:hover { background: var(--paper-deep); }
+/* A linked figure has to look linked before it is hovered — a forum reader
+   asked which rows went somewhere "w/o having to mouse over". The mission
+   reference takes the accent, an underline, and a small arrow. */
+.perf-row.linked .perf-mission {
+    color: var(--accent-dark);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-underline-offset: 0.15em;
+}
+.perf-row.linked .perf-mission::after { content: " \2197"; font-size: 0.8em; }
+.perf-row.linked:hover .perf-mission { color: var(--ink-strong); }
 .perf-row[title] th { border-bottom: 1px dotted var(--border); }
 .perf-mission {
     color: var(--ink-muted);

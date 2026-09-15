@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IL-2 Korea Service Record</title>
+    <link rel="icon" href="/static/images/icon.png?v=__ASSET_VERSION__">
     <link rel="stylesheet" href="/static/css/main.css?v=__ASSET_VERSION__">
     <link rel="stylesheet" href="/static/css/landing.css?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
     <link rel="stylesheet" href="/static/css/detail.css?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/map.css?v=__ASSET_VERSION__">
 </head>
 <body>
 <div id="app">
@@ -92,6 +95,7 @@
                                         </div>
                                         <img class="portrait-overlay"
                                              src="/static/images/photo-frame.svg" alt="">
+                                        <img id="d-portrait-seal" class="portrait-seal" alt="" hidden>
                                     </div>
                                     <div class="portrait-actions">
                                         <button id="photo-pick" class="nav-btn small" data-i18n="pilot.change_photo">Change photo</button>
@@ -149,7 +153,8 @@
 
                             <section class="panel" id="d-victories-panel">
                                 <h3><span data-i18n="victories.heading">Confirmed Victories</span>
-                                    <span id="d-victory-count" class="count"></span></h3>
+                                    <span id="d-victory-count" class="count"></span>
+                                    <span id="d-victory-whose" class="whose"></span></h3>
                                 <div id="d-victories" class="victory-roll"></div>
                             </section>
                         </div>
@@ -164,9 +169,67 @@
 
                     </div>
 
+                    <section class="panel map-panel" id="d-map-panel">
+                        <h3><span data-i18n="map.heading">Operations Map</span>
+                            <span id="d-map-count" class="count"></span>
+                            <span id="d-map-whose" class="whose"></span></h3>
+                        <div class="map-tools">
+                            <label><input type="checkbox" id="map-routes" checked> <span data-i18n="map.routes">Routes</span></label>
+                            <label><input type="checkbox" id="map-victories" checked> <span data-i18n="map.victories">Air victories</span></label>
+                            <label><input type="checkbox" id="map-targets" checked> <span data-i18n="map.targets">Targets</span></label>
+                            <label><input type="checkbox" id="map-labels" checked> <span data-i18n="map.labels">Place names</span></label>
+                            <span class="map-note" data-i18n="map.note">The game's own chart, read from your installation.</span>
+                        </div>
+                        <div id="d-map" class="map-view"></div>
+                    </section>
+
+                    <section class="panel aircraft-panel" id="d-aircraft-panel">
+                        <h3><span data-i18n="aircraft.heading">Aircraft</span> <span id="d-aircraft-count" class="count"></span></h3>
+                        <div id="d-aircraft-strip" class="stat-strip"></div>
+                        <div class="aircraft-cols">
+                            <div class="aircraft-col">
+                                <h4 class="panel-subhead with-glyph"><span class="h-glyph" data-glyph="wrench"></span><span data-i18n="aircraft.repairs_heading">In repair</span></h4>
+                                <ol class="service-list" id="d-aircraft-repairs"></ol>
+                                <p class="panel-note" id="d-aircraft-repairs-note"></p>
+                            </div>
+                            <div class="aircraft-col">
+                                <h4 class="panel-subhead with-glyph"><span class="h-glyph" data-glyph="incoming"></span><span data-i18n="aircraft.arrivals_heading">Incoming</span></h4>
+                                <ol class="service-list" id="d-aircraft-arrivals"></ol>
+                                <p class="panel-note" id="d-aircraft-arrivals-note"></p>
+                            </div>
+                            <div class="aircraft-col">
+                                <h4 class="panel-subhead with-glyph"><span class="h-glyph" data-glyph="stores"></span><span data-i18n="aircraft.stores_heading">Stores</span></h4>
+                                <table class="mini-table" id="d-aircraft-stores"></table>
+                            </div>
+                        </div>
+                        <details class="airframes" id="d-airframes">
+                            <summary><span data-i18n="aircraft.airframes_heading">Airframes</span> <span id="d-airframes-count" class="count"></span></summary>
+                            <div class="table-scroll">
+                                <table class="roster airframe-table">
+                                    <thead>
+                                        <tr>
+                                            <th data-i18n="aircraft.col_code">Tail number</th>
+                                            <th data-i18n="aircraft.col_status">Status</th>
+                                            <th data-i18n="aircraft.col_since">Since</th>
+                                            <th class="num" data-i18n="aircraft.col_sorties">Sorties</th>
+                                            <th data-i18n="aircraft.col_usual">Usual pilot</th>
+                                            <th class="num" data-i18n="aircraft.col_pilots">Pilots</th>
+                                            <th class="num" data-i18n="aircraft.col_air">Air<br>Victories</th>
+                                            <th class="num" data-i18n="aircraft.col_ground">Ground<br>Targets</th>
+                                            <th class="num" data-i18n="aircraft.col_repairs">Repairs</th>
+                                            <th data-i18n="aircraft.col_fate">Fate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </details>
+                    </section>
+
                     <section class="panel roster-panel">
                         <h3><span data-i18n="roster.heading">Squadron Statistics</span> <span id="d-roster-count" class="count"></span></h3>
                         <div id="d-squadron-strip" class="stat-strip"></div>
+                        <div id="d-squadron-citations" class="citation-strip" hidden></div>
                         <div class="table-scroll">
                             <table class="roster" id="d-roster">
                                 <thead>
@@ -260,7 +323,9 @@
     </div>
 
 </div>
+<script src="/static/vendor/leaflet/leaflet.js"></script>
 <script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/map.js?v=__ASSET_VERSION__"></script>
 <script src="/static/js/app.js?v=__ASSET_VERSION__"></script>
 </body>
 </html>

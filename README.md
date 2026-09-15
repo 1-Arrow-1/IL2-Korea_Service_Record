@@ -132,6 +132,40 @@ pilot 17's panel reads SKILLS 4 / DISCIPLINE 5 / COURAGE 5, and the mission that
 earned the Distinguished Service Cross had exactly 4 airborne kills and 1
 aircraft destroyed on the ground.
 
+## Download
+
+Windows builds are published as a setup program (tracker plus the optional
+awards mod) in the release thread on the IL-2 Series forum and on the
+[Releases](../../releases) page of this repository. The zip carries the
+SHA-256 of the setup program in its README.
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate
+by [SignPath Foundation](https://signpath.org).
+
+- Committers and reviewers: Alexander Bleiholder (repository owner).
+- Approvers: Alexander Bleiholder.
+- Release builds are produced by the GitHub Actions workflow in
+  `.github/workflows/build.yml` from a tagged commit of this repository, and
+  only those builds are submitted for signing. Nothing built outside that
+  workflow is signed.
+
+## Privacy policy
+
+This program will not transfer any information to other networked systems
+unless specifically requested by the user or the person installing or
+operating it.
+
+In practice: the tracker runs a local web server bound to 127.0.0.1 and
+opens it in your browser. It reads your career files and game assets from
+your own installation and never writes to them. Its settings and any pilot
+photographs you add live under `%LOCALAPPDATA%\IL2KoreaTracker`. It makes no
+network connections of its own, collects no telemetry, and has no
+auto-update.
+
 ## Licence
 
-TBD.
+The source code is licensed under the [MIT License](LICENSE). The awards
+mod's texture atlases and locale files contain material derived from IL-2
+Sturmovik: Korea, which is not covered by that licence — see [NOTICE](NOTICE).

@@ -103,6 +103,11 @@ class MissionResult:
             if target_name and target_name not in ("BlocksArray", "NOICON"):
                 # "Nam-il Chung,503056,0" -> the name only
                 victim = target_name.split(",")[0].strip()
+            # Ground vehicles carry the literal placeholder "noname" where an
+            # aircraft carries its pilot; it reached the page as a name until a
+            # forum screenshot showed "IS-2 Tank noname".
+            if victim.lower() == "noname":
+                victim = ""
             out.append({
                 "tick": int(_number(row.get("date", "0"))),
                 "target": row.get("targetType", ""),

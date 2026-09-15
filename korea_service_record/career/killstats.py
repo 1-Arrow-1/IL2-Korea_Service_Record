@@ -37,6 +37,9 @@ logger = logging.getLogger(__name__)
 # Building despite the name.
 ROLLUP_KEYS = {"Aircraft", "Building"}
 
+# The game's own misspelt keys, folded into the right one at parse time.
+KEY_FIXES = {"Raildoad": "Railroad"}
+
 BUILDING_CHILDREN = {"MilitaryFacility", "AirfieldFacility", "IndustrialBuilding"}
 
 # Scenery clutter — crates, barrels, boxes. Recorded in killStats but excluded
@@ -63,7 +66,7 @@ GROUND_CATEGORIES: Dict[str, set] = {
     "buildings": {"Building", "IndustrialBuilding", "MilitaryFacility",
                   "AirfieldFacility", "RailwayStationFacility",
                   "RailwayBridge", "Detachment"},
-    "rail": {"Raildoad", "Railroad", "TrainLocomotive", "TrainVagon"},
+    "rail": {"Railroad", "TrainLocomotive", "TrainVagon"},
     "naval": {"SeaSmallObj", "SeaCargoObj", "SeaDestrObj", "SeaSubObj"},
 }
 
@@ -78,8 +81,12 @@ class KillStats:
             if "=" not in pair:
                 continue
             key, _, value = pair.partition("=")
+            # The game books rail kills under two keys, one of them its own
+            # typo (Raildoad=20&Railroad=23 on one squadron), and names
+            # neither in any language. One row, spelt right.
+            key = KEY_FIXES.get(key, key)
             try:
-                self.counts[key] = int(value)
+                self.counts[key] = self.counts.get(key, 0) + int(value)
             except ValueError:
                 logger.debug("Non-integer killStats value: %s=%s", key, value)
 

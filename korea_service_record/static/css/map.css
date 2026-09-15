@@ -1,0 +1,74 @@
+/* ------------------------------------------------------------------ map -- */
+
+/* The game's chart, in Leaflet, dressed to the page: the paper palette on
+   the controls, a sepia wash on the tiles so the map reads as part of the
+   record rather than a window into the game. */
+
+.map-panel { margin-bottom: 1.25rem; }
+.map-panel > h3 { font-size: 1.05rem; letter-spacing: 0.14em; }
+.map-tools {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1.4rem;
+    font-size: 0.86rem; color: var(--ink-muted); margin-bottom: 0.7rem;
+}
+.map-tools label { display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; }
+.map-tools input { accent-color: var(--accent-dark); }
+.map-note { margin-left: auto; font-style: italic; }
+
+.map-view {
+    height: 620px; max-height: 70vh;
+    background: var(--paper-deep);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 0 0 4px var(--paper-panel), inset 0 0 0 5px var(--border-soft);
+}
+.map-view.mission { height: 420px; margin: 0.9rem 0 1.4rem; }
+.map-view.mission[hidden] { display: none; }
+/* The chart's own paper margin, as it renders under the wash, so the space
+   beyond the world's edge reads as more chart rather than a hole. */
+.leaflet-container { font: inherit; background: #ebdabd; }
+.leaflet-tile { filter: sepia(0.35) saturate(0.85) contrast(0.96); }
+
+/* Leaflet's own chrome */
+.leaflet-bar { border: 1px solid var(--border); box-shadow: none; }
+.leaflet-bar a { background: var(--paper-panel); color: var(--ink); border-bottom-color: var(--border-soft); }
+.leaflet-bar a:hover { background: var(--paper-deep); }
+.leaflet-tooltip.map-tip {
+    background: var(--paper-panel); color: var(--ink); border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(44, 34, 18, 0.18); font-size: 0.86rem; padding: 0.35rem 0.6rem;
+}
+.leaflet-tooltip.map-tip::before { border-top-color: var(--border); }
+
+/* Drawn things. `dim` is the career overview, where dozens of routes lie
+   over one another and only their density should show. */
+.map-route { stroke: var(--bad); stroke-opacity: 0.9; fill: none; stroke-linejoin: round; }
+.map-route.dim { stroke: var(--accent-dark); stroke-opacity: 0.28; }
+.map-route.dim:hover { stroke-opacity: 0.9; }
+.map-target { stroke: var(--bad); stroke-width: 2; fill: var(--bad); fill-opacity: 0.12; }
+.map-target.dim { stroke-opacity: 0.35; fill-opacity: 0.06; stroke-width: 1; }
+.map-victory { stroke: var(--paper-panel); stroke-width: 1.5; fill: var(--bad); fill-opacity: 0.85; }
+.map-victory.mine { fill: #1f140a; stroke: var(--bad); stroke-width: 2; }
+.map-ground { stroke: none; fill: var(--accent-dark); fill-opacity: 0.55; }
+
+.map-wp span {
+    display: block; width: 18px; height: 18px; line-height: 18px; text-align: center;
+    border-radius: 50%; background: var(--paper-panel); border: 1.5px solid var(--bad);
+    color: var(--bad); font-size: 0.7rem; font-variant-numeric: tabular-nums;
+}
+.map-wp.target span { background: var(--bad); color: var(--paper-panel); }
+
+.map-airfield svg, .map-base svg { width: 16px; height: 16px; fill: none; stroke: var(--accent-dark); stroke-width: 1.6; }
+.map-base svg { width: 18px; height: 18px; stroke: #1f140a; stroke-width: 2; }
+.map-base svg .fill { fill: #1f140a; stroke: none; }
+.map-airfield .map-label {
+    position: absolute; left: 20px; top: 0; white-space: nowrap;
+    font-size: 0.74rem; letter-spacing: 0.04em; color: var(--bad);
+    text-shadow: 0 0 3px var(--paper-panel), 0 0 3px var(--paper-panel);
+}
+.map-city .map-label {
+    position: absolute; left: 4px; top: -8px; white-space: nowrap;
+    font-size: 0.72rem; color: var(--ink-muted);
+    text-shadow: 0 0 3px var(--paper-panel), 0 0 3px var(--paper-panel);
+}
+/* Town names only once the map is close enough to place them. */
+.leaflet-zoom-anim .map-city, .map-far .map-city { display: none; }
+
+@media (max-width: 700px) { .map-view { height: 420px; } .map-note { display: none; } }

@@ -1,4 +1,5 @@
-IL-2 Korea Service Record — a pilot's file for your career, plus an awards fix
+IL-2 Korea Service Record 1.3 — a pilot's file for your career, a fix for the awards, a
+promotion system that means something, and unit citations for the squadron
 
 
 Gentlemen,
@@ -8,13 +9,103 @@ paperwork would have kept: what my pilot shot down, who he shot down, what he wa
 decorated for, and what the flak did to him on the way home. The game holds all of it and
 shows very little of it, so I built something that reads it out.
 
-It comes with a second thing I did not plan on. While chasing a medal that never arrived I
-found real bugs in the game's award definitions — six decorations that cannot be granted at
-all, one of them broken in two separate ways. The installer offers the fix as an optional
-component and I would encourage you to take it. More on that below.
+It comes with a mod I did not plan on. While chasing a medal that never arrived I found
+real bugs in the game's award definitions — six decorations that cannot be granted at all,
+and a promotion ladder with a rung missing, so that a career commander can never leave
+Major. Fixing those led to a merit-based promotion system, two flag ranks for every
+nation, and now three unit citations the squadron earns as a whole.
 
-It is read-only. It never writes to a career file and cannot cost you a campaign. Careers
-only for now — scripted campaigns and single missions are not read.
+The tracker is read-only. It never writes to a career file and cannot cost you a campaign.
+Careers only for now — scripted campaigns and single missions are not read.
+
+
+WHAT'S NEW IN 1.3
+
+Most of this release comes out of the thread. Viking1 posted four screenshots from a career
+that had gone further than mine, and every one showed something the game does that I had not
+seen; another reader caught two typos that turned out to be the game's own. Thank you — this
+is exactly the feedback the thing needs.
+
+The map
+ • An Operations Map on the career page: the game's own briefing chart — read from your
+   installation, nothing shipped — with every mission the squadron has flown drawn on it,
+   every air victory where it happened (hover for who, whom and how high; click for the
+   debriefing), and the bases the squadron flew from. Three months of a career on one
+   sheet: the dense fan out of Chungju, then the move to Seoul, and the cluster of red
+   dots over Pyonggang and Inje where the MiGs and Yaks were met. Routes, victories,
+   targets and place names switch on and off; it zooms down to the game's finest level.
+ • Every mission debriefing has its own map: the briefed route with the turning points
+   numbered, the target ringed, and the kills of that sortie plotted.
+
+The squadron's aircraft
+ • An Aircraft panel above the roster — Viking1's question: how many are in repair, how long,
+   and when new ones arrive. It shows what is serviceable, in the shop, in reserve, received
+   and written off over the career; each aircraft under repair with its condition and the
+   day it comes back (the game's own date, not a guess — repairs run from half a day to ten,
+   and not in proportion to the damage); everything on its way and when — aircraft,
+   replacement pilots, fuel, ordnance and equipment; and the squadron's stores in the same
+   terms and units as the game's Resources screen, with the requests still available.
+ • Every airframe's history, folded under the panel: tail number, status, sorties, the
+   pilot who usually flew it, how many others did, what was destroyed from it, how often it
+   was in the shop, and — for the write-offs — the day it was lost and with whom. You will
+   find the machine one man has flown 39 times out of 39, the pool aircraft with four
+   pilots, and the squadron's top-scoring airframe, which is not necessarily the CO's. The
+   tail numbers are the game's own: FF-148 on a Mustang, FU-101 on a Sabre.
+ • Loadouts. Each debriefing now says which airframe you flew and what hung under it — "2 ×
+   AN-M64A1 500 lb, 6 × HVAR 5"" — with the fuel fraction and the mission's range; the
+   mission detail shows the same for every pilot on it, in the words the hangar uses.
+
+Unit citations — three awards to the squadron as a whole
+ • Distinguished Unit Citation. The unit's Distinguished Service Cross: extraordinary
+   heroism in a single action. Awarded for one mission in which a squadron at full
+   efficiency destroys eight aircraft, or twenty-five vehicles and vessels — three and
+   eight are typical, so this is a big day, not a milestone.
+ • Republic of Korea Presidential Unit Citation. The long-service one, given by Syngman
+   Rhee to nearly every UN air unit — USAF, Navy and Marines. A hundred squadron missions at
+   full efficiency.
+ • A second Distinguished Unit Citation, worn as a bronze oak leaf cluster on the first.
+ Citations appear on the career page beneath the pilot, since they belong to everyone on
+ the roster. Names and histories in all six languages, artwork drawn into the game's atlas.
+ The game's file format has a flag for squadron awards that its own notes describe as
+ "conceived, never used" — it works, and this is the first use of it I know of.
+
+Fixed
+ • "Did not return" on every mission. If you end a mission from the menu once you are
+   home, the flight log never records a landing, and the tracker read that as lost — on a
+   record whose own totals said 36 returned, none lost. It now takes the game's verdict on
+   the aircraft and uses the log only for the landing time. And a sortie the pilot did not
+   survive now says "killed in action" rather than describing the landing.
+ • "Hit 5× F-51D". That was the pilot's own bombs and rockets going off under him. The
+   game logs own-ordnance damage with the attacker being your own aircraft; it now says
+   "own ordnance" instead of naming your type as the enemy.
+ • "Mission -7". The game numbers scrambles and other unscheduled missions downward in
+   their own series. Shown as "Unscheduled mission 7".
+ • "noname" appearing as a victim on ground vehicles — gone.
+ • Forty-seven "active" pilots in a nineteen-slot squadron. The game keeps a reserve pool
+   behind the line-up — on strength, never flying — and the tracker called all of them
+   active. They are now marked "reserve", sorted below the line-up, and the roster reads
+   "47, 28 in reserve". A pilot in a state I have not seen yet shows "state N" rather than
+   nothing, so you can tell me the number.
+ • Player killed, career carried on with a successor — the record still showed the dead
+   man. The tracker now follows the game's own pointer to the current character. The
+   roster highlights him alone, his record opens with "Took over the career", and the
+   predecessor keeps every one of his debriefings when you open him from the roster.
+ • "Raildoad" and "Train Vagon" in the combat results. Both are the game's — one a misspelt
+   data key, one a slip in its English text — and are corrected on the way through. The
+   categories the game names in no language at all (materiel, railroad track, the buildings
+   total) now have proper names in all six.
+ • The "missing in action" entry in a pilot's incidences printed its key instead of its
+   text.
+
+Also
+ • Planned flight time beside the flown hours. Warping to the target does not advance the
+   clock — the game moves you — so a pilot who warps logs about 15 minutes for a 55-minute
+   route. The new figure is the full route as briefed: on my career, 33 hours planned
+   against 9 flown. Both are shown; the logbook keeps its honesty.
+ • Shared victories on the pilot's record and per sortie, and — should it ever happen — an
+   own-side aircraft shot down, which a file would not forget.
+ • The victories panel carries the pilot's name, so it is clear whose they are, and the
+   Combat Efficiency rows that link to a debriefing now look like links.
 
 
 WHAT IT SHOWS
@@ -23,7 +114,11 @@ The pilot
  • Rank insignia, squadron badge, date of birth, status and health
  • Skill, discipline and courage with their boosters — the characteristics the game tracks
    but only half shows
- • A portrait you can add yourself, cropped to a passport frame
+ • A portrait you can add yourself, cropped to a passport frame and stamped across its
+   corner with his nation's seal — Far East Command for the Americans, the 64th Fighter
+   Aviation Corps for the Soviets, the Chinese People's Volunteer Army Air Force, the Korean
+   People's Army Air Force. Three of the four name formations that officially were not
+   there.
 
 Combat record
  • Aircraft, vehicles, railroad, armaments, buildings and shipping, broken down by target
@@ -35,19 +130,27 @@ Combat record
    engagement altitude, mission and career score
 
 Mission debriefings
- • Take-off and landing times from the flight log, and how the sortie ended — landed,
-   landed damaged, force-landed with the aircraft written off, bailed out, or failed to
-   return
+ • Take-off and landing times from the flight log, and how the sortie ended — returned,
+   returned damaged, force-landed with the aircraft written off, bailed out, failed to
+   return, or killed in action
+ • The airframe flown and its loadout, fuel and the mission's range
  • A combat log per sortie: what was destroyed, when, by whom, at what height
  • Battle damage in the same timeline — when you were hit, how many strikes in that pass,
    how much of the aircraft was gone by the end of it, and what did it where the game
    recorded that. Roughly nine times in ten the game logs no attacker, so I show nothing
    rather than invent one.
  • Every pilot on the mission, each with their own damage timeline
+ • Missions you send the squadron on without flying yourself are resolved by the game as a
+   text summary; their combat logs name the pilot who made each kill
 
 The squadron
  • The full roster — portraits, rank, highest combat decoration, status, victories,
-   sorties, hours and characteristics — sortable on every column
+   sorties, hours and characteristics — sortable on every column; line-up first, reserve
+   pool below
+ • Status as a rubber stamp: active, wounded, killed, missing
+ • The squadron's own citations
+ • Its aircraft: serviceable, in repair and when each is due back, in reserve, on the way;
+   fuel, ordnance, equipment and available requests; and every airframe's history
  • Click a pilot for his own record; click a medal for the full-size art and the game's own
    description
 
@@ -56,14 +159,23 @@ INSTALL
 
  1. Run the setup program. It asks for your language first — that becomes the application's
     language, and you can change it later from any page.
- 2. Choose both components: the Service Record and the Awards Mod.
- 3. Point it at your IL-2 Korea folder. Setup usually finds it. It is the folder containing
-    data\Career.
+ 2. Choose both components: the Service Record and the Awards Mod. Under the mod, pick a
+    promotion system — extended, or stock corrected. Extended is the default and what I
+    fly with. More on the difference below.
+ 3. Point it at your IL-2 Korea folder. Setup usually finds it. If yours came direct from
+    the developer rather than through Steam, the game lives in a "game" subfolder — setup
+    knows, and either the folder above or the game folder itself is accepted.
  4. Enable modifications in the game — Settings, General, Enable modifications. Without
     this the game never looks at modded files and the awards mod does nothing at all. Setup
     warns you if it sees the setting switched off.
  5. Fly a mission, then open the Service Record. The first launch takes a few seconds while
     it reads the game's art and text; after that it is instant.
+
+It opens in your browser and puts a small star in the notification area, by the clock.
+Right-click that when you are finished with it — closing the browser tab leaves it running.
+Launching it a second time just opens the browser again.
+
+Updating from 1.1 or 1.2: run the new setup over the old one. Nothing to uninstall first.
 
 Uninstalling removes both cleanly. The mod is additions only — nothing in your game is
 overwritten or replaced, so deleting the files simply returns the game to reading its own
@@ -71,6 +183,45 @@ archives. Your careers and the medals already in them are untouched either way.
 
 Note that verifying game files in Steam removes loose mod files. If your medals stop
 appearing after a game update, run setup again.
+
+
+THE PROMOTION LADDER
+
+Stock has a hole in it. There are promotions out of 2nd Lieutenant, 1st Lieutenant,
+Captain and Lieutenant Colonel — and none out of Major. A career commander starts as a
+Major. He can therefore never be promoted in an unmodified game, on any side. Both variants
+of the mod restore that rung.
+
+Beyond that they differ:
+
+Stock, corrected
+ • The game's own criteria: sorties for the first three rungs, career days after that
+ • The ladder ends at Colonel, as the stock game intends
+ • For anyone who wants the stock experience with the one bug fixed
+
+Extended
+ • Rank is earned by serving the time AND earning it — both required at every rung
+ • The merit measure is the game's own career points, the figure it already keeps for every
+   pilot: score, plus credit for rank, awards and command
+ • Thresholds calibrated against a real squadron roster, not invented — a good pilot makes
+   1st Lieutenant at about 25 sorties; an average one takes longer; a quiet one may stay a
+   2nd Lieutenant for the war, which is rather the point
+ • Two flag ranks above Colonel for every nation — Brigadier General and Major General for
+   the USAF and Marines, Rear Admiral for the Navy, Major General and Lieutenant General
+   for the Soviets, Senior Colonel and Major General for the Chinese and North Koreans.
+   Insignia and names in all six languages, each a genuine long haul
+
+In both, AI pilots can rise as far as Lieutenant Colonel on their own merits. Colonel and
+above belong to whoever commands the squadron.
+
+A note on the flag ranks: the game ships six ranks per nation and its own documentation
+says the rank index runs "from 0 to 5". It turns out that describes the data, not a limit —
+I added a seventh and eighth and the game promoted into them, offered the usual skill
+point, and asked me politely for a name it did not have. So the insignia are drawn into the
+free space each rank atlas already had, and the names are in all six locale files.
+
+Two errors in the game's German naval ranks are corrected on the way: Commander is
+Fregattenkapitän and Captain is Kapitän zur See, not "Kommandant" and "Hauptmann".
 
 
 WHY THE AWARDS FIX MATTERS
@@ -103,10 +254,8 @@ no competing award, and nothing was granted.
 
 The base Silver Star and the Distinguished Service Cross do arrive in the stock game, but
 only through AwardByDef — a 10% roll against your career total, not against the sortie you
-actually flew. In my own career the Silver Star landed on that roll the day my career total
-first reached three victories, while the sortie that earned it was ignored. The Medal of
-Honor is not guarded and works as intended; it simply asks a great deal — six airborne
-victories in one sortie, or five while wounded.
+actually flew. The Medal of Honor is not guarded and works as intended; it simply asks a
+great deal — six airborne victories in one sortie, or five while wounded.
 
 What the mod changes
  • Removes the noAwards condition from the affected USAF valour awards, so the sortie you
@@ -119,14 +268,15 @@ What the mod changes
 The communist ladders have noAwards in places too, but always inside an OR, so they are
 harmless and I have left them alone.
 
-Three decorations added
+Six decorations added
  • Senior Pilot Wings and Command Pilot Wings — the qualification badges the stock game
    leaves out
  • Medal of Honor with Oak Leaf Cluster, for the second award
- • A missing promotion step, so rank progression no longer skips a rung
+ • Distinguished Unit Citation, its oak leaf cluster, and the Republic of Korea
+   Presidential Unit Citation — to the squadron, as above
 
 New artwork is drawn into the game's own award atlas, and every decoration carries a name
-and description in all six languages.
+and description in all six languages. Both promotion variants carry all of them.
 
 
 LANGUAGES
@@ -142,17 +292,22 @@ his mission types — while everything else stays German.
 
 REQUIREMENTS AND NOTES
 
- • Windows, and IL-2 Sturmovik: Korea installed. No Python or other runtime needed.
+ • Windows, and IL-2 Sturmovik: Korea installed — Steam or direct. No Python or other
+   runtime needed.
  • The Service Record never writes to your game. Pilot photographs and its own settings
    live under %LOCALAPPDATA%\IL2KoreaTracker.
  • The application ships no game content. It reads the art and text it needs from your own
    installation each time.
- • The awards mod is an ordinary set of loose files. If you would rather install it by
-   hand, the full list and destinations are in "Awards mod - manual install.txt".
+ • The awards mod is an ordinary set of loose files. If you would rather place them by hand
+   than run setup, say so below and I will post them separately with their destinations.
+ • If something goes wrong, %LOCALAPPDATA%\IL2KoreaTracker\tracker.log has the details
+   from the last run. Please include it with any bug report.
 
 
 Feedback, bug reports and requests are all welcome — particularly from anyone flying a
-communist career, since this has had far more hours against a USAF one. And if you manage a
-Medal of Honor, I would like to hear about it. I have not managed it yet.
+communist career, since this has had far more hours against a USAF one. If your squadron
+earns a Distinguished Unit Citation, tell me what the mission was; the trigger is new in
+this build and I want to know it fires at the right moment. And if you manage a Medal of
+Honor, I would like to hear about it. I have not managed it yet.
 
 Clear skies.

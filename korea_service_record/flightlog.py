@@ -51,13 +51,20 @@ WANTED = {0, 2, 5, 6, 10, 12, 18}
 BURST_GAP_S = 15.0
 
 
+# The attacker field when the damage came from the aircraft's own ordnance —
+# bomb blast or rocket debris on a low pass. The log records the attacker as
+# the aircraft itself, which read as "hit by F-51D" until a forum screenshot
+# showed five such hits right after a strafing run.
+SELF = "*self*"
+
+
 class DamageBurst(NamedTuple):
     """One pass, however many records the log split it into."""
     at_s: float                     # when the burst ended
     hits: int
     amount: float                   # inflicted in this burst, 0..1
     total: float                    # of the aircraft lost by the end of it
-    attacker: str                   # object type, "" when the log recorded none
+    attacker: str                   # object type, "" when none recorded, SELF when own
 
 
 class SortieLog(NamedTuple):
@@ -256,6 +263,10 @@ def _bursts(harm, target_id: Optional[int],
     mine.sort()
     out: List[DamageBurst] = []
     total = 0.0
+
+    def who(attacker):
+        return SELF if attacker == target_id else named.get(attacker, "")
+
     for tick, amount, attacker in mine:
         seconds = tick / TICKS_PER_SECOND
         total += amount
@@ -263,10 +274,9 @@ def _bursts(harm, target_id: Optional[int],
             last = out[-1]
             out[-1] = DamageBurst(seconds, last.hits + 1,
                                   last.amount + amount, total,
-                                  last.attacker or named.get(attacker, ""))
+                                  last.attacker or who(attacker))
         else:
-            out.append(DamageBurst(seconds, 1, amount, total,
-                                   named.get(attacker, "")))
+            out.append(DamageBurst(seconds, 1, amount, total, who(attacker)))
     return out
 
 

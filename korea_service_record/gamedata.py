@@ -108,14 +108,14 @@ def resolve_game_dir(start: Path) -> Optional[Path]:
     """
     Accept the game folder, its ``data`` folder, or anything below, and return
     the install root (the folder containing ``data``).
+
+    Delegates to :mod:`locate`, which owns the definition of what an IL-2
+    installation looks like. This used to insist on ``data\\Career`` — a folder
+    the game only creates once a career has been flown — and so rejected
+    perfectly good installations.
     """
-    path = Path(start).resolve()
-    for candidate in (path, *path.parents):
-        if (candidate / "data" / "Career").is_dir():
-            return candidate
-        if candidate.name.lower() == "data" and (candidate / "Career").is_dir():
-            return candidate.parent
-    return None
+    from .locate import normalise
+    return normalise(start)
 
 
 # ---------------------------------------------------------------------------
@@ -277,16 +277,29 @@ class LocaleStrings:
         return {stem: self.resolver.source_of(self.vpath(stem))
                 for stem in ("awards", "ranks", "missiontypes")}
 
+    # The game's own slips in its English statobjects file, reported from the
+    # forum: "Train Vagon" (the other five languages have it right) and the
+    # one lower-case "Heavy gun" beside "Light Gun". Corrected here rather
+    # than in the game's file, which the mod does not ship.
+    STAT_NAME_FIXES = {
+        ("eng", "TrainVagon"): "Train Wagon",
+        ("eng", "HeavyGun"): "Heavy Gun",
+    }
+
     def stat_name(self, category: str) -> str:
         """
         The game's own name for a killStats category.
 
         killStats keys the categories bare — ``LightFlak``, ``StaticPlane`` —
         and statobjects keys them with a ``kill`` prefix. A few have no entry
-        because they are rollups the tracker computes rather than categories
-        the game counts (``Building``, ``Aircraft``), and one is the game's own
-        typo (``Raildoad``); those fall back to splitting the camel case.
+        in any language: the rollups the tracker computes rather than
+        categories the game counts (``Building``, ``Aircraft``), and
+        ``Materiel`` and ``Railroad``; the caller supplies those from the
+        tracker's own locale.
         """
+        fixed = self.STAT_NAME_FIXES.get((self.lang, category))
+        if fixed:
+            return fixed
         name = self.stat_objects.get("kill" + category)
         return name.strip() if isinstance(name, str) and name.strip() else ""
 
@@ -357,6 +370,20 @@ COUNTRY_STAMPS = {
     601: "eng",
     602: "eng",
     603: "eng",
+}
+
+# The round seal struck across the corner of the pilot's photograph, as a
+# clerk would have done to authenticate it. One per nation rather than per
+# branch: it names the theatre formation the air arm actually fought under in
+# Korea, and the US one — Far East Command — covered Air Force, Navy and
+# Marines alike. Files are static/images/stamps/seal_<name>.png.
+COUNTRY_SEALS = {
+    501: "ussr",    # 64 ИАК — the corps that was officially never there
+    502: "prc",     # 中国人民志愿军空军 — the "volunteers"
+    503: "dprk",    # 조선인민군 공군
+    601: "usa",     # FAR EAST COMMAND
+    602: "usa",
+    603: "usa",
 }
 
 

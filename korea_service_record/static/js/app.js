@@ -63,6 +63,13 @@
               esc(ident) + '" data-title="' + esc(title || "") +
               '" onerror="this.style.display=&quot;none&quot;">';
 
+    // The game numbers scheduled missions up from 1 and unscheduled ones -
+    // scrambles, urgent tasks - DOWN from -1, in a series of their own. Shown
+    // raw that read as "Mission -7" on the forum.
+    const missionLabel = (n) => (n < 0)
+        ? T("debrief.unscheduled", {number: -n})
+        : T("debrief.mission", {number: n});
+
     /* ----------------------------------------------------------- lightbox -- */
 
     // Every icon is clickable: full-size art plus the game's own description.
@@ -276,13 +283,31 @@
         buildings: "icon_buildings", naval: "icon_marine"
     };
 
+    // Line glyphs in the style of the category pictograms (a ring, ink
+    // strokes), drawn inline so they take the page's own ink and stay crisp.
+    const RING = '<circle cx="32" cy="32" r="29"/>';
+    const PLANE = '<path class="fill" d="M32 11l2.4 14.5L51 33.5v4l-16-3.2-1.2 11.2 6.4 4v3L32 50.6l-8.2 1.9v-3l6.4-4L29 34.3l-16 3.2v-4l16.6-8z"/>';
+    const AIRCRAFT_ICON = {
+        serviceable: RING + PLANE,
+        repair: RING + '<path class="fill" d="M44.5 17.5a9 9 0 0 0-10.3 12L18 45.7a3.4 3.4 0 0 0 4.8 4.8l16.2-16.2a9 9 0 0 0 12-10.3l-5.6 5.6-5.2-1.2-1.2-5.2z"/>',
+        reserve: RING + '<path d="M14 47V32a18 18 0 0 1 36 0v15M22 47V37h20v10M14 47h36"/>',
+        received: RING + '<path d="M32 12v14m-6-5l6 6 6-6"/><path d="M17 30h30v18H17zM17 36h30"/>',
+        written_off: RING + '<g class="dim">' + PLANE + '</g><path class="bad" d="M17 47L47 17"/>',
+        incoming: '<path d="M12 22h24v14H12zM36 27h8l6 6v3h-14z"/><circle cx="19" cy="41" r="3"/><circle cx="43" cy="41" r="3"/>',
+        stores: '<path d="M20 16h24v32H20zM20 26h24M20 38h24"/>',
+        wrench: '<path class="fill" d="M44.5 17.5a9 9 0 0 0-10.3 12L18 45.7a3.4 3.4 0 0 0 4.8 4.8l16.2-16.2a9 9 0 0 0 12-10.3l-5.6 5.6-5.2-1.2-1.2-5.2z"/>'
+    };
+    const glyph = (name, cls) =>
+        '<svg class="' + (cls || "stat-icon") + ' glyph" viewBox="0 0 64 64" aria-hidden="true">' +
+        AIRCRAFT_ICON[name] + "</svg>";
+
     function statStrip(items) {
         return items.map((item) => {
             const icon = CATEGORY_ICON[item.key];
             const img = icon
                 ? '<img class="stat-icon" src="/static/images/icons/' + icon +
                   '.png" alt="">'
-                : "";
+                : item.glyph ? glyph(item.glyph) : "";
             return '<div class="stat-cell">' + img +
                 '<span class="stat-value">' + esc(item.value) + "</span>" +
                 '<span class="stat-label">' +
@@ -290,10 +315,207 @@
         }).join("");
     }
 
+    /* ------------------------------------------------------ operations map -- */
+
+    // One Leaflet map for the career page, rebuilt per career; the layers
+    // are swapped as the toggles change so the tiles never reload.
+    let opsMap = null;
+    let opsLayers = {};
+    let opsData = null;
+
+    async function renderOpsMap(careerId, subjectId, subjectName, isPlayer) {
+        const panel = el("d-map-panel");
+        const box = el("d-map");
+        if (!window.L || !window.KoreaMap) { panel.hidden = true; return; }
+        panel.hidden = false;
+        el("d-map-whose").textContent = "";
+        if (!opsMap) {
+            opsMap = KoreaMap.createMap(box);
+            ["routes", "victories", "targets", "labels"].forEach((name) => {
+                el("map-" + name).addEventListener("change", applyOpsLayers);
+            });
+        }
+        Object.values(opsLayers).forEach((layer) => opsMap.removeLayer(layer));
+        opsLayers = {};
+        try {
+            const [data, features] = await Promise.all([
+                getJSON("/api/map/" + encodeURIComponent(careerId)),
+                KoreaMap.overlayFeatures()
+            ]);
+            opsData = data;
+            opsLayers.labels = KoreaMap.labelLayer(features);
+            opsLayers.routes = L.layerGroup(data.routes.map((r) => KoreaMap.routeLayer(r, true, T)));
+            opsLayers.targets = L.layerGroup(data.routes.map((r) => KoreaMap.targetMarker(r.target, true, r, T)).filter(Boolean));
+            // The subject's own victories drawn on top of the squadron's, so
+            // his page shows where he fought amid where the unit did.
+            opsLayers.victories = L.layerGroup(data.victories.map((v) => {
+                const m = KoreaMap.victoryMarker(v, T);
+                if (subjectId != null && v.pilot_id === subjectId) m.options.className += " mine";
+                return m;
+            }));
+            opsLayers.bases = L.layerGroup(data.bases.map((b) => KoreaMap.baseMarker(b, T)));
+            el("d-map-count").textContent =
+                "(" + T("map.count", {sorties: data.routes.length, victories: data.victories.length}) + ")";
+            applyOpsLayers();
+            opsMap.invalidateSize();
+            KoreaMap.fitTo(opsMap, [opsLayers.routes, opsLayers.victories], 0.08);
+        } catch (err) {
+            console.error("map", err);
+            panel.hidden = true;
+        }
+    }
+
+    function applyOpsLayers() {
+        if (!opsMap) return;
+        const want = {
+            routes: el("map-routes").checked, victories: el("map-victories").checked,
+            targets: el("map-targets").checked, labels: el("map-labels").checked, bases: true
+        };
+        Object.keys(opsLayers).forEach((name) => {
+            const on = opsMap.hasLayer(opsLayers[name]);
+            if (want[name] && !on) opsLayers[name].addTo(opsMap);
+            if (!want[name] && on) opsMap.removeLayer(opsLayers[name]);
+        });
+    }
+
+    // The mission's own map in the modal: the briefed route with numbered
+    // turning points, the target, and every kill where it fell.
+    let missionMap = null;
+    function renderMissionMap(m) {
+        const box = el("mb-map");
+        if (!box || !window.L || !window.KoreaMap) return;
+        if (missionMap) { missionMap.remove(); missionMap = null; }
+        if (!m.route || !m.route.length) { box.hidden = true; return; }
+        box.hidden = false;
+        // Buttons and double-click zoom; not the wheel, which scrolls the modal.
+        missionMap = KoreaMap.createMap(box, {scrollWheelZoom: false});
+        const route = KoreaMap.routeLayer({points: m.route.map((p) => [p.x, p.z, p.type])}, false, T).addTo(missionMap);
+        const target = KoreaMap.targetMarker(m.target, false);
+        if (target) target.addTo(missionMap);
+        const kills = L.layerGroup((m.log || []).filter((k) => k.x || k.z).map((k) => {
+            if (k.air) {
+                return KoreaMap.victoryMarker({x: k.x, z: k.z, alt: k.altitude, target: k.target,
+                    victim: k.victim, pilot: k.actor, number: m.number, date: m.date, mission_id: m.id}, T);
+            }
+            return KoreaMap.groundMarker(k, T);
+        })).addTo(missionMap);
+        KoreaMap.overlayFeatures().then((features) => {
+            if (missionMap) KoreaMap.labelLayer(features).addTo(missionMap);
+        });
+        missionMap.invalidateSize();
+        KoreaMap.fitTo(missionMap, [route, kills], 0.12);
+    }
+
+    // The squadron's aircraft: strength, the repair queue with the game's own
+    // completion dates, deliveries on their way, and the three stores.
+    function renderAircraft(a) {
+        const panel = el("d-aircraft-panel");
+        if (!a || !a.on_strength) { panel.hidden = true; return; }
+        panel.hidden = false;
+        panel.querySelectorAll(".h-glyph").forEach((span) => {
+            span.innerHTML = glyph(span.dataset.glyph, "h-icon");
+        });
+        el("d-aircraft-count").textContent =
+            "(" + T("aircraft.on_strength", {count: a.on_strength, type: a.type}) + ")";
+        el("d-aircraft-strip").innerHTML = statStrip([
+            {label: T("aircraft.serviceable"), value: a.serviceable, glyph: "serviceable"},
+            {label: T("aircraft.in_repair"), value: a.in_repair, glyph: "repair"},
+            {label: T("aircraft.reserve"), value: a.reserve, glyph: "reserve"},
+            {label: T("aircraft.received"), value: a.received, glyph: "received"},
+            {label: T("aircraft.written_off"), value: a.written_off, glyph: "written_off"}
+        ]);
+
+        const when = (days) => days === 0 ? T("aircraft.today")
+            : days === 1 ? T("aircraft.tomorrow")
+            : T("aircraft.in_days", {days: days});
+        // Same shape as the Incoming list: the day it is due back on the
+        // left, the airframe and its condition as the text.
+        el("d-aircraft-repairs").innerHTML = a.repairs.map((r) =>
+            '<li><span class="service-date">' + esc(r.ready) + "</span>" +
+            '<span class="service-text">' +
+            esc(T("aircraft.airframe", {slot: r.slot + 1, type: r.type})) + " " +
+            '<span class="repair-health"><span class="bar"><span style="width:' + r.health + '%"></span></span>' +
+            esc(T("aircraft.health", {health: r.health})) + "</span>" +
+            (r.ready ? " &middot; " + esc(when(r.days)) : "") +
+            "</span></li>").join("");
+        el("d-aircraft-repairs-note").textContent =
+            a.repairs.length ? "" : T("aircraft.none_in_repair");
+
+        // Quantities in the units the game's Resources screen prints: fuel
+        // in litres, ordnance and equipment in "units", the rest plain.
+        const qty = (kind, n) => kind === "fuel" ? T("aircraft.litres", {value: n.toLocaleString()})
+            : (kind === "ordnance" || kind === "equipment")
+                ? T("aircraft.units", {value: n.toLocaleString()})
+                : n.toLocaleString();
+        // One line per delivery on its way, in the game's own resource
+        // names: aircraft, pilots, fuel, ordnance, equipment.
+        el("d-aircraft-arrivals").innerHTML = a.arrivals.map((x) =>
+            '<li><span class="service-date">' + esc(x.date) + "</span>" +
+            '<span class="service-text">' +
+            esc(T("aircraft.arrival_" + x.kind,
+                  {quantity: qty(x.kind, x.quantity), type: x.type})) +
+            " · " + esc(when(x.days)) + "</span></li>").join("");
+        el("d-aircraft-arrivals-note").textContent = a.arrivals.length ? ""
+            : a.last_delivery
+                ? T("aircraft.none_on_order_last", a.last_delivery)
+                : T("aircraft.none_on_order");
+
+        el("d-aircraft-stores").innerHTML = rows([
+            [T("aircraft.fuel"), qty("fuel", a.stores.fuel)],
+            [T("aircraft.ordnance"), qty("ordnance", a.stores.ordnance)],
+            [T("aircraft.equipment"), qty("equipment", a.stores.equipment)],
+            [T("aircraft.requests"), a.stores.requests]
+        ]);
+
+        // Every airframe the squadron has had, line-up first, write-offs
+        // last. Folded by default: forty rows are for the reader who wants
+        // them, not for everyone scrolling to the roster.
+        const frames = a.airframes || [];
+        el("d-airframes-count").textContent = "(" + frames.length + ")";
+        el("d-airframes").querySelector("tbody").innerHTML = frames.map((f) => {
+            const status = f.status === "repair" && f.ready
+                ? T("aircraft.status_repair_until", {date: f.ready})
+                : T("aircraft.status_" + f.status);
+            const usual = f.usual
+                ? '<button class="link-btn pilot-link" data-pilot="' + f.usual.id + '">' +
+                  esc(f.usual.name) + "</button>" +
+                  ' <span class="muted">(' + esc(f.usual.sorties) + ")</span>"
+                : "—";
+            const fate = f.lost
+                ? esc(f.lost.date) + (f.lost.pilot ? " · " + esc(f.lost.pilot) : "")
+                : "";
+            return '<tr class="is-' + esc(f.status) + '">' +
+                '<td class="code-cell">' + esc(f.code || "—") +
+                    (f.number ? ' <span class="muted">' +
+                        esc(T("debrief.airframe", {number: f.number})) + "</span>" : "") + "</td>" +
+                "<td>" + esc(status) + "</td>" +
+                "<td>" + esc(f.since) + "</td>" +
+                '<td class="num">' + esc(f.sorties) + "</td>" +
+                "<td>" + usual + "</td>" +
+                '<td class="num">' + esc(f.pilots) + "</td>" +
+                '<td class="num">' + esc(f.airborne) + "</td>" +
+                '<td class="num">' + esc(f.ground_targets) + "</td>" +
+                '<td class="num">' + esc(f.repairs) + "</td>" +
+                '<td class="fate-cell">' + fate + "</td></tr>";
+        }).join("");
+    }
+
     function breakdown(items) {
         return items.map((item) =>
-            '<div class="breakdown-row"><span>' + esc(item.label) + "</span>" +
+            '<div class="breakdown-row"><span>' + esc(rowLabel(item)) + "</span>" +
             "<span>" + esc(item.value) + "</span></div>").join("");
+    }
+
+    // The airframe flown, what hung under it, the fuel and the range - from
+    // the mission's manifest. Guns-only sorties say so rather than nothing.
+    function loadoutLine(d) {
+        const parts = [];
+        if (d.airframe) parts.push(d.airframe);
+        parts.push(d.loadout || T("debrief.guns_only"));
+        if (d.fuel_pct != null) parts.push(T("debrief.fuel", {percent: d.fuel_pct}));
+        if (d.range_km) parts.push(T("debrief.range", {km: d.range_km}));
+        if (!d.loadout && d.fuel_pct == null) return "";
+        return '<div class="debrief-loadout">' + parts.map(esc).join(" &middot; ") + "</div>";
     }
 
     // One block per sortie: the header the game shows at debrief, then the kill
@@ -305,6 +527,8 @@
                          {state: T("debrief.outcome_" + d.outcome)}));
         }
         if (d.wounded) flags.push(T("debrief.wounded"));
+        if (d.assists) flags.push(T("debrief.assists", {count: d.assists}));
+        if (d.friendly_kills) flags.push(T("debrief.friendly_kills", {count: d.friendly_kills}));
         let log = d.log.map((k) => {
             if (k.hurt) {
                 // Damage taken, in the same timeline as the kills so the
@@ -312,8 +536,10 @@
                 // The attacker is shown only where the log recorded one —
                 // most of what hits a career pilot is flak the log leaves
                 // anonymous, and "by unknown" on every line is noise.
-                const by = k.hurt.attacker
-                    ? ' <span class="hurt-by">' + esc(k.hurt.attacker) + "</span>"
+                const byWhom = k.hurt.self_inflicted
+                    ? T("debrief.own_ordnance") : k.hurt.attacker;
+                const by = byWhom
+                    ? ' <span class="hurt-by">' + esc(byWhom) + "</span>"
                     : "";
                 return '<div class="log-row hurt">' +
                     '<span class="log-time">' + esc(k.time) + "</span>" +
@@ -356,13 +582,14 @@
             : "";
         return '<article class="debrief"><header class="debrief-head">' +
             '<span class="debrief-no">' +
-                esc(T("debrief.mission", {number: d.mission_num})) + "</span>" +
+                esc(missionLabel(d.mission_num)) + "</span>" +
             '<span class="debrief-date">' + esc(d.date) + " " + esc(d.time) +
                 ' <button class="link-btn" data-mission="' + esc(d.mission_id) +
                 '">' + esc(T("debrief.details")) + "</button></span>" +
             "</header>" +
             '<div class="debrief-type">' + esc(d.type) + "</div>" +
             flight +
+            loadoutLine(d) +
             '<div class="debrief-meta">' +
                 esc(T("debrief.summary", {duration: d.duration, air: d.airborne,
                                           ground: d.ground_targets})) +
@@ -377,7 +604,7 @@
     // tilted. The angle is derived from the pilot's id rather than drawn at
     // random: Math.random() would give every row a fresh angle on each sort,
     // and the whole column would twitch each time a heading was clicked.
-    const STAMPED = ["active", "wounded", "kia"];
+    const STAMPED = ["active", "wounded", "kia", "missing"];
 
     function stampAngle(seed) {
         let h = 0;
@@ -388,10 +615,19 @@
         return (Math.abs(h) % 25) - 12;      // -12deg .. +12deg
     }
 
+    // Sorting on status: the line-up, then the wounded who will rejoin it,
+    // then the pool, then the gone. Alphabetical put "reserve" between the
+    // missing and the wounded, which separates nothing.
+    const STATE_ORDER = { active: 0, wounded: 1, reserve: 2, missing: 3, kia: 4 };
+
     function renderRoster() {
         const body = el("d-roster").querySelector("tbody");
         const sorted = rosterRows.slice().sort((a, b) => {
-            const x = a[sortKey], y = b[sortKey];
+            let x = a[sortKey], y = b[sortKey];
+            if (sortKey === "state") {
+                x = STATE_ORDER[x] ?? 9;
+                y = STATE_ORDER[y] ?? 9;
+            }
             if (x === null || x === undefined) return 1;
             if (y === null || y === undefined) return -1;
             const cmp = (typeof x === "string")
@@ -400,12 +636,20 @@
             return sortAsc ? cmp : -cmp;
         });
         body.innerHTML = sorted.map((p) => {
-            const dotClass = ["active", "kia", "wounded", "pow"].indexOf(p.state) >= 0
-                ? "status-" + p.state : "status-other";
+            const dotClass = ["active", "kia", "missing", "wounded", "reserve", "pow"]
+                .indexOf(p.state) >= 0 ? "status-" + p.state : "status-other";
+            // The missing are greyed with the dead: both are gone for good and
+            // neither is coming back, whatever the difference on paper.
             const cls = [p.is_player ? "is-player" : "",
-                         p.state === "kia" ? "is-kia" : ""].filter(Boolean).join(" ");
+                         (p.state === "kia" || p.state === "missing")
+                             ? "is-kia" : "",
+                         p.reserve ? "is-reserve" : ""].filter(Boolean).join(" ");
             const statusIcon = { kia: "kia", wounded: "wia" }[p.state];
-            const statusTitle = p.state +
+            // Translated where a key exists; an unmapped state keeps its raw
+            // "state N" so the number reaches the screenshot.
+            const stateWord = i18n.has("state." + p.state)
+                ? T("state." + p.state) : p.state;
+            const statusTitle = stateWord +
                 (p.state_until ? " until " + p.state_until : "") +
                 (p.state_since ? " " + p.state_since : "");
             return '<tr class="' + cls + '" data-pilot="' + p.id + '">' +
@@ -424,7 +668,11 @@
                         ? '<img class="status-stamp" src="/static/images/stamps/' +
                           esc(p.state) + '.png" alt="' + esc(p.state) +
                           '" style="transform:rotate(' + stampAngle(p.id) + 'deg)">'
-                        : '<span class="status-badge ' + dotClass + '"></span>') +
+                        // No stamp drawn for this state: say it in words. A
+                        // bare dot was invisible in a forum screenshot, and
+                        // a roster with blank status cells reads as broken.
+                        : '<span class="status-word ' + dotClass + '">' +
+                          esc(stateWord) + "</span>") +
                     "</td>" +
                 '<td class="num">' + esc(p.airborne) + "</td>" +
                 '<td class="num">' + esc(p.ground_targets) + "</td>" +
@@ -525,6 +773,21 @@
             el("d-squadron-strip").innerHTML =
                 icon("squadron", d.squadron_key, 84, "squadron-emblem strip", d.squadron) +
                 statStrip(d.squadron_totals);
+            renderAircraft(d.aircraft);
+            // Decorations to the unit itself. Hidden entirely when there are
+            // none: an empty "Unit Citations" heading would be a promise.
+            const citations = d.citations || [];
+            const strip = el("d-squadron-citations");
+            strip.hidden = citations.length === 0;
+            strip.innerHTML = citations.length === 0 ? "" :
+                '<span class="citation-label">' + T("roster.citations") + "</span>" +
+                citations.map((c) =>
+                    '<span class="citation">' +
+                    icon("award", c.type, 64, "award-icon citation-icon", c.name) +
+                    '<span class="citation-text"><span class="award-name">' +
+                    esc(c.name) + '</span><span class="award-dates">' +
+                    esc(T("awards.received", {date: c.received})) +
+                    "</span></span></span>").join("");
             // The header art is whatever the squadron flies. Set as a custom
         // property so the CSS keeps ownership of size, opacity and blending,
         // and an aircraft with no picture yet simply shows nothing.
@@ -536,6 +799,19 @@
             head.style.setProperty("--classification", d.classification
                 ? 'url("/static/images/stamps/' + d.classification + '.png")'
                 : "none");
+        }
+        // The seal across the photograph's corner. Shown only once the image
+        // has actually loaded, so a nation whose seal is not drawn yet gets a
+        // clean photograph rather than a broken-image icon over the face.
+        const seal = el("d-portrait-seal");
+        currentSeal = d.seal || "";
+        if (seal) {
+            seal.hidden = true;
+            if (d.seal) {
+                seal.onload = () => { seal.hidden = false; };
+                seal.onerror = () => { seal.hidden = true; };
+                seal.src = "/static/images/stamps/seal_" + d.seal + ".png";
+            }
         }
 
         // Combat efficiency and the victory roll. Both panels are hidden
@@ -554,7 +830,7 @@
                 "<th>" + esc(rowLabel(row)) + "</th><td>" + esc(rowValue(row)) +
                 (linked && row.mission_num
                     ? ' <span class="perf-mission">' +
-                      esc(T("debrief.mission", {number: row.mission_num})) + "</span>"
+                      esc(missionLabel(row.mission_num)) + "</span>"
                     : "") +
                 "</td></tr>";
         }).join("");
@@ -563,6 +839,12 @@
         const victories = d.victories || [];
         el("d-victory-count").textContent = victories.length
             ? "(" + victories.length + ")" : "";
+        // Whose. A forum reader "took a minute to figure out" that the roll
+        // was the commander's and not the squadron's — the roster below it
+        // lists forty other men.
+        el("d-victory-whose").textContent = d.player
+            ? "— " + [d.player.rank, d.player.name].filter(Boolean).join(" ")
+            : "";
         el("d-victories").innerHTML = victories.map((v) =>
             '<div class="victory" data-mission="' + esc(v.mission_id) + '">' +
                 '<span class="victory-no">' + esc(v.number) + "</span>" +
@@ -580,7 +862,12 @@
         show(el("d-victories-panel"), victories.length > 0);
 
         rosterRows = d.roster.map(flatten);
-            el("d-roster-count").textContent = "(" + rosterRows.length + ")";
+            // "(66)" hid that 47 of them were in the pool. Say both.
+            const inReserve = rosterRows.filter((p) => p.reserve).length;
+            el("d-roster-count").textContent = inReserve
+                ? "(" + T("roster.count_with_reserve",
+                          {total: rosterRows.length, reserve: inReserve}) + ")"
+                : "(" + rosterRows.length + ")";
             renderRoster();
             el("d-pending-note").textContent = d.pending_total
                 ? T("awards.pending_note", {count: d.pending_total,
@@ -591,6 +878,8 @@
             i18n.apply(el("detail-page"));
             show(el("detail-loading"), false);
             show(el("detail-body"));
+            // After the body is visible: Leaflet needs the box to have a size.
+            renderOpsMap(d.id, d.subject_id, p.name, d.is_player);
         } catch (err) {
             el("detail-loading").innerHTML =
                 '<p class="state-message">Could not open that career: ' +
@@ -630,12 +919,24 @@
                     photoUrl(careerId, f.pilot_id, f.avatar, 120) +
                     '" alt="" onerror="this.style.display=&quot;none&quot;"></td>' +
                 "<td>" + icon("rank", f.rank_key, 26, "rank-icon", f.rank) + "</td>" +
-                "<td>" + esc(f.name) + "</td>" +
+                // Name with the airframe and loadout beneath it: one column
+                // rather than two, so the table fits a modal at any width.
+                '<td class="name-cell">' + esc(f.name) +
+                    '<span class="loadout-line">' +
+                    (f.airframe ? '<span class="airframe-no">' + esc(f.airframe) + "</span> · " : "") +
+                    // Each store stays on one line; the cell breaks between them.
+                    (f.loadout ? f.loadout.split(", ").map((s) =>
+                        '<span class="store">' + esc(s) + "</span>").join(", ")
+                        : esc(T("debrief.guns_only"))) + "</span></td>" +
                 '<td class="num">' + esc(f.airborne) + "</td>" +
                 '<td class="num">' + esc(f.ground_targets) + "</td>" +
                 '<td class="num">' + esc(f.flight_time) + "</td>" +
                 "<td>" + esc(T("debrief.outcome_" + f.outcome)) +
-                    (f.wounded ? ", " + esc(T("debrief.wounded")) : "") + "</td>" +
+                    (f.wounded ? ", " + esc(T("debrief.wounded")) : "") +
+                    (f.assists ? ", " + esc(T("debrief.assists", {count: f.assists})) : "") +
+                    (f.friendly_kills ? ', <span class="pilot-hurt">' +
+                        esc(T("debrief.friendly_kills", {count: f.friendly_kills})) + "</span>" : "") +
+                "</td>" +
                 // The timeline hangs off the cell rather than expanding the
                 // table: eight pilots each with their own burst list would
                 // bury the flight it is meant to summarise.
@@ -644,7 +945,8 @@
                     ((f.damage_log || []).length
                         ? ' title="' + esc(f.damage_log.map((b) =>
                             b.time + "  " + T("debrief.hit_burst", {hits: b.hits}) +
-                            (b.attacker ? " — " + b.attacker : "") +
+                            (b.self_inflicted ? " — " + T("debrief.own_ordnance")
+                                : b.attacker ? " — " + b.attacker : "") +
                             "  → " + b.total + "%").join("\n")) + '"'
                         : "") + ">" +
                     (f.plane_damage === null || f.plane_damage === undefined
@@ -675,15 +977,16 @@
             }).join("");
 
             el("mb-body").innerHTML =
-                "<h2>" + esc(T("debrief.mission", {number: m.number})) +
+                "<h2>" + esc(missionLabel(m.number)) +
                     " &middot; " + esc(m.type) + "</h2>" +
                 '<p class="lightbox-sub">' + esc(m.date) + " &middot; " +
                     esc(m.duration) + " &middot; " +
                     esc(T("debrief.objectives", {met: m.obj_success,
                                                  failed: m.obj_failure})) + "</p>" +
                 '<div class="mb-brief">' + brief + "</div>" +
+                '<div id="mb-map" class="map-view mission"></div>' +
                 "<h3>" + esc(T("debrief.pilots_on_mission")) + "</h3>" +
-                '<table class="roster mission-roster"><thead><tr>' +
+                '<div class="table-scroll"><table class="roster mission-roster"><thead><tr>' +
                     "<th></th><th>" + esc(T("debrief.rank")) + "</th><th>" +
                     esc(T("debrief.name")) + "</th>" +
                     '<th class="num">' + esc(T("debrief.air")) + '</th>' +
@@ -691,10 +994,11 @@
                     '<th class="num">' + esc(T("debrief.time")) + "</th><th>" +
                     esc(T("debrief.outcome")) + "</th>" +
                     '<th class="num">' + esc(T("debrief.damage")) + "</th>" +
-                "</tr></thead><tbody>" + flown + "</tbody></table>" +
+                "</tr></thead><tbody>" + flown + "</tbody></table></div>" +
                 "<h3>" + esc(T("debrief.combat_log")) +
                     ' <span class="count">(' + m.log.length + ")</span></h3>" +
                 '<div class="mb-log">' + log + "</div>";
+            renderMissionMap(m);
         } catch (err) {
             el("mb-body").innerHTML =
                 '<p class="state-message">Could not open that mission: ' +
@@ -705,7 +1009,13 @@
     function closeMission() {
         show(el("missionbox"), false);
         document.body.classList.remove("lightbox-open");
+        if (missionMap) { missionMap.remove(); missionMap = null; }
     }
+
+    // A route or a victory on the operations map opens its debriefing.
+    document.addEventListener("map:mission", (event) => {
+        if (currentCareer) openMission(currentCareer, Number(event.detail));
+    });
 
     /* ------------------------------------------------------- pilot modal -- */
 
@@ -745,6 +1055,10 @@
                         '<div class="portrait"><img src="' +
                             photoUrl(careerId, p.id, p.avatar, 392) + '" alt=""></div>' +
                         '<img class="portrait-overlay" src="/static/images/photo-frame.svg" alt="">' +
+                        (currentSeal
+                            ? '<img class="portrait-seal" alt="" src="/static/images/stamps/seal_' +
+                              esc(currentSeal) + '.png" onerror="this.hidden=true">'
+                            : "") +
                     "</div>" +
                     '<div class="pb-identity">' +
                         '<h2 id="pb-name">' + esc(p.name) + "</h2>" +
@@ -792,6 +1106,10 @@
     let currentCareer = "";
     let currentPilot = null;
     let currentAvatar = "";
+    // The nation's photo seal, remembered from the career so the pilot modal
+    // can strike it across its own portrait — every pilot in a squadron is
+    // filed under the same seal.
+    let currentSeal = "";
     const crop = { image: null, scale: 1, minScale: 1, x: 0, y: 0,
                    dragging: false, lastX: 0, lastY: 0 };
 
@@ -1037,7 +1355,9 @@
             openMission(currentCareer, Number(detailsBtn.dataset.mission));
             return;
         }
-        const row = event.target.closest && event.target.closest("tr[data-pilot]");
+        // A roster row, or a pilot's name in the airframe table.
+        const row = event.target.closest &&
+                    event.target.closest("tr[data-pilot], button[data-pilot]");
         if (row && !(event.target.closest && event.target.closest("img.emblem"))) {
             openPilot(currentCareer, Number(row.dataset.pilot));
             return;

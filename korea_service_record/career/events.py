@@ -83,6 +83,21 @@ EVENT_TYPES: Dict[int, EventType] = {
                  "destroyed as well as his aircraft and gets a type 3; the "
                  "player loses only the aircraft and gets none."),
 
+    4: EventType(4, "pilot_missing", "Missing in action", CONFIRMED,
+                 "Shot down over enemy territory and not recovered — the "
+                 "counterpart to type 3, and emphatically not a death. Manuel "
+                 "Rivera, 1951.06.22, the one instance in this career: "
+                 "pilot.state = 3 where the killed are 2, health **100** where "
+                 "the killed are 0, and sortie.status 3 where theirs is 2 — "
+                 "the only status-3 sortie in nearly 500. He is gone for good "
+                 "all the same: stateEndDate is zeroed as it is for the dead, "
+                 "and his slot moves outside the squadron's range. The game's "
+                 "own strings carry the sense — carCharacterDetails_MIA "
+                 "'Missing in action', carAutoMissionMIA_Text '$[name] shot "
+                 "down over enemy territory', and carCommanderMIA, captioned "
+                 "'Commander Captured', so missing and taken prisoner are one "
+                 "outcome here."),
+
     5: EventType(5, "wounded", "Wounded in action", CONFIRMED,
                  "ipar2 = the pilot's health afterwards. Emitted alongside a "
                  "type 16 with the same value, and matches the in-game service "
@@ -94,9 +109,20 @@ EVENT_TYPES: Dict[int, EventType] = {
                  "$[rank] $[name]'."),
 
     13: EventType(13, "unknown_13", "Unknown (13)", UNKNOWN,
-                  "One row: the player, 1951.05.15 06:00, a day the career "
-                  "skips over. No ipar. Candidates from the UI strings are "
-                  "leave, discharge or a newspaper; none confirmed."),
+                  "Still one row across both careers: the player, "
+                  "1951.05.15 06:00. pilotId and rankId are filled in, every "
+                  "ipar is -1 and every tpar empty, so the caption it feeds "
+                  "needs a pilot and a rank and nothing else. Written one "
+                  "minute before the career advanced to 05.16, so it is "
+                  "emitted while rolling the day over, not during a mission. "
+                  "Re-checked 2026-09-10: **not** a marker for an idle "
+                  "stretch — the career has 12 gaps of two days or more, two "
+                  "of them also five days and one of seven, and only this one "
+                  "carries a 13. The log table is no help either; it holds "
+                  "nothing but onUpdateSquadronUnits rows. Remaining "
+                  "candidates, all needing name and rank alone: "
+                  "carEventPilot_Discharged, carEventDaySkip, "
+                  "carEventManyNewspapers."),
 
     14: EventType(14, "reported", "Reported for duty", LIKELY,
                   "Emitted for replacement pilots on arrival; all ipar are -1. "
@@ -121,12 +147,43 @@ EVENT_TYPES: Dict[int, EventType] = {
 
     19: EventType(19, "promotion", "Promotion", CONFIRMED,
                   "ipar1 = award row id, ipar2 = promotion award type "
-                  "(601980..601984), ipar3 = action. rankId holds the rank at "
+                  "(601980..601986), ipar3 = action. rankId holds the rank at "
                   "the time of the row, so it differs between the granted and "
-                  "presented rows."),
+                  "presented rows. **A promotion writes two rows**: ipar3=0 "
+                  "when granted, carrying the old rank, and ipar3=1 when the "
+                  "rank is applied, carrying the new one. A lone ipar3=0 row "
+                  "means the promotion was granted but never took effect. "
+                  "Note the award row in `award` is the record of what a pilot "
+                  "holds, and it is independent of these events — deleting the "
+                  "events alone leaves the award in place, and the engine then "
+                  "skips that rung as already held."),
 
     20: EventType(20, "award", "Award", CONFIRMED,
-                  "ipar1 = award row id, ipar2 = award type, ipar3 = action."),
+                  "ipar1 = award row id, ipar2 = award type, ipar3 = action: "
+                  "0 nominated, 1 applied, 2 removed. The 2 was seen when a "
+                  "successor's Air Medal (601031) gave way to the next cluster "
+                  "(601032) a day after he arrived: the 601031 award row went "
+                  "isDeleted=1 and two ipar3=2 rows were written for it."),
+
+    22: EventType(22, "successor", "Took over the career", CONFIRMED,
+                  "Written once, for the replacement character the game "
+                  "creates when the player's pilot is killed. One instance, "
+                  "1951.07.08, five days after the predecessor's type-3 row: "
+                  "pilotId = the successor, rankId = his starting rank, no "
+                  "ipar or tpar payload. career.playerId and resumeDate move "
+                  "to him the same day; the predecessor keeps isPlayer=1 in "
+                  "slot 5000."),
+
+    21: EventType(21, "unit_award", "Unit citation", CONFIRMED,
+                  "A decoration to the squadron as a whole, from an award "
+                  "flagged IsSquadron=1 in awards.cfg. Proven 1951.07.02 with "
+                  "the Distinguished Unit Citation probe: pilotId = -1, ipar1 = "
+                  "the award row id, ipar2 = the award type, ipar3 = 1. The "
+                  "award row itself carries category 2, pilotId -1 and the "
+                  "squadronId, with isPending 0 - unit awards are not held for "
+                  "award points - and the engine logs 'Award for Squadron "
+                  "Type:<id>'. Fires in the day-rollover sweep, and goes "
+                  "straight to applied with no nomination row."),
 
     25: EventType(25, "efficiency", "Squadron efficiency changed", LIKELY,
                   "One row, ipar1 = 3, matching squadron.efficiency = 3 and "

@@ -1,0 +1,60 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:app="clr-namespace:WPFDesign">
+
+  <BitmapImage x:Key="AtlasBitmap.Ranks603" UriSource="Ranks603.dds" />
+  <BitmapImage x:Key="AtlasBitmap.Ranks602" UriSource="Ranks602.dds" />
+  <BitmapImage x:Key="AtlasBitmap.Ranks601" UriSource="Ranks601.dds" />
+  <BitmapImage x:Key="AtlasBitmap.Ranks503" UriSource="Ranks503.dds" />
+  <BitmapImage x:Key="AtlasBitmap.Ranks502" UriSource="Ranks502.dds" />
+  <BitmapImage x:Key="AtlasBitmap.Ranks501" UriSource="Ranks501.dds" />
+
+  <app:ResourceKeyConverter x:Key="Images.Ranks">
+    <CroppedBitmap x:Key="rank5010" SourceRect="4,4,461,207" Source="{StaticResource AtlasBitmap.Ranks501}" />
+    <CroppedBitmap x:Key="rank5011" SourceRect="473,4,461,207" Source="{StaticResource AtlasBitmap.Ranks501}" />
+    <CroppedBitmap x:Key="rank5012" SourceRect="4,219,461,207" Source="{StaticResource AtlasBitmap.Ranks501}" />
+    <CroppedBitmap x:Key="rank5013" SourceRect="473,219,461,207" Source="{StaticResource AtlasBitmap.Ranks501}" />
+    <CroppedBitmap x:Key="rank5014" SourceRect="4,434,461,207" Source="{StaticResource AtlasBitmap.Ranks501}" />
+    <CroppedBitmap x:Key="rank5015" SourceRect="473,434,461,207" Source="{StaticResource AtlasBitmap.Ranks501}" />
+    <CroppedBitmap x:Key="rank5016" SourceRect="4,649,504,219" Source="{StaticResource AtlasBitmap.Ranks501}" />
+    <CroppedBitmap x:Key="rank5017" SourceRect="516,649,504,219" Source="{StaticResource AtlasBitmap.Ranks501}" />
+    <CroppedBitmap x:Key="rank5020" SourceRect="4,4,460,185" Source="{StaticResource AtlasBitmap.Ranks502}" />
+    <CroppedBitmap x:Key="rank5021" SourceRect="472,4,460,185" Source="{StaticResource AtlasBitmap.Ranks502}" />
+    <CroppedBitmap x:Key="rank5022" SourceRect="4,197,460,185" Source="{StaticResource AtlasBitmap.Ranks502}" />
+    <CroppedBitmap x:Key="rank5023" SourceRect="472,197,460,185" Source="{StaticResource AtlasBitmap.Ranks502}" />
+    <CroppedBitmap x:Key="rank5024" SourceRect="4,390,460,185" Source="{StaticResource AtlasBitmap.Ranks502}" />
+    <CroppedBitmap x:Key="rank5025" SourceRect="472,390,460,185" Source="{StaticResource AtlasBitmap.Ranks502}" />
+    <CroppedBitmap x:Key="rank5026" SourceRect="4,583,460,186" Source="{StaticResource AtlasBitmap.Ranks502}" />
+    <CroppedBitmap x:Key="rank5027" SourceRect="472,583,455,180" Source="{StaticResource AtlasBitmap.Ranks502}" />
+    <CroppedBitmap x:Key="rank5030" SourceRect="4,4,461,187" Source="{StaticResource AtlasBitmap.Ranks503}" />
+    <CroppedBitmap x:Key="rank5031" SourceRect="473,4,461,187" Source="{StaticResource AtlasBitmap.Ranks503}" />
+    <CroppedBitmap x:Key="rank5032" SourceRect="4,199,461,187" Source="{StaticResource AtlasBitmap.Ranks503}" />
+    <CroppedBitmap x:Key="rank5033" SourceRect="473,199,461,187" Source="{StaticResource AtlasBitmap.Ranks503}" />
+    <CroppedBitmap x:Key="rank5034" SourceRect="4,394,461,187" Source="{StaticResource AtlasBitmap.Ranks503}" />
+    <CroppedBitmap x:Key="rank5035" SourceRect="473,394,461,187" Source="{StaticResource AtlasBitmap.Ranks503}" />
+    <CroppedBitmap x:Key="rank5036" SourceRect="4,589,461,187" Source="{StaticResource AtlasBitmap.Ranks503}" />
+    <CroppedBitmap x:Key="rank5037" SourceRect="473,589,471,198" Source="{StaticResource AtlasBitmap.Ranks503}" />
+    <CroppedBitmap x:Key="rank6010" SourceRect="4,4,467,198" Source="{StaticResource AtlasBitmap.Ranks601}" />
+    <CroppedBitmap x:Key="rank6011" SourceRect="479,4,467,198" Source="{StaticResource AtlasBitmap.Ranks601}" />
+    <CroppedBitmap x:Key="rank6012" SourceRect="4,210,467,198" Source="{StaticResource AtlasBitmap.Ranks601}" />
+    <CroppedBitmap x:Key="rank6013" SourceRect="479,210,467,198" Source="{StaticResource AtlasBitmap.Ranks601}" />
+    <CroppedBitmap x:Key="rank6014" SourceRect="4,416,467,198" Source="{StaticResource AtlasBitmap.Ranks601}" />
+    <CroppedBitmap x:Key="rank6015" SourceRect="479,416,467,198" Source="{StaticResource AtlasBitmap.Ranks601}" />
+    <CroppedBitmap x:Key="rank6016" SourceRect="4,622,467,198" Source="{StaticResource AtlasBitmap.Ranks601}" />
+    <CroppedBitmap x:Key="rank6017" SourceRect="479,622,467,198" Source="{StaticResource AtlasBitmap.Ranks601}" />
+    <CroppedBitmap x:Key="rank6020" SourceRect="4,4,468,199" Source="{StaticResource AtlasBitmap.Ranks602}" />
+    <CroppedBitmap x:Key="rank6021" SourceRect="480,4,468,199" Source="{StaticResource AtlasBitmap.Ranks602}" />
+    <CroppedBitmap x:Key="rank6022" SourceRect="4,211,468,199" Source="{StaticResource AtlasBitmap.Ranks602}" />
+    <CroppedBitmap x:Key="rank6023" SourceRect="480,211,468,199" Source="{StaticResource AtlasBitmap.Ranks602}" />
+    <CroppedBitmap x:Key="rank6024" SourceRect="4,418,468,199" Source="{StaticResource AtlasBitmap.Ranks602}" />
+    <CroppedBitmap x:Key="rank6025" SourceRect="480,418,468,199" Source="{StaticResource AtlasBitmap.Ranks602}" />
+    <CroppedBitmap x:Key="rank6026" SourceRect="4,625,468,199" Source="{StaticResource AtlasBitmap.Ranks602}" />
+    <CroppedBitmap x:Key="rank6027" SourceRect="480,625,468,199" Source="{StaticResource AtlasBitmap.Ranks602}" />
+    <CroppedBitmap x:Key="rank6030" SourceRect="4,4,470,197" Source="{StaticResource AtlasBitmap.Ranks603}" />
+    <CroppedBitmap x:Key="rank6031" SourceRect="482,4,470,197" Source="{StaticResource AtlasBitmap.Ranks603}" />
+    <CroppedBitmap x:Key="rank6032" SourceRect="4,209,470,197" Source="{StaticResource AtlasBitmap.Ranks603}" />
+    <CroppedBitmap x:Key="rank6033" SourceRect="482,209,470,197" Source="{StaticResource AtlasBitmap.Ranks603}" />
+    <CroppedBitmap x:Key="rank6034" SourceRect="4,414,470,197" Source="{StaticResource AtlasBitmap.Ranks603}" />
+    <CroppedBitmap x:Key="rank6035" SourceRect="482,414,470,197" Source="{StaticResource AtlasBitmap.Ranks603}" />
+    <CroppedBitmap x:Key="rank6036" SourceRect="4,619,470,197" Source="{StaticResource AtlasBitmap.Ranks603}" />
+    <CroppedBitmap x:Key="rank6037" SourceRect="482,619,470,197" Source="{StaticResource AtlasBitmap.Ranks603}" />
+  </app:ResourceKeyConverter>
+</ResourceDictionary>

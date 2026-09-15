@@ -1,0 +1,146 @@
+# Builds the Windows release: the PyInstaller tracker, the Inno Setup
+# installer that wraps it together with the awards mod, and the zip that goes
+# on the forum. Every push and pull request builds; a tag of the form v1.2.3
+# also signs and publishes.
+#
+# Signing is done by SignPath (certificate from SignPath Foundation) and is
+# two-step, because the installer contains the tracker exe: the exe is signed
+# first and the installer is built around the signed copy, then the installer
+# itself is signed. Both steps are skipped when the SignPath secrets are not
+# configured, so forks and pull requests still build unsigned artifacts.
+#
+# Secrets / variables required for signing (repository settings):
+#   SIGNPATH_API_TOKEN          secret  - CI user token from SignPath
+#   SIGNPATH_ORGANIZATION_ID    variable - from the SignPath organization page
+#   SIGNPATH_PROJECT_SLUG       variable - e.g. il-2-korea-service-record
+#   SIGNPATH_POLICY_SLUG        variable - release-signing (test-signing on branches)
+
+name: build
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pystray==0.19.5 pyinstaller==6.17.0
+
+      - name: Build the tracker (PyInstaller)
+        run: pyinstaller korea_service_record.spec --noconfirm
+
+      - name: Smoke-test the frozen exe
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath dist\IL2_Korea_Service_Record\IL2_Korea_Service_Record.exe `
+               -ArgumentList "--console","--port","5010","--no-browser","--game","$env:RUNNER_TEMP" -PassThru -WindowStyle Hidden
+          Start-Sleep -Seconds 10
+          try { $r = Invoke-WebRequest -Uri http://127.0.0.1:5010/api/ping -UseBasicParsing; "ping $($r.StatusCode)" }
+          finally { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
+
+      # -- sign the tracker exe ------------------------------------------
+      - name: Upload unsigned tracker exe
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        id: unsigned-exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracker-exe-unsigned
+          path: dist/IL2_Korea_Service_Record/IL2_Korea_Service_Record.exe
+          if-no-files-found: error
+
+      - name: Sign the tracker exe (SignPath)
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ startsWith(github.ref, 'refs/tags/v') && vars.SIGNPATH_POLICY_SLUG || 'test-signing' }}
+          artifact-configuration-slug: tracker-exe
+          github-artifact-id: ${{ steps.unsigned-exe.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed/exe
+
+      - name: Use the signed tracker exe
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        run: Copy-Item signed\exe\IL2_Korea_Service_Record.exe dist\IL2_Korea_Service_Record\IL2_Korea_Service_Record.exe -Force
+
+      # -- installer -------------------------------------------------------
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Stage and build the installer
+        shell: pwsh
+        run: |
+          python tools/stage_release.py
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\IL2_Korea_Service_Record.iss
+
+      # -- sign the installer -----------------------------------------------
+      - name: Upload unsigned installer
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        id: unsigned-setup
+        uses: actions/upload-artifact@v4
+        with:
+          name: setup-unsigned
+          path: installer/Output/IL2_Korea_Service_Record_Setup_v*.exe
+          if-no-files-found: error
+
+      - name: Sign the installer (SignPath)
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ startsWith(github.ref, 'refs/tags/v') && vars.SIGNPATH_POLICY_SLUG || 'test-signing' }}
+          artifact-configuration-slug: setup-exe
+          github-artifact-id: ${{ steps.unsigned-setup.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed/setup
+
+      - name: Use the signed installer
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        run: Copy-Item signed\setup\*.exe installer\Output\ -Force
+
+      # -- package -----------------------------------------------------------
+      - name: Make the release zip
+        run: python tools/make_release_zip.py
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: |
+            installer/Output/*.zip
+            installer/Output/*.exe
+          if-no-files-found: error
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            installer/Output/*.zip
+            installer/Output/*.exe
+          generate_release_notes: true

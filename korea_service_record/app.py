@@ -26,32 +26,16 @@ from .i18n import (apply_game_strings, available as available_languages,
 from .photos import PhotoStore
 from .settings import Settings
 from .assets import default_cache_dir
-from .gamedata import resolve_game_dir
+from .locate import find_game_dir
 
 logger = logging.getLogger(__name__)
-
-STEAM_SUFFIX = Path("SteamLibrary/steamapps/common/IL2Series")
-
-
-def autodetect_game_dir() -> Optional[Path]:
-    """Look for an IL-2 Korea install on the usual drives."""
-    env = os.environ.get("KOREA_GAME_DIR")
-    if env:
-        found = resolve_game_dir(Path(env))
-        if found:
-            return found
-        logger.warning("KOREA_GAME_DIR set but not an IL-2 install: %s", env)
-    for drive in "CDEFGH":
-        candidate = Path(f"{drive}:/") / STEAM_SUFFIX
-        if (candidate / "data" / "Career").is_dir():
-            return candidate
-    return None
-
 
 def create_app(game_dir: Optional[Path] = None) -> Flask:
     app = Flask(__name__, static_folder="static", static_url_path="/static")
 
-    resolved = resolve_game_dir(Path(game_dir)) if game_dir else autodetect_game_dir()
+    # See locate.py: what setup was told beats anything guessed here, and the
+    # guessing covers non-Steam installations as well as Steam's own libraries.
+    resolved = find_game_dir(Path(game_dir) if game_dir else None)
     app.config["PHOTOS"] = PhotoStore(default_cache_dir().parent / "photos")
     app.config["SETTINGS"] = Settings(default_cache_dir().parent)
     app.config["STARTED_AT"] = time.time()
@@ -243,6 +227,18 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
                                agg.resolver.read_text, loads_lenient)
         return jsonify(bundle)
 
+    @app.route("/api/ping")
+    def api_ping():
+        """Identifies this server to a second launch of the exe.
+
+        Without a console window there is nothing to tell the user the tracker
+        is already running, so the second copy asks the port who is on it. Any
+        other program that happens to hold 5002 will not answer to this, and
+        the launcher reports a port conflict instead of opening a browser onto
+        a stranger's web page.
+        """
+        return jsonify({"app": "korea-service-record"})
+
     @app.route("/api/careers")
     def api_careers():
         agg = aggregator()
@@ -277,6 +273,41 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if detail is None:
             return jsonify({"error": "mission_not_found"}), 404
         return jsonify(detail)
+
+    @app.route("/api/maptile/<int(signed=True):zoom>/<int:row>/<int:col>")
+    def api_maptile(zoom: int, row: int, col: int):
+        """One tile of the game's chart, from the player's own installation."""
+        agg = aggregator()
+        if agg is None:
+            return ("", 404)
+        data = agg.tiles.tile(zoom, row, col)
+        if data is None:
+            return ("", 404)
+        return Response(data, mimetype="image/jpeg",
+                        headers={"Cache-Control": "public, max-age=31536000"})
+
+    @app.route("/api/map/overlay")
+    def api_map_overlay():
+        """Airfields and towns with their names, for the map's labels."""
+        agg = aggregator()
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        return jsonify({"features": agg.overlay.features()})
+
+    @app.route("/api/map/<path:career_id>")
+    def api_map_career(career_id: str):
+        """Every route and victory of the career, for the operations map."""
+        agg = aggregator(career_id)
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        try:
+            pilot_id = int(request.args["pilot"]) if "pilot" in request.args else None
+        except ValueError:
+            pilot_id = None
+        data = agg.career_map(career_id, pilot_id)
+        if data is None:
+            return jsonify({"error": "career_not_found"}), 404
+        return jsonify(data)
 
     @app.route("/api/pilot/<path:career_id>/<int:pilot_id>")
     def api_pilot(career_id: str, pilot_id: int):
