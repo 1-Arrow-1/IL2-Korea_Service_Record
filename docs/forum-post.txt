@@ -91,9 +91,10 @@ Fixed
    roster highlights him alone, his record opens with "Took over the career", and the
    predecessor keeps every one of his debriefings when you open him from the roster.
  • "Raildoad" and "Train Vagon" in the combat results. Both are the game's — one a misspelt
-   data key, one a slip in its English text — and are corrected on the way through. The
-   categories the game names in no language at all (materiel, railroad track, the buildings
-   total) now have proper names in all six.
+   data key, one a slip in its English text — and are corrected on the way through. Three
+   rows that were never categories at all — the game's own subtotals for vehicles, buildings
+   and rail, which it writes beside the real ones — no longer appear as if they were, and
+   the railroad figure no longer counts the subtotal on top of its parts.
  • The "missing in action" entry in a pilot's incidences printed its key instead of its
    text.
 

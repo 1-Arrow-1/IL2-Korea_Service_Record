@@ -38,7 +38,7 @@ from ..worldobjects import WorldObjectIndex, normalise as normalise_object
 from .attributes import PilotAttributes
 from .database import CareerFile, KoreaCareerDatabase, find_careers
 from .events import describe, is_award_event
-from .killstats import KillStats
+from .killstats import ROLLUP_KEYS, KillStats
 from .missionresult import MissionResult, _number
 
 logger = logging.getLogger(__name__)
@@ -138,10 +138,6 @@ def _tail_code(raw: Optional[str], plane_key: str) -> str:
     else:
         prefix = BUZZ_PREFIX.get(plane_key.lower(), "")
     return f"{prefix}-{number}" if prefix else number
-
-# killStats categories the game's statobjects file names in no language;
-# the tracker's locales carry them as targets.<key>.
-TRACKER_NAMED_TARGETS = {"Building", "Materiel", "Railroad"}
 
 # Promotion pseudo-awards 601980..601984 confer rank 1..5.
 PROMOTION_BASE = 601980
@@ -431,19 +427,14 @@ class CareerAggregator:
         headline = [{"key": key, "label": label,
                      "value": sum(cats.get(s, 0) for s in sources)}
                     for key, (label, sources) in COMBAT_CATEGORIES.items()]
-        # The game names these itself in every language it ships. The few it
-        # names in none - Building, Materiel, Railroad - carry a key into the
-        # tracker's own locale, so a German reader no longer meets "Materiel"
-        # and "Raildoad" in English; _humanise is the last resort for a
-        # category neither side has heard of.
-        breakdown = []
-        for k, v in sorted(kills.counts.items(), key=lambda x: -x[1]):
-            if k == "Aircraft" or not v:
-                continue
-            row = {"label": self.locale.stat_name(k) or _humanise(k), "value": v}
-            if not self.locale.stat_name(k) and k in TRACKER_NAMED_TARGETS:
-                row["key"] = f"targets.{k}"
-            breakdown.append(row)
+        # Leaf categories only. The rollups the game writes beside them
+        # (Aircraft, Materiel, Building, Railroad) are subtotals, which is
+        # also why the game names them in no language: they were never meant
+        # to be rows. _humanise is the last resort for a category the game
+        # has no name for.
+        breakdown = [{"label": self.locale.stat_name(k) or _humanise(k), "value": v}
+                     for k, v in sorted(kills.counts.items(), key=lambda x: -x[1])
+                     if k not in ROLLUP_KEYS and v]
         return {
             "headline": headline,
             "breakdown": breakdown,

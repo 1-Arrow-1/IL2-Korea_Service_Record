@@ -61,11 +61,6 @@
     "until": "jusqu'au {date}",
     "unknown": "inconnu"
   },
-  "targets": {
-    "Building": "Bâtiments (total)",
-    "Materiel": "Matériel (approvisionnements)",
-    "Railroad": "Voie ferrée"
-  },
   "combat": {
     "heading": "Résultats au combat",
     "aircraft": "Avions",

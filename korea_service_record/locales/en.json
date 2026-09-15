@@ -61,11 +61,6 @@
     "until": "until {date}",
     "unknown": "unknown"
   },
-  "targets": {
-    "Building": "Buildings (all)",
-    "Materiel": "Materiel (supplies)",
-    "Railroad": "Railroad track"
-  },
   "combat": {
     "heading": "Combat Results",
     "aircraft": "Aircraft",

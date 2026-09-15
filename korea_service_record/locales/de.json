@@ -61,11 +61,6 @@
     "until": "bis {date}",
     "unknown": "unbekannt"
   },
-  "targets": {
-    "Building": "Gebäude (gesamt)",
-    "Materiel": "Material (Vorräte)",
-    "Railroad": "Gleise"
-  },
   "combat": {
     "heading": "Gefechtsergebnisse",
     "aircraft": "Flugzeuge",

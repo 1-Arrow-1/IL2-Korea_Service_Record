@@ -61,11 +61,6 @@
     "until": "至 {date}",
     "unknown": "未知"
   },
-  "targets": {
-    "Building": "建筑（合计）",
-    "Materiel": "物资（补给）",
-    "Railroad": "铁轨"
-  },
   "combat": {
     "heading": "战斗成果",
     "aircraft": "飞机",

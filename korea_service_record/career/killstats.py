@@ -26,26 +26,30 @@ from typing import Dict, Optional
 logger = logging.getLogger(__name__)
 
 
-# Rollup keys that already contain other keys. Counting a rollup *and* its
-# children double-counts, so exactly one side must be dropped.
+# Rollup keys: subtotals the game writes beside the categories they sum.
+# Counting a rollup *and* its children double-counts, so rollups are never
+# rows and never added. The grouping is the game's own, from
+# nsdata/assets/worldobjects/statreporting.json ("internal"):
 #
-#   Aircraft = airborne subtypes + StaticPlane
-#   Building = MilitaryFacility + AirfieldFacility + IndustrialBuilding
+#   Aircraft = every aircraft type + StaticPlane
+#   Materiel = Car, Truck, Trailer, armour, Detachment, guns, flak,
+#              Searchlight, Radar, RocketLauncher, MilEquip
+#   Building = MilitaryFacility, AirfieldFacility, IndustrialBuilding,
+#              Fortification, Bridge, Dam, TownBuilding, RuralYard, OtherBuilding
+#   Railroad = TrainLocomotive, TrainVagon, RailwayStationFacility, RailwayBridge
 #
-# Verified on three pilots, e.g. pilot 8: Building 60 = 54 + 3 + 3, and the
-# player: 549 = 500 + 30 + 19. RailwayStationFacility is NOT a child of
-# Building despite the name.
-ROLLUP_KEYS = {"Aircraft", "Building"}
+# Proven on a squadron row: Materiel=895 is exactly the sum of its members,
+# Building 681 = 597 + 62 + 22, and Raildoad=20 + Railroad=23 = 43 = the four
+# rail members - the rail subtotal is written under two spellings, one of
+# them the game's typo. Materiel is what awards.cfg's GrObj counts.
+ROLLUP_KEYS = {"Aircraft", "Materiel", "Building", "Railroad"}
 
 # The game's own misspelt keys, folded into the right one at parse time.
 KEY_FIXES = {"Raildoad": "Railroad"}
 
-BUILDING_CHILDREN = {"MilitaryFacility", "AirfieldFacility", "IndustrialBuilding"}
-
-# Scenery clutter — crates, barrels, boxes. Recorded in killStats but excluded
-# from the game's own "GROUND TARGETS" figure. Dropping it is what makes the
-# totals match the pilot file exactly (pilot 8: 115, pilot 17: 102).
-CLUTTER_KEYS = {"Materiel"}
+BUILDING_CHILDREN = {"MilitaryFacility", "AirfieldFacility", "IndustrialBuilding",
+                     "Fortification", "Bridge", "Dam", "TownBuilding", "RuralYard",
+                     "OtherBuilding"}
 
 # Aircraft subtypes seen in live data. Used for the air-kill breakdown only;
 # the airborne total is computed from the rollup, not from this set, so an
@@ -57,17 +61,19 @@ AIR_SUBTYPES = {
 
 STATIC_AIR_KEYS = {"StaticPlane"}
 
+# Leaf categories only; the rollups above are skipped. Membership follows
+# statreporting.json, regrouped into the six headline figures the page shows.
 GROUND_CATEGORIES: Dict[str, set] = {
-    "vehicles": {"Truck", "Car", "Trailer", "ArmouredVehicle", "Materiel",
-                 "MilEquip", "RocketLauncher"},
+    "vehicles": {"Truck", "Car", "Trailer", "ArmouredVehicle", "MilEquip",
+                 "Detachment"},
     "armour": {"LightTank", "MediumTank", "HeavyTank"},
     "artillery": {"HeavyFlak", "LightFlak", "HeavyGun", "LightGun",
-                  "MachineGun", "Mortar", "Searchlight"},
-    "buildings": {"Building", "IndustrialBuilding", "MilitaryFacility",
-                  "AirfieldFacility", "RailwayStationFacility",
-                  "RailwayBridge", "Detachment"},
-    "rail": {"Railroad", "TrainLocomotive", "TrainVagon"},
-    "naval": {"SeaSmallObj", "SeaCargoObj", "SeaDestrObj", "SeaSubObj"},
+                  "MachineGun", "Mortar", "RocketLauncher", "Searchlight", "Radar"},
+    "buildings": BUILDING_CHILDREN,
+    "rail": {"TrainLocomotive", "TrainVagon", "RailwayStationFacility", "RailwayBridge"},
+    "naval": {"SmallCraft", "MediumCraft", "MediumShip", "LargeShip", "Destroyer",
+              "Cruiser", "Battleship", "Carrier", "Submarine",
+              "SeaSmallObj", "SeaCargoObj", "SeaDestrObj", "SeaSubObj"},
 }
 
 
@@ -126,31 +132,22 @@ class KillStats:
         """
         The figure the game shows as GROUND TARGETS on the pilot file.
 
-        Counts the ``Building`` rollup rather than its children, includes
-        aircraft destroyed on the ground (a parked plane is a ground target),
-        and excludes scenery clutter. Matches the panel exactly for every
-        pilot checked.
+        Every leaf category that is not an airborne aircraft: vehicles,
+        guns, buildings, rail, ships, and aircraft destroyed on the ground (a
+        parked plane is a ground target). The rollups are skipped, since
+        each is exactly the sum of its members. Matches the panel exactly
+        for every pilot checked.
         """
         return sum(v for k, v in self.counts.items()
-                   if k != "Aircraft"
-                   and k not in BUILDING_CHILDREN
-                   and k not in CLUTTER_KEYS
-                   and k not in AIR_SUBTYPES)
+                   if k not in ROLLUP_KEYS and k not in AIR_SUBTYPES)
 
     @property
     def ground_total(self) -> int:
-        """
-        Every non-airborne kill including clutter — a superset of
-        ``ground_targets``, useful for a full breakdown rather than the
-        headline number.
-        """
-        return sum(v for k, v in self.counts.items()
-                   if k != "Aircraft"
-                   and k not in BUILDING_CHILDREN
-                   and k not in AIR_SUBTYPES)
+        """Kept as an alias: with the rollups understood there is no clutter."""
+        return self.ground_targets
 
     def category_totals(self) -> Dict[str, int]:
-        """Ground breakdown. Uses Building's children, so Building is skipped."""
+        """Ground breakdown by leaf category; rollups and aircraft skipped."""
         out = {name: 0 for name in GROUND_CATEGORIES}
         out["other"] = 0
         for key, value in self.counts.items():
