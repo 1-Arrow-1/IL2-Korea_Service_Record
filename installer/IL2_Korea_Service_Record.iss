@@ -61,7 +61,9 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
-Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+; Not part of the Inno Setup distribution (it is one of the "unofficial"
+; translations), so the CI runner's install lacks it: shipped in the repo.
+Name: "chinesesimplified"; MessagesFile: "Languages\ChineseSimplified.isl"
 
 [CustomMessages]
 english.IL2PageTitle=Select your IL-2 Korea installation
