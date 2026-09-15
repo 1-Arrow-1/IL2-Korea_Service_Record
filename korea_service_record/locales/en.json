@@ -52,6 +52,7 @@
     "courage_booster": "Courage booster"
   },
   "state": {
+    "not_ready": "not ready",
     "reserve": "reserve",
     "active": "active",
     "wounded": "wounded",

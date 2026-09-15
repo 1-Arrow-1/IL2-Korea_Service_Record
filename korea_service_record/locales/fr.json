@@ -52,6 +52,7 @@
     "courage_booster": "Bonus de courage"
   },
   "state": {
+    "not_ready": "indisponible",
     "reserve": "réserve",
     "active": "en service",
     "wounded": "blessé",

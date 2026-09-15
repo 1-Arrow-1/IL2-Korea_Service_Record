@@ -52,6 +52,7 @@
     "courage_booster": "勇气加成"
   },
   "state": {
+    "not_ready": "未就绪",
     "reserve": "预备",
     "active": "现役",
     "wounded": "负伤",

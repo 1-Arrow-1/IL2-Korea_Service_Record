@@ -52,6 +52,7 @@
     "courage_booster": "Mut-Bonus"
   },
   "state": {
+    "not_ready": "nicht einsatzbereit",
     "reserve": "Reserve",
     "active": "aktiv",
     "wounded": "verwundet",

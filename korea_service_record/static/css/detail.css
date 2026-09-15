@@ -396,6 +396,8 @@ table.roster tr.is-reserve .roster-photo { filter: saturate(0.6); opacity: 0.85;
     background: var(--paper-panel);
 }
 .status-word.status-reserve { border-style: dashed; }
+/* Grounded with his aircraft in the shop: the game's "not ready". */
+.status-word.status-not_ready { color: var(--bad); border-color: var(--bad); }
 
 .status-dot {
     display: inline-block;

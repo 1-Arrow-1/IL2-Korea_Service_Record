@@ -52,6 +52,7 @@
     "courage_booster": "Bonificación de valor"
   },
   "state": {
+    "not_ready": "no listo",
     "reserve": "reserva",
     "active": "en activo",
     "wounded": "herido",

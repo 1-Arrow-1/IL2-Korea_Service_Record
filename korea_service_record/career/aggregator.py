@@ -62,11 +62,16 @@ logger = logging.getLogger(__name__)
 # treats missing and taken prisoner as one outcome.
 PILOT_STATE = {0: "active", 2: "kia", 3: "missing", 4: "wounded"}
 
-# pilot.slot bands. The line-up is 0..19 (16..19 are the "watchmen" the
-# squadron row lists); the reserve pool is 2000..2019, where a pilot waits to
-# be called into a slot; the dead and the missing are moved to 5000+. Read off
-# a 50-pilot career where every state-0 pilot sat in one of the first two bands
-# and every state-2/3 pilot in the third.
+# pilot.slot bands, matched against the game's "Combat units" screen on a
+# fresh career (17 in service, 3 "in reserve - not ready", 5 unseen):
+#
+#   0..19       Combat units in service - the line-up (16..19 the "watchmen")
+#   1000..1999  Combat units in reserve, NOT READY - a pilot moved out with
+#               his aircraft while it is in repair; back when it is
+#   2000..4999  the replacement pool: on strength, no aircraft, not shown on
+#               that screen at all
+#   5000+       the dead and the missing
+NOT_READY_SLOTS = range(1000, 2000)
 RESERVE_SLOTS = range(2000, 5000)
 
 
@@ -74,8 +79,14 @@ def _in_reserve(row) -> bool:
     return row["state"] == 0 and row["slot"] in RESERVE_SLOTS
 
 
+def _not_ready(row) -> bool:
+    return row["state"] == 0 and row["slot"] in NOT_READY_SLOTS
+
+
 def _pilot_state(row) -> str:
-    """The roster's state word: PILOT_STATE, with the pool told apart."""
+    """The roster's state word: PILOT_STATE, with the two benches told apart."""
+    if _not_ready(row):
+        return "not_ready"
     if _in_reserve(row):
         return "reserve"
     # An unmapped value is shown as its number rather than swallowed, so the
@@ -982,6 +993,7 @@ class CareerAggregator:
             ready = p["stateEndDate"] if not p["stateEndDate"].startswith("0000") else ""
             repairs.append({
                 "slot": p["slot"],
+                "code": _tail_code(p["tcode"], PurePath(p["config"]).stem if p["config"] else ""),
                 "type": type_name(p["config"]),
                 "health": p["health"],
                 "since": p["stateDate"][:10],
@@ -1029,9 +1041,11 @@ class CareerAggregator:
             arrived.setdefault(e["planeId"], e["date"][:10])
 
         def band(p) -> int:
+            # 0 line-up (the "not ready" bench at 1000+ still belongs to it,
+            # it is only parked there while in repair), 1 reserve, 2 gone.
             if p["state"] == 3 or p["slot"] >= 5000:
                 return 2
-            return 1 if p["slot"] >= 1000 else 0
+            return 1 if p["slot"] >= 2000 else 0
 
         airframes = []
         for p in sorted(planes, key=lambda p: (band(p), p["slot"], p["id"])):
@@ -1088,7 +1102,9 @@ class CareerAggregator:
             "line_up": sum(1 for p in on_strength if p["slot"] < 1000),
             "serviceable": len(serviceable),
             "in_repair": len(repairing),
-            "reserve": sum(1 for p in on_strength if 1000 <= p["slot"] < 5000),
+            # Slots 1000..1999 are the "not ready" bench, an aircraft in
+            # repair with its pilot; those are counted in the repair figure.
+            "reserve": sum(1 for p in on_strength if 2000 <= p["slot"] < 5000),
             "written_off": len(written_off),
             "repairs": repairs,
             "arrivals": arrivals,

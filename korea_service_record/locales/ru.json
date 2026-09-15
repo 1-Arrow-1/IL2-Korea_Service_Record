@@ -52,6 +52,7 @@
     "courage_booster": "Бонус отваги"
   },
   "state": {
+    "not_ready": "не готов",
     "reserve": "резерв",
     "active": "в строю",
     "wounded": "ранен",

@@ -433,7 +433,7 @@
         el("d-aircraft-repairs").innerHTML = a.repairs.map((r) =>
             '<li><span class="service-date">' + esc(r.ready) + "</span>" +
             '<span class="service-text">' +
-            esc(T("aircraft.airframe", {slot: r.slot + 1, type: r.type})) + " " +
+            esc(r.code ? r.code + " " + r.type : T("aircraft.airframe", {slot: r.slot + 1, type: r.type})) + " " +
             '<span class="repair-health"><span class="bar"><span style="width:' + r.health + '%"></span></span>' +
             esc(T("aircraft.health", {health: r.health})) + "</span>" +
             (r.ready ? " &middot; " + esc(when(r.days)) : "") +
@@ -618,7 +618,7 @@
     // Sorting on status: the line-up, then the wounded who will rejoin it,
     // then the pool, then the gone. Alphabetical put "reserve" between the
     // missing and the wounded, which separates nothing.
-    const STATE_ORDER = { active: 0, wounded: 1, reserve: 2, missing: 3, kia: 4 };
+    const STATE_ORDER = { active: 0, not_ready: 1, wounded: 2, reserve: 3, missing: 4, kia: 5 };
 
     function renderRoster() {
         const body = el("d-roster").querySelector("tbody");
@@ -636,7 +636,7 @@
             return sortAsc ? cmp : -cmp;
         });
         body.innerHTML = sorted.map((p) => {
-            const dotClass = ["active", "kia", "missing", "wounded", "reserve", "pow"]
+            const dotClass = ["active", "kia", "missing", "wounded", "reserve", "not_ready", "pow"]
                 .indexOf(p.state) >= 0 ? "status-" + p.state : "status-other";
             // The missing are greyed with the dead: both are gone for good and
             // neither is coming back, whatever the difference on paper.
