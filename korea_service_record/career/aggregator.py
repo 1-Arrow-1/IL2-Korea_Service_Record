@@ -19,6 +19,7 @@ Everything here is derived, never stored. The decoding lives in the sibling
 modules (killstats, attributes, events) so this file stays about assembly.
 """
 
+import json
 import logging
 import re
 import urllib.parse
@@ -33,6 +34,7 @@ from ..gamedata import (COUNTRY_FLAGS, COUNTRY_NAMES, COUNTRY_SEALS, COUNTRY_STA
 from ..geo import (MapTiles, Overlay, WAYPOINT_TAKEOFF, WAYPOINT_LANDING,
                    parse_point, parse_route)
 from ..icons import IconLibrary
+from .. import ribbons
 from ..loadouts import AmmoSchemes, parse_pilots_list
 from ..worldobjects import WorldObjectIndex, normalise as normalise_object
 from .attributes import PilotAttributes
@@ -153,7 +155,29 @@ VALOUR_LADDER = {601: (601002, 601026), 602: (602002, 602027),
                  502: (502002, 502026), 503: (503002, 503026)}
 
 
+# USAF order of precedence, lowest first, for the ids the mod added outside the
+# stock 601002..601026 block: the Commendation below the Air Medal, the Bronze
+# Star "V" ladder above the merit Bronze Star, the Silver Star's fourth and
+# fifth rungs with the Silver Star. Ids not listed keep their numeric order
+# inside the stock block, which happens to be precedence order there.
+USAF_PRECEDENCE = [
+    601054, 601055, 601056, 601057,                     # Commendation Ribbon
+    601002, 601003, 601004, 601005, 601006, 601007,     # Air Medal
+    601008, 601009, 601010,                             # Bronze Star, merit
+    601058, 601059, 601061, 601060, 601062,             # Bronze Star with V
+    601011, 601012, 601013, 601014, 601015, 601016,     # DFC
+    601017,                                             # Legion of Merit
+    601018, 601019, 601020, 601050, 601051,             # Silver Star
+    601021, 601022, 601023, 601024, 601025,             # DSC
+    601026, 601041,                                     # Medal of Honor
+]
+_USAF_RANK = {a: i for i, a in enumerate(USAF_PRECEDENCE)}
+
+
 def _top_combat_award(country: int, award_ids) -> Optional[int]:
+    if country == 601:
+        return max((a for a in award_ids if a in _USAF_RANK),
+                   key=_USAF_RANK.get, default=None)
     lo, hi = VALOUR_LADDER.get(country, (0, 10 ** 9))
     return max((a for a in award_ids if lo <= a <= hi), default=None)
 
@@ -222,6 +246,7 @@ class CareerAggregator:
         self.tiles = MapTiles(self.resolver)
         self.overlay = Overlay(self.resolver, lang)
         self.icons = IconLibrary(self.resolver)
+        self.ribbons = ribbons.RibbonRenderer(self.resolver.cache_dir)
         self.flightlogs = FlightLogIndex(self.game_dir)
         self.descriptions = MissionDescriptions(self.resolver, lang, DEFAULT_TVD)
         # Through the resolver: a stock installation keeps awards.cfg inside
@@ -334,6 +359,25 @@ class CareerAggregator:
                 return inherited
         return {"description": "" if match else text, "inherited_from": ""}
 
+    def _rank_texts(self) -> Dict[str, str]:
+        """The tracker's own rank descriptions for this language; English
+        when the language has none."""
+        cached = getattr(self, "_rank_text_cache", None)
+        if cached is not None:
+            return cached
+        folder = Path(__file__).resolve().parent.parent / "locales" / "ranks"
+        texts: Dict[str, str] = {}
+        for lang in (self.lang, "eng"):
+            path = folder / f"{lang}.json"
+            if path.is_file():
+                try:
+                    texts = json.loads(path.read_text(encoding="utf-8"))
+                    break
+                except (OSError, ValueError) as exc:
+                    logger.warning("Rank texts %s unreadable: %s", path.name, exc)
+        self._rank_text_cache = texts
+        return texts
+
     def emblem_detail(self, kind: str, ident: str) -> Optional[Dict[str, Any]]:
         """
         Name, description and full-size art for one medal, rank or emblem.
@@ -343,7 +387,9 @@ class CareerAggregator:
             awards      nsdata/assets/awards/<6xx>/<id>.locale=<lang>.txt
             squadrons   nsdata/assets/squadrons/<601>/<id>.locale=<lang>.txt
 
-        Ranks have artwork but no description, so they return a name only.
+        Ranks have artwork but no description anywhere in the game, so the
+        tracker carries its own, per language, in locales/ranks/<lang>.json
+        keyed like the game's rank keys (6013 = USAF Major).
         """
         # An id with no artwork is not a thing the user can click, so 404
         # rather than returning an empty shell.
@@ -374,6 +420,8 @@ class CareerAggregator:
             return None
 
         text = self.resolver.read_text(vpath) if vpath else None
+        if kind == "rank":
+            text = self._rank_texts().get(ident, "")
         return {
             "kind": kind,
             "id": ident,
@@ -524,9 +572,97 @@ class CareerAggregator:
                          "label": "Friendly aircraft shot down", "value": friendly})
         return rows
 
+    def _superseded(self, award_id: int) -> List[int]:
+        """
+        The awards this one retires when granted - the ``(ExAw=...)`` ids in
+        its AwardRemove expression, in file order. That is the game's own
+        definition of "same ladder": a cluster removes the base decoration
+        and every earlier cluster. RequiredAward is not used because it also
+        names prerequisites from other ladders (the DFC requires an Air
+        Medal), which are not rungs of this one.
+        """
+        defn = self.awards_cfg.get(award_id)
+        if not defn or not defn.removes:
+            return []
+        return [int(x) for x in re.findall(r"ExAw\s*=\s*(\d+)", defn.removes)]
+
+    def _ladder_root(self, award_id: int) -> int:
+        """The base decoration of an award's ladder: follow AwardRemove down
+        until an award that retires nothing (bounded against a cycle)."""
+        seen = [award_id]
+        while len(seen) < 12:
+            below = self._superseded(seen[-1])
+            if not below or below[0] in seen:
+                break
+            seen.append(min(below))
+        return seen[-1]
+
+    def _citation_ladders(self, current, retired) -> List[Dict[str, Any]]:
+        """
+        Decorations to the unit itself, one row per ladder, every rung the
+        unit has held in the order it earned them. Unlike a pilot's medals
+        these are shown in full rather than folded: a wing's citations are
+        its history, and there are only ever a handful.
+        """
+        ladders: Dict[int, Dict[str, Any]] = {}
+        for row in list(current) + list(retired):
+            root = self._ladder_root(row["type"])
+            ladder = ladders.setdefault(root, {
+                "type": root, "name": self.award_name(root), "awards": []})
+            ladder["awards"].append({
+                "type": row["type"],
+                "name": self.award_name(row["type"]),
+                "earned": row["earnedDate"],
+                "received": row["receivedDate"],
+                "current": not row["isDeleted"],
+            })
+        for ladder in ladders.values():
+            ladder["awards"].sort(key=lambda a: (a["earned"], a["type"]))
+        # Ladders in awards.cfg order, so the DUC row comes before the ROK PUC.
+        def order(root: int) -> int:
+            defn = self.awards_cfg.get(root)
+            return defn.order if defn else root
+        return [ladders[k] for k in sorted(ladders, key=order)]
+
+    def _ribbon_rack(self, medals: List[Dict[str, Any]],
+                     citations=()) -> Dict[str, Any]:
+        """
+        The ribbons worn on the tunic. Individual decorations on the left
+        breast: one per ladder, highest precedence first, rows of three with
+        a short top row; pending awards are not worn yet. Unit citations are
+        the squadron's, worn by everyone serving with it, and on the right
+        breast - so they come back as a separate rack. Names ride along for
+        the tooltips.
+        """
+        def entries(ids):
+            return [{"type": t, "name": names.get(t) or self.award_name(t),
+                     "framed": ribbons.RIBBONS[t].framed,
+                     "geometry": ribbons.geometry(t)} for t in ids]
+        names = {m["type"]: m["name"] for m in medals}
+        worn = ribbons.rack(m["type"] for m in medals if not m["pending"])
+        unit = ribbons.rack(row["type"] for row in citations
+                            if row["category"] == 2 and not row["isDeleted"])
+        return {
+            "ribbons": entries(worn),
+            "rows": ribbons.rows(len(worn)),
+            "citations": entries(unit),
+            "citation_rows": ribbons.rows(len(unit)),
+            "rev": ribbons.REVISION,
+        }
+
     def _promotions_and_awards(self, awards, country: int = 601) -> Dict[str, List]:
+        """
+        Group a pilot's award rows. Rows retired by a higher cluster
+        (isDeleted=1, the engine's AwardRemove bookkeeping) are not listed on
+        their own; each is filed under the rung that replaced it as
+        ``history``, so the record shows the ribbon the pilot wears now and,
+        folded beneath it, the ones it superseded with their dates.
+        """
         promotions, medals = [], []
+        retired = [row for row in awards if row["isDeleted"]]
         for row in awards:
+            if row["isDeleted"]:
+                continue
             if row["category"] == 1:
                 rank_id = row["type"] - PROMOTION_BASE + 1
                 promotions.append({
@@ -538,12 +674,23 @@ class CareerAggregator:
                     "pending": bool(row["isPending"]),
                 })
             else:
+                below = self._superseded(row["type"])
+                history = [
+                    {"type": old["type"],
+                     "name": self.award_name(old["type"]),
+                     "earned": old["earnedDate"],
+                     "received": old["receivedDate"]}
+                    for old in retired if old["type"] in below
+                ]
+                # Nearest rung first, so the list reads downwards into the past.
+                history.sort(key=lambda h: (h["earned"], h["type"]), reverse=True)
                 medals.append({
                     "type": row["type"],
                     "name": self.award_name(row["type"]),
                     "earned": row["earnedDate"],
                     "received": row["receivedDate"],
                     "pending": bool(row["isPending"]),
+                    "history": history,
                 })
         return {"promotions": promotions, "awards": medals}
 
@@ -905,7 +1052,8 @@ class CareerAggregator:
                 return None
             awards_by_pilot = {pilot_id: db.awards(pilot_id)}
             summary = self._pilot_row(row, awards_by_pilot)
-            groups = self._promotions_and_awards(db.awards(pilot_id), row["country"])
+            groups = self._promotions_and_awards(
+                db.awards(pilot_id, include_removed=True), row["country"])
             sorties = db.sorties(pilot_id)
             kills = KillStats(row["killStats"])
             summary.update({
@@ -913,6 +1061,7 @@ class CareerAggregator:
                 "squadron": meta.squadron_name,
                 "combat": self._combat_results(kills)["headline"],
                 "awards_list": groups["awards"],
+                "ribbon_rack": self._ribbon_rack(groups["awards"], db.awards(-1)),
                 "promotions_list": groups["promotions"],
                 "incidences": self._incidences(db.events(pilot_id)),
                 "recent": self._debriefings(
@@ -1495,7 +1644,12 @@ class CareerAggregator:
             is_player = bool(player["isPlayer"])
 
             awards_by_pilot: Dict[int, List] = {}
-            for row in db.awards():
+            retired_citations: List = []
+            for row in db.awards(include_removed=True):
+                if row["isDeleted"]:
+                    if row["category"] == 2:
+                        retired_citations.append(row)
+                    continue
                 awards_by_pilot.setdefault(row["pilotId"], []).append(row)
 
             current_id = career["playerId"]
@@ -1506,7 +1660,7 @@ class CareerAggregator:
 
             sorties = db.sorties(pid)
             kill_events = db.events(pid, types=[0])
-            player_awards = db.awards(pid)
+            player_awards = db.awards(pid, include_removed=True)
             groups = self._promotions_and_awards(player_awards, player['country'])
 
             # The rank on the earliest sortie is where the career began.
@@ -1552,6 +1706,7 @@ class CareerAggregator:
                 "missions_flown": self._missions_flown(sorties, {m["id"]: m for m in db.missions()}),
                 "promotions": groups["promotions"],
                 "awards": groups["awards"],
+                "ribbon_rack": self._ribbon_rack(groups["awards"], awards_by_pilot.get(-1, [])),
                 "incidences": self._incidences(db.events(pid), aircraft_flown),
                 "debriefings": debriefings,
                 "victories": victories,
@@ -1574,13 +1729,8 @@ class CareerAggregator:
                 # IsSquadron=1: the engine files them under pilotId -1 with
                 # category 2, so they fall out of the same grouping the roster
                 # uses. Never pending — the engine grants them outright.
-                "citations": [
-                    {"type": row["type"],
-                     "name": self.award_name(row["type"]),
-                     "earned": row["earnedDate"],
-                     "received": row["receivedDate"]}
-                    for row in awards_by_pilot.get(-1, [])
-                    if row["category"] == 2 and not row["isDeleted"]
-                ],
+                "citations": self._citation_ladders(
+                    [r for r in awards_by_pilot.get(-1, []) if r["category"] == 2],
+                    retired_citations),
                 "aircraft": self._aircraft(db, career, squad),
             }

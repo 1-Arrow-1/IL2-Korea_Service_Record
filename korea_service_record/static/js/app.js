@@ -242,17 +242,64 @@
         return body + note;
     }
 
+    // The ribbon rack: rows of three, highest precedence top-left, a short
+    // top row centred, exactly as the bars sit on a tunic. Each ribbon is one
+    // image the server composes with its devices; the name is the tooltip.
+    function ribbonRows(list, rows, rev) {
+        let i = 0;
+        return rows.map((n) => {
+            const row = list.slice(i, i + n); i += n;
+            return '<div class="ribbon-row">' + row.map((r) =>
+                '<img class="ribbon' + (r.framed ? " framed" : "") + (r.geometry === "sov" ? " sov" : "") + '" src="/api/ribbon/' + esc(r.type) + "?v=" + esc(rev || 0) +
+                '" alt="' + esc(r.name) + '" title="' + esc(r.name) + '" width="168" height="56">').join("") +
+                "</div>";
+        }).join("");
+    }
+
+    // The ribbon rack: rows of three, highest precedence top-left, a short
+    // top row centred, exactly as the bars sit on a tunic. Each ribbon is one
+    // image the server composes with its devices; the name is the tooltip.
+    // Unit citations are worn on the right breast, so they form their own
+    // small rack beneath the decorations.
+    function ribbonRack(rack) {
+        if (!rack) { return ""; }
+        const own = rack.ribbons || [], unit = rack.citations || [];
+        if (!own.length && !unit.length) { return ""; }
+        return (own.length ? '<div class="ribbon-group">' + ribbonRows(own, rack.rows, rack.rev) + "</div>" : "") +
+            (unit.length ? '<div class="ribbon-group citations">' +
+                ribbonRows(unit, rack.citation_rows, rack.rev) + "</div>" : "");
+    }
+
     function awardItem(award) {
         const badge = award.pending ? '<span class="badge pending">pending</span>' : "";
         const when = award.pending
             ? T("awards.awaiting_points")
             : T("awards.received", {date: award.received});
-        return '<li class="with-icon">' +
+        const history = award.history || [];
+        // A cluster replaces the decoration below it, so the earlier rungs are
+        // folded under the ribbon the pilot wears now; a chevron unfolds them.
+        const toggle = history.length
+            ? '<button type="button" class="history-toggle" aria-expanded="false" ' +
+              'title="' + esc(T("awards.history", {count: history.length})) + '">' +
+              '<span class="sr-only">' + esc(T("awards.history", {count: history.length})) + "</span>" +
+              '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>'
+            : "";
+        const folded = history.length
+            ? '<ol class="award-history" hidden>' + history.map(function (h) {
+                return '<li class="with-icon">' +
+                    icon("award", h.type, 56, "award-icon small", h.name) +
+                    "<div>" +
+                    '<span class="award-name">' + esc(h.name) + "</span>" +
+                    '<span class="award-dates">' + esc(T("awards.earned", {date: h.earned})) +
+                    " &middot; " + esc(T("awards.received", {date: h.received})) + "</span></div></li>";
+            }).join("") + "</ol>"
+            : "";
+        return '<li class="with-icon' + (history.length ? " has-history" : "") + '">' +
             icon("award", award.type, 88, "award-icon", award.name) +
             "<div>" +
             '<span class="award-name">' + esc(award.name) + badge + "</span>" +
             '<span class="award-dates">' + esc(T("awards.earned", {date: award.earned})) +
-            " &middot; " + when + "</span></div></li>";
+            " &middot; " + when + "</span></div>" + toggle + folded + "</li>";
     }
 
     function promotionItem(promotion) {
@@ -739,6 +786,11 @@
                 ? d.incidences.map(incidenceItem).join("")
                 : '<li class="muted">' + esc(T("incidences.none")) + "</li>";
 
+            const rackEl = el("d-ribbon-rack");
+            rackEl.innerHTML = ribbonRack(d.ribbon_rack);
+            rackEl.hidden = !rackEl.innerHTML;
+            rackEl.setAttribute("aria-label", T("awards.ribbon_rack"));
+
             el("d-promotions").innerHTML = d.promotions.length
                 ? d.promotions.map(promotionItem).join("")
                 : '<li class="muted">' + esc(T("awards.none_yet")) + "</li>";
@@ -779,15 +831,18 @@
             const citations = d.citations || [];
             const strip = el("d-squadron-citations");
             strip.hidden = citations.length === 0;
+            // One row per ladder (DUC and its clusters, then the ROK PUC and
+            // its clusters), every rung the unit has held, oldest first.
             strip.innerHTML = citations.length === 0 ? "" :
                 '<span class="citation-label">' + T("roster.citations") + "</span>" +
-                citations.map((c) =>
-                    '<span class="citation">' +
-                    icon("award", c.type, 64, "award-icon citation-icon", c.name) +
-                    '<span class="citation-text"><span class="award-name">' +
-                    esc(c.name) + '</span><span class="award-dates">' +
-                    esc(T("awards.received", {date: c.received})) +
-                    "</span></span></span>").join("");
+                citations.map((ladder) =>
+                    '<div class="citation-row">' + (ladder.awards || []).map((c) =>
+                        '<span class="citation' + (c.current ? " current" : " retired") + '">' +
+                        icon("award", c.type, 64, "award-icon citation-icon", c.name) +
+                        '<span class="citation-text"><span class="award-name">' +
+                        esc(c.name) + '</span><span class="award-dates">' +
+                        esc(T("awards.received", {date: c.received})) +
+                        "</span></span></span>").join("") + "</div>").join("");
             // The header art is whatever the squadron flies. Set as a custom
         // property so the CSS keeps ownership of size, opacity and blending,
         // and an aircraft with no picture yet simply shows nothing.
@@ -1072,6 +1127,10 @@
                             '">Full record &rarr;</a>' +
                     "</div>" +
                 "</div>" +
+                (ribbonRack(p.ribbon_rack)
+                    ? '<div class="ribbon-rack pb-rack" aria-label="' + esc(T("awards.ribbon_rack")) + '">' +
+                      ribbonRack(p.ribbon_rack) + "</div>"
+                    : "") +
                 '<div class="stat-strip pb-strip">' + statStrip(p.combat) + "</div>" +
                 '<div class="pb-grid">' +
                     "<div><h3>Characteristics</h3>" +
@@ -1304,6 +1363,7 @@
         show(el("landing-page"), !onDetail);
         show(el("detail-page"), onDetail);
         show(el("back-btn"), onDetail);
+        el("quit-btn").title = T("app.quit_hint");
         window.scrollTo(0, 0);
         if (!onDetail) {
             i18n.setLocale(settings.language).then(() => {
@@ -1319,6 +1379,22 @@
     }
 
     wirePortrait();
+    // Closing the tab does not stop the server; this does, the same way
+    // the tray's Quit does, after a confirmation so a stray click cannot
+    // kill the session. The page then explains itself, since every later
+    // request would fail.
+    el("quit-btn").addEventListener("click", async () => {
+        if (!window.confirm(T("app.quit_confirm"))) { return; }
+        try {
+            const r = await fetch("/api/quit", {method: "POST"});
+            if (!r.ok) { throw new Error(String(r.status)); }
+            document.body.innerHTML = '<main class="page-container"><p class="state-message closed">' +
+                esc(T("app.quit_done")) + "</p></main>";
+        } catch (err) {
+            window.alert(T("app.quit_failed"));
+        }
+    });
+
     el("back-btn").addEventListener("click", () => {
         // From a pilot's record, step back to the career rather than all the
         // way out to the career list.
@@ -1360,6 +1436,14 @@
                     event.target.closest("tr[data-pilot], button[data-pilot]");
         if (row && !(event.target.closest && event.target.closest("img.emblem"))) {
             openPilot(currentCareer, Number(row.dataset.pilot));
+            return;
+        }
+        const toggle = event.target.closest && event.target.closest("button.history-toggle");
+        if (toggle) {
+            const open = toggle.getAttribute("aria-expanded") !== "true";
+            toggle.setAttribute("aria-expanded", open ? "true" : "false");
+            const list = toggle.parentElement.querySelector("ol.award-history");
+            if (list) { list.hidden = !open; }
             return;
         }
         const img = event.target.closest && event.target.closest("img.emblem");

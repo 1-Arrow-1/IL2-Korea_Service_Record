@@ -122,6 +122,32 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         return Response(data, mimetype="image/png",
                         headers={"Cache-Control": "public, max-age=31536000"})
 
+    @app.route("/api/quit", methods=["POST"])
+    def api_quit():
+        """
+        Close the Service Record from the page. Closing the browser tab
+        leaves the tray server running, which even the author found
+        non-obvious; this does what the tray's Quit does. Only the launcher
+        installs the hook, so a bare Flask test app answers 409.
+        """
+        hook = app.config.get("SHUTDOWN")
+        if hook is None:
+            return jsonify({"ok": False, "reason": "no shutdown hook"}), 409
+        hook()
+        return jsonify({"ok": True})
+
+    @app.route("/api/ribbon/<int:award_id>")
+    def api_ribbon(award_id: int):
+        """A service ribbon with its devices, composed from the mod's own art."""
+        agg = aggregator()
+        if agg is None:
+            return ("", 404)
+        data = agg.ribbons.png(award_id)
+        if data is None:
+            return ("", 404)
+        return Response(data, mimetype="image/png",
+                        headers={"Cache-Control": "public, max-age=31536000"})
+
     @app.route("/api/photo/<path:career_id>/<int:pilot_id>", methods=["GET"])
     def api_photo(career_id: str, pilot_id: int):
         """

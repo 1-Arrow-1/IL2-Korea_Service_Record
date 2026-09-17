@@ -5,6 +5,11 @@
     "readonly": "Read-only. Nothing is written to your game files.",
     "language": "Language",
     "detail_language": "Detail page language",
+    "quit": "Close the Service Record",
+    "quit_hint": "Stops the Service Record. Closing the browser tab alone leaves it running in the tray.",
+    "quit_confirm": "Close the Service Record? It stops running in the background; start it again from the Start menu.",
+    "quit_done": "The Service Record has been closed. You can close this tab.",
+    "quit_failed": "Could not close the Service Record from here. Use Quit on the tray icon.",
     "language_default": "Default"
   },
   "landing": {
@@ -123,6 +128,8 @@
     "earned": "earned {date}",
     "received": "received {date}",
     "no_description": "No description in the game files.",
+    "history": "Earlier awards in this series ({count})",
+    "ribbon_rack": "Ribbon rack",
     "pending_note": "{count} awards are waiting on award points; you have {points}."
   },
   "incidences": {

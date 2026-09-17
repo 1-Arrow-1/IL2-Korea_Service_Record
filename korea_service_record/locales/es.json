@@ -5,6 +5,11 @@
     "readonly": "Solo lectura. No se escribe nada en los archivos del juego.",
     "language": "Idioma",
     "detail_language": "Idioma de la hoja",
+    "quit": "Cerrar la Hoja de Servicios",
+    "quit_hint": "Detiene la Hoja de Servicios. Cerrar solo la pestaña del navegador la deja funcionando en la bandeja.",
+    "quit_confirm": "¿Cerrar la Hoja de Servicios? Dejará de funcionar en segundo plano; vuelva a iniciarla desde el menú Inicio.",
+    "quit_done": "La Hoja de Servicios se ha cerrado. Puede cerrar esta pestaña.",
+    "quit_failed": "No se pudo cerrar la Hoja de Servicios desde aquí. Use Salir en el icono de la bandeja.",
     "language_default": "Predeterminado"
   },
   "landing": {
@@ -123,6 +128,8 @@
     "earned": "merecida el {date}",
     "received": "entregada el {date}",
     "no_description": "Sin descripción en los archivos del juego.",
+    "history": "Concesiones anteriores de esta condecoración ({count})",
+    "ribbon_rack": "Pasador de condecoraciones",
     "pending_note": "{count} condecoraciones esperan puntos; usted tiene {points}."
   },
   "incidences": {

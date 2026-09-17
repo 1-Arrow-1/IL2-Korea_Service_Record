@@ -5,6 +5,11 @@
     "readonly": "只读。不会写入任何游戏文件。",
     "language": "语言",
     "detail_language": "档案页语言",
+    "quit": "关闭服役记录",
+    "quit_hint": "停止服役记录。仅关闭浏览器标签页时，它仍会在托盘中运行。",
+    "quit_confirm": "关闭服役记录？它将停止在后台运行；可从“开始”菜单重新启动。",
+    "quit_done": "服役记录已关闭。您可以关闭此标签页。",
+    "quit_failed": "无法从此处关闭服役记录。请使用托盘图标上的“退出”。",
     "language_default": "默认"
   },
   "landing": {
@@ -123,6 +128,8 @@
     "earned": "{date} 获得资格",
     "received": "{date} 颁发",
     "no_description": "游戏文件中没有说明。",
+    "history": "此奖项的先前授予（{count}）",
+    "ribbon_rack": "略章板",
     "pending_note": "{count} 项勋章正在等待勋章点数；您当前有 {points} 点。"
   },
   "incidences": {

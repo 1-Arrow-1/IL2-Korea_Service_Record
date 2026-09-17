@@ -5,6 +5,11 @@
     "readonly": "Nur Lesezugriff. Es wird nichts in Ihre Spieldateien geschrieben.",
     "language": "Sprache",
     "detail_language": "Sprache der Detailseite",
+    "quit": "Dienstakte schließen",
+    "quit_hint": "Beendet die Dienstakte. Nur den Browser-Tab zu schließen lässt sie im Infobereich weiterlaufen.",
+    "quit_confirm": "Dienstakte schließen? Sie läuft dann nicht mehr im Hintergrund; starten Sie sie über das Startmenü neu.",
+    "quit_done": "Die Dienstakte wurde geschlossen. Sie können diesen Tab schließen.",
+    "quit_failed": "Die Dienstakte konnte von hier aus nicht geschlossen werden. Verwenden Sie Beenden am Symbol im Infobereich.",
     "language_default": "Standard"
   },
   "landing": {
@@ -123,6 +128,8 @@
     "earned": "erworben am {date}",
     "received": "verliehen am {date}",
     "no_description": "Keine Beschreibung in den Spieldateien.",
+    "history": "Frühere Verleihungen dieser Auszeichnung ({count})",
+    "ribbon_rack": "Ordensspange",
     "pending_note": "{count} Auszeichnungen warten auf Auszeichnungspunkte; Sie haben {points}."
   },
   "incidences": {

@@ -95,6 +95,28 @@ def port_is_free(host: str, port: int) -> bool:
         return probe.connect_ex((host, port)) != 0
 
 
+TRAY: dict = {}
+
+
+def request_quit(shutdown) -> None:
+    """
+    Shut down from a web request. The response must leave first, so the
+    work happens on a timer; the tray's Quit path is used when there is one,
+    and os._exit is the backstop for the console mode, where app.run() owns
+    the thread and has no shutdown() to call.
+    """
+    def later():
+        try:
+            stop = TRAY.get("stop")
+            if stop is not None:
+                stop()
+            elif shutdown is not None:
+                shutdown()
+        finally:
+            threading.Timer(1.5, lambda: os._exit(0)).start()
+    threading.Timer(0.4, later).start()
+
+
 def run_tray(url: str, shutdown) -> bool:
     """Sit in the notification area until the user picks Quit.
 
@@ -123,6 +145,10 @@ def run_tray(url: str, shutdown) -> bool:
         shutdown()
         if icon is not None:
             icon.stop()
+
+    # The page's own Close control ends up here too, so the tray icon goes
+    # away with the server instead of lingering as a dead entry.
+    TRAY["stop"] = quit_now
 
     menu = pystray.Menu(
         pystray.MenuItem("Open Service Record",
@@ -176,6 +202,7 @@ def main() -> int:
         threading.Timer(0.8, lambda: webbrowser.open(url)).start()
 
     if console:
+        app.config["SHUTDOWN"] = lambda: request_quit(None)
         app.run(host=args.host, port=args.port,
                 debug=args.debug, use_reloader=False)
         return 0
@@ -185,6 +212,7 @@ def main() -> int:
     from werkzeug.serving import make_server
     server = make_server(args.host, args.port, app, threaded=True)
     threading.Thread(target=server.serve_forever, daemon=True).start()
+    app.config["SHUTDOWN"] = lambda: request_quit(server.shutdown)
 
     if not run_tray(url, server.shutdown):
         log.warning("no tray icon; serving until the process is stopped")

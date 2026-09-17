@@ -5,6 +5,11 @@
     "readonly": "Lecture seule. Aucune écriture dans vos fichiers de jeu.",
     "language": "Langue",
     "detail_language": "Langue de la fiche",
+    "quit": "Fermer l'état de service",
+    "quit_hint": "Arrête l'état de service. Fermer seulement l'onglet du navigateur le laisse tourner dans la zone de notification.",
+    "quit_confirm": "Fermer l'état de service ? Il cessera de tourner en arrière-plan ; relancez-le depuis le menu Démarrer.",
+    "quit_done": "L'état de service a été fermé. Vous pouvez fermer cet onglet.",
+    "quit_failed": "Impossible de fermer l'état de service d'ici. Utilisez Quitter sur l'icône de la zone de notification.",
     "language_default": "Par défaut"
   },
   "landing": {
@@ -123,6 +128,8 @@
     "earned": "méritée le {date}",
     "received": "remise le {date}",
     "no_description": "Aucune description dans les fichiers du jeu.",
+    "history": "Attributions antérieures de cette décoration ({count})",
+    "ribbon_rack": "Barrette de décorations",
     "pending_note": "{count} décorations attendent des points ; vous en avez {points}."
   },
   "incidences": {
