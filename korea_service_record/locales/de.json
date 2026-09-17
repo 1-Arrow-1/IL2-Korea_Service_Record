@@ -142,6 +142,7 @@
     "returned_to_duty": "Zum Dienst zurückgekehrt",
     "health": "Gesundheit {value}",
     "plane_lost": "Flugzeug verloren",
+    "friendly_destroyed": "Eigenes Objekt zerstört",
     "pilot_kia": "Pilot gefallen",
     "wounded": "Im Einsatz verwundet",
     "commander_assigned": "Zum Kommandeur ernannt",

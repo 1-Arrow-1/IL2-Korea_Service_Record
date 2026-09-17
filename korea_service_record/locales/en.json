@@ -142,6 +142,7 @@
     "returned_to_duty": "Returned to duty",
     "health": "health {value}",
     "plane_lost": "Aircraft lost",
+    "friendly_destroyed": "Friendly object destroyed",
     "pilot_kia": "Pilot killed in action",
     "wounded": "Wounded in action",
     "commander_assigned": "Commander assigned",

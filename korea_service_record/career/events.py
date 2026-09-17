@@ -69,6 +69,15 @@ EVENT_TYPES: Dict[int, EventType] = {
                  "objects too, so never infer airborne kills from these — use "
                  "killStats."),
 
+    1: EventType(1, "friendly_destroyed", "Friendly object destroyed", CONFIRMED,
+                 "Own-side object destroyed by the pilot: tpar1 = the object "
+                 "(Static_plane_C47B), tpar2 = its owner (BlocksArray = an "
+                 "airfield's parked scenery). Proven 1951.04.12: a parked USAF "
+                 "C-47 at K-47 Chunchon strafed on an armed reconnaissance; the "
+                 "mission result lists it with target country 601 = actor "
+                 "country 601. Not in killStats, not in sortie.fkill (which "
+                 "counts friendly aircraft shot down in the air)."),
+
     2: EventType(2, "plane_lost", "Aircraft lost", CONFIRMED,
                  "Fires whether or not the pilot survives. tpar1 = aircraft "
                  "type and tpar2 = pilot name for AI; for the player tpar1 "

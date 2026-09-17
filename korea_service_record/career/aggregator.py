@@ -746,6 +746,9 @@ class CareerAggregator:
                 described = self.objects.describe(row["tpar1"])
                 entry["detail"] = (described["name"] if described["named"]
                                    else aircraft_flown)
+            elif info.key == "friendly_destroyed":
+                described = self.objects.describe(row["tpar1"])
+                entry["detail"] = described["name"] if described["named"] else row["tpar1"]
             elif info.key in ("wounded", "medical"):
                 if info.key == "medical" and row["ipar1"] == 1:
                     entry["label"] = "Returned to duty"

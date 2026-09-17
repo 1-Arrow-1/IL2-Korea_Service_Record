@@ -142,6 +142,7 @@
     "returned_to_duty": "Reincorporado al servicio",
     "health": "salud {value}",
     "plane_lost": "Aeronave perdida",
+    "friendly_destroyed": "Objeto propio destruido",
     "pilot_kia": "Piloto caído en combate",
     "wounded": "Herido en combate",
     "commander_assigned": "Nombrado comandante",

@@ -142,6 +142,7 @@
     "returned_to_duty": "Вернулся в строй",
     "health": "здоровье {value}",
     "plane_lost": "Потерян самолёт",
+    "friendly_destroyed": "Уничтожен свой объект",
     "pilot_kia": "Лётчик погиб в бою",
     "wounded": "Ранен в бою",
     "commander_assigned": "Назначен командиром",
