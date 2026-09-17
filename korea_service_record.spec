@@ -66,7 +66,6 @@ excludes = [
     "matplotlib",
     "pandas",
     "pytest",
-    "tkinter",
 ]
 
 a = Analysis(
@@ -82,7 +81,25 @@ a = Analysis(
     noarchive=False,
 )
 
+# The Career Helper: a second, windowed exe in the same folder, sharing the
+# package, the bundled data and the _internal libraries (tkinter included -
+# the tracker never imports it, but a second COLLECT would double the size).
+helper = Analysis(
+    ["career_helper.py"],
+    pathex=[str(base)],
+    binaries=[],
+    datas=[],
+    hiddenimports=hiddenimports,
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[e for e in excludes if e != "tkinter"],
+    noarchive=False,
+)
+MERGE((a, "run", "IL2_Korea_Service_Record"), (helper, "career_helper", "IL2_Korea_Career_Helper"))
+
 pyz = PYZ(a.pure, a.zipped_data)
+helper_pyz = PYZ(helper.pure, helper.zipped_data)
 
 exe = EXE(
     pyz,
@@ -105,11 +122,33 @@ exe = EXE(
     icon=str(base / "installer" / "IL2_Korea_Service_Record.ico"),
 )
 
+helper_exe = EXE(
+    helper_pyz,
+    helper.scripts,
+    [],
+    exclude_binaries=True,
+    name="IL2_Korea_Career_Helper",
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=False,
+    console=False,
+    disable_windowed_traceback=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=str(base / "installer" / "IL2_Korea_Service_Record.ico"),
+)
+
 coll = COLLECT(
     exe,
+    helper_exe,
     a.binaries,
     a.zipfiles,
     a.datas,
+    helper.binaries,
+    helper.zipfiles,
+    helper.datas,
     strip=False,
     upx=False,
     upx_exclude=[],
