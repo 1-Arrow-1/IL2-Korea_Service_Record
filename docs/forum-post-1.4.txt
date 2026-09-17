@@ -107,10 +107,24 @@ you merge.
 DOWNLOAD
 
 IL-2 Korea Service Record v1.4.0.zip — the setup program (tracker plus the optional awards
-mod) and a README with the SHA-256 of the setup:
+mod) and a README. Also on the Releases page of the GitHub repository.
+
+About the long code in the README, for anyone who wonders what it is for: it is the
+setup program's fingerprint. Every file has one — change a single byte and the fingerprint
+changes completely — and this is the fingerprint of the file I built:
 
     22f504032cf5a2a6e0a5ca6c5f072696746dc04d0b1b997f5df720f3d62b95fa
 
-Also on the Releases page of the GitHub repository. Unsigned still — the SignPath
-application is pending — so Defender may want a second look, as it did with 1.3; the hash
-is what to check it against.
+If you want to be sure the file you downloaded is the one I uploaded — not damaged, not
+swapped by a file host, not tampered with — open PowerShell in your download folder and
+type:
+
+    Get-FileHash IL2_Korea_Service_Record_Setup_v1.4.0.exe
+
+It prints the fingerprint of your copy. If it matches the one above, letter for letter,
+you have my file. If it does not, do not run it, and tell me. You do not have to do this;
+it is there for the careful.
+
+The setup is still unsigned — the free code-signing application is pending — so Windows
+Defender may want a second look, as it did with 1.3. The fingerprint is the answer to that
+as well: it says the file is what it claims to be.
