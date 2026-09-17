@@ -184,6 +184,10 @@ Source: "mod\assets\awards6xx.dds"; DestDir: "{code:GetIL2Dir}\data\nsdata\asset
     Components: mod; Flags: ignoreversion uninsremovereadonly
 Source: "mod\assets\awards6xx2.dds"; DestDir: "{code:GetIL2Dir}\data\nsdata\assets\images"; \
     Components: mod; Flags: ignoreversion uninsremovereadonly
+; The mod's own atlas (1.4.0): everything added after the first three unit
+; citations - Silver Star rungs, DSM, NDSM, Commendation ladder, Bronze Star V.
+Source: "mod\assets\awards6xx3.dds"; DestDir: "{code:GetIL2Dir}\data\nsdata\assets\images"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
 
 ; The six locale dictionaries carrying the new decorations' names.
 Source: "mod\assets\awards.locale=*.json"; \
