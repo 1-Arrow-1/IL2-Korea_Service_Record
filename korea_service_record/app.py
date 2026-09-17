@@ -66,7 +66,9 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         language = app.config["SETTINGS"].resolve(career_id)
         cache = app.config["AGGREGATORS"]
         if language not in cache:
-            cache[language] = CareerAggregator(resolved, lang=game_code(language))
+            cache[language] = CareerAggregator(
+                resolved, lang=game_code(language),
+                corrections_on=lambda: app.config["SETTINGS"].corrected_times)
             logger.info("Built aggregator for %s (game locale %s)",
                         language, game_code(language))
         return cache[language]
@@ -207,13 +209,17 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         settings = app.config["SETTINGS"]
         if request.method == "POST":
             payload = request.get_json(silent=True) or {}
-            chosen = settings.set_language(payload.get("language", ""))
-            logger.info("Global language set to %s (game locale %s)",
-                        chosen, game_code(chosen))
+            if "language" in payload:
+                chosen = settings.set_language(payload.get("language", ""))
+                logger.info("Global language set to %s (game locale %s)",
+                            chosen, game_code(chosen))
+            if "corrected_times" in payload:
+                settings.set_corrected_times(bool(payload["corrected_times"]))
         return jsonify({
             "language": settings.language,
             "languages": available_languages(),
             "overrides": settings.career_overrides(),
+            "corrected_times": settings.corrected_times,
         })
 
     @app.route("/api/settings/career/<path:career_id>", methods=["GET", "POST"])

@@ -922,3 +922,9 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 
 /* A cell that has a timeline behind it says so. */
 .damage-cell.has-log { cursor: help; border-bottom: 1px dotted var(--border); }
+
+/* ---------------------------------------------------------- header switch -- */
+#header-nav .switch { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.86rem;
+    color: var(--ink-muted); cursor: pointer; margin-right: 0.4rem; white-space: nowrap; }
+#header-nav .switch input { accent-color: var(--accent-dark); margin: 0; }
+#header-nav .switch:hover { color: var(--ink-strong); }

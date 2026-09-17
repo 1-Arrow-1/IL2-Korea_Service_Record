@@ -9,6 +9,8 @@
     "quit_hint": "Stops the Service Record. Closing the browser tab alone leaves it running in the tray.",
     "quit_confirm": "Close the Service Record? It stops running in the background; start it again from the Start menu.",
     "quit_done": "The Service Record has been closed. You can close this tab.",
+    "corrected": "Corrected flight times",
+    "corrected_hint": "Show the missions you warped through re-timed to the briefed plan, as the game does for missions flown without you. Computed by the Career Helper; the career file is not changed.",
     "quit_failed": "Could not close the Service Record from here. Use Quit on the tray icon.",
     "language_default": "Default"
   },

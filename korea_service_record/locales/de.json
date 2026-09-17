@@ -9,6 +9,8 @@
     "quit_hint": "Beendet die Dienstakte. Nur den Browser-Tab zu schließen lässt sie im Infobereich weiterlaufen.",
     "quit_confirm": "Dienstakte schließen? Sie läuft dann nicht mehr im Hintergrund; starten Sie sie über das Startmenü neu.",
     "quit_done": "Die Dienstakte wurde geschlossen. Sie können diesen Tab schließen.",
+    "corrected": "Korrigierte Flugzeiten",
+    "corrected_hint": "Zeigt die Einsätze, in denen Sie gesprungen sind, auf den geplanten Zeitplan umgerechnet - so wie das Spiel es bei Einsätzen ohne Sie tut. Vom Laufbahn-Helfer berechnet; die Laufbahndatei bleibt unverändert.",
     "quit_failed": "Die Dienstakte konnte von hier aus nicht geschlossen werden. Verwenden Sie Beenden am Symbol im Infobereich.",
     "language_default": "Standard"
   },

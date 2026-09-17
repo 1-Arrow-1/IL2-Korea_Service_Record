@@ -9,6 +9,8 @@
     "quit_hint": "Detiene la Hoja de Servicios. Cerrar solo la pestaña del navegador la deja funcionando en la bandeja.",
     "quit_confirm": "¿Cerrar la Hoja de Servicios? Dejará de funcionar en segundo plano; vuelva a iniciarla desde el menú Inicio.",
     "quit_done": "La Hoja de Servicios se ha cerrado. Puede cerrar esta pestaña.",
+    "corrected": "Tiempos de vuelo corregidos",
+    "corrected_hint": "Muestra las misiones en las que saltó, ajustadas al plan de vuelo, como hace el juego con las misiones voladas sin usted. Las calcula el Asistente de carrera; el archivo de la carrera no cambia.",
     "quit_failed": "No se pudo cerrar la Hoja de Servicios desde aquí. Use Salir en el icono de la bandeja.",
     "language_default": "Predeterminado"
   },

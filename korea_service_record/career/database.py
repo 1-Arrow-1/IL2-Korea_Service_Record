@@ -99,6 +99,61 @@ class KoreaCareerDatabase:
     def __init__(self, path: Path):
         self.path = Path(path)
         self._conn: Optional[sqlite3.Connection] = None
+        # Flight-time corrections (see corrections.py): when set, sorties,
+        # events, missions, pilots and the squadron come back re-timed. Rows
+        # become dicts; every caller indexes by column name, which both take.
+        self._corr: Optional[Dict[str, Any]] = None
+        self._corr_sortie: Dict[int, Dict[str, Any]] = {}
+        self._corr_pilot_delta: Dict[int, float] = {}
+        self._corr_total: float = 0.0
+
+    def set_corrections(self, data: Optional[Dict[str, Any]]) -> None:
+        self._corr = data if data and data.get("missions") else None
+        self._corr_sortie, self._corr_pilot_delta, self._corr_total = {}, {}, 0.0
+        if self._corr is None:
+            return
+        for entry in self._corr["missions"].values():
+            for sid, d in entry.get("durations", {}).items():
+                self._corr_sortie[int(sid)] = d
+                delta = float(d["credited"]) - float(d["orig"])
+                self._corr_pilot_delta[int(d["pilot"])] = self._corr_pilot_delta.get(int(d["pilot"]), 0.0) + delta
+                self._corr_total += delta
+
+    def _corrected(self, rows, kind: str):
+        """Return rows as-is, or as dicts with the correction applied."""
+        if self._corr is None:
+            return rows
+        from .. import corrections
+        missions = self._corr["missions"]
+        out = []
+        for row in rows:
+            d = dict(row)
+            if kind == "sortie":
+                c = self._corr_sortie.get(d["id"])
+                if c:
+                    d["_flightTime_raw"] = d["flightTime"]
+                    d["flightTime"] = int(round(float(c["credited"])))
+            elif kind == "event":
+                entry = missions.get(str(d.get("missionId")))
+                if entry and d.get("date"):
+                    d["date"] = corrections.shift_stamp(corrections.warps_of(entry), entry["start"], d["date"])
+            elif kind == "mission":
+                entry = missions.get(str(d["id"]))
+                if entry:
+                    d["endTime"] = entry["end_time"]["credited"]
+            elif kind == "pilot":
+                delta = self._corr_pilot_delta.get(d["id"])
+                if delta:
+                    d["flightTime"] = int(round((d["flightTime"] or 0) + delta))
+            elif kind == "squadron":
+                d["flightTime"] = int(round((d["flightTime"] or 0) + self._corr_total))
+            out.append(d)
+        return out
+
+    def correction_for(self, mission_id: int) -> Optional[Dict[str, Any]]:
+        if self._corr is None:
+            return None
+        return self._corr["missions"].get(str(mission_id))
 
     # -- connection ---------------------------------------------------------
 
@@ -149,13 +204,14 @@ class KoreaCareerDatabase:
         return self.query_one("SELECT * FROM career LIMIT 1")
 
     def squadron(self) -> Optional[sqlite3.Row]:
-        return self.query_one("SELECT * FROM squadron WHERE isDeleted=0 LIMIT 1")
+        row = self.query_one("SELECT * FROM squadron WHERE isDeleted=0 LIMIT 1")
+        return self._corrected([row], "squadron")[0] if row is not None else None
 
     def pilots(self, include_deleted: bool = False) -> List[sqlite3.Row]:
         sql = "SELECT * FROM pilot"
         if not include_deleted:
             sql += " WHERE isDeleted=0"
-        return self.query(sql + " ORDER BY slot, id")
+        return self._corrected(self.query(sql + " ORDER BY slot, id"), "pilot")
 
     def player(self) -> Optional[sqlite3.Row]:
         """
@@ -176,13 +232,16 @@ class KoreaCareerDatabase:
                 "SELECT * FROM pilot WHERE id=? AND isDeleted=0",
                 (career["playerId"],))
             if row is not None:
-                return row
-        return self.query_one(
+                return self._one_pilot(row)
+        return self._one_pilot(self.query_one(
             """SELECT * FROM pilot WHERE isPlayer=1 AND isDeleted=0
-               ORDER BY (state = 0) DESC, id DESC""")
+               ORDER BY (state = 0) DESC, id DESC"""))
 
     def pilot(self, pilot_id: int) -> Optional[sqlite3.Row]:
-        return self.query_one("SELECT * FROM pilot WHERE id=?", (pilot_id,))
+        return self._one_pilot(self.query_one("SELECT * FROM pilot WHERE id=?", (pilot_id,)))
+
+    def _one_pilot(self, row):
+        return self._corrected([row], "pilot")[0] if row is not None else None
 
     def awards(self, pilot_id: Optional[int] = None,
                include_removed: bool = False) -> List[sqlite3.Row]:
@@ -208,10 +267,10 @@ class KoreaCareerDatabase:
         if pilot_id is not None:
             sql += " AND pilotId=?"
             params.append(pilot_id)
-        return self.query(sql + " ORDER BY id", params)
+        return self._corrected(self.query(sql + " ORDER BY id", params), "sortie")
 
     def missions(self) -> List[sqlite3.Row]:
-        return self.query("SELECT * FROM mission WHERE isDeleted=0 ORDER BY id")
+        return self._corrected(self.query("SELECT * FROM mission WHERE isDeleted=0 ORDER BY id"), "mission")
 
     def events(self, pilot_id: Optional[int] = None,
                types: Optional[Iterable[int]] = None) -> List[sqlite3.Row]:
@@ -224,7 +283,7 @@ class KoreaCareerDatabase:
         if types:
             sql += " AND type IN (%s)" % ",".join("?" * len(types))
             params.extend(types)
-        return self.query(sql + " ORDER BY id", params)
+        return self._corrected(self.query(sql + " ORDER BY id", params), "event")
 
     def table_names(self) -> List[str]:
         return [r[0] for r in self.query(

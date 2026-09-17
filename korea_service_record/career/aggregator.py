@@ -34,7 +34,7 @@ from ..gamedata import (COUNTRY_FLAGS, COUNTRY_NAMES, COUNTRY_SEALS, COUNTRY_STA
 from ..geo import (MapTiles, Overlay, WAYPOINT_TAKEOFF, WAYPOINT_LANDING,
                    parse_point, parse_route)
 from ..icons import IconLibrary
-from .. import ribbons
+from .. import corrections, ribbons
 from ..loadouts import AmmoSchemes, parse_pilots_list
 from ..worldobjects import WorldObjectIndex, normalise as normalise_object
 from .attributes import PilotAttributes
@@ -236,9 +236,12 @@ def _days_between(start: str, end: str) -> int:
 class CareerAggregator:
     """Builds the API payloads for one game installation."""
 
-    def __init__(self, game_dir: Path, lang: str = "eng"):
+    def __init__(self, game_dir: Path, lang: str = "eng", corrections_on=None):
         self.game_dir = Path(game_dir)
         self.lang = lang
+        # A callable answering "are corrected flight times switched on?" -
+        # read per request so the header switch takes effect at once.
+        self.corrections_on = corrections_on or (lambda: False)
         self.resolver = AssetResolver(self.game_dir)
         self.locale = LocaleStrings(self.game_dir, lang, resolver=self.resolver)
         self.objects = WorldObjectIndex(self.resolver, lang)
@@ -439,11 +442,34 @@ class CareerAggregator:
 
     # -- landing page ------------------------------------------------------
 
+    def _open(self, meta) -> KoreaCareerDatabase:
+        """A career file, with the flight-time corrections attached when the
+        user has switched them on and the helper has computed any."""
+        db = KoreaCareerDatabase(meta.path)
+        if self.corrections_on():
+            db.set_corrections(corrections.load(Path(meta.path).stem))
+        return db
+
+    def _shifted_log(self, db, mission_id, flight):
+        """The flight log's offsets re-timed for a corrected mission, so the
+        take-off, landing and damage timeline agree with the events."""
+        entry = db.correction_for(mission_id) if flight is not None else None
+        if not entry:
+            return flight
+        warps = corrections.warps_of(entry)
+        fix = lambda t: None if t is None else corrections.offset(warps, t)   # noqa: E731
+        return flight._replace(
+            takeoff_s=fix(flight.takeoff_s),
+            landing_s=fix(flight.landing_s),
+            damage=[b._replace(at_s=fix(b.at_s)) for b in flight.damage],
+            damage_by_pilot={k: [b._replace(at_s=fix(b.at_s)) for b in v]
+                             for k, v in flight.damage_by_pilot.items()})
+
     def list_careers(self) -> List[Dict[str, Any]]:
         out = []
         for career_id, meta in self._career_files().items():
             try:
-                with KoreaCareerDatabase(meta.path) as db:
+                with self._open(meta) as db:
                     career, squad, player = db.career(), db.squadron(), db.player()
                     if career is None or player is None:
                         continue
@@ -933,6 +959,7 @@ class CareerAggregator:
             flight = (self.flightlogs.for_sortie(sortie["date"][:10],
                                                  sortie["date"][11:16])
                       if with_flight_log else None)
+            flight = self._shifted_log(db, sortie["missionId"], flight)
             # Damage taken, folded into the same timeline as the kills: what a
             # reader wants is the order things happened in, not two lists.
             if flight is not None and flight.damage:
@@ -1052,7 +1079,7 @@ class CareerAggregator:
         meta = self._career_files().get(career_id)
         if meta is None:
             return None
-        with KoreaCareerDatabase(meta.path) as db:
+        with self._open(meta) as db:
             row = db.pilot(pilot_id)
             if row is None:
                 return None
@@ -1296,7 +1323,7 @@ class CareerAggregator:
 
         if len(slots) == len(ai_pilots):
             pairs = list(zip(slots, ai_pilots))
-            if all(_number(slot.get("totalFlightTime", "-1")) == pilot["flight_s"]
+            if all(_number(slot.get("totalFlightTime", "-1")) == pilot.get("_flight_raw", pilot["flight_s"])
                    for slot, pilot in pairs):
                 for slot, pilot in pairs:
                     crew[slot["personageId"]] = pilot["name"]
@@ -1319,8 +1346,14 @@ class CareerAggregator:
         meta = self._career_files().get(career_id)
         if meta is None:
             return None
-        with KoreaCareerDatabase(meta.path) as db:
+        with self._open(meta) as db:
             mission = db.query_one("SELECT * FROM mission WHERE id=?", (mission_id,))
+            if mission is not None:
+                mission = db._corrected([mission], "mission")[0]
+            # Blob ticks are the game's compressed clock; corrected, they move
+            # with the warps exactly as the DB events do.
+            correction = db.correction_for(mission_id)
+            warps = corrections.warps_of(correction) if correction else []
             if mission is None:
                 return None
             result = MissionResult(mission["result"])
@@ -1343,18 +1376,18 @@ class CareerAggregator:
                 (mission_id,))
             flight_log = None
             if player_sortie:
-                flight_log = self.flightlogs.for_sortie(
-                    player_sortie["date"][:10], player_sortie["date"][11:16])
+                flight_log = self._shifted_log(db, mission_id, self.flightlogs.for_sortie(
+                    player_sortie["date"][:10], player_sortie["date"][11:16]))
 
             manifest = {r["pilot_id"]: r for r in parse_pilots_list(mission["pilotsList"])}
             planes = {p["id"]: p for p in db.query("SELECT id, slot, config, tcode FROM plane")}
             flown = []
-            for row in db.query(
+            for row in db._corrected(db.query(
                     """SELECT s.*, p.name, p.lastName, p.isPlayer, p.avatarPath,
                               p.country, p.rankId
                        FROM sortie s JOIN pilot p ON p.id = s.pilotId
                        WHERE s.missionId = ? AND s.isDeleted = 0
-                       ORDER BY s.id""", (mission_id,)):
+                       ORDER BY s.id""", (mission_id,)), "sortie"):
                 kills = KillStats(row["killStats"])
                 carried = manifest.get(row["pilotId"])
                 airframe = planes.get(row["planeId"])
@@ -1378,6 +1411,10 @@ class CareerAggregator:
                     "ground_targets": kills.ground_targets,
                     "flight_time": _hm(row["flightTime"]),
                     "flight_s": row["flightTime"],
+                    # The blob's totalFlightTime is the game's own clock; the
+                    # positional AI check must compare against that, not the
+                    # corrected value. Stripped again before the payload.
+                    "_flight_raw": row.get("_flightTime_raw", row["flightTime"]) if isinstance(row, dict) else row["flightTime"],
                     "outcome": PLANE_OUTCOME.get(row["planeStatus"], "unknown"),
                     "wounded": row["status"] == 4,
                     # Filled in below, once the slots are paired to pilots.
@@ -1462,7 +1499,7 @@ class CareerAggregator:
                     actor = by["name"] if by["named"] else e["actor"]
                 air = bool(info["aircraft"] and not info["parked"])
                 log.append({
-                    "time": _clock(start, e["tick"]),
+                    "time": _clock(start, corrections.offset(warps, e["tick"]) if warps else e["tick"]),
                     "target": info["name"],
                     "named": info["named"],
                     "air": air,
@@ -1505,12 +1542,12 @@ class CareerAggregator:
                 "end": mission["endTime"],
                 "type": self.locale.mission_type_name(mission["type"]),
                 "briefing": briefing,
-                "duration": _hm(result.duration_s or 0),
+                "duration": _hm(correction["planned_s"] if correction else (result.duration_s or 0)),
                 "objectives": result.objectives(),
                 "coalitions": result.coalitions(),
                 "obj_success": mission["objSuccess"],
                 "obj_failure": mission["objFailure"],
-                "flown": flown,
+                "flown": [{k: v for k, v in f.items() if not k.startswith("_")} for f in flown],
                 "log": log,
                 # The briefed route, take-off to landing, and the target the
                 # mission was drawn against - both in world metres.
@@ -1542,7 +1579,7 @@ class CareerAggregator:
         meta = self._career_files().get(career_id)
         if meta is None:
             return None
-        with KoreaCareerDatabase(meta.path) as db:
+        with self._open(meta) as db:
             career = db.career()
             if career is None:
                 return None
@@ -1640,7 +1677,7 @@ class CareerAggregator:
         if meta is None:
             return None
 
-        with KoreaCareerDatabase(meta.path) as db:
+        with self._open(meta) as db:
             career, squad = db.career(), db.squadron()
             subject = db.pilot(pilot_id) if pilot_id is not None else db.player()
             if career is None or subject is None:

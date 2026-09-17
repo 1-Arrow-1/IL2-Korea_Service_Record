@@ -81,6 +81,20 @@ class Settings:
     def _key(career_id: str) -> str:
         return _SAFE_KEY.sub("_", str(career_id or "")).strip()[:160]
 
+    # -- corrected flight times ---------------------------------------------
+
+    @property
+    def corrected_times(self) -> bool:
+        """Show the missions the player warped through re-timed to the plan
+        (see corrections.py). Off by default: the game's own numbers."""
+        return bool(self._read().get("corrected_times", False))
+
+    def set_corrected_times(self, on: bool) -> bool:
+        data = self._read()
+        data["corrected_times"] = bool(on)
+        self._write(data)
+        return bool(on)
+
     # -- global language ---------------------------------------------------
 
     def _installed_language(self) -> Optional[str]:

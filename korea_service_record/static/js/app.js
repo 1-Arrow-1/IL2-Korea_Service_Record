@@ -1341,6 +1341,16 @@
         await i18n.setLocale(settings.language);
         i18n.apply(document);
         fillPicker(el("lang-select"), settings.language, false);
+        el("corrected-times").checked = Boolean(settings.corrected_times);
+    }
+
+    // The missions the player warped through, re-timed to the plan (the
+    // Career Helper computes them; see corrections.py). A view switch: the
+    // career file is never touched, so it can be flipped at any time.
+    async function changeCorrectedTimes(on) {
+        settings = await postJSON("/api/settings", {corrected_times: on});
+        el("corrected-times").checked = Boolean(settings.corrected_times);
+        route();
     }
 
     async function changeLanguage(code) {
@@ -1466,6 +1476,9 @@
 
     el("lang-select").addEventListener("change", (event) => {
         changeLanguage(event.target.value);
+    });
+    el("corrected-times").addEventListener("change", (event) => {
+        changeCorrectedTimes(event.target.checked);
     });
     el("career-lang-select").addEventListener("change", (event) => {
         changeCareerLanguage(event.target.value);

@@ -9,6 +9,8 @@
     "quit_hint": "Arrête l'état de service. Fermer seulement l'onglet du navigateur le laisse tourner dans la zone de notification.",
     "quit_confirm": "Fermer l'état de service ? Il cessera de tourner en arrière-plan ; relancez-le depuis le menu Démarrer.",
     "quit_done": "L'état de service a été fermé. Vous pouvez fermer cet onglet.",
+    "corrected": "Temps de vol corrigés",
+    "corrected_hint": "Affiche les missions où vous avez sauté dans le temps, recalées sur le plan briefé, comme le jeu le fait pour les missions volées sans vous. Calculées par l’assistant de carrière ; le fichier de carrière n’est pas modifié.",
     "quit_failed": "Impossible de fermer l'état de service d'ici. Utilisez Quitter sur l'icône de la zone de notification.",
     "language_default": "Par défaut"
   },
