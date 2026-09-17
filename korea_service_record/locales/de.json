@@ -11,6 +11,8 @@
     "quit_done": "Die Dienstakte wurde geschlossen. Sie können diesen Tab schließen.",
     "corrected": "Korrigierte Flugzeiten",
     "corrected_hint": "Zeigt die Einsätze, in denen Sie gesprungen sind, auf den geplanten Zeitplan umgerechnet - so wie das Spiel es bei Einsätzen ohne Sie tut. Vom Laufbahn-Helfer berechnet; die Laufbahndatei bleibt unverändert.",
+    "helper": "Laufbahn-Helfer",
+    "helper_hint": "Öffnet den Laufbahn-Helfer: einen heute verlorenen Piloten zurückholen, Auszeichnungspunkte hinzufügen, gesprungene Einsätze umrechnen. Er schreibt in die Laufbahn - vorher wird gesichert.",
     "quit_failed": "Die Dienstakte konnte von hier aus nicht geschlossen werden. Verwenden Sie Beenden am Symbol im Infobereich.",
     "language_default": "Standard"
   },
@@ -142,7 +144,7 @@
     "returned_to_duty": "Zum Dienst zurückgekehrt",
     "health": "Gesundheit {value}",
     "plane_lost": "Flugzeug verloren",
-    "friendly_destroyed": "Eigenes Objekt zerstört",
+    "friendly_destroyed": "Beschuss eigener Kräfte",
     "pilot_kia": "Pilot gefallen",
     "wounded": "Im Einsatz verwundet",
     "commander_assigned": "Zum Kommandeur ernannt",

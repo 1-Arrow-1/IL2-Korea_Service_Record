@@ -1375,6 +1375,7 @@
         show(el("detail-page"), onDetail);
         show(el("back-btn"), onDetail);
         el("quit-btn").title = T("app.quit_hint");
+        el("helper-btn").title = T("app.helper_hint");
         window.scrollTo(0, 0);
         if (!onDetail) {
             i18n.setLocale(settings.language).then(() => {
@@ -1479,6 +1480,12 @@
     });
     el("corrected-times").addEventListener("change", (event) => {
         changeCorrectedTimes(event.target.checked);
+    });
+    // The Career Helper is a separate desktop program; the button only shows
+    // where one is installed beside the tracker (or the script, from source).
+    getJSON("/api/helper").then((h) => { show(el("helper-btn"), Boolean(h && h.available)); }).catch(() => {});
+    el("helper-btn").addEventListener("click", async () => {
+        try { await fetch("/api/helper", {method: "POST"}); } catch (err) { /* the server said why in its log */ }
     });
     el("career-lang-select").addEventListener("change", (event) => {
         changeCareerLanguage(event.target.value);

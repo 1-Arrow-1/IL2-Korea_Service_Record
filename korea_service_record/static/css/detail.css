@@ -292,7 +292,8 @@ table.roster td.award-cell { white-space: normal; }
     letter-spacing: 0.06em;
     margin-left: 0.35rem;
 }
-.kind-pilot_kia .service-text, .kind-plane_lost .service-text { color: var(--bad); }
+.kind-pilot_kia .service-text, .kind-plane_lost .service-text,
+.kind-friendly_destroyed .service-text { color: var(--bad); }
 .kind-promotion .service-text { color: var(--good); }
 
 /* ---------------------------------------------------------------- roster -- */

@@ -11,6 +11,8 @@
     "quit_done": "The Service Record has been closed. You can close this tab.",
     "corrected": "Corrected flight times",
     "corrected_hint": "Show the missions you warped through re-timed to the briefed plan, as the game does for missions flown without you. Computed by the Career Helper; the career file is not changed.",
+    "helper": "Career Helper",
+    "helper_hint": "Opens the Career Helper: revive a pilot lost today, add award points, re-time warped missions. It writes to the career - with a backup first.",
     "quit_failed": "Could not close the Service Record from here. Use Quit on the tray icon.",
     "language_default": "Default"
   },
@@ -142,7 +144,7 @@
     "returned_to_duty": "Returned to duty",
     "health": "health {value}",
     "plane_lost": "Aircraft lost",
-    "friendly_destroyed": "Friendly object destroyed",
+    "friendly_destroyed": "Friendly fire",
     "pilot_kia": "Pilot killed in action",
     "wounded": "Wounded in action",
     "commander_assigned": "Commander assigned",

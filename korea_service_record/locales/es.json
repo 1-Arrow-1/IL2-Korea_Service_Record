@@ -11,6 +11,8 @@
     "quit_done": "La Hoja de Servicios se ha cerrado. Puede cerrar esta pestaña.",
     "corrected": "Tiempos de vuelo corregidos",
     "corrected_hint": "Muestra las misiones en las que saltó, ajustadas al plan de vuelo, como hace el juego con las misiones voladas sin usted. Las calcula el Asistente de carrera; el archivo de la carrera no cambia.",
+    "helper": "Asistente de carrera",
+    "helper_hint": "Abre el Asistente de carrera: recuperar a un piloto perdido hoy, añadir puntos de condecoración, ajustar misiones con salto. Escribe en la carrera, con copia de seguridad previa.",
     "quit_failed": "No se pudo cerrar la Hoja de Servicios desde aquí. Use Salir en el icono de la bandeja.",
     "language_default": "Predeterminado"
   },
@@ -142,7 +144,7 @@
     "returned_to_duty": "Reincorporado al servicio",
     "health": "salud {value}",
     "plane_lost": "Aeronave perdida",
-    "friendly_destroyed": "Objeto propio destruido",
+    "friendly_destroyed": "Fuego amigo",
     "pilot_kia": "Piloto caído en combate",
     "wounded": "Herido en combate",
     "commander_assigned": "Nombrado comandante",

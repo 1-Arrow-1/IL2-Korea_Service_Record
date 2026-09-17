@@ -69,7 +69,7 @@ EVENT_TYPES: Dict[int, EventType] = {
                  "objects too, so never infer airborne kills from these — use "
                  "killStats."),
 
-    1: EventType(1, "friendly_destroyed", "Friendly object destroyed", CONFIRMED,
+    1: EventType(1, "friendly_destroyed", "Friendly fire", CONFIRMED,
                  "Own-side object destroyed by the pilot: tpar1 = the object "
                  "(Static_plane_C47B), tpar2 = its owner (BlocksArray = an "
                  "airfield's parked scenery). Proven 1951.04.12: a parked USAF "

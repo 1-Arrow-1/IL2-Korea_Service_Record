@@ -30,6 +30,16 @@ from .locate import find_game_dir
 
 logger = logging.getLogger(__name__)
 
+def helper_command() -> Optional[list]:
+    """How to start the Career Helper here, or None if there is none."""
+    import sys
+    if getattr(sys, "frozen", False):
+        exe = Path(sys.executable).parent / "IL2_Korea_Career_Helper.exe"
+        return [str(exe)] if exe.is_file() else None
+    script = Path(__file__).resolve().parent.parent / "career_helper.py"
+    return [sys.executable, str(script)] if script.is_file() else None
+
+
 def create_app(game_dir: Optional[Path] = None) -> Flask:
     app = Flask(__name__, static_folder="static", static_url_path="/static")
 
@@ -123,6 +133,27 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             return ("", 404)
         return Response(data, mimetype="image/png",
                         headers={"Cache-Control": "public, max-age=31536000"})
+
+    @app.route("/api/helper", methods=["GET", "POST"])
+    def api_helper():
+        """
+        The Career Helper, launched from the page. GET says whether one is
+        available (the frozen exe beside this one, or the script in a source
+        checkout); POST starts it as its own process - it is a desktop window
+        that writes to the career, deliberately separate from this server.
+        """
+        import subprocess
+        cmd = helper_command()
+        if request.method == "GET":
+            return jsonify({"available": cmd is not None})
+        if cmd is None:
+            return jsonify({"ok": False, "reason": "no helper"}), 404
+        try:
+            subprocess.Popen(cmd, cwd=str(Path(cmd[0]).parent), close_fds=True)
+        except OSError as exc:
+            logger.warning("Career Helper failed to start: %s", exc)
+            return jsonify({"ok": False, "reason": str(exc)}), 500
+        return jsonify({"ok": True})
 
     @app.route("/api/quit", methods=["POST"])
     def api_quit():

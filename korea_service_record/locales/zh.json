@@ -11,6 +11,8 @@
     "quit_done": "服役记录已关闭。您可以关闭此标签页。",
     "corrected": "修正后的飞行时间",
     "corrected_hint": "将您跳跃过的任务按简报计划重新计时显示，如同游戏对无您参与的任务所做的那样。由生涯助手计算；生涯文件不会被更改。",
+    "helper": "生涯助手",
+    "helper_hint": "打开生涯助手：复活今天损失的飞行员、增加授勋点数、重新计时跳跃任务。它会写入生涯——但先做备份。",
     "quit_failed": "无法从此处关闭服役记录。请使用托盘图标上的“退出”。",
     "language_default": "默认"
   },
@@ -142,7 +144,7 @@
     "returned_to_duty": "归队",
     "health": "健康 {value}",
     "plane_lost": "损失飞机",
-    "friendly_destroyed": "摧毁己方目标",
+    "friendly_destroyed": "误击友军",
     "pilot_kia": "飞行员阵亡",
     "wounded": "作战负伤",
     "commander_assigned": "任命为中队长",
