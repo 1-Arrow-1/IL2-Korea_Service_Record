@@ -45,10 +45,14 @@ FOLDER = default_cache_dir().parent / "corrections"
 FORMAT = 1
 TIME = "%Y.%m.%d %H:%M:%S"
 
-# A jump between two fixes that no aircraft of 1951 could fly: at least this
-# far, at least this fast (an F-86 in a dive stays under 330 m/s).
+# A jump between two fixes that the aircraft could not have flown: at least
+# this far, and faster on average than the briefed speed of that leg times
+# this factor. The fixes are sparse (one every few minutes), so a warp is
+# blended with real flying either side of it - 101 km in 349 s is only 289
+# m/s, but a Mustang briefed at 430 km/h cannot average 1040 km/h. The factor
+# leaves room for a fast leg without catching a dive.
 WARP_MIN_M = 5_000.0
-WARP_MIN_MPS = 350.0
+WARP_FACTOR = 1.5
 # Record types whose payload starts with the aircraft id and a position.
 FIX_TYPES = {5, 6, 24, 25, 26, 27, 28, 30, 31}
 # A mission counts as warped when it was flown in less than this share of the plan.
@@ -157,13 +161,18 @@ def player_fixes(log_path: Path) -> List[Tuple[float, float, float]]:
     return fixes
 
 
-def find_warps(fixes: List[Tuple[float, float, float]]) -> List[Tuple[float, float, float, float, float, float]]:
-    """(t_before, t_after, x0, z0, x1, z1) for every impossible jump."""
+def find_warps(fixes: List[Tuple[float, float, float]],
+               route: Optional[List[Dict[str, Any]]] = None) -> List[Tuple[float, float, float, float, float, float]]:
+    """(t_before, t_after, x0, z0, x1, z1) for every jump the aircraft could
+    not have flown at the speed briefed for that part of the route."""
     out = []
     for (t0, x0, z0), (t1, x1, z1) in zip(fixes, fixes[1:]):
         d = math.hypot(x1 - x0, z1 - z0)
         dt_s = t1 - t0
-        if d >= WARP_MIN_M and dt_s > 0 and d / dt_s >= WARP_MIN_MPS:
+        if d < WARP_MIN_M or dt_s <= 0:
+            continue
+        ceiling = (_leg_speed(route, (x0 + x1) / 2, (z0 + z1) / 2) if route else 400 / 3.6) * WARP_FACTOR
+        if d / dt_s >= ceiling:
             out.append((t0, t1, x0, z0, x1, z1))
     return out
 
@@ -238,7 +247,7 @@ def compute(db_path: Path, game_dir: Path, existing: Optional[Dict[str, Any]] = 
         source = "plan"
 
         log = logs.for_sortie(m["sdate"][:10], m["sdate"][11:])
-        jumps = find_warps(player_fixes(log.path)) if log else []
+        jumps = find_warps(player_fixes(log.path), route) if log else []
         if jumps:
             source = "log"
             for (t0, t1, x0, z0, x1, z1) in jumps:
