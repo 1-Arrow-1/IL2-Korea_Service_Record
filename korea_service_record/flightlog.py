@@ -303,6 +303,13 @@ class FlightLogIndex:
         except (ValueError, IndexError):
             return ""
 
+    @staticmethod
+    def _written(path: Path) -> str:
+        m = re.search(r"\((\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\)", path.name)
+        if m:
+            return "0" + m.group(1)
+        return "1" + f"{path.stat().st_mtime:020.6f}"    # sorts after any stamped name
+
     def logs(self) -> Dict[str, SortieLog]:
         if self._logs is not None:
             return self._logs
@@ -314,9 +321,13 @@ class FlightLogIndex:
                     continue
                 key = self.key(log.date, log.time)
                 # Several logs can share a start time when a mission is flown
-                # more than once; the newest file is the one that counts.
+                # more than once - one career had a mission with eight - and
+                # the last attempt is the one the career kept. Newest by the
+                # real-world stamp in the game's own file name
+                # (missionReport(2026-08-31_23-31-29).mlg), which survives a
+                # folder being copied; the file's mtime only as a fallback.
                 if key and (key not in found
-                            or path.stat().st_mtime > found[key].path.stat().st_mtime):
+                            or self._written(path) > self._written(found[key].path)):
                     found[key] = log
             logger.info("Flight logs: %d usable of %d files",
                         len(found), len(list(self.folder.glob("*.mlg"))))
