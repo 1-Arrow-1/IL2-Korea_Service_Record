@@ -90,6 +90,13 @@ read as a hostname and renders an error page silently.
 Bump `MyAppVersion` in the .iss and `VERSION` in `make_release_zip.py`
 together. The zip is the setup exe plus a README and nothing else.
 
+`stage_release.py` **without flags** copies `dist/` into
+`installer/payload/tracker`; `--refresh-mod` alone refreshes only the mod
+files, and Inno then packs whatever tracker build is already in the
+payload — 1.4.0 shipped a 1.3.0 tracker for ten minutes that way. Verify
+with `ls installer/payload/tracker/_internal/korea_service_record/locales/ranks`
+(or any file the release added) before compiling.
+
 **The PyInstaller bootloader is a local rebuild, not the stock one.** A forum
 user's Defender flagged 1.3.0 as `Trojan:Script/Wacatac.C!ml` on download
 (2026-09-15), and Defender here quarantined PyInstaller's own PyPI source

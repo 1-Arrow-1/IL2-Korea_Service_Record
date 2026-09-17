@@ -109,7 +109,7 @@ DOWNLOAD
 IL-2 Korea Service Record v1.4.0.zip — the setup program (tracker plus the optional awards
 mod) and a README with the SHA-256 of the setup:
 
-    ad6ee2218fb899ea39099b905cd3bbe38a3343ab87d41cdbbedde298585bd098
+    6cb6344668249096ece17b9f362626a45aee297987a88fb4a9c8c0f1a5d7a8b1
 
 Also on the Releases page of the GitHub repository. Unsigned still — the SignPath
 application is pending — so Defender may want a second look, as it did with 1.3; the hash
