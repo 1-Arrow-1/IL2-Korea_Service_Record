@@ -294,18 +294,31 @@ class RibbonRenderer:
 
 def _level(img):
     """Rotate a device so its long axis is horizontal, from the alpha's
-    principal axis, and re-fit it to its ink."""
-    import numpy as np
+    principal axis (pure Python over the alpha band: a device is a few
+    thousand pixels, and this runs once per device per process), and re-fit
+    it to its ink. Art that is already level within 3 degrees is untouched."""
     from PIL import Image
-    a = np.asarray(img)[..., 3].astype(float)
-    ys, xs = np.nonzero(a > 40)
-    if len(xs) < 10:
+    alpha = img.getchannel("A")
+    w, h = alpha.size
+    data = alpha.getdata()
+    n = sx = sy = 0.0
+    pts = []
+    for i, a in enumerate(data):
+        if a > 40:
+            x, y = i % w, i // w
+            pts.append((x, y, a))
+            n += a
+            sx += a * x
+            sy += a * y
+    if len(pts) < 10:
         return img
-    w = a[ys, xs]
-    cx, cy = np.average(xs, weights=w), np.average(ys, weights=w)
-    sxx = np.average((xs - cx) ** 2, weights=w)
-    syy = np.average((ys - cy) ** 2, weights=w)
-    sxy = np.average((xs - cx) * (ys - cy), weights=w)
+    cx, cy = sx / n, sy / n
+    sxx = syy = sxy = 0.0
+    for x, y, a in pts:
+        dx, dy = x - cx, y - cy
+        sxx += a * dx * dx
+        syy += a * dy * dy
+        sxy += a * dx * dy
     angle = 0.5 * math.degrees(math.atan2(2 * sxy, sxx - syy))
     if abs(angle) < 3:
         return img
@@ -315,7 +328,6 @@ def _level(img):
     box = turned.getbbox()
     if box:
         turned = turned.crop(box)
-    h = img.height
     scale = min(h / turned.height, img.width * 1.4 / turned.width)
     size = (max(1, round(turned.width * scale)), max(1, round(turned.height * scale)))
     return turned.resize(size, Image.LANCZOS)
