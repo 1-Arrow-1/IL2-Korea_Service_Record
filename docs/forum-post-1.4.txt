@@ -1,0 +1,116 @@
+IL-2 Korea Service Record 1.4 — ribbon racks, eighteen more decorations, a Bronze Star
+with the V, and a fix for a citation that could never be earned
+
+
+Gentlemen,
+
+1.4 is out. Everything below is new or corrected since 1.3; what the tracker and the mod
+already did is in the earlier posts and has not changed.
+
+
+THE RIBBON RACK
+
+Every pilot now wears his ribbons. Under the portrait on the service record, and in the
+roster's pilot card, there is the rack as it would sit on his tunic: rows of three, highest
+precedence top-left, the short top row centred, with the devices on the bars — bronze and
+silver oak leaf clusters, the V, the bronze and silver service stars of the Korean Service
+Medal — at the sizes the regulations give them, and a unit citation with its gold frame.
+Unit citations are worn on the right breast, so they form their own small rack beneath the
+decorations.
+
+The order of wear is the Army's of 1950–53, which the Air Force followed until it had a
+manual of its own. One thing that surprises people: the Purple Heart sat *below* the
+Commendation Ribbon then; it moved up only in 1985.
+
+Soviet and North Korean pilots have racks too, on the 24 × 8 mm bar those armies used
+(the American bar is 1⅜ × ⅜ in., a different shape, and the rack shows it). A second or
+third Order of the Red Banner is a second or third order, worn as another identical bar —
+there were no clusters in that system. The North Korean Orders of Freedom and Independence
+and of Soldier's Honour have a different bar for each class, as the originals do. Chinese
+pilots get no rack, on purpose: the People's Volunteers' awards were pin badges, and the PLA
+wore no ribbon bars until 1955. I would rather show nothing than invent something.
+
+
+THE AWARDS
+
+Eighteen more decorations, all things a USAF pilot in Korea could actually wear:
+
+ • The Bronze Star with the "V". Army regulations of 1950 put a bronze V on the ribbon of a
+   Bronze Star awarded for heroism — worn once, however many valorous awards followed; every
+   further Bronze Star, for valour or merit, added a cluster. The mod now tracks both: how
+   many, and whether one was for valour. The V is earned by the sortie that was hard rather
+   than the one with the biggest score — one enemy aircraft in a fight that went badly, a
+   strike of twenty-five or more targets pressed through the flak, or a mission finished
+   wounded — each with a chance, never a certainty. Three tiles: V, V and one cluster, V and
+   two.
+ • Silver Star, fourth and fifth awards (three and four clusters). Real, if rare — Robin Olds
+   had four — and needed, because an aggressive pilot fills the first three in weeks.
+ • Distinguished Unit Citation, third and fourth (two and three clusters), and the ROK
+   Presidential Unit Citation with one, two and three clusters at 200, 300 and 400 squadron
+   missions.
+ • Distinguished Service Medal — the Army pattern, since the Air Force had none until 1960 —
+   for a commander who has reached general rank and held the squadron for half a year. The
+   one decoration the flag ranks from the promotion mod can earn.
+ • National Defense Service Medal. Created 22 April 1953 for everyone in uniform since June
+   1950: nothing happens for two years, then the whole roster gets it on one morning.
+ • Commendation Ribbon with Metal Pendant, and three clusters. The Air Force Commendation
+   Medal did not exist until 1958; in Korea airmen received the Army's, green with five white
+   stripes. It is the award below the Bronze Star for the man who does the unglamorous work
+   well — the wingman who has flown his missions, held his position and brought his aircraft
+   home. Fifteen missions and a one-in-five chance each sortie after that; clusters at 45,
+   75 and 110.
+
+Every one has its name in six languages, a description in the medal screen (three written
+fresh, the clusters pointing at their base decoration as the game's own do), and artwork in
+the mod's own atlas rather than squeezed into the game's.
+
+
+CORRECTED
+
+ • The Distinguished Unit Citation could never be earned. 1.3 defined it on one mission's
+   kills, which is how the DUC was historically given — but the game's squadron-award path
+   evaluates an empty sortie record, so every per-sortie value is zero there. I found this by
+   watching a 15-vehicle squadron sortie earn nothing, then reading the game's own code to be
+   sure. The DUC now marks the point where a squadron at full efficiency has destroyed 50
+   aircraft or 600 vehicles, vessels and buildings — a milestone rather than a day, which is
+   the only shape the engine allows. My own squadron earned it on 23 April 1951, so it works.
+ • The Silver Star and Distinguished Service Cross are now single-sortie awards with a
+   chance rather than a certainty: two kills, 60 %; three, 80 %; four or five for the DSC.
+   A pilot can no longer collect a Silver Star and a DSC for the same fight.
+ • Why a `noAwards` guard never works, if you have looked at the awards file: the plain Air
+   Medal is re-granted and retired again every sortie once a pilot holds a cluster, and that
+   silently clears the flag for everything below it in the file. The mod avoids the token;
+   the note is in the file for anyone who mods it further.
+
+
+ALSO
+
+ • Earlier rungs of a ladder are no longer lost. Behind each ribbon in the awards list there
+   is a small arrow; it unfolds the decorations that ribbon replaced — the plain Silver Star
+   under its cluster, the five Air Medals under the silver cluster — each with its own
+   dates. The squadron's citations show every rung on one row.
+ • Rank descriptions. The game has none. Click any rank insignia and there is now a
+   paragraph on it — what the insignia was, where the rank stood, and what a pilot of that
+   rank was doing in Korea — for all 32 ranks of the four nations, in six languages. The
+   Chinese ones say honestly that the PLA had no ranks until 1955 and the game applies them
+   backwards.
+ • "Close the Service Record" in the header. Closing the browser tab leaves the tracker
+   running in the tray, which even I found non-obvious; this stops it properly.
+ • The "highest combat award" on the roster now ranks the new decorations correctly (the V
+   ladder above the merit Bronze Star, the Commendation below the Air Medal).
+
+Existing careers pick the new rules up at the next day rollover; nothing needs restarting.
+The awards file changed shape considerably this time, so if you edit it yourself, diff before
+you merge.
+
+
+DOWNLOAD
+
+IL-2 Korea Service Record v1.4.0.zip — the setup program (tracker plus the optional awards
+mod) and a README with the SHA-256 of the setup:
+
+    ad6ee2218fb899ea39099b905cd3bbe38a3343ab87d41cdbbedde298585bd098
+
+Also on the Releases page of the GitHub repository. Unsigned still — the SignPath
+application is pending — so Defender may want a second look, as it did with 1.3; the hash
+is what to check it against.
