@@ -671,6 +671,7 @@
         const body = el("d-roster").querySelector("tbody");
         const sorted = rosterRows.slice().sort((a, b) => {
             let x = a[sortKey], y = b[sortKey];
+            if (sortKey === "top_award") { x = a.top_award_rank; y = b.top_award_rank; }
             if (sortKey === "state") {
                 x = STATE_ORDER[x] ?? 9;
                 y = STATE_ORDER[y] ?? 9;
@@ -1406,7 +1407,7 @@
             const key = th.dataset.sort;
             if (!key) return;
             if (key === sortKey) sortAsc = !sortAsc;
-            else { sortKey = key; sortAsc = (key === "name" || key === "top_award"); }
+            else { sortKey = key; sortAsc = (key === "name"); }
             renderRoster();
         });
     });

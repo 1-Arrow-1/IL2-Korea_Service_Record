@@ -326,6 +326,12 @@ class CareerAggregator:
             "awards_pending": sum(1 for a in held if a["isPending"]),
             "top_award": self.award_name(top) if top else "",
             "top_award_id": top,
+            # Sort key for the roster: precedence, not the name's first letter
+            # (which put "Bronze Oak Leaf Cluster in Lieu of 2nd Silver Star"
+            # under the DFC). USAF ids rank by the explicit list; the other
+            # nations' stock blocks happen to be in precedence order by id.
+            "top_award_rank": (_USAF_RANK.get(top, -1) if row["country"] == 601
+                               else (top or 0)) if top else -1,
             # rank icon keys are rank<country><index>
             "rank_key": f"{row['country']}{row['rankId']}",
             "promotions": sum(1 for a in held if a["category"] == 1),
