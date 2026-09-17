@@ -929,3 +929,4 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     color: var(--ink-muted); cursor: pointer; margin-right: 0.4rem; white-space: nowrap; }
 #header-nav .switch input { accent-color: var(--accent-dark); margin: 0; }
 #header-nav .switch:hover { color: var(--ink-strong); }
+#header-nav .switch.locked { cursor: default; color: var(--accent-dark); }

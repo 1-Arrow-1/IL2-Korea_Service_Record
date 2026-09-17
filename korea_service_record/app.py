@@ -309,8 +309,24 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             return jsonify({"error": "game_not_found", "careers": []}), 200
         return jsonify({"careers": agg.list_careers()})
 
+    def auto_correct(career_id: str) -> None:
+        """A career kept corrected by standing order (set in the Career
+        Helper) gets its new missions applied when it is read."""
+        agg = aggregator(career_id)
+        if agg is None:
+            return
+        meta = agg._career_files().get(career_id)
+        if meta is None:
+            return
+        try:
+            from .corrections import auto_sync
+            auto_sync(Path(meta.path), agg.game_dir)
+        except Exception:                    # noqa: BLE001 - never break the page over this
+            logger.exception("Automatic flight-time correction failed for %s", career_id)
+
     @app.route("/api/career/<path:career_id>")
     def api_career(career_id: str):
+        auto_correct(career_id)
         agg = aggregator(career_id)
         if agg is None:
             return jsonify({"error": "game_not_found"}), 404

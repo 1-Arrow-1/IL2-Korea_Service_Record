@@ -11,6 +11,7 @@
     "quit_done": "Die Dienstakte wurde geschlossen. Sie können diesen Tab schließen.",
     "corrected": "Korrigierte Flugzeiten",
     "corrected_hint": "Zeigt die Einsätze, in denen Sie gesprungen sind, auf den geplanten Zeitplan umgerechnet - so wie das Spiel es bei Einsätzen ohne Sie tut. Vom Laufbahn-Helfer berechnet; die Laufbahndatei bleibt unverändert.",
+    "corrected_applied": "Die angerechneten Stunden wurden in diese Laufbahn geschrieben (Laufbahn-Helfer), daher wird ihre Akte immer umgerechnet angezeigt.",
     "helper": "Laufbahn-Helfer",
     "helper_hint": "Öffnet den Laufbahn-Helfer: einen heute verlorenen Piloten zurückholen, Auszeichnungspunkte hinzufügen, gesprungene Einsätze umrechnen. Er schreibt in die Laufbahn - vorher wird gesichert.",
     "quit_failed": "Die Dienstakte konnte von hier aus nicht geschlossen werden. Verwenden Sie Beenden am Symbol im Infobereich.",

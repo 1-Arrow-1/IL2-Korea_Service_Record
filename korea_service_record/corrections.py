@@ -42,6 +42,8 @@ from .geo import parse_route
 logger = logging.getLogger(__name__)
 
 FOLDER = default_cache_dir().parent / "corrections"
+BACKUPS = default_cache_dir().parent / "backups"
+KEEP_BACKUPS = 12          # per career; the automatic mode would otherwise pile them up
 FORMAT = 1
 TIME = "%Y.%m.%d %H:%M:%S"
 
@@ -107,6 +109,11 @@ def save(career_name: str, data: Dict[str, Any]) -> Path:
     p = path_for(career_name)
     p.write_text(json.dumps(data, indent=1, ensure_ascii=False), encoding="utf-8")
     return p
+
+
+def is_applied(data: Optional[Dict[str, Any]]) -> bool:
+    """Whether any of a career's credited hours have been written into it."""
+    return bool(data) and (bool(data.get("auto")) or any(e.get("applied") for e in data.get("missions", {}).values()))
 
 
 def warps_of(entry: Dict[str, Any]) -> List[Warp]:
@@ -313,6 +320,37 @@ def compute(db_path: Path, game_dir: Path, existing: Optional[Dict[str, Any]] = 
 
 
 # ---------------------------------------------------------------------------
+# Backups: before every write, outside the game's folder, oldest pruned
+# ---------------------------------------------------------------------------
+
+def backup(db_path: Path) -> Path:
+    """
+    Copy the career file aside. Not into the game's Career folder and not
+    ending in .db: the game lists every .db there as a career. A counter
+    keeps two writes in one second apart; the oldest copies beyond
+    KEEP_BACKUPS for this career are removed.
+    """
+    import shutil
+    BACKUPS.mkdir(parents=True, exist_ok=True)
+    name = Path(db_path).stem
+    stamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+    n = 0
+    while True:
+        target = BACKUPS / f"{name}.{stamp}{'' if n == 0 else f'-{n}'}.career-backup"
+        if not target.exists():
+            break
+        n += 1
+    shutil.copy2(db_path, target)
+    old = sorted(BACKUPS.glob(f"{name}.*.career-backup"), key=lambda p: p.stat().st_mtime)
+    for p in old[:-KEEP_BACKUPS]:
+        try:
+            p.unlink()
+        except OSError:
+            pass
+    return target
+
+
+# ---------------------------------------------------------------------------
 # Pushing the hours into the game file, and taking them back
 # ---------------------------------------------------------------------------
 
@@ -377,6 +415,43 @@ def restore_hours(db_path: Path, data: Dict[str, Any], mission_ids: Iterable[str
     finally:
         con.close()
     return done
+
+
+def auto_sync(db_path: Path, game_dir: Path) -> Optional[Dict[str, Any]]:
+    """
+    The standing order: when a career's record carries ``auto``, compute any
+    mission flown since and apply its hours, backup first. Called by the
+    tracker whenever it reads the career - the natural moment, since the
+    record is opened after flying. A file the game is holding is left alone
+    and picked up next time. Returns {"computed": n, "applied": n} or None
+    when nothing was to be done.
+    """
+    import sqlite3
+    name = Path(db_path).stem
+    data = load(name)
+    if not data or not data.get("auto"):
+        return None
+    before = set(data.get("missions", {}))
+    try:
+        data = compute(db_path, game_dir, existing=data)
+    except sqlite3.Error as exc:
+        logger.info("Auto-correction: %s not readable now (%s)", name, exc)
+        return None
+    new_keys = [k for k in data["missions"] if k not in before]
+    pending = [k for k, e in data["missions"].items() if not e.get("applied")]
+    if not new_keys and not pending:
+        return None
+    applied: List[str] = []
+    if pending:
+        try:
+            backup(db_path)
+            applied = apply_hours(db_path, data, pending)
+        except sqlite3.OperationalError as exc:
+            logger.info("Auto-correction: %s is in use, will retry (%s)", name, exc)
+    save(name, data)
+    if new_keys or applied:
+        logger.info("Auto-correction on %s: %d new mission(s), %d applied", name, len(new_keys), len(applied))
+    return {"computed": len(new_keys), "applied": len(applied)}
 
 
 def awards_since_apply(db_path: Path, data: Dict[str, Any]) -> List[Dict[str, Any]]:

@@ -11,6 +11,7 @@
     "quit_done": "L'état de service a été fermé. Vous pouvez fermer cet onglet.",
     "corrected": "Temps de vol corrigés",
     "corrected_hint": "Affiche les missions où vous avez sauté dans le temps, recalées sur le plan briefé, comme le jeu le fait pour les missions volées sans vous. Calculées par l’assistant de carrière ; le fichier de carrière n’est pas modifié.",
+    "corrected_applied": "Les heures créditées ont été écrites dans cette carrière (assistant de carrière) ; son état de service est donc toujours affiché recalé.",
     "helper": "Assistant de carrière",
     "helper_hint": "Ouvre l’assistant de carrière : ramener un pilote perdu aujourd’hui, ajouter des points de décoration, recaler les missions avec saut. Il écrit dans la carrière, après sauvegarde.",
     "quit_failed": "Impossible de fermer l'état de service d'ici. Utilisez Quitter sur l'icône de la zone de notification.",

@@ -11,6 +11,7 @@
     "quit_done": "The Service Record has been closed. You can close this tab.",
     "corrected": "Corrected flight times",
     "corrected_hint": "Show the missions you warped through re-timed to the briefed plan, as the game does for missions flown without you. Computed by the Career Helper; the career file is not changed.",
+    "corrected_applied": "The credited hours have been written into this career (Career Helper), so its record is always shown re-timed.",
     "helper": "Career Helper",
     "helper_hint": "Opens the Career Helper: revive a pilot lost today, add award points, re-time warped missions. It writes to the career - with a backup first.",
     "quit_failed": "Could not close the Service Record from here. Use Quit on the tray icon.",

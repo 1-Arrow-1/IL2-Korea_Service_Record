@@ -787,6 +787,13 @@
                 ? d.incidences.map(incidenceItem).join("")
                 : '<li class="muted">' + esc(T("incidences.none")) + "</li>";
 
+            // Hours written into the career: the clock follows, no choice offered.
+            const sw = el("corrected-times");
+            sw.disabled = Boolean(d.corrections_applied);
+            if (d.corrections_applied) { sw.checked = true; }
+            el("corrected-switch").title = T(d.corrections_applied ? "app.corrected_applied" : "app.corrected_hint");
+            el("corrected-switch").classList.toggle("locked", Boolean(d.corrections_applied));
+
             const rackEl = el("d-ribbon-rack");
             rackEl.innerHTML = ribbonRack(d.ribbon_rack);
             rackEl.hidden = !rackEl.innerHTML;
@@ -1378,6 +1385,9 @@
         el("helper-btn").title = T("app.helper_hint");
         window.scrollTo(0, 0);
         if (!onDetail) {
+            el("corrected-times").disabled = false;
+            el("corrected-times").checked = Boolean(settings.corrected_times);
+            el("corrected-switch").classList.remove("locked");
             i18n.setLocale(settings.language).then(() => {
                 i18n.apply(document);
                 loadLanding();

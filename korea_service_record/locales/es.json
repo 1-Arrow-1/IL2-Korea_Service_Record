@@ -11,6 +11,7 @@
     "quit_done": "La Hoja de Servicios se ha cerrado. Puede cerrar esta pestaña.",
     "corrected": "Tiempos de vuelo corregidos",
     "corrected_hint": "Muestra las misiones en las que saltó, ajustadas al plan de vuelo, como hace el juego con las misiones voladas sin usted. Las calcula el Asistente de carrera; el archivo de la carrera no cambia.",
+    "corrected_applied": "Las horas acreditadas se han escrito en esta carrera (Asistente de carrera), por lo que su registro se muestra siempre ajustado.",
     "helper": "Asistente de carrera",
     "helper_hint": "Abre el Asistente de carrera: recuperar a un piloto perdido hoy, añadir puntos de condecoración, ajustar misiones con salto. Escribe en la carrera, con copia de seguridad previa.",
     "quit_failed": "No se pudo cerrar la Hoja de Servicios desde aquí. Use Salir en el icono de la bandeja.",

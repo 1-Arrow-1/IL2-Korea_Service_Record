@@ -446,8 +446,12 @@ class CareerAggregator:
         """A career file, with the flight-time corrections attached when the
         user has switched them on and the helper has computed any."""
         db = KoreaCareerDatabase(meta.path)
-        if self.corrections_on():
-            db.set_corrections(corrections.load(Path(meta.path).stem))
+        data = corrections.load(Path(meta.path).stem)
+        # Once the credited hours are in the file, the clock must follow or the
+        # record shows a hybrid - so an applied career is always re-timed,
+        # whatever the switch says; the switch only governs the others.
+        if data and (self.corrections_on() or corrections.is_applied(data)):
+            db.set_corrections(data)
         return db
 
     def _shifted_log(self, db, mission_id, flight):
@@ -1753,6 +1757,7 @@ class CareerAggregator:
                 "promotions": groups["promotions"],
                 "awards": groups["awards"],
                 "ribbon_rack": self._ribbon_rack(groups["awards"], awards_by_pilot.get(-1, [])),
+                "corrections_applied": corrections.is_applied(corrections.load(Path(meta.path).stem)),
                 "incidences": self._incidences(db.events(pid), aircraft_flown),
                 "debriefings": debriefings,
                 "victories": victories,

@@ -113,6 +113,10 @@ class KoreaCareerDatabase:
         if self._corr is None:
             return
         for entry in self._corr["missions"].values():
+            # Once the hours have been written into the career file, the file
+            # already carries them: the overlay then only re-times the clock.
+            if entry.get("applied"):
+                continue
             for sid, d in entry.get("durations", {}).items():
                 self._corr_sortie[int(sid)] = d
                 delta = float(d["credited"]) - float(d["orig"])

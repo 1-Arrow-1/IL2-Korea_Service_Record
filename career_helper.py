@@ -35,9 +35,7 @@ event types 2 (aircraft lost) and 3 (killed) / 4 (missing).
 
 from __future__ import annotations
 
-import datetime as dt
 import locale
-import shutil
 import sqlite3
 import sys
 import tkinter as tk
@@ -108,6 +106,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_times": "No warped missions found - either you fly the whole route, or nothing has been flown yet.",
         "awards_since": "Awards granted since the hours were applied - tick the ones to withdraw (an award earned on kills should stay):",
         "withdraw": "Withdraw ticked awards",
+        "auto": "Keep this career corrected automatically: the Service Record applies new missions when it reads the career (backup first; skipped while the game holds the file).",
+        "auto_on": "Automatic correction is on for this career.",
+        "auto_off": "Automatic correction is off for this career.",
         "withdrawn": "{n} awards withdrawn. Backup: {backup}",
     },
     "de": {
@@ -155,6 +156,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_times": "Keine Einsätze mit Zeitsprung gefunden - entweder fliegen Sie die ganze Strecke, oder es wurde noch nichts geflogen.",
         "awards_since": "Seit dem Übernehmen der Stunden verliehene Auszeichnungen - die zu entziehenden ankreuzen (eine mit Abschüssen verdiente sollte bleiben):",
         "withdraw": "Angekreuzte Auszeichnungen entziehen",
+        "auto": "Diese Laufbahn automatisch korrigiert halten: die Dienstakte übernimmt neue Einsätze beim Lesen der Laufbahn (vorher Sicherung; übersprungen, solange das Spiel die Datei hält).",
+        "auto_on": "Automatische Korrektur für diese Laufbahn ist eingeschaltet.",
+        "auto_off": "Automatische Korrektur für diese Laufbahn ist ausgeschaltet.",
         "withdrawn": "{n} Auszeichnungen entzogen. Sicherung: {backup}",
     },
     "es": {
@@ -202,6 +206,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_times": "No se encontraron misiones con salto: o vuela toda la ruta, o aún no se ha volado nada.",
         "awards_since": "Condecoraciones concedidas desde que se aplicaron las horas - marque las que quiera retirar (una ganada por derribos debería quedarse):",
         "withdraw": "Retirar las marcadas",
+        "auto": "Mantener esta carrera corregida automáticamente: la Hoja de Servicios aplica las misiones nuevas al leer la carrera (copia de seguridad previa; se omite mientras el juego tenga el archivo abierto).",
+        "auto_on": "La corrección automática está activada para esta carrera.",
+        "auto_off": "La corrección automática está desactivada para esta carrera.",
         "withdrawn": "{n} condecoraciones retiradas. Copia de seguridad: {backup}",
     },
     "fr": {
@@ -249,6 +256,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_times": "Aucune mission avec saut trouvée : soit vous volez toute la route, soit rien n’a encore été volé.",
         "awards_since": "Décorations attribuées depuis l’application des heures - cochez celles à retirer (une décoration gagnée par des victoires doit rester) :",
         "withdraw": "Retirer les décorations cochées",
+        "auto": "Garder cette carrière corrigée automatiquement : l’état de service applique les nouvelles missions quand il lit la carrière (sauvegarde d’abord ; ignoré tant que le jeu tient le fichier).",
+        "auto_on": "La correction automatique est activée pour cette carrière.",
+        "auto_off": "La correction automatique est désactivée pour cette carrière.",
         "withdrawn": "{n} décorations retirées. Sauvegarde : {backup}",
     },
     "ru": {
@@ -296,6 +306,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_times": "Вылетов с перемоткой не найдено — либо вы летаете весь маршрут, либо ещё ничего не налётано.",
         "awards_since": "Награды, вручённые после применения часов — отметьте те, что нужно отозвать (заслуженная сбитыми должна остаться):",
         "withdraw": "Отозвать отмеченные",
+        "auto": "Держать эту карьеру исправленной автоматически: послужной список применяет новые вылеты при чтении карьеры (сначала резервная копия; пропускается, пока файл занят игрой).",
+        "auto_on": "Автоматическое исправление для этой карьеры включено.",
+        "auto_off": "Автоматическое исправление для этой карьеры выключено.",
         "withdrawn": "Отозвано наград: {n}. Резервная копия: {backup}",
     },
     "zh": {
@@ -343,6 +356,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_times": "未找到跳跃任务——您要么飞完了全程，要么尚未出击。",
         "awards_since": "应用小时数后授予的奖励——勾选要撤销的（凭击落获得的应保留）：",
         "withdraw": "撤销勾选的奖励",
+        "auto": "自动保持此生涯为修正状态：服役记录在读取生涯时自动应用新任务（先备份；游戏占用文件时跳过）。",
+        "auto_on": "此生涯的自动修正已开启。",
+        "auto_off": "此生涯的自动修正已关闭。",
         "withdrawn": "已撤销 {n} 项奖励。备份：{backup}",
     },
 }
@@ -420,12 +436,19 @@ class Career:
         corrections.save(self.name, data)
         return data
 
-    def apply_hours(self, keys) -> Path:
+    def apply_hours(self, keys, auto: Optional[bool] = None):
         backup = self.backup()
-        data = corrections.load(self.name) or {"missions": {}}
+        data = corrections.load(self.name) or {"format": corrections.FORMAT, "career": self.name, "missions": {}}
         done = corrections.apply_hours(self.path, data, keys)
+        if auto is not None:
+            data["auto"] = bool(auto)
         corrections.save(self.name, data)
         return backup, done
+
+    def set_auto(self, on: bool) -> None:
+        data = corrections.load(self.name) or {"format": corrections.FORMAT, "career": self.name, "missions": {}}
+        data["auto"] = bool(on)
+        corrections.save(self.name, data)
 
     def restore_hours(self, keys):
         backup = self.backup()
@@ -441,20 +464,7 @@ class Career:
     # -- writes ------------------------------------------------------------
 
     def backup(self) -> Path:
-        BACKUPS.mkdir(parents=True, exist_ok=True)
-        stamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
-        # Not ".db": the game lists every .db in its Career folder, and this
-        # folder is elsewhere anyway, but the extension is changed as well so
-        # a copy can never be mistaken for a live career. A counter keeps two
-        # writes in the same second from sharing one backup.
-        n = 0
-        while True:
-            target = BACKUPS / f"{self.name}.{stamp}{'' if n == 0 else f'-{n}'}.career-backup"
-            if not target.exists():
-                break
-            n += 1
-        shutil.copy2(self.path, target)
-        return target
+        return corrections.backup(self.path)
 
     @staticmethod
     def _free_slot(con: sqlite3.Connection) -> int:
@@ -588,6 +598,8 @@ class App(tk.Tk):
             self.ft_tree.heading(key, text=self.t["col_" + key])
             self.ft_tree.column(key, width=width, anchor="w")
         self.ft_tree.pack(fill="both", expand=True, padx=8)
+        self.auto_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(ft, text=self.t["auto"], variable=self.auto_var, command=self._set_auto).pack(anchor="w", padx=8, pady=(6, 0))
         ftb = ttk.Frame(ft)
         ftb.pack(fill="x", padx=8, pady=6)
         ttk.Button(ftb, text=self.t["compute"], command=self._compute_times).pack(side="left")
@@ -698,6 +710,7 @@ class App(tk.Tk):
             return
         data = self.career.corrections()
         entries = (data or {}).get("missions", {})
+        self.auto_var.set(bool((data or {}).get("auto")))
         for key in sorted(entries, key=int):
             e = entries[key]
             self.ft_tree.insert("", "end", iid=key, values=(
@@ -742,12 +755,18 @@ class App(tk.Tk):
         keys = list(self.ft_tree.selection()) or list(entries)
         return [k for k in keys if bool(entries.get(k, {}).get("applied")) == want_applied]
 
+    def _set_auto(self) -> None:
+        if self.career is None:
+            return
+        self.career.set_auto(self.auto_var.get())
+        self.status.set(self.t["auto_on"] if self.auto_var.get() else self.t["auto_off"])
+
     def _apply_hours(self) -> None:
         keys = self._ft_selected(want_applied=False)
         if not keys or not messagebox.askyesno(self.t["title"], self.t["apply_confirm"].format(n=len(keys))):
             return
         try:
-            backup, done = self.career.apply_hours(keys)
+            backup, done = self.career.apply_hours(keys, auto=self.auto_var.get())
         except sqlite3.OperationalError:
             messagebox.showerror(self.t["title"], self.t["locked"])
             return
