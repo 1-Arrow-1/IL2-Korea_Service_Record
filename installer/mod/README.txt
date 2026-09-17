@@ -59,6 +59,114 @@ Both carry the same medal fixes. Only the promotion block differs.
     601044.locale=ger.txt
     601044.locale=rus.txt
     601044.locale=spa.txt
+    601045.locale=chs.txt
+    601045.locale=eng.txt
+    601045.locale=fra.txt
+    601045.locale=ger.txt
+    601045.locale=rus.txt
+    601045.locale=spa.txt
+    601046.locale=chs.txt
+    601046.locale=eng.txt
+    601046.locale=fra.txt
+    601046.locale=ger.txt
+    601046.locale=rus.txt
+    601046.locale=spa.txt
+    601047.locale=chs.txt
+    601047.locale=eng.txt
+    601047.locale=fra.txt
+    601047.locale=ger.txt
+    601047.locale=rus.txt
+    601047.locale=spa.txt
+    601048.locale=chs.txt
+    601048.locale=eng.txt
+    601048.locale=fra.txt
+    601048.locale=ger.txt
+    601048.locale=rus.txt
+    601048.locale=spa.txt
+    601049.locale=chs.txt
+    601049.locale=eng.txt
+    601049.locale=fra.txt
+    601049.locale=ger.txt
+    601049.locale=rus.txt
+    601049.locale=spa.txt
+    601050.locale=chs.txt
+    601050.locale=eng.txt
+    601050.locale=fra.txt
+    601050.locale=ger.txt
+    601050.locale=rus.txt
+    601050.locale=spa.txt
+    601051.locale=chs.txt
+    601051.locale=eng.txt
+    601051.locale=fra.txt
+    601051.locale=ger.txt
+    601051.locale=rus.txt
+    601051.locale=spa.txt
+    601052.locale=chs.txt
+    601052.locale=eng.txt
+    601052.locale=fra.txt
+    601052.locale=ger.txt
+    601052.locale=rus.txt
+    601052.locale=spa.txt
+    601053.locale=chs.txt
+    601053.locale=eng.txt
+    601053.locale=fra.txt
+    601053.locale=ger.txt
+    601053.locale=rus.txt
+    601053.locale=spa.txt
+    601054.locale=chs.txt
+    601054.locale=eng.txt
+    601054.locale=fra.txt
+    601054.locale=ger.txt
+    601054.locale=rus.txt
+    601054.locale=spa.txt
+    601055.locale=chs.txt
+    601055.locale=eng.txt
+    601055.locale=fra.txt
+    601055.locale=ger.txt
+    601055.locale=rus.txt
+    601055.locale=spa.txt
+    601056.locale=chs.txt
+    601056.locale=eng.txt
+    601056.locale=fra.txt
+    601056.locale=ger.txt
+    601056.locale=rus.txt
+    601056.locale=spa.txt
+    601057.locale=chs.txt
+    601057.locale=eng.txt
+    601057.locale=fra.txt
+    601057.locale=ger.txt
+    601057.locale=rus.txt
+    601057.locale=spa.txt
+    601058.locale=chs.txt
+    601058.locale=eng.txt
+    601058.locale=fra.txt
+    601058.locale=ger.txt
+    601058.locale=rus.txt
+    601058.locale=spa.txt
+    601059.locale=chs.txt
+    601059.locale=eng.txt
+    601059.locale=fra.txt
+    601059.locale=ger.txt
+    601059.locale=rus.txt
+    601059.locale=spa.txt
+    601060.locale=chs.txt
+    601060.locale=eng.txt
+    601060.locale=fra.txt
+    601060.locale=ger.txt
+    601060.locale=rus.txt
+    601060.locale=spa.txt
+    601061.locale=chs.txt
+    601061.locale=eng.txt
+    601061.locale=fra.txt
+    601061.locale=ger.txt
+    601061.locale=rus.txt
+    601061.locale=spa.txt
+    601062.locale=chs.txt
+    601062.locale=eng.txt
+    601062.locale=fra.txt
+    601062.locale=ger.txt
+    601062.locale=rus.txt
+    601062.locale=spa.txt
 
 <IL-2 Korea>\data\nsdata\assets\images\
     Ranks501.dds
@@ -70,6 +178,7 @@ Both carry the same medal fixes. Only the promotion block differs.
     awards.xaml
     awards6xx.dds
     awards6xx2.dds
+    awards6xx3.dds
     ranks.xaml
 
 <IL-2 Korea>\data\nsdata\assets\locale\

@@ -41,6 +41,10 @@ MOD_FILES = {
     "awards.xaml": "nsdata/assets/images",
     "awards6xx.dds": "nsdata/assets/images",
     "awards6xx2.dds": "nsdata/assets/images",
+    # The mod's own atlas, created by add_award_art.py --atlas Awards6xx3 for
+    # everything the stock atlases had no room for (second-batch unit
+    # citations, Silver Star rungs 4-6, Commendation, NDSM, DSM).
+    "awards6xx3.dds": "nsdata/assets/images",
     # Flag rank for all six ladders. Each atlas carries two more ranks in the
     # one free row a 1024x1024 texture had left, ranks.xaml crops them, and
     # each locale names them - without which the game draws RANK6016!LOCALIZE!.
@@ -54,7 +58,12 @@ for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
 # proved IsSquadron=1 works - and 601043 the Republic of Korea Presidential
 # Unit Citation beside it, 601044 the DUC's oak leaf cluster. Their
 # description files ship like any other's.
-for award in ("601027", "601040", "601041", "601042", "601043", "601044"):
+for award in ("601027", "601040", "601041", "601042", "601043", "601044",
+              # second batch (2026-09-16): unit-citation rungs, Silver Star 4-5,
+              # DSM, NDSM, Commendation ladder - tools/add_awards_batch2.py
+              "601045", "601046", "601047", "601048", "601049", "601050", "601051",
+              "601052", "601053", "601054", "601055", "601056", "601057",
+              "601058", "601059", "601060", "601061", "601062"):
     for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
         MOD_FILES[f"{award}.locale={lang}.txt"] = "nsdata/assets/awards/6xx"
 for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
