@@ -1,0 +1,153 @@
+IL-2 Korea Service Record 1.5 — the coat with the medals on it, a Career Helper, and
+honest flight hours for people who warp
+
+
+Gentlemen,
+
+1.5 is out. As before, everything below is new or changed since 1.4; the earlier posts
+describe the rest, and none of it has changed.
+
+
+THE COAT
+
+Click the ribbon rack on a service record and the tunic opens: a photograph of the coat the
+man would have worn, with his awards on it as the regulations of his army placed them. Two
+buttons switch between service dress and full dress.
+
+Service dress is the ribbons — for a USAF pilot the rack over the left pocket with his wings
+above it, four to a row when he has more than nine (regulations allowed three or four, and a
+man with four rows of three would have pushed his wings into the collar), and the unit
+citations over the right pocket, which is where the Army put them and the Air Force kept
+them until it had a manual of its own.
+
+Full dress is the medals themselves, hanging from their bar, four to a row, each higher row
+over the drapes of the row below, the clusters, the V and the campaign stars on the drape at
+the sizes the regulations give them. The Medal of Honor is a neck decoration, so it hangs at
+the collar on its pad, the ribbon passing under the shirt collar. The unit citations have
+no medal and stay ribbons on the right. The twelve medals were drawn for this to one scale,
+so a Bronze Star is not the size of a Distinguished Service Cross.
+
+Soviet and North Korean pilots get their own coats — the M1943 kitel with the standing
+collar and the Air Force's blue piping, and the KPA tunic — and their own rules, which are
+the Soviet rules of 1943 (the Korean People's Army took them over with its Soviet
+advisers), and quite different from the American ones:
+
+ • The Gold Star of a Hero is worn above everything on the left breast, and always in kind —
+   it was never replaced by a ribbon bar, even on the everyday tunic.
+ • Orders and medals that have a ribbon (Lenin, Red Banner, For Courage, For Battle Merit;
+   the two Korean medals) hang on pentagonal mounts over the left pocket, on one common bar,
+   the senior nearest the centre of the chest and lying on top where they overlap. A second
+   or third Red Banner is a second or third order, with its numeral, and takes its own place
+   on the bar.
+ • The orders that have no ribbon at all — Suvorov, Nevsky, the Red Star; the Korean Orders
+   of Freedom and Independence and of Soldier's Honour, both classes — are screw-back badges
+   and are pinned over the right pocket, senior nearest the centre.
+ • Above them, the military pilot's class badge, which appeared in 1950, and above that the
+   wound stripes of 1942, side by side if there are several; a centimetre between each.
+ • In service dress the bars go over the left pocket — the bottom row just above the flap,
+   never on it — and the bars of the right-breast orders on the right side, which is where
+   the 1943 rules had them (they moved to the left only after 1955).
+
+All the Soviet and Korean pieces are the game's own artwork, brought to one scale; the coat
+just puts them where they belong. The Chinese still get nothing, for the reason given last
+time.
+
+
+THE CAREER HELPER
+
+A second program, installed beside the tracker and opened from the button in the header.
+The tracker itself never writes to the game — that has been its rule from the first day —
+and the Helper is the deliberate exception: a small window that changes the career file, and
+only that, with a backup taken before every single write (kept outside the game's folder, so
+the game can never mistake one for a career; the last twelve are kept). It refuses to run
+unless the awards mod is installed, because everything it does assumes the mod's data.
+
+Three things it can do.
+
+REVIVE A PILOT. When an AI pilot is killed or goes missing, the game writes his state and the
+date into the career on the spot. The Helper can undo that — but only on the same career
+day, before the next day's rollover has processed the loss, and never for the player. Pick
+the man, and choose whether he comes back having bailed out (the aircraft stays lost) or with
+his aircraft restored. It is there for the cases the sim gets wrong: the wingman who "died"
+because the AI flew him into a hill on the taxiway, or the loss you caused yourself by an
+Alt-Tab at the wrong moment. Use it as you would a house rule.
+
+AWARD POINTS. Adds points to the squadron's award pool, which is what the game spends when
+it grants decorations. For the campaign that reaches its end with the pool empty and the
+Silver Star three points away.
+
+CORRECTED FLIGHT TIMES. This is the one that needs explaining, because it changes numbers
+you look at every day.
+
+The game credits a sortie with the time you actually spent in it. If you fly a mission in
+real time, that is the truth. If you take off, climb out and then warp to the target and
+back — which is how most of us fly a 90-minute Sabre patrol — the sortie is written into the
+career as twenty-five minutes, and everything that grows from flight time grows from that:
+the pilot's hours, the squadron's, the Air Medal that can be earned on hours, the Soviet
+pilot's class badges that are earned on nothing else (20, 40 and 60 hours — a Soviet pilot
+who warps never sees one), the logbook that says a man with 40 missions has 18 hours. Worse, the clock inside the mission does not know about
+the warp either, so the log says you shot down a MiG at 08:04 on a mission that took off at
+07:40 and would not have reached the Yalu before 08:30.
+
+The Helper puts the plan's time back. For every mission it reads the flight log the game
+wrote, finds the warps — a warp is where your aircraft covered five kilometres or more
+between two fixes at better than one and a half times the speed the briefing gave that leg,
+which distinguishes a warp from merely flying fast — and re-times the sortie to what the
+route would have taken at the briefed speeds, plus the allowance the game itself adds for
+take-off, join-up and landing. A pilot who returned is credited with the planned duration.
+A pilot who was lost is credited with the time up to the moment he was lost, shifted by
+whatever warps came before it, since he could not have been lost at a place he had not
+reached. The events in the log — kills, hits, the bail-out — are shifted the same way, so the
+MiG now goes down at 08:41, where it happened. Missions with no flight log (there are a few,
+if you reflew one and the older log was replaced) fall back to the plan's duration alone;
+the Helper shows for each mission whether it was timed from the log or from the plan.
+
+Nothing is written until you say so. The Helper shows every mission with its original and
+corrected time side by side; you tick the ones you want and apply. The change goes into the
+sortie, the pilot, the squadron and the mission's end time, and a record of the originals is
+kept in a sidecar file beside the tracker's settings, so it is fully reversible — months
+later, if you like: "restore" puts the original figures back, to the second.
+
+Two things follow from this that you should know. First, the tracker has a switch in its
+header, "corrected times", that shows the corrected figures as an overlay without touching
+the game at all — you can look before you decide, and a career you never apply to is never
+written. Once you have applied to a career, the switch locks on for it, since the corrected
+figures are then the ones in the file. Second, the game hands out some awards on flight
+time. Applying hours can therefore earn a pilot an Air Medal the next day that he would not
+have had; the Helper lists awards granted since the correction and lets you withdraw any of
+them if you feel they were not earned. I leave that to your conscience.
+
+If you would rather not think about it again, there is a box: "keep this career corrected
+automatically". With it ticked, the tracker applies the correction to each new mission the
+first time it reads the career after you have flown — backup first, as always, and it steps
+back and waits if the game still has the file open. This is what I do.
+
+
+ALSO
+
+ • A "friendly fire" line in the incidents. The game logs an event for a friendly object the
+   pilot destroyed — I found it after bombing a parked C-47 at K-47 on 12 April 1951 — and
+   the record now shows it, in red, with the object's name. It costs nothing in the game
+   beyond the shame.
+ • The "highest combat award" column of the roster sorts by precedence now, not by the
+   award's name — a Silver Star above a Bronze Star rather than "B" before "S".
+ • A mission flown twice takes its newest flight log, by the timestamp in the file's name,
+   instead of whichever the folder listed first.
+ • Two framed unit citations side by side keep both their frames.
+
+
+DOWNLOAD
+
+IL-2 Korea Service Record v1.5.0.zip — the setup program (tracker, Career Helper, and the
+optional awards mod, which has not changed since 1.4) and a README. Also on the Releases
+page of the GitHub repository.
+
+The fingerprint of the setup program, for anyone who wants to check the file they downloaded
+against the one I built (see the 1.4 post for how):
+
+    e1b456d82e5089ff649ff5bc8bf7e0f38adc1a488e358842e5c45efbf98ec817
+
+    Get-FileHash IL2_Korea_Service_Record_Setup_v1.5.0.exe
+
+Still unsigned; still waiting on the signing foundation. Defender scanned this build clean
+here, and the fingerprint tells you it is the same file there.
