@@ -69,6 +69,9 @@ NOTES
 
   * Windows only. Nothing else to install - no Python, no Visual C++
     redistributable.
+  * Setup installs the tracker into your own profile, not Program Files:
+        %LOCALAPPDATA%\\IL-2 Korea Service Record
+    (the Career Helper is the second exe in the same folder).
   * If something goes wrong, %LOCALAPPDATA%\\IL2KoreaTracker\\tracker.log has
     the details from the last run. Please include it with any bug report.
   * The Service Record is read-only. It never writes to a career file and
