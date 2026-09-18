@@ -324,15 +324,27 @@
         <div class="lightbox-backdrop" data-tunic-close></div>
         <div class="lightbox-panel tunic-panel" role="dialog" aria-modal="true" aria-labelledby="tunic-title">
             <button class="lightbox-close" data-tunic-close aria-label="Close" data-i18n-title="common.close">&times;</button>
-            <h2 id="tunic-title" class="tunic-title"></h2>
+            <div class="tunic-head">
+                <h2 id="tunic-title" class="tunic-title"></h2>
+                <!-- Service dress wears the ribbons; full dress the medals. -->
+                <div class="tunic-dress" role="group">
+                    <button type="button" class="dress-btn" data-dress="service" data-i18n="awards.dress_service">Service dress</button>
+                    <button type="button" class="dress-btn" data-dress="full" data-i18n="awards.dress_full">Full dress</button>
+                </div>
+            </div>
             <div id="tunic" class="tunic">
-                <img class="tunic-coat" src="/static/images/tunic_usaf.jpg" alt="">
+                <img id="tunic-coat" class="tunic-coat" src="/static/images/tunic_usaf.jpg" alt="">
                 <div id="tunic-left" class="tunic-left"></div>
                 <div id="tunic-right" class="tunic-right"></div>
+                <!-- The Medal of Honor hangs at the collar in full dress; the
+                     shirt collar, cut from the photograph, lies over its band
+                     so the ribbon passes under the collar as worn. -->
+                <div id="tunic-neck" class="tunic-neck"></div>
+                <img id="tunic-collar" class="tunic-collar" src="/static/images/collar_usaf.png" alt="" aria-hidden="true">
                 <!-- The lapel, cut from the same photograph, on top: it folds
                      over the inner ribbon and the wing tip as on a real coat,
                      and its shadow is thrown from its own silhouette. -->
-                <img class="tunic-lapel" src="/static/images/lapel_usaf.png" alt="" aria-hidden="true">
+                <img id="tunic-lapel" class="tunic-lapel" src="/static/images/lapel_usaf.png" alt="" aria-hidden="true">
             </div>
             <p id="tunic-caption" class="tunic-caption"></p>
         </div>

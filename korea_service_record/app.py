@@ -181,6 +181,18 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         return Response(data, mimetype="image/png",
                         headers={"Cache-Control": "public, max-age=31536000"})
 
+    @app.route("/api/medal/<int:award_id>")
+    def api_medal(award_id: int):
+        """A full-size medal with its devices on the drape, for the coat."""
+        agg = aggregator()
+        if agg is None:
+            return ("", 404)
+        data = agg.medals.png(award_id)
+        if data is None:
+            return ("", 404)
+        return Response(data, mimetype="image/png",
+                        headers={"Cache-Control": "public, max-age=31536000"})
+
     @app.route("/api/photo/<path:career_id>/<int:pilot_id>", methods=["GET"])
     def api_photo(career_id: str, pilot_id: int):
         """

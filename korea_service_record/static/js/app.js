@@ -274,27 +274,141 @@
     // panel's, laid over the photograph at the pocket: ribbons and badge over
     // the wearer's left breast, unit citations over the right.
     let currentRack = null;
+    // Service dress (ribbons) or full dress (the medals); remembered per
+    // browser, as a convenience only.
+    let dress = "service";
+    try { dress = localStorage.getItem("tunic_dress") === "full" ? "full" : "service"; } catch (err) { /* private window */ }
+    function medalRows(list, rows, rev) {
+        // Rows are painted top row last so the pendants of each row hang
+        // over the drapes of the row below: the z-index counts down.
+        let i = 0;
+        return rows.map((n, r) => {
+            const row = list.slice(i, i + n); i += n;
+            let prev = 0;
+            return '<div class="medal-row n' + n + '" style="z-index:' + (rows.length - r) + '">' + row.map((m, k) => {
+                let style = "z-index:" + (row.length - k);
+                if (m.w) {
+                    style += ";width:" + (+m.w).toFixed(3) + "%";
+                    if (k > 0 && coatRow.step) { style += ";margin-left:" + (coatRow.step - prev).toFixed(3) + "%"; }
+                    if (k > 0 && coatRow.lift) { style += ";margin-top:" + (-k * coatRow.lift).toFixed(3) + "%"; }
+                    prev = +m.w;
+                }
+                return medalImg(m.type, m.name, "medal", rev, style);
+            }).join("") + "</div>";
+        }).join("");
+    }
+    function rowsOf(count, per) {
+        if (count <= 0) { return []; }
+        const first = count % per || per, out = [first];
+        for (let n = first; n < count; n += per) { out.push(per); }
+        return out;
+    }
+    function medalImg(id, name, cls, rev, style) {
+        return '<img class="' + cls + '"' + (style ? ' style="' + style + '"' : "") +
+            ' src="/api/medal/' + esc(id) + "?v=" + esc(rev || 0) +
+            '" alt="' + esc(name) + '" title="' + esc(name) + '">';
+    }
+    // The Soviet-pattern coats lay their awards out in percent of the coat,
+    // with widths that come with the pieces. On the common bar one mount
+    // starts every `step` percent (they overlap; 0 = mounted touching),
+    // each slot `lift` percent higher than the last where the row follows
+    // a tilted flap. The pinned orders on the right breast overlap by their
+    // own step when there are more than fit the pocket.
+    const COAT_ROW = {
+        sov: {step: 5.69, lift: 0, pinned: 8.6},
+        dprk: {step: 0, lift: 0, pinned: 6.9},
+    };
+    let coatRow = COAT_ROW.sov;
     function openTunic(name) {
         const rack = currentRack;
         if (!rack || !rack.tunic) { return; }
+        const coat = rack.tunic, full = dress === "full";
         const own = rack.ribbons || [], unit = rack.citations || [];
         el("tunic-title").textContent = name || "";
-        // Regulations allowed four ribbons per row; a man with four rows of
-        // three would push his wings into the collar, so on the coat a large
-        // rack goes four across (the panel keeps three).
-        let rows = rack.rows, wide = false;
-        if (own.length > 9) {
-            wide = true;
-            const first = own.length % 4 || 4;
-            rows = [first];
-            for (let n = first; n < own.length; n += 4) { rows.push(4); }
+        document.querySelectorAll(".dress-btn").forEach((b) => {
+            b.classList.toggle("active", b.dataset.dress === dress);
+            b.setAttribute("aria-pressed", b.dataset.dress === dress ? "true" : "false");
+        });
+        const tunic = el("tunic");
+        tunic.dataset.coat = coat;
+        tunic.classList.toggle("full", full);
+        el("tunic-coat").src = "/static/images/tunic_" + coat + ".jpg";
+        // The lapel and collar cut-outs belong to the USAF coat's photograph.
+        show(el("tunic-lapel"), coat === "usaf");
+        show(el("tunic-collar"), coat === "usaf");
+        el("tunic-neck").innerHTML = full && rack.neck
+            ? '<img class="neck-medal" src="' + esc(rack.neck_src) + '" alt="' + esc(rack.neck_name) + '" title="' + esc(rack.neck_name) + '">' : "";
+        let right = "", left = "", caption;
+        if (coat === "sov" || coat === "dprk") {
+            coatRow = COAT_ROW[coat];
+            // 1943 rules. Left breast (viewer's right): the Hero's star in
+            // kind above everything, then the mounted orders and medals -
+            // or their ribbon bars in service dress. Right breast: wound
+            // stripes on top, the class badge, then the screw-back orders,
+            // which have no ribbon; in service dress their bars went on the
+            // right side too.
+            const pinnedIds = new Set((rack.pinned || []).map((p) => p.type));
+            // A slot is placed on the coat in percent of the coat, sized to
+            // its piece, and the piece fills it.
+            const piece = (cls, m, extra) => '<div class="' + cls + '" style="width:' + (+m.w).toFixed(3) + '%">' +
+                medalImg(m.type, m.name, "sov-piece", rack.medal_rev, "width:100%") + "</div>";
+            const hero = rack.hero ? medalImg(rack.hero.type, rack.hero.name, "tunic-hero", rack.medal_rev, "width:" + (+rack.hero.w).toFixed(3) + "%") : "";
+            // The right breast is a stack over the pocket: wound stripes on
+            // top (1942 order: 8-10 mm above the awards, side by side), the
+            // class badge below them (1950 order), the orders - or their
+            // bars - at the bottom; with nothing below, a badge takes the
+            // orders' place, as the orders said.
+            let stack = "";
+            const stripes = rack.stripes || [];
+            if (stripes.length) {
+                const total = stripes.reduce((a, m) => a + +m.w, 0) + 1 * (stripes.length - 1);
+                stack += '<div class="sov-stripes" style="width:' + total.toFixed(3) + '%">' + stripes.map((m) =>
+                    medalImg(m.type, m.name, "sov-piece", rack.medal_rev, "width:" + (+m.w / total * 100).toFixed(3) + "%")).join("") + "</div>";
+            }
+            if (rack.wings) { stack += piece("sov-wings", rack.wings); }
+            if (full) {
+                const bar = rack.medals || [];
+                right = '<div class="sov-breast">' + hero + (bar.length ? '<div class="medal-group">' + medalRows(bar, rack.medal_rows, rack.medal_rev) + "</div>" : "") + "</div>";
+                // One row from the centre outward, overlapping when wider
+                // than the pocket, the senior on top.
+                let prevW = 0;
+                if ((rack.pinned || []).length) {
+                    stack += '<div class="pinned-row">' + rack.pinned.map((m, k) => {
+                        const style = "z-index:" + (99 - k) + ";width:" + (+m.w).toFixed(3) + "%" +
+                            (k > 0 ? ";margin-right:" + (coatRow.pinned - prevW).toFixed(3) + "%" : "");
+                        prevW = +m.w;
+                        return medalImg(m.type, m.name, "pinned", rack.medal_rev, style);
+                    }).join("") + "</div>";
+                }
+            } else {
+                const bars = own.filter((r) => !pinnedIds.has(r.type) && !(rack.hero && r.type === rack.hero.type));
+                const rightBars = own.filter((r) => pinnedIds.has(r.type));
+                right = '<div class="sov-breast">' + hero + (bars.length ? '<div class="ribbon-group">' + ribbonRows(bars, rowsOf(bars.length, 3), rack.rev) + "</div>" : "") + "</div>";
+                if (rightBars.length) {
+                    stack += '<div class="sov-bars"><div class="ribbon-group">' + ribbonRows(rightBars, rowsOf(rightBars.length, 3), rack.rev) + "</div></div>";
+                }
+            }
+            left = stack ? '<div class="sov-right">' + stack + "</div>" : "";
+            caption = T("awards.tunic_caption_" + coat + (full ? "_full" : ""));
+        } else {
+            const badge = rack.badge ? '<img class="tunic-badge" src="/api/icon/award/' + esc(rack.badge) + '" alt="' + esc(rack.badge_name) + '" title="' + esc(rack.badge_name) + '">' : "";
+            if (full) {
+                const bar = rack.medals || [];
+                right = badge + (bar.length ? '<div class="medal-group">' + medalRows(bar, rack.medal_rows, rack.medal_rev) + "</div>" : "");
+            } else {
+                // Regulations allowed four ribbons per row; a man with four
+                // rows of three would push his wings into the collar, so on
+                // the coat a large rack goes four across (the panel keeps three).
+                const wide = own.length > 9;
+                const rows = wide ? rowsOf(own.length, 4) : rack.rows;
+                right = badge + (own.length ? '<div class="ribbon-group' + (wide ? " four" : "") + '">' + ribbonRows(own, rows, rack.rev) + "</div>" : "");
+            }
+            left = unit.length ? '<div class="ribbon-group">' + ribbonRows(unit, rack.citation_rows, rack.rev) + "</div>" : "";
+            caption = T(full ? "awards.tunic_caption_full" : "awards.tunic_caption");
         }
-        el("tunic-right").innerHTML =
-            (rack.badge ? '<img class="tunic-badge" src="/api/icon/award/' + esc(rack.badge) + '" alt="' + esc(rack.badge_name) + '" title="' + esc(rack.badge_name) + '">' : "") +
-            (own.length ? '<div class="ribbon-group' + (wide ? " four" : "") + '">' + ribbonRows(own, rows, rack.rev) + "</div>" : "");
-        el("tunic-left").innerHTML = unit.length
-            ? '<div class="ribbon-group">' + ribbonRows(unit, rack.citation_rows, rack.rev) + "</div>" : "";
-        el("tunic-caption").textContent = T("awards.tunic_caption");
+        el("tunic-right").innerHTML = right;
+        el("tunic-left").innerHTML = left;
+        el("tunic-caption").textContent = caption;
         show(el("tunicbox"), true);
         document.body.classList.add("lightbox-open");
     }
@@ -1515,6 +1629,12 @@
         }
         if (event.target.closest && event.target.closest("[data-tunic-close]")) {
             closeTunic();
+        }
+        const dressBtn = event.target.closest && event.target.closest(".dress-btn");
+        if (dressBtn && dressBtn.dataset.dress !== dress) {
+            dress = dressBtn.dataset.dress;
+            try { localStorage.setItem("tunic_dress", dress); } catch (err) { /* not persisted */ }
+            openTunic(el("tunic-title").textContent);
         }
     });
     document.addEventListener("keydown", (event) => {

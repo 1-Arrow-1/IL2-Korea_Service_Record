@@ -137,6 +137,13 @@
     "ribbon_rack": "Pasador de condecoraciones",
     "tunic_hint": "Pulse para ver las cintas tal como se llevaban en la guerrera",
     "tunic_caption": "Guerrera azul de la USAF, modelo de 1949. Pasadores sobre el bolsillo izquierdo con la insignia de aviador encima; menciones de unidad sobre el derecho, como mandaba el reglamento.",
+    "tunic_caption_full": "Guerrera azul de la USAF, modelo de 1949, con medallas. Medallas de tamaño completo sobre el bolsillo izquierdo, cuatro por fila, con la insignia de aviador encima; la Medalla de Honor al cuello; las menciones de unidad, que no tienen medalla, sobre el derecho.",
+    "tunic_caption_sov": "Guerrera de la Fuerza Aérea soviética, modelo 1943. Pasadores sobre el pecho izquierdo con la Estrella de Oro de Héroe encima, llevada en su forma real; los pasadores de las órdenes sin cinta a la derecha, como disponían las normas de 1943.",
+    "tunic_caption_sov_full": "Guerrera de la Fuerza Aérea soviética, modelo 1943, con órdenes y medallas. Órdenes y medallas en sus monturas pentagonales sobre el pecho izquierdo, cinco por fila, con la Estrella de Oro de Héroe encima; las órdenes de tornillo, sin cinta, prendidas a la derecha.",
+    "tunic_caption_dprk": "Guerrera de la Fuerza Aérea del Ejército Popular de Corea. Pasadores sobre el pecho izquierdo con la estrella de Héroe de la República encima, llevada en su forma real; los pasadores de las órdenes sin cinta a la derecha, según las normas soviéticas que adoptó el Ejército Popular.",
+    "tunic_caption_dprk_full": "Guerrera de la Fuerza Aérea del Ejército Popular de Corea, con órdenes y medallas. Las dos medallas en sus monturas sobre el pecho izquierdo bajo la estrella de Héroe de la República; las órdenes de tornillo, sin cinta, prendidas a la derecha bajo la insignia de piloto.",
+    "dress_service": "Uniforme de servicio",
+    "dress_full": "Uniforme de gala",
     "pending_note": "{count} condecoraciones esperan puntos; usted tiene {points}."
   },
   "incidences": {

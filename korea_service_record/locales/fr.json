@@ -137,6 +137,13 @@
     "ribbon_rack": "Barrette de décorations",
     "tunic_hint": "Cliquez pour voir les barrettes telles que portées sur la vareuse",
     "tunic_caption": "Vareuse bleue de l’USAF, modèle 1949. Barrettes au-dessus de la poche gauche, insigne d’aviateur au-dessus ; citations d’unité au-dessus de la droite, comme le règlement le prescrivait.",
+    "tunic_caption_full": "Vareuse bleue de l’USAF, modèle 1949, avec décorations. Médailles pendantes au-dessus de la poche gauche, quatre par rangée, insigne d’aviateur au-dessus ; la Medal of Honor au col ; les citations d’unité, qui n’ont pas de médaille, au-dessus de la droite.",
+    "tunic_caption_sov": "Vareuse des forces aériennes soviétiques, modèle 1943. Barrettes sur la poitrine gauche, l’Étoile d’or de Héros portée en nature au-dessus ; les barrettes des ordres portés sans ruban à droite, comme le prescrivaient les règles de 1943.",
+    "tunic_caption_sov_full": "Vareuse des forces aériennes soviétiques, modèle 1943, avec ordres et médailles. Ordres et médailles sur leurs montures pentagonales sur la poitrine gauche, cinq par rangée, l’Étoile d’or de Héros au-dessus ; les ordres à vis, sans ruban, épinglés à droite.",
+    "tunic_caption_dprk": "Vareuse des forces aériennes de l’Armée populaire de Corée. Barrettes sur la poitrine gauche, l’étoile de Héros de la République portée en nature au-dessus ; les barrettes des ordres portés sans ruban à droite, selon les règles soviétiques reprises par l’Armée populaire.",
+    "tunic_caption_dprk_full": "Vareuse des forces aériennes de l’Armée populaire de Corée, avec ordres et médailles. Les deux médailles sur leurs montures sur la poitrine gauche sous l’étoile de Héros de la République ; les ordres à vis, sans ruban, épinglés à droite sous l’insigne de pilote.",
+    "dress_service": "Tenue de service",
+    "dress_full": "Grande tenue",
     "pending_note": "{count} décorations attendent des points ; vous en avez {points}."
   },
   "incidences": {

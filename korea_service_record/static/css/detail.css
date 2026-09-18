@@ -243,6 +243,112 @@ table.roster td.award-cell { white-space: normal; }
 .tunic-badge { width: 62%; height: auto; display: block; margin: 0 auto 4%;
     filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)); }
 .tunic-caption { margin: 0.6rem 0 0; font-size: 0.82rem; color: var(--ink-muted); }
+
+/* Full dress. Each medal is drawn 224 x 474 with the drape 1 3/8 inch wide,
+   so four fill the pocket width side by side. Rows are stacked so the
+   pendants of a row hang over the drapes of the row below (the medal is
+   52% drape-to-pendant; the offset is 51.7% of its height, 25.6% of the
+   group width), and the bottom row's bar sits at the top of the pocket:
+   the group's bottom edge is therefore one medal height (52.9% of the
+   pocket width, 22.2% of the coat height) below the ribbon rack's. */
+/* The close button sits in the panel's top right corner; the switch stops short of it. */
+.tunic-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 2rem 0.6rem 0; }
+.tunic-head .tunic-title { margin: 0; }
+.tunic-dress { display: flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; flex: none; }
+.dress-btn { border: 0; background: transparent; color: var(--ink-muted); font: inherit; font-size: 0.8rem;
+    padding: 0.25rem 0.75rem; cursor: pointer; }
+.dress-btn + .dress-btn { border-left: 1px solid var(--border); }
+.dress-btn.active { background: var(--accent); color: var(--accent-ink, #fff); }
+.dress-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.tunic.full .tunic-right { bottom: 31.4%; }
+.medal-group { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.medal-row { position: relative; display: flex; justify-content: center; width: 100%; }
+.medal-row + .medal-row { margin-top: -25.6%; }
+.medal { position: relative; width: 25%; height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
+/* On the tie below the knot, the bow largely behind the collar points. */
+.tunic-neck { position: absolute; left: 46.5%; top: 0; width: 23%; transform: translateX(-50%); }
+.tunic-neck:empty { display: none; }
+.tunic-collar { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.neck-medal { width: 100%; height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
+.tunic-hero, .pinned { height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
+
+/* The Soviet coat: M1943 kitel, photograph 1086x974, lit flat. Both
+   breast containers become full overlays of the coat, so every percentage
+   below is a percentage of the coat. Pockets 28% wide, flaps topping out
+   at 32.5%; the wearer's left pocket (viewer's right) centred at 76%, the
+   right at 24%. The game's tiles are worn at 42% of their size.
+   Left breast: the Hero's star over the orders and medals on their common
+   bar, one mount every 5.69% (they overlap; a full row of five is a touch
+   wider than the pocket), mount tops on the flap line. Right breast: the
+   class badge and wound stripes over the screw-back orders, which overlap
+   in one row when three of them are wider than the pocket, senior nearest
+   the centre and on top. */
+.tunic[data-coat="sov"] { aspect-ratio: 1086 / 974; }
+.tunic[data-coat="sov"] .tunic-right, .tunic[data-coat="sov"] .tunic-left,
+.tunic[data-coat="sov"].full .tunic-right, .tunic[data-coat="sov"].full .tunic-left {
+    left: 0; top: 0; bottom: auto; width: 100%; height: 100%; transform: none; display: block; }
+.sov-breast { position: absolute; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; }
+/* The mount tops sit a shade (1.5%) above the flap edge, the pendants
+   hanging over the pocket: the pendant bottoms are 18.2% below it. */
+.tunic[data-coat="sov"] .sov-breast { bottom: 49.3%; transform: translateX(26%); }
+/* The star sits about a centimetre above the row below it. */
+.tunic[data-coat="sov"] .tunic-hero { margin: 0 0 1.2%; }
+.tunic[data-coat="sov"] .medal-group, .tunic[data-coat="sov"] .sov-breast .ribbon-group { width: 100%; }
+.tunic[data-coat="sov"] .medal-row { justify-content: center; align-items: flex-start; }
+.tunic[data-coat="sov"] .medal { width: auto; }
+/* A higher row's pendants hang over the mounts below: the next row starts
+   101 px (9.3%) below the previous row's top, i.e. 94 px (8.66%) back. */
+.tunic[data-coat="sov"] .medal-row + .medal-row { margin-top: -8.66%; }
+/* A Soviet bar (24 x 8 mm at the scale of the mounts: 81 px) is 7.46% of
+   the coat, 8.17% with its canvas margin. In service dress the bottom
+   row's lower edge sits on the flap line. */
+.tunic[data-coat="sov"] .ribbon-row .ribbon.sov { width: 8.17%; margin: -0.35% -0.355%; }
+/* Service dress, by the 1943 rules: bars are pinned over the pocket flap,
+   never on it - the bottom row just above the flap edge on both breasts,
+   further rows above it, the star a centimetre over the top row. */
+.tunic[data-coat="sov"]:not(.full) .sov-breast { bottom: 67.85%; }
+/* The right breast: one stack centred over the pocket, built up from the
+   flap - the orders (or their bars) at the bottom, the class badge 8-10 mm
+   above them, the wound stripes 8-10 mm above the badge, side by side with
+   3-4 mm between. A centimetre is about 3% of the coat width at the scale
+   of the tiles. With nothing below it, a badge takes the orders' place. */
+.sov-right { position: absolute; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.sov-right > * + * { margin-top: 3%; }
+.sov-piece { height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
+.sov-stripes { display: flex; justify-content: space-between; }
+.pinned-row { width: 100%; display: flex; flex-direction: row-reverse; justify-content: center; align-items: flex-end; }
+.pinned { position: relative; height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
+.sov-bars { width: 24%; }
+.sov-bars .ribbon-row { flex-direction: row-reverse; }
+/* The orders overlap the flap edge by a few percent; the bars sit over it. */
+.tunic[data-coat="sov"] .sov-right { bottom: 64.5%; transform: translateX(-26%); }
+.tunic[data-coat="sov"]:not(.full) .sov-right { bottom: 67.85%; }
+.tunic[data-coat="sov"] .sov-bars .ribbon-row .ribbon.sov { width: 34%; margin: -1.48% -1.48%; }
+
+/* The DPRK coat: KPA tunic, photograph 1122x984, lit flat: no perspective.
+   Pockets 25.5% wide, flat flaps topping out at 31.7%; the wearer's left
+   pocket (viewer's right) centred at 77.5%, the right at 24%. Tiles at
+   42% as on the Soviet coat. Left breast: the Hero's star over the two
+   ribboned medals, mounted touching, mount tops on the flap line. Right
+   breast: the pilot badge over the screw-back orders, which overlap in
+   one row (four of them are wider than the pocket), senior nearest the
+   centre and on top. */
+.tunic[data-coat="dprk"] { aspect-ratio: 1122 / 984; }
+.tunic[data-coat="dprk"] .tunic-right, .tunic[data-coat="dprk"] .tunic-left,
+.tunic[data-coat="dprk"].full .tunic-right, .tunic[data-coat="dprk"].full .tunic-left {
+    left: 0; top: 0; bottom: auto; width: 100%; height: 100%; transform: none; display: block; }
+.tunic[data-coat="dprk"] .sov-breast { bottom: 51.4%; transform: translateX(27.5%); }
+.tunic[data-coat="dprk"] .tunic-hero { margin: 0 0 1.2%; }
+.tunic[data-coat="dprk"] .medal-group, .tunic[data-coat="dprk"] .sov-breast .ribbon-group { width: 100%; }
+.tunic[data-coat="dprk"] .medal-row { justify-content: center; align-items: flex-start; }
+.tunic[data-coat="dprk"] .medal { width: auto; }
+.tunic[data-coat="dprk"] .medal-row + .medal-row { margin-top: -8.4%; }
+/* A DPRK bar at this scale: 6.5% of the coat, 7.1% with its canvas margin. */
+.tunic[data-coat="dprk"] .ribbon-row .ribbon.sov { width: 7.1%; margin: -0.31% -0.31%; }
+.tunic[data-coat="dprk"]:not(.full) .sov-breast { bottom: 68.6%; }
+.tunic[data-coat="dprk"] .sov-right { bottom: 65.5%; transform: translateX(-26%); }
+.tunic[data-coat="dprk"]:not(.full) .sov-right { bottom: 68.6%; }
+.tunic[data-coat="dprk"] .sov-bars .ribbon-row .ribbon.sov { width: 29.6%; margin: -1.29% -1.3%; }
 .ribbon-rack.wearable { cursor: pointer; }
 .ribbon-rack.wearable:hover { border-color: var(--border); }
 
@@ -272,6 +378,9 @@ table.roster td.award-cell { white-space: normal; }
 /* A unit citation's frame overhangs the bars beside and above it, as on a
    real rack, so it is painted on top of them rather than clipped by them. */
 .ribbon-row .ribbon.framed { z-index: 1; }
+/* Two framed citations side by side keep both frames, edge to edge: the
+   second undoes the pull-in that lets plain bars touch. */
+.ribbon-row .ribbon.framed + .ribbon.framed { margin-left: 1.44%; }
 /* Soviet-pattern bars are 3:1 on a 460-wide canvas: the transparent margin
    is 4.35% of the image, so the pull-in is a touch larger. */
 .ribbon-row .ribbon.sov { margin: -1.2% -1.5%; }

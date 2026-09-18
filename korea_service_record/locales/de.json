@@ -137,6 +137,13 @@
     "ribbon_rack": "Ordensspange",
     "tunic_hint": "Anklicken: die Bänder, wie sie auf dem Dienstrock getragen wurden",
     "tunic_caption": "Blauer Dienstrock der USAF, Muster 1949. Bandspangen über der linken Brusttasche mit dem Fliegerabzeichen darüber; Verbandsauszeichnungen über der rechten, wie es die Vorschrift vorsah.",
+    "tunic_caption_full": "Blauer Dienstrock der USAF, Muster 1949, mit Orden. Die Medaillen in voller Größe über der linken Brusttasche, zu viert in der Reihe, darüber das Fliegerabzeichen; die Medal of Honor am Kragen; Verbandsauszeichnungen, für die es keine Medaille gibt, über der rechten.",
+    "tunic_caption_sov": "Kitel der sowjetischen Luftstreitkräfte, Muster 1943. Bandspangen über der linken Brust, darüber der Goldene Stern des Helden im Original; die Spangen der ohne Band getragenen Orden rechts, wie es die Vorschrift von 1943 vorsah.",
+    "tunic_caption_sov_full": "Kitel der sowjetischen Luftstreitkräfte, Muster 1943, mit Orden und Medaillen. Orden und Medaillen an ihren fünfeckigen Spangen über der linken Brust, zu fünft in der Reihe, darüber der Goldene Stern des Helden; die Schraubscheiben-Orden ohne Band rechts angesteckt.",
+    "tunic_caption_dprk": "Uniformrock der Luftstreitkräfte der Koreanischen Volksarmee. Bandspangen über der linken Brust, darüber der Stern des Helden der Republik im Original; die Spangen der ohne Band getragenen Orden rechts, nach den sowjetischen Regeln, die die Volksarmee übernahm.",
+    "tunic_caption_dprk_full": "Uniformrock der Luftstreitkräfte der Koreanischen Volksarmee mit Orden und Medaillen. Die beiden Medaillen an ihren Spangen über der linken Brust unter dem Stern des Helden der Republik; die Schraubscheiben-Orden ohne Band rechts unter dem Fliegerabzeichen angesteckt.",
+    "dress_service": "Dienstanzug",
+    "dress_full": "Große Uniform",
     "pending_note": "{count} Auszeichnungen warten auf Auszeichnungspunkte; Sie haben {points}."
   },
   "incidences": {

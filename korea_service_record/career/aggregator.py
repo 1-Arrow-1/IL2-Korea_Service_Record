@@ -21,6 +21,7 @@ modules (killstats, attributes, events) so this file stays about assembly.
 
 import json
 import logging
+import os
 import re
 import urllib.parse
 from collections import Counter, OrderedDict
@@ -35,6 +36,18 @@ from ..geo import (MapTiles, Overlay, WAYPOINT_TAKEOFF, WAYPOINT_LANDING,
                    parse_point, parse_route)
 from ..icons import IconLibrary
 from .. import corrections, ribbons
+from .. import medals as medal_art
+
+# KOREA_PREVIEW_RACK=all|sov|dprk: every ladder of that country at its top
+# rung (plus the Command Pilot badge for the USAF), for looking at a complete
+# rack and coat without a career that earned one. Or a list of award ids,
+# comma-separated, for any other set.
+PREVIEW_RACK = {
+    "all": (601026, 601025, 601052, 601051, 601017, 601016, 601062, 601007,
+            601057, 601030, 601053, 601038, 601039, 601040),
+    "sov": (501022, 501024, 501020, 501014, 501012, 501006, 501002, 501004, 501049, 501038),
+    "dprk": (503007, 503006, 503005, 503004, 503003, 503002, 503008, 503001),
+}
 from ..loadouts import AmmoSchemes, parse_pilots_list
 from ..worldobjects import WorldObjectIndex, normalise as normalise_object
 from .attributes import PilotAttributes
@@ -250,6 +263,7 @@ class CareerAggregator:
         self.overlay = Overlay(self.resolver, lang)
         self.icons = IconLibrary(self.resolver)
         self.ribbons = ribbons.RibbonRenderer(self.resolver.cache_dir)
+        self.medals = medal_art.MedalRenderer(self.resolver.cache_dir, self.ribbons, self.icons)
         self.flightlogs = FlightLogIndex(self.game_dir)
         self.descriptions = MissionDescriptions(self.resolver, lang, DEFAULT_TVD)
         # Through the resolver: a stock installation keeps awards.cfg inside
@@ -674,6 +688,13 @@ class CareerAggregator:
             return [{"type": t, "name": names.get(t) or self.award_name(t),
                      "framed": ribbons.RIBBONS[t].framed,
                      "geometry": ribbons.geometry(t)} for t in ids]
+        wanted = os.environ.get("KOREA_PREVIEW_RACK", "")
+        preview = PREVIEW_RACK.get(wanted) or tuple(int(t) for t in wanted.split(",") if t.strip().isdigit())
+        if preview:
+            # A developer's switch, see PREVIEW_RACK.
+            medals = [{"type": t, "name": self.award_name(t), "pending": False} for t in preview]
+            citations = ([{"type": t, "category": 2, "isDeleted": 0} for t in (601046, 601049)]
+                         if preview[0] == 601026 else [])
         names = {m["type"]: m["name"] for m in medals}
         worn = ribbons.rack(m["type"] for m in medals if not m["pending"])
         unit = ribbons.rack(row["type"] for row in citations
@@ -683,14 +704,38 @@ class CareerAggregator:
         # for the USAF - it is their coat.
         held = {m["type"] for m in medals if not m["pending"]}
         badge = next((b for b in (601040, 601027, 601001) if b in held), None)
+        # Full dress: the awards themselves. US medals four to a row on the
+        # bar with the Medal of Honor at the collar; Soviet-pattern orders
+        # and medals on their mounts, five to a row, the screw-back orders
+        # pinned to the right breast and the Hero's star above everything.
+        held = {m["type"] for m in medals if not m["pending"]}
+        kit = medal_art.wear(held)
+        country = next((str(t)[:3] for t in list(worn) + list(unit) + [badge] if t), "")
+        coat = {"601": "usaf", "501": "sov", "503": "dprk"}.get(country)
+        name = lambda t: names.get(t) or (self.award_name(t) if t else "")   # noqa: E731
+
+        def pieces(ids):
+            # Atlas-drawn pieces carry their width on the coat, in percent.
+            return [{"type": t, "name": name(t),
+                     "w": medal_art.width_pct(self.icons, t, coat) if coat else None} for t in ids]
         return {
             "ribbons": entries(worn),
             "rows": ribbons.rows(len(worn)),
             "citations": entries(unit),
             "citation_rows": ribbons.rows(len(unit)),
+            "medals": pieces(kit["bar"]),
+            "medal_rows": medal_art.rows(len(kit["bar"]), 5 if coat in ("sov", "dprk") else 4),
+            "pinned": pieces(kit["pinned"]),
+            "hero": pieces([kit["hero"]])[0] if kit["hero"] else None,
+            "wings": pieces([kit["wings"]])[0] if kit["wings"] else None,
+            "stripes": pieces(kit["stripes"]),
+            "neck": kit["neck"],
+            "neck_name": name(kit["neck"]),
+            "neck_src": medal_art.neck_url(kit["neck"]),
+            "medal_rev": medal_art.REVISION,
             "badge": badge,
-            "badge_name": names.get(badge) or (self.award_name(badge) if badge else ""),
-            "tunic": "usaf" if any(str(t).startswith("601") for t in list(worn) + list(unit)) or badge else None,
+            "badge_name": name(badge),
+            "tunic": coat,
             "rev": ribbons.REVISION,
         }
 

@@ -137,6 +137,13 @@
     "ribbon_rack": "Ribbon rack",
     "tunic_hint": "Click to see the ribbons as worn on the service coat",
     "tunic_caption": "USAF blue service coat, 1949 pattern. Ribbons over the left breast with the aviator badge above; unit citations over the right, as regulations placed them.",
+    "tunic_caption_full": "USAF blue service coat, 1949 pattern, with medals. Full-size medals over the left breast, four to a row, the aviator badge above; the Medal of Honor at the collar; unit citations, which have no medal, over the right.",
+    "tunic_caption_sov": "Soviet Air Force kitel, 1943 pattern. Ribbon bars over the left breast with the Gold Star of a Hero worn in kind above them; the bars of the orders worn without ribbon on the right, as the 1943 rules placed them.",
+    "tunic_caption_sov_full": "Soviet Air Force kitel, 1943 pattern, with orders and medals. Orders and medals on their pentagonal mounts over the left breast, five to a row, the Gold Star of a Hero above; the screw-back orders, which have no ribbon, pinned over the right.",
+    "tunic_caption_dprk": "Korean People's Army Air Force tunic. Ribbon bars over the left breast with the Hero of the Republic's star worn in kind above them; the bars of the orders worn without ribbon on the right, after the Soviet rules the KPA took over.",
+    "tunic_caption_dprk_full": "Korean People's Army Air Force tunic, with orders and medals. The two medals on their mounts over the left breast under the Hero of the Republic's star; the screw-back orders, which have no ribbon, pinned over the right under the pilot's badge.",
+    "dress_service": "Service dress",
+    "dress_full": "Full dress",
     "pending_note": "{count} awards are waiting on award points; you have {points}."
   },
   "incidences": {
