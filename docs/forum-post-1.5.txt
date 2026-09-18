@@ -85,8 +85,8 @@ back — which is how most of us fly a 90-minute Sabre patrol — the sortie is 
 career as twenty-five minutes, and everything that grows from flight time grows from that:
 the pilot's hours, the squadron's, the Air Medal that can be earned on hours, the Soviet
 pilot's class badges that are earned on nothing else (20, 40 and 60 hours — a Soviet pilot
-who warps never sees one), the logbook that says a man with 40 missions has 18 hours. Worse, the clock inside the mission does not know about
-the warp either, so the log says you shot down a MiG at 08:04 on a mission that took off at
+who warps never sees one), the logbook that says a man with 40 missions has 18 hours.
+Worse, the clock inside the mission does not know about the warp either, so the log says you shot down a MiG at 08:04 on a mission that took off at
 07:40 and would not have reached the Yalu before 08:30.
 
 The Helper puts the plan's time back. For every mission it reads the flight log the game
