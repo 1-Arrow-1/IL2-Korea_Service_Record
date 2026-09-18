@@ -226,6 +226,8 @@
     "empty": "Noch keine Einsätze geflogen.",
     "note": "Stunden, wie das Spiel sie aufgezeichnet hat.",
     "note_corrected": "Korrigierte Stunden: gesprungene Einsätze mit der geplanten Zeit angerechnet.",
+    "prev": "Voriger Monat",
+    "next": "Nächster Monat",
     "form": {
       "title": "FLUGBUCH",
       "form_no": "",

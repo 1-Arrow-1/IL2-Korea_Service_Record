@@ -10,6 +10,13 @@
 .logbook-page { background: var(--desk); padding: 1rem 1rem 3rem; }
 .logbook-bar { display: flex; align-items: center; gap: 1rem; max-width: 1180px; margin: 0 auto 1rem; }
 .logbook-bar .lb-note { flex: 1; font-size: 0.84rem; color: var(--ink-muted); font-style: italic; }
+.lb-pager { display: flex; align-items: center; gap: 0.5rem; }
+.lb-pager[hidden] { display: none; }
+.lb-pager #lb-month { min-width: 9rem; text-align: center; font-variant-numeric: tabular-nums; }
+.lb-pager button:disabled { opacity: 0.35; cursor: default; }
+/* One sheet on screen; every sheet on paper. */
+.paged .sheet { display: none; }
+.paged .sheet.current { display: block; }
 
 .sheet {
     background: #fbf7ec; color: #1f140a; max-width: 1180px; margin: 0 auto 1.4rem;
@@ -55,7 +62,7 @@
     @page { size: landscape; margin: 10mm; }
     .no-print { display: none !important; }
     .logbook-page { background: #fff; padding: 0; }
-    .sheet { box-shadow: none; max-width: none; margin: 0; page-break-after: always; break-after: page; padding: 0.4rem 0.2rem; }
+    .sheet, .paged .sheet { display: block; box-shadow: none; max-width: none; margin: 0; page-break-after: always; break-after: page; padding: 0.4rem 0.2rem; }
     .sheet:last-child { page-break-after: auto; break-after: auto; }
 }
 @media (max-width: 900px) {

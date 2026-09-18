@@ -226,6 +226,8 @@
     "empty": "Aún no se han volado misiones.",
     "note": "Horas tal como las registró el juego.",
     "note_corrected": "Horas corregidas: las misiones con salto de tiempo acreditadas con el tiempo previsto.",
+    "prev": "Mes anterior",
+    "next": "Mes siguiente",
     "form": {
       "title": "CARTILLA DE VUELO",
       "form_no": "",

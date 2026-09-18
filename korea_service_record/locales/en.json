@@ -226,6 +226,8 @@
     "empty": "No sorties flown yet.",
     "note": "Hours as the game recorded them.",
     "note_corrected": "Hours as corrected: warped missions credited with the planned time.",
+    "prev": "Previous month",
+    "next": "Next month",
     "form": {
       "title": "INDIVIDUAL FLIGHT RECORD",
       "form_no": "AF FORM 5",

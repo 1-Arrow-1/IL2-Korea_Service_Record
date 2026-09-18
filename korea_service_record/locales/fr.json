@@ -226,6 +226,8 @@
     "empty": "Aucune sortie volée pour l’instant.",
     "note": "Heures telles que le jeu les a enregistrées.",
     "note_corrected": "Heures corrigées : les missions avec saut de temps créditées du temps prévu.",
+    "prev": "Mois précédent",
+    "next": "Mois suivant",
     "form": {
       "title": "CARNET DE VOL",
       "form_no": "",

@@ -123,4 +123,25 @@
             "</section>";
     });
     el("lb-sheets").innerHTML = sheets.join("") || '<p class="state-message">' + esc(i18n.t("logbook.empty")) + "</p>";
+
+    // On screen one sheet at a time, the current month first, the arrows
+    // (and the keyboard's) turning the pages; print gets them all.
+    const nodes = Array.from(document.querySelectorAll(".sheet"));
+    let page = nodes.length - 1;
+    const show = () => {
+        nodes.forEach((n, i) => n.classList.toggle("current", i === page));
+        el("lb-month").textContent = data.months[page] ? monthName(data.months[page].month) : "";
+        el("lb-prev").disabled = page <= 0;
+        el("lb-next").disabled = page >= nodes.length - 1;
+    };
+    if (nodes.length > 1) {
+        el("lb-pager").hidden = false;
+        el("lb-prev").addEventListener("click", () => { if (page > 0) { page -= 1; show(); } });
+        el("lb-next").addEventListener("click", () => { if (page < nodes.length - 1) { page += 1; show(); } });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft") el("lb-prev").click();
+            if (e.key === "ArrowRight") el("lb-next").click();
+        });
+    }
+    if (nodes.length) { document.body.classList.add("paged"); show(); }
 })();
