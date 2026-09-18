@@ -575,10 +575,15 @@ def hour_awards(db_path: Path, data: Dict[str, Any], awards_cfg) -> List[Dict[st
                 stats["sorties"] += 1
                 stats["complsorties"] += 1 if s["status"] == 0 else 0
             base = dict(stats, country=row["type"] // 1000, cdate=int(str(row["earnedDate"]).replace(".", "")),
-                        rankid=0, rnd=0)
+                        rankid=0, rnd=0, isplayer=0, iscommander=0)
             rank = con.execute("SELECT pilotRank FROM award WHERE id=?", (row["id"],)).fetchone()
             if rank and rank[0] is not None:
                 base["rankid"] = rank[0]
+            # The player commands the squadron in this game's career: the
+            # Legion of Merit (commander and hours) is his alone.
+            who = con.execute("SELECT isPlayer FROM pilot WHERE id=?", (row["pilotId"],)).fetchone()
+            if who and who[0]:
+                base["isplayer"] = base["iscommander"] = 1
             without = evaluate(cond, dict(base, fltime=raw / 3600.0))
             with_hours = evaluate(cond, dict(base, fltime=credited / 3600.0))
             if not without and with_hours:
