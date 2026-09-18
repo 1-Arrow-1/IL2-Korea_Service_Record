@@ -99,16 +99,15 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "computed": "{n} missions re-timed; the tracker shows them with the switch on.",
         "apply": "Apply credited hours",
         "restore": "Restore game hours",
-        "apply_confirm": "Write the credited hours of {n} missions into the career? A backup is made first.",
-        "restore_confirm": "Put the game's own hours back for {n} missions?",
+        "apply_confirm": "Write the corrected times of {n} mission(s) into the career and keep it corrected from now on? A backup is taken first.",
+        "restore_confirm": "Put the game's own times back for all {n} corrected mission(s) and stop correcting this career? A backup is taken first.",
         "applied_done": "Credited hours applied to {n} missions. Backup: {backup}",
         "restored_done": "Game hours restored for {n} missions. Backup: {backup}",
         "no_times": "No warped missions found - either you fly the whole route, or nothing has been flown yet.",
         "awards_since": "Awards granted since the hours were applied - tick the ones to withdraw (an award earned on kills should stay):",
         "withdraw": "Withdraw ticked awards",
-        "auto": "Keep this career corrected automatically: the Service Record applies new missions when it reads the career (backup first; skipped while the game holds the file).",
-        "auto_on": "Automatic correction is on for this career.",
-        "auto_off": "Automatic correction is off for this career.",
+        "auto_on": "This career is kept corrected: every mission flown from now on is re-timed when the Service Record next reads the career (backup first; skipped while the game holds the file). Restore puts all originals back and ends this.",
+        "auto_off": "This career is not corrected. Apply writes the corrected times of every computed mission and keeps the career corrected from then on.",
         "open_from_tracker": "Please open the Career Helper from the Service Record - the button in its header.",
         "needs_mod": "The Career Helper is part of the awards mod. Install the mod component of the Service Record setup and enable modifications in IL-2 Korea.",
         "withdrawn": "{n} awards withdrawn. Backup: {backup}",
@@ -151,16 +150,15 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "computed": "{n} Einsätze umgerechnet; die Dienstakte zeigt sie mit eingeschaltetem Schalter.",
         "apply": "Angerechnete Stunden übernehmen",
         "restore": "Spielstunden zurücksetzen",
-        "apply_confirm": "Die angerechneten Stunden von {n} Einsätzen in die Laufbahn schreiben? Vorher wird eine Sicherung angelegt.",
-        "restore_confirm": "Die Stunden des Spiels für {n} Einsätze wiederherstellen?",
+        "apply_confirm": "Die korrigierten Zeiten von {n} Einsatz/Einsätzen in die Laufbahn schreiben und sie ab jetzt korrigiert halten? Vorher wird gesichert.",
+        "restore_confirm": "Die Originalzeiten des Spiels für alle {n} korrigierten Einsätze zurücksetzen und die Korrektur dieser Laufbahn beenden? Vorher wird gesichert.",
         "applied_done": "Angerechnete Stunden für {n} Einsätze übernommen. Sicherung: {backup}",
         "restored_done": "Spielstunden für {n} Einsätze wiederhergestellt. Sicherung: {backup}",
         "no_times": "Keine Einsätze mit Zeitsprung gefunden - entweder fliegen Sie die ganze Strecke, oder es wurde noch nichts geflogen.",
         "awards_since": "Seit dem Übernehmen der Stunden verliehene Auszeichnungen - die zu entziehenden ankreuzen (eine mit Abschüssen verdiente sollte bleiben):",
         "withdraw": "Angekreuzte Auszeichnungen entziehen",
-        "auto": "Diese Laufbahn automatisch korrigiert halten: die Dienstakte übernimmt neue Einsätze beim Lesen der Laufbahn (vorher Sicherung; übersprungen, solange das Spiel die Datei hält).",
-        "auto_on": "Automatische Korrektur für diese Laufbahn ist eingeschaltet.",
-        "auto_off": "Automatische Korrektur für diese Laufbahn ist ausgeschaltet.",
+        "auto_on": "Diese Laufbahn wird korrigiert gehalten: jeder ab jetzt geflogene Einsatz wird umgerechnet, sobald die Dienstakte die Laufbahn das nächste Mal liest (vorher Sicherung; übersprungen, solange das Spiel die Datei hält). Wiederherstellen setzt alle Originalwerte zurück und beendet das.",
+        "auto_off": "Diese Laufbahn ist nicht korrigiert. Übernehmen schreibt die korrigierten Zeiten aller berechneten Einsätze und hält die Laufbahn von da an korrigiert.",
         "open_from_tracker": "Bitte öffnen Sie den Laufbahn-Helfer aus der Dienstakte - über die Schaltfläche in ihrer Kopfzeile.",
         "needs_mod": "Der Laufbahn-Helfer gehört zum Auszeichnungs-Mod. Installieren Sie die Mod-Komponente des Dienstakte-Setups und aktivieren Sie Modifikationen in IL-2 Korea.",
         "withdrawn": "{n} Auszeichnungen entzogen. Sicherung: {backup}",
@@ -203,16 +201,15 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "computed": "{n} misiones ajustadas; la Hoja de Servicios las muestra con el interruptor activado.",
         "apply": "Aplicar horas acreditadas",
         "restore": "Restaurar horas del juego",
-        "apply_confirm": "¿Escribir las horas acreditadas de {n} misiones en la carrera? Antes se hace una copia de seguridad.",
-        "restore_confirm": "¿Restaurar las horas propias del juego en {n} misiones?",
+        "apply_confirm": "¿Escribir los tiempos corregidos de {n} misión(es) en la carrera y mantenerla corregida a partir de ahora? Antes se hace una copia de seguridad.",
+        "restore_confirm": "¿Devolver los tiempos originales del juego a las {n} misiones corregidas y dejar de corregir esta carrera? Antes se hace una copia de seguridad.",
         "applied_done": "Horas acreditadas aplicadas a {n} misiones. Copia de seguridad: {backup}",
         "restored_done": "Horas del juego restauradas en {n} misiones. Copia de seguridad: {backup}",
         "no_times": "No se encontraron misiones con salto: o vuela toda la ruta, o aún no se ha volado nada.",
         "awards_since": "Condecoraciones concedidas desde que se aplicaron las horas - marque las que quiera retirar (una ganada por derribos debería quedarse):",
         "withdraw": "Retirar las marcadas",
-        "auto": "Mantener esta carrera corregida automáticamente: la Hoja de Servicios aplica las misiones nuevas al leer la carrera (copia de seguridad previa; se omite mientras el juego tenga el archivo abierto).",
-        "auto_on": "La corrección automática está activada para esta carrera.",
-        "auto_off": "La corrección automática está desactivada para esta carrera.",
+        "auto_on": "Esta carrera se mantiene corregida: cada misión volada a partir de ahora se recalcula cuando la Hoja de Servicios vuelva a leer la carrera (copia de seguridad previa; se omite mientras el juego tenga el archivo abierto). Restaurar devuelve todos los originales y pone fin a esto.",
+        "auto_off": "Esta carrera no está corregida. Aplicar escribe los tiempos corregidos de todas las misiones calculadas y mantiene la carrera corregida desde entonces.",
         "open_from_tracker": "Abra el Asistente de carrera desde la Hoja de Servicios: el botón de su cabecera.",
         "needs_mod": "El Asistente de carrera forma parte del mod de condecoraciones. Instale el componente del mod en el instalador de la Hoja de Servicios y active las modificaciones en IL-2 Korea.",
         "withdrawn": "{n} condecoraciones retiradas. Copia de seguridad: {backup}",
@@ -255,16 +252,15 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "computed": "{n} missions recalées ; l’état de service les affiche avec l’interrupteur activé.",
         "apply": "Appliquer les heures créditées",
         "restore": "Rétablir les heures du jeu",
-        "apply_confirm": "Inscrire les heures créditées de {n} missions dans la carrière ? Une sauvegarde est faite d’abord.",
-        "restore_confirm": "Remettre les heures propres du jeu pour {n} missions ?",
+        "apply_confirm": "Écrire les temps corrigés de {n} mission(s) dans la carrière et la maintenir corrigée désormais ? Une sauvegarde est faite d’abord.",
+        "restore_confirm": "Remettre les temps d’origine du jeu pour les {n} missions corrigées et cesser de corriger cette carrière ? Une sauvegarde est faite d’abord.",
         "applied_done": "Heures créditées appliquées à {n} missions. Sauvegarde : {backup}",
         "restored_done": "Heures du jeu rétablies pour {n} missions. Sauvegarde : {backup}",
         "no_times": "Aucune mission avec saut trouvée : soit vous volez toute la route, soit rien n’a encore été volé.",
         "awards_since": "Décorations attribuées depuis l’application des heures - cochez celles à retirer (une décoration gagnée par des victoires doit rester) :",
         "withdraw": "Retirer les décorations cochées",
-        "auto": "Garder cette carrière corrigée automatiquement : l’état de service applique les nouvelles missions quand il lit la carrière (sauvegarde d’abord ; ignoré tant que le jeu tient le fichier).",
-        "auto_on": "La correction automatique est activée pour cette carrière.",
-        "auto_off": "La correction automatique est désactivée pour cette carrière.",
+        "auto_on": "Cette carrière est maintenue corrigée : chaque mission volée désormais est recalée quand l’état de service relit la carrière (sauvegarde d’abord ; ignoré tant que le jeu tient le fichier). Restaurer remet tous les originaux et y met fin.",
+        "auto_off": "Cette carrière n’est pas corrigée. Appliquer écrit les temps corrigés de toutes les missions calculées et maintient la carrière corrigée à partir de là.",
         "open_from_tracker": "Ouvrez l’assistant de carrière depuis l’état de service : le bouton de son en-tête.",
         "needs_mod": "L’assistant de carrière fait partie du mod de décorations. Installez le composant mod de l’installateur de l’état de service et activez les modifications dans IL-2 Korea.",
         "withdrawn": "{n} décorations retirées. Sauvegarde : {backup}",
@@ -307,16 +303,15 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "computed": "Пересчитано вылетов: {n}; послужной список показывает их при включённом переключателе.",
         "apply": "Применить зачтённые часы",
         "restore": "Вернуть часы игры",
-        "apply_confirm": "Записать зачтённые часы {n} вылетов в карьеру? Сначала будет сделана резервная копия.",
-        "restore_confirm": "Вернуть собственные часы игры для {n} вылетов?",
+        "apply_confirm": "Записать исправленное время {n} вылет(ов) в карьеру и держать её исправленной с этого момента? Сначала будет сделана резервная копия.",
+        "restore_confirm": "Вернуть исходное время игры для всех {n} исправленных вылетов и прекратить исправление этой карьеры? Сначала будет сделана резервная копия.",
         "applied_done": "Зачтённые часы применены к {n} вылетам. Резервная копия: {backup}",
         "restored_done": "Часы игры возвращены для {n} вылетов. Резервная копия: {backup}",
         "no_times": "Вылетов с перемоткой не найдено — либо вы летаете весь маршрут, либо ещё ничего не налётано.",
         "awards_since": "Награды, вручённые после применения часов — отметьте те, что нужно отозвать (заслуженная сбитыми должна остаться):",
         "withdraw": "Отозвать отмеченные",
-        "auto": "Держать эту карьеру исправленной автоматически: послужной список применяет новые вылеты при чтении карьеры (сначала резервная копия; пропускается, пока файл занят игрой).",
-        "auto_on": "Автоматическое исправление для этой карьеры включено.",
-        "auto_off": "Автоматическое исправление для этой карьеры выключено.",
+        "auto_on": "Эта карьера держится исправленной: каждый вылет, совершённый с этого момента, пересчитывается, когда послужной список в следующий раз читает карьеру (сначала резервная копия; пропускается, пока файл занят игрой). «Восстановить» возвращает все исходные значения и прекращает это.",
+        "auto_off": "Эта карьера не исправлена. «Применить» записывает исправленное время всех рассчитанных вылетов и с этого момента держит карьеру исправленной.",
         "open_from_tracker": "Откройте помощник карьеры из послужного списка — кнопкой в его шапке.",
         "needs_mod": "Помощник карьеры — часть мода наград. Установите компонент мода в установщике послужного списка и включите модификации в IL-2 Korea.",
         "withdrawn": "Отозвано наград: {n}. Резервная копия: {backup}",
@@ -359,16 +354,15 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "computed": "已重新计时 {n} 个任务；打开开关后服役记录将显示。",
         "apply": "应用计入的小时数",
         "restore": "恢复游戏小时数",
-        "apply_confirm": "将 {n} 个任务的计入小时数写入生涯？会先创建备份。",
-        "restore_confirm": "恢复 {n} 个任务的游戏原始小时数？",
+        "apply_confirm": "将 {n} 个任务的修正时间写入生涯并从此保持修正状态？会先备份。",
+        "restore_confirm": "还原全部 {n} 个已修正任务的游戏原始时间并停止修正此生涯？会先备份。",
         "applied_done": "已将计入小时数应用于 {n} 个任务。备份：{backup}",
         "restored_done": "已恢复 {n} 个任务的游戏小时数。备份：{backup}",
         "no_times": "未找到跳跃任务——您要么飞完了全程，要么尚未出击。",
         "awards_since": "应用小时数后授予的奖励——勾选要撤销的（凭击落获得的应保留）：",
         "withdraw": "撤销勾选的奖励",
-        "auto": "自动保持此生涯为修正状态：服役记录在读取生涯时自动应用新任务（先备份；游戏占用文件时跳过）。",
-        "auto_on": "此生涯的自动修正已开启。",
-        "auto_off": "此生涯的自动修正已关闭。",
+        "auto_on": "此生涯保持修正状态：从现在起飞行的每个任务都会在服役记录下次读取生涯时重新计时（先备份；游戏占用文件时跳过）。“恢复”会还原全部原始值并结束此状态。",
+        "auto_off": "此生涯未修正。“应用”会写入所有已计算任务的修正时间，并从此保持生涯为修正状态。",
         "open_from_tracker": "请从服役记录中打开生涯助手——其页眉中的按钮。",
         "needs_mod": "生涯助手是奖励模组的一部分。请在服役记录安装程序中安装模组组件，并在 IL-2 Korea 中启用修改。",
         "withdrawn": "已撤销 {n} 项奖励。备份：{backup}",
@@ -448,24 +442,25 @@ class Career:
         corrections.save(self.name, data)
         return data
 
-    def apply_hours(self, keys, auto: Optional[bool] = None):
+    # A career is either corrected or not, never half: applying writes every
+    # computed mission and sets the standing order, so each mission flown
+    # afterwards is re-timed when the tracker next reads the career;
+    # restoring puts every original back and ends the order.
+    def apply_hours(self):
         backup = self.backup()
         data = corrections.load(self.name) or {"format": corrections.FORMAT, "career": self.name, "missions": {}}
+        keys = [k for k, e in data["missions"].items() if not e.get("applied")]
         done = corrections.apply_hours(self.path, data, keys)
-        if auto is not None:
-            data["auto"] = bool(auto)
+        data["auto"] = True
         corrections.save(self.name, data)
         return backup, done
 
-    def set_auto(self, on: bool) -> None:
-        data = corrections.load(self.name) or {"format": corrections.FORMAT, "career": self.name, "missions": {}}
-        data["auto"] = bool(on)
-        corrections.save(self.name, data)
-
-    def restore_hours(self, keys):
+    def restore_hours(self):
         backup = self.backup()
         data = corrections.load(self.name) or {"missions": {}}
+        keys = [k for k, e in data["missions"].items() if e.get("applied")]
         done = corrections.restore_hours(self.path, data, keys)
+        data["auto"] = False
         corrections.save(self.name, data)
         return backup, done
 
@@ -610,8 +605,8 @@ class App(tk.Tk):
             self.ft_tree.heading(key, text=self.t["col_" + key])
             self.ft_tree.column(key, width=width, anchor="w")
         self.ft_tree.pack(fill="both", expand=True, padx=8)
-        self.auto_var = tk.BooleanVar(value=False)
-        ttk.Checkbutton(ft, text=self.t["auto"], variable=self.auto_var, command=self._set_auto).pack(anchor="w", padx=8, pady=(6, 0))
+        self.auto_label = ttk.Label(ft, text="", wraplength=700)
+        self.auto_label.pack(anchor="w", padx=8, pady=(6, 0))
         ftb = ttk.Frame(ft)
         ftb.pack(fill="x", padx=8, pady=6)
         ttk.Button(ftb, text=self.t["compute"], command=self._compute_times).pack(side="left")
@@ -722,7 +717,7 @@ class App(tk.Tk):
             return
         data = self.career.corrections()
         entries = (data or {}).get("missions", {})
-        self.auto_var.set(bool((data or {}).get("auto")))
+        self.auto_label.configure(text=self.t["auto_on"] if (data or {}).get("auto") else self.t["auto_off"])
         for key in sorted(entries, key=int):
             e = entries[key]
             self.ft_tree.insert("", "end", iid=key, values=(
@@ -761,24 +756,20 @@ class App(tk.Tk):
         self.status.set(self.t["computed"].format(n=n) if n else self.t["no_times"])
         self._fill_times()
 
-    def _ft_selected(self, want_applied: bool):
+    def _ft_selected(self, want_applied: bool, everything: bool = False):
+        """Mission keys in the wanted state: the selection, or all of them -
+        apply and restore always take all, so a career is never half done."""
         data = self.career.corrections() if self.career else None
         entries = (data or {}).get("missions", {})
-        keys = list(self.ft_tree.selection()) or list(entries)
+        keys = list(entries) if everything else (list(self.ft_tree.selection()) or list(entries))
         return [k for k in keys if bool(entries.get(k, {}).get("applied")) == want_applied]
 
-    def _set_auto(self) -> None:
-        if self.career is None:
-            return
-        self.career.set_auto(self.auto_var.get())
-        self.status.set(self.t["auto_on"] if self.auto_var.get() else self.t["auto_off"])
-
     def _apply_hours(self) -> None:
-        keys = self._ft_selected(want_applied=False)
+        keys = self._ft_selected(want_applied=False, everything=True)
         if not keys or not messagebox.askyesno(self.t["title"], self.t["apply_confirm"].format(n=len(keys))):
             return
         try:
-            backup, done = self.career.apply_hours(keys, auto=self.auto_var.get())
+            backup, done = self.career.apply_hours()
         except sqlite3.OperationalError:
             messagebox.showerror(self.t["title"], self.t["locked"])
             return
@@ -789,11 +780,11 @@ class App(tk.Tk):
         self._fill_times()
 
     def _restore_hours(self) -> None:
-        keys = self._ft_selected(want_applied=True)
+        keys = self._ft_selected(want_applied=True, everything=True)
         if not keys or not messagebox.askyesno(self.t["title"], self.t["restore_confirm"].format(n=len(keys))):
             return
         try:
-            backup, done = self.career.restore_hours(keys)
+            backup, done = self.career.restore_hours()
         except sqlite3.OperationalError:
             messagebox.showerror(self.t["title"], self.t["locked"])
             return

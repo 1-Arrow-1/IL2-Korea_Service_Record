@@ -103,10 +103,17 @@ if you reflew one and the older log was replaced) fall back to the plan's durati
 the Helper shows for each mission whether it was timed from the log or from the plan.
 
 Nothing is written until you say so. The Helper shows every mission with its original and
-corrected time side by side; you tick the ones you want and apply. The change goes into the
-sortie, the pilot, the squadron and the mission's end time, and a record of the originals is
-kept in a sidecar file beside the tracker's settings, so it is fully reversible — months
-later, if you like: "restore" puts the original figures back, to the second.
+corrected time side by side, and "apply" writes them all. The change goes into the sortie,
+the pilot, the squadron and the mission's end time, and a record of the originals is kept in
+a sidecar file beside the tracker's settings, so it is fully reversible — months later, if
+you like: "restore" puts every original figure back, to the second.
+
+A career is either corrected or it is not; there is no half-way. Once you have applied, the
+career stays corrected: each mission you fly afterwards is re-timed the first time the
+tracker reads the career after the flight — backup first, as always, and it steps back and
+waits if the game still has the file open. I did it that way deliberately, because the
+alternative — corrected hours up to May, raw ones after — would be a file that lies in a
+way you cannot see. Restore undoes the lot and ends it.
 
 Two things follow from this that you should know. First, the tracker has a switch in its
 header, "corrected times", that shows the corrected figures as an overlay without touching
@@ -116,11 +123,6 @@ figures are then the ones in the file. Second, the game hands out some awards on
 time. Applying hours can therefore earn a pilot an Air Medal the next day that he would not
 have had; the Helper lists awards granted since the correction and lets you withdraw any of
 them if you feel they were not earned. I leave that to your conscience.
-
-If you would rather not think about it again, there is a box: "keep this career corrected
-automatically". With it ticked, the tracker applies the correction to each new mission the
-first time it reads the career after you have flown — backup first, as always, and it steps
-back and waits if the game still has the file open. This is what I do.
 
 
 ALSO
