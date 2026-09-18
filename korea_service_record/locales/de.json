@@ -135,6 +135,8 @@
     "no_description": "Keine Beschreibung in den Spieldateien.",
     "history": "Frühere Verleihungen dieser Auszeichnung ({count})",
     "ribbon_rack": "Ordensspange",
+    "tunic_hint": "Anklicken: die Bänder, wie sie auf dem Dienstrock getragen wurden",
+    "tunic_caption": "Blauer Dienstrock der USAF, Muster 1949. Bandspangen über der linken Brusttasche mit dem Fliegerabzeichen darüber; Verbandsauszeichnungen über der rechten, wie es die Vorschrift vorsah.",
     "pending_note": "{count} Auszeichnungen warten auf Auszeichnungspunkte; Sie haben {points}."
   },
   "incidences": {

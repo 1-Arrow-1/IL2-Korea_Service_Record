@@ -317,6 +317,23 @@
     </div>
 
     <!-- Lightbox for medals, insignia and squadron emblems -->
+    <!-- The rack on the coat: the 1949-pattern USAF blue service coat, ribbons
+         over the wearer's left pocket with the aviator badge above, unit
+         citations over the right. Opens from a click on the ribbon rack. -->
+    <div id="tunicbox" class="lightbox" hidden>
+        <div class="lightbox-backdrop" data-tunic-close></div>
+        <div class="lightbox-panel tunic-panel" role="dialog" aria-modal="true" aria-labelledby="tunic-title">
+            <button class="lightbox-close" data-tunic-close aria-label="Close" data-i18n-title="common.close">&times;</button>
+            <h2 id="tunic-title" class="tunic-title"></h2>
+            <div id="tunic" class="tunic">
+                <img class="tunic-coat" src="/static/images/tunic_usaf.jpg" alt="">
+                <div id="tunic-left" class="tunic-left"></div>
+                <div id="tunic-right" class="tunic-right"></div>
+            </div>
+            <p id="tunic-caption" class="tunic-caption"></p>
+        </div>
+    </div>
+
     <div id="lightbox" class="lightbox" hidden>
         <div class="lightbox-backdrop" data-close></div>
         <div class="lightbox-panel" role="dialog" aria-modal="true"

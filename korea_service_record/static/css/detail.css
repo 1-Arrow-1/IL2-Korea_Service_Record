@@ -212,6 +212,31 @@ table.roster td.award-cell { white-space: normal; }
 /* ------------------------------------------------------------- closed -- */
 .state-message.closed { margin: 4rem auto; max-width: 34rem; text-align: center; font-size: 1.15rem; }
 
+/* -------------------------------------------------------------- tunic -- */
+
+/* The coat image is 1122x930 (the photograph cropped from the tie knot to
+   below the pockets). Both pockets' flaps top out at 46.8% of the height;
+   the wearer's left pocket (viewer's right) is centred at 75.3% of the
+   width and 34.8% wide, the right pocket at 16.8%. Everything is placed in
+   percentages of the image so it scales with the panel. */
+.tunic-panel { max-width: 760px; padding: 1rem 1rem 0.8rem; }
+.tunic-title { margin: 0 0 0.6rem; font-size: 1.15rem; }
+.tunic { position: relative; width: 100%; aspect-ratio: 1122 / 930; overflow: hidden; border-radius: 3px; }
+.tunic-coat { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.tunic-right, .tunic-left { position: absolute; bottom: 53.6%; width: 34.8%; display: flex; flex-direction: column;
+    align-items: center; }
+.tunic-right { left: 75.3%; transform: translateX(-50%); }
+.tunic-left { left: 16.8%; transform: translateX(-50%); }
+.tunic .ribbon-group { width: 100%; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45)); }
+.tunic .ribbon-row .ribbon { margin: -1.2% -1.44%; }
+.tunic .ribbon-row .ribbon.sov { margin: -1.2% -1.5%; }
+/* Regulation: the badge sits half an inch above the top row, centred. */
+.tunic-badge { width: 62%; height: auto; display: block; margin: 0 auto 4%;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)); }
+.tunic-caption { margin: 0.6rem 0 0; font-size: 0.82rem; color: var(--ink-muted); }
+.ribbon-rack.wearable { cursor: pointer; }
+.ribbon-rack.wearable:hover { border-color: var(--border); }
+
 /* ---------------------------------------------------------- ribbon rack -- */
 
 /* Composed 480x160 images (a 440x120 bar with a 20 px margin so a citation's

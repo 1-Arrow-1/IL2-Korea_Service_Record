@@ -270,6 +270,29 @@
                 ribbonRows(unit, rack.citation_rows, rack.rev) + "</div>" : "");
     }
 
+    // The rack on the coat. The composed ribbons are the same images as the
+    // panel's, laid over the photograph at the pocket: ribbons and badge over
+    // the wearer's left breast, unit citations over the right.
+    let currentRack = null;
+    function openTunic(name) {
+        const rack = currentRack;
+        if (!rack || !rack.tunic) { return; }
+        const own = rack.ribbons || [], unit = rack.citations || [];
+        el("tunic-title").textContent = name || "";
+        el("tunic-right").innerHTML =
+            (rack.badge ? '<img class="tunic-badge" src="/api/icon/award/' + esc(rack.badge) + '" alt="' + esc(rack.badge_name) + '" title="' + esc(rack.badge_name) + '">' : "") +
+            (own.length ? '<div class="ribbon-group">' + ribbonRows(own, rack.rows, rack.rev) + "</div>" : "");
+        el("tunic-left").innerHTML = unit.length
+            ? '<div class="ribbon-group">' + ribbonRows(unit, rack.citation_rows, rack.rev) + "</div>" : "";
+        el("tunic-caption").textContent = T("awards.tunic_caption");
+        show(el("tunicbox"), true);
+        document.body.classList.add("lightbox-open");
+    }
+    function closeTunic() {
+        show(el("tunicbox"), false);
+        document.body.classList.remove("lightbox-open");
+    }
+
     function awardItem(award) {
         const badge = award.pending ? '<span class="badge pending">pending</span>' : "";
         const when = award.pending
@@ -798,6 +821,10 @@
             rackEl.innerHTML = ribbonRack(d.ribbon_rack);
             rackEl.hidden = !rackEl.innerHTML;
             rackEl.setAttribute("aria-label", T("awards.ribbon_rack"));
+            currentRack = d.ribbon_rack;
+            rackEl.classList.toggle("wearable", Boolean(d.ribbon_rack && d.ribbon_rack.tunic));
+            rackEl.title = d.ribbon_rack && d.ribbon_rack.tunic ? T("awards.tunic_hint") : "";
+            rackEl.onclick = () => openTunic(d.player ? d.player.name : "");
 
             el("d-promotions").innerHTML = d.promotions.length
                 ? d.promotions.map(promotionItem).join("")
@@ -1476,9 +1503,13 @@
         if (event.target.closest && event.target.closest("[data-close]")) {
             closeLightbox();
         }
+        if (event.target.closest && event.target.closest("[data-tunic-close]")) {
+            closeTunic();
+        }
     });
     document.addEventListener("keydown", (event) => {
         if (event.key !== "Escape") return;
+        if (!el("tunicbox").hidden) { closeTunic(); return; }
         if (!el("cropper").hidden) closeCropper();
         else if (!el("missionbox").hidden) closeMission();
         else if (!el("pilotbox").hidden) closePilot();

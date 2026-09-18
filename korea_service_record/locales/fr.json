@@ -135,6 +135,8 @@
     "no_description": "Aucune description dans les fichiers du jeu.",
     "history": "Attributions antérieures de cette décoration ({count})",
     "ribbon_rack": "Barrette de décorations",
+    "tunic_hint": "Cliquez pour voir les barrettes telles que portées sur la vareuse",
+    "tunic_caption": "Vareuse bleue de l’USAF, modèle 1949. Barrettes au-dessus de la poche gauche, insigne d’aviateur au-dessus ; citations d’unité au-dessus de la droite, comme le règlement le prescrivait.",
     "pending_note": "{count} décorations attendent des points ; vous en avez {points}."
   },
   "incidences": {

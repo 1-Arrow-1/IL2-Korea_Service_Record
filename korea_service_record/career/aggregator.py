@@ -678,11 +678,19 @@ class CareerAggregator:
         worn = ribbons.rack(m["type"] for m in medals if not m["pending"])
         unit = ribbons.rack(row["type"] for row in citations
                             if row["category"] == 2 and not row["isDeleted"])
+        # The aviator badge worn above the ribbons: the highest of the three,
+        # sliced from the game's atlas like any medal. The tunic is only drawn
+        # for the USAF - it is their coat.
+        held = {m["type"] for m in medals if not m["pending"]}
+        badge = next((b for b in (601040, 601027, 601001) if b in held), None)
         return {
             "ribbons": entries(worn),
             "rows": ribbons.rows(len(worn)),
             "citations": entries(unit),
             "citation_rows": ribbons.rows(len(unit)),
+            "badge": badge,
+            "badge_name": names.get(badge) or (self.award_name(badge) if badge else ""),
+            "tunic": "usaf" if any(str(t).startswith("601") for t in list(worn) + list(unit)) or badge else None,
             "rev": ribbons.REVISION,
         }
 

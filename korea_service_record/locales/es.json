@@ -135,6 +135,8 @@
     "no_description": "Sin descripción en los archivos del juego.",
     "history": "Concesiones anteriores de esta condecoración ({count})",
     "ribbon_rack": "Pasador de condecoraciones",
+    "tunic_hint": "Pulse para ver las cintas tal como se llevaban en la guerrera",
+    "tunic_caption": "Guerrera azul de la USAF, modelo de 1949. Pasadores sobre el bolsillo izquierdo con la insignia de aviador encima; menciones de unidad sobre el derecho, como mandaba el reglamento.",
     "pending_note": "{count} condecoraciones esperan puntos; usted tiene {points}."
   },
   "incidences": {

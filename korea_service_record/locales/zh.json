@@ -135,6 +135,8 @@
     "no_description": "游戏文件中没有说明。",
     "history": "此奖项的先前授予（{count}）",
     "ribbon_rack": "略章板",
+    "tunic_hint": "点击查看略章在制服上的佩戴样式",
+    "tunic_caption": "美国空军1949年式蓝色常服。略章位于左胸口袋上方，飞行员徽章在其上；部队嘉奖位于右胸口袋上方，一如条例所规定。",
     "pending_note": "{count} 项勋章正在等待勋章点数；您当前有 {points} 点。"
   },
   "incidences": {

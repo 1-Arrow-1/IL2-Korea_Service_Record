@@ -135,6 +135,8 @@
     "no_description": "No description in the game files.",
     "history": "Earlier awards in this series ({count})",
     "ribbon_rack": "Ribbon rack",
+    "tunic_hint": "Click to see the ribbons as worn on the service coat",
+    "tunic_caption": "USAF blue service coat, 1949 pattern. Ribbons over the left breast with the aviator badge above; unit citations over the right, as regulations placed them.",
     "pending_note": "{count} awards are waiting on award points; you have {points}."
   },
   "incidences": {
