@@ -57,6 +57,8 @@
 .map-mark.hit svg { stroke: var(--bad); }
 .map-mark.bailout svg { stroke: #1c3a5e; }
 .map-mark.loss svg { stroke: #1f140a; stroke-width: 2.5; }
+.map-mark.loss .count { position: absolute; left: 12px; top: -8px; font-size: 0.68rem; font-weight: bold; color: #1f140a;
+    text-shadow: 0 0 3px var(--paper-panel), 0 0 3px var(--paper-panel); }
 .map-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; margin: -1rem 0 1.2rem; font-size: 0.78rem; color: var(--ink-muted); }
 .map-legend[hidden] { display: none; }
 .legend-item { display: inline-flex; align-items: center; gap: 0.35rem; }

@@ -547,7 +547,7 @@
                 if (subjectId != null && v.pilot_id === subjectId) m.options.className += " mine";
                 return m;
             }));
-            opsLayers.losses = L.layerGroup((data.losses || []).map((l) => KoreaMap.lossMarker(l, T)));
+            opsLayers.losses = KoreaMap.lossLayer(data.losses, T);
             opsLayers.bases = L.layerGroup(data.bases.map((b) => KoreaMap.baseMarker(b, T)));
             el("d-map-count").textContent =
                 "(" + T("map.count", {sorties: data.routes.length, victories: data.victories.length}) + ")";
@@ -614,7 +614,7 @@
                 layers.push(KoreaMap.trackLayer(track, T).addTo(missionMap));
             }
             if (track.losses && track.losses.length) {
-                layers.push(L.layerGroup(track.losses.map((l) => KoreaMap.lossMarker(l, T))).addTo(missionMap));
+                layers.push(KoreaMap.lossLayer(track.losses, T).addTo(missionMap));
             }
             if (legend) {
                 const items = [["route", T("map.legend_route")]];

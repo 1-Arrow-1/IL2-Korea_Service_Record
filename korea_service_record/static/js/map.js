@@ -221,20 +221,34 @@
         return group;
     }
 
-    // One of ours, lost: a cross where it came down.
-    function lossMarker(l, T) {
-        const m = L.marker(toLatLng(l.x, l.z), {
-            icon: L.divIcon({className: "map-mark loss", html: MARKS.loss, iconSize: [16, 16], iconAnchor: [8, 8]}),
-            keyboard: false
+    // Ours, lost: a cross where each came down. Two lost at the same spot
+    // and moment - a collision within the flight - share one cross with a
+    // count, or the second would hide under the first.
+    function lossLayer(losses, T) {
+        const group = L.layerGroup();
+        const spots = new Map();
+        (losses || []).forEach((l) => {
+            const key = Math.round(l.x / 200) + ":" + Math.round(l.z / 200) + ":" + (l.mission_id || "");
+            if (!spots.has(key)) spots.set(key, []);
+            spots.get(key).push(l);
         });
-        m.bindTooltip(T("map.loss_tip", {pilot: esc(l.pilot), plane: esc(l.plane)}) +
-            (l.alt ? " · " + l.alt + " m" : "") +
-            (l.number ? "<br>" + T("debrief.mission", {number: l.number}) + " · " + l.date : ""),
-            {className: "map-tip", direction: "top", offset: [0, -8]});
-        if (l.mission_id) {
-            m.on("click", () => document.dispatchEvent(new CustomEvent("map:mission", {detail: l.mission_id})));
-        }
-        return m;
+        spots.forEach((list) => {
+            const l = list[0];
+            const badge = list.length > 1 ? '<span class="count">' + list.length + "</span>" : "";
+            const m = L.marker(toLatLng(l.x, l.z), {
+                icon: L.divIcon({className: "map-mark loss", html: MARKS.loss + badge, iconSize: [16, 16], iconAnchor: [8, 8]}),
+                keyboard: false
+            });
+            m.bindTooltip(list.map((x) => T("map.loss_tip", {pilot: esc(x.pilot), plane: esc(x.plane)}) +
+                    (x.alt ? " · " + x.alt + " m" : "")).join("<br>") +
+                (l.number ? "<br>" + T("debrief.mission", {number: l.number}) + " · " + l.date : ""),
+                {className: "map-tip", direction: "top", offset: [0, -8]});
+            if (l.mission_id) {
+                m.on("click", () => document.dispatchEvent(new CustomEvent("map:mission", {detail: l.mission_id})));
+            }
+            m.addTo(group);
+        });
+        return group;
     }
 
     function fitTo(map, layers, pad) {
@@ -250,5 +264,5 @@
     }
 
     window.KoreaMap = {createMap, overlayFeatures, labelLayer, routeLayer, targetMarker,
-                       groundMarker, victoryMarker, baseMarker, trackLayer, lossMarker, fitTo, toLatLng};
+                       groundMarker, victoryMarker, baseMarker, trackLayer, lossLayer, fitTo, toLatLng};
 })();
