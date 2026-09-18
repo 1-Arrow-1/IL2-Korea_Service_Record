@@ -134,7 +134,7 @@
         el("lb-prev").disabled = page <= 0;
         el("lb-next").disabled = page >= nodes.length - 1;
     };
-    if (nodes.length > 1) {
+    if (nodes.length) {
         el("lb-pager").hidden = false;
         el("lb-prev").addEventListener("click", () => { if (page > 0) { page -= 1; show(); } });
         el("lb-next").addEventListener("click", () => { if (page < nodes.length - 1) { page += 1; show(); } });
