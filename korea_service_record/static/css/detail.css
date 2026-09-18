@@ -237,6 +237,8 @@ table.roster td.award-cell { white-space: normal; }
 .tunic .ribbon-group { width: 100%; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45)); }
 .tunic .ribbon-row .ribbon { margin: -1.2% -1.44%; }
 .tunic .ribbon-row .ribbon.sov { margin: -1.2% -1.5%; }
+/* Four across: each bar three quarters the width, the same pull-in scaled. */
+.tunic .ribbon-group.four .ribbon-row .ribbon { width: 26%; margin: -0.9% -1.08%; }
 /* Regulation: the badge sits half an inch above the top row, centred. */
 .tunic-badge { width: 62%; height: auto; display: block; margin: 0 auto 4%;
     filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)); }

@@ -279,9 +279,19 @@
         if (!rack || !rack.tunic) { return; }
         const own = rack.ribbons || [], unit = rack.citations || [];
         el("tunic-title").textContent = name || "";
+        // Regulations allowed four ribbons per row; a man with four rows of
+        // three would push his wings into the collar, so on the coat a large
+        // rack goes four across (the panel keeps three).
+        let rows = rack.rows, wide = false;
+        if (own.length > 9) {
+            wide = true;
+            const first = own.length % 4 || 4;
+            rows = [first];
+            for (let n = first; n < own.length; n += 4) { rows.push(4); }
+        }
         el("tunic-right").innerHTML =
             (rack.badge ? '<img class="tunic-badge" src="/api/icon/award/' + esc(rack.badge) + '" alt="' + esc(rack.badge_name) + '" title="' + esc(rack.badge_name) + '">' : "") +
-            (own.length ? '<div class="ribbon-group">' + ribbonRows(own, rack.rows, rack.rev) + "</div>" : "");
+            (own.length ? '<div class="ribbon-group' + (wide ? " four" : "") + '">' + ribbonRows(own, rows, rack.rev) + "</div>" : "");
         el("tunic-left").innerHTML = unit.length
             ? '<div class="ribbon-group">' + ribbonRows(unit, rack.citation_rows, rack.rev) + "</div>" : "";
         el("tunic-caption").textContent = T("awards.tunic_caption");
