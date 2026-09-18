@@ -978,6 +978,12 @@
             rackEl.hidden = !rackEl.innerHTML;
             rackEl.setAttribute("aria-label", T("awards.ribbon_rack"));
             currentRack = d.ribbon_rack;
+            // The flight record opens on its own page, ready to print.
+            const logbook = el("d-logbook");
+            logbook.href = "/logbook?career=" + encodeURIComponent(careerId) +
+                (d.player && d.player.id != null ? "&pilot=" + encodeURIComponent(d.player.id) : "");
+            logbook.title = T("logbook.open_hint");
+            logbook.hidden = false;
             rackEl.classList.toggle("wearable", Boolean(d.ribbon_rack && d.ribbon_rack.tunic));
             rackEl.title = d.ribbon_rack && d.ribbon_rack.tunic ? T("awards.tunic_hint") : "";
             rackEl.onclick = () => openTunic(d.player ? d.player.name : "");
@@ -1316,7 +1322,10 @@
                         '<p class="pb-status">' + esc(status) + "</p>" +
                         '<a class="nav-btn small" href="#career/' +
                             encodeURIComponent(careerId) + "/pilot/" + p.id +
-                            '">Full record &rarr;</a>' +
+                            '">Full record &rarr;</a> ' +
+                        '<a class="nav-btn small" target="_blank" rel="noopener" href="/logbook?career=' +
+                            encodeURIComponent(careerId) + "&pilot=" + p.id + '" title="' + esc(T("logbook.open_hint")) + '">' +
+                            esc(T("logbook.open")) + "</a>" +
                     "</div>" +
                 "</div>" +
                 (ribbonRack(p.ribbon_rack)

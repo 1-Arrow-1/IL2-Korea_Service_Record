@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Individual Flight Record</title>
+    <link rel="icon" href="/static/images/icon.png?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/main.css?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/logbook.css?v=__ASSET_VERSION__">
+</head>
+<body class="logbook-page">
+    <!-- The flight record as the form the pilot's air force kept it on: the
+         AF Form 5 for the USAF, the flight book for the Soviet and Korean
+         air forces. One sheet per month; print it from the button. -->
+    <div class="logbook-bar no-print">
+        <a id="lb-back" class="nav-btn" href="/">&larr; <span data-i18n="logbook.back">Service Record</span></a>
+        <span id="lb-note" class="lb-note"></span>
+        <button id="lb-print" class="nav-btn" data-i18n="logbook.print">Print</button>
+    </div>
+    <main id="lb-sheets"></main>
+    <p id="lb-state" class="state-message" hidden></p>
+<script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/logbook.js?v=__ASSET_VERSION__"></script>
+</body>
+</html>

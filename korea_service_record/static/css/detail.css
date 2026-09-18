@@ -47,6 +47,7 @@
 .record-identity, .record-meta { position: relative; z-index: 1; }
 
 .record-identity h2 { font-size: 1.9rem; font-weight: normal; color: var(--ink-strong); }
+.record-link { display: inline-block; margin-top: 0.5rem; }
 .record-sub { color: var(--ink-muted); font-style: italic; }
 
 .record-meta {

@@ -1,0 +1,124 @@
+/*
+ * The individual flight record, one sheet per month, on the form the
+ * pilot's own air force used: the AF Form 5 for the USAF (an English
+ * document, whatever the page's language), the flight book for the Soviet
+ * Air Force (a Russian one), and the Korean People's Army's book in the
+ * page's language, since there is no fixed one here. The page chrome -
+ * the bar at the top - follows the page's language.
+ *
+ * Strings: logbook.* in the locale files. The form's own text comes from
+ * the form language's bundle (loaded beside the page's), so a German
+ * reader of an American record sees "INDIVIDUAL FLIGHT RECORD" and a
+ * German button to print it.
+ */
+(async function () {
+    "use strict";
+
+    const el = (id) => document.getElementById(id);
+    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
+        ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+    const params = new URLSearchParams(location.search);
+    const careerId = params.get("career");
+    const pilotId = params.get("pilot");
+
+    const settings = await fetch("/api/settings").then((r) => r.json()).catch(() => ({}));
+    const override = (settings.overrides || []).find((o) => o.career === careerId);
+    const pageLang = (override && override.language) || settings.language || "en";
+    await i18n.init(pageLang);
+    i18n.apply(document.body);
+    el("lb-back").href = careerId ? "/#career/" + encodeURIComponent(careerId) : "/";
+    el("lb-print").addEventListener("click", () => window.print());
+
+    if (!careerId) {
+        el("lb-state").textContent = "?"; el("lb-state").hidden = false;
+        return;
+    }
+    let data;
+    try {
+        const r = await fetch("/api/logbook/" + encodeURIComponent(careerId) + (pilotId ? "/" + encodeURIComponent(pilotId) : ""));
+        if (!r.ok) throw new Error(r.status);
+        data = await r.json();
+    } catch (err) {
+        el("lb-state").textContent = i18n.t("logbook.failed"); el("lb-state").hidden = false;
+        return;
+    }
+
+    // The form's language: the document's own where it has one.
+    const formLang = {usaf: "en", sov: "ru"}[data.form] || pageLang;
+    if (formLang !== pageLang) await i18n.load(formLang);
+    const bundle = i18n.loaded[formLang] || i18n.loaded[pageLang];
+    const TF = (key, p) => {
+        let text = i18n._lookup(bundle, key);
+        if (text === null) text = i18n.t(key, p);
+        else if (p) text = text.replace(/\{(\w+)\}/g, (m, n) => (n in p ? String(p[n]) : m));
+        return text;
+    };
+    document.documentElement.lang = formLang;
+    document.title = TF("logbook.form.title") + " — " + data.pilot.name;
+    el("lb-note").textContent = i18n.t(data.corrected ? "logbook.note_corrected" : "logbook.note");
+
+    const monthName = (key) => {
+        const [y, m] = key.split(".");
+        const d = new Date(Date.UTC(+y, +m - 1, 1));
+        return d.toLocaleDateString(formLang, {month: "long", year: "numeric", timeZone: "UTC"});
+    };
+    const tenths = (h) => (h == null ? "" : (+h).toFixed(1));
+    const remarks = (r) => {
+        const out = [];
+        const kills = {};
+        (r.remarks || []).forEach((k) => { if (typeof k === "string") kills[k] = (kills[k] || 0) + 1; });
+        Object.keys(kills).forEach((name) => out.push((kills[name] > 1 ? kills[name] + " × " : "") + name + " " + TF("logbook.form.destroyed")));
+        if (r.ground) out.push(TF("logbook.form.ground", {n: r.ground}));
+        if (r.hits) out.push(TF("logbook.form.hits", {n: r.hits}));
+        if (r.outcome === "bailed") out.push(TF("logbook.form.bailed"));
+        if (r.outcome === "missing") out.push(TF("logbook.form.missing"));
+        return out.join("; ");
+    };
+
+    const sheets = data.months.map((mo, i) => {
+        const head = data.form === "usaf" ? '<div class="form-title"><span>' + esc(TF("logbook.form.title")) + "</span>" +
+                '<span class="form-no">' + esc(TF("logbook.form.form_no")) + "</span></div>"
+            : '<div class="form-title book"><span>' + esc(TF("logbook.form.title")) + "</span></div>";
+        const fields = [
+            [TF("logbook.form.name"), data.form === "usaf" ? data.pilot.last + ", " + data.pilot.first : data.pilot.name],
+            [TF("logbook.form.grade"), data.pilot.rank],
+            [TF("logbook.form.organization"), data.organization],
+            [TF("logbook.form.station"), mo.station],
+            [TF("logbook.form.aircraft_type"), data.aircraft],
+            [TF("logbook.form.month"), monthName(mo.month)],
+        ];
+        const rows = mo.rows.map((r) => "<tr>" +
+            '<td class="num">' + r.day + "</td>" +
+            "<td>" + esc(r.aircraft) + "</td>" +
+            '<td class="mono">' + esc(r.code) + "</td>" +
+            "<td>" + esc(r.mission) + "</td>" +
+            '<td class="num">' + esc(r.takeoff) + "</td>" +
+            '<td class="num">' + esc(r.landing) + "</td>" +
+            '<td class="num">' + tenths(r.day_h) + "</td>" +
+            '<td class="num">' + (r.night_h ? tenths(r.night_h) : "") + "</td>" +
+            '<td class="num">' + tenths(r.hours) + "</td>" +
+            '<td class="num">' + r.landings + "</td>" +
+            '<td class="remarks">' + esc(remarks(r)) + "</td></tr>").join("");
+        const totals = (label, t) => '<tr class="totals"><td colspan="6">' + esc(label) + "</td>" +
+            '<td class="num">' + tenths(t.day) + "</td><td class=\"num\">" + (t.night ? tenths(t.night) : "") + "</td>" +
+            '<td class="num">' + tenths(t.hours) + "</td><td class=\"num\">" + t.landings + "</td>" +
+            "<td>" + esc(TF("logbook.form.summary", {sorties: t.sorties, air: t.air, ground: t.ground})) + "</td></tr>";
+        return '<section class="sheet ' + esc(data.form) + '">' + head +
+            '<div class="form-head">' + fields.map(([k, v]) =>
+                '<div class="field"><span class="k">' + esc(k) + '</span><span class="v">' + esc(v) + "</span></div>").join("") + "</div>" +
+            '<table class="form-table"><thead><tr>' +
+                "<th>" + esc(TF("logbook.form.date")) + "</th><th>" + esc(TF("logbook.form.type")) + "</th>" +
+                "<th>" + esc(TF("logbook.form.serial")) + "</th><th>" + esc(TF("logbook.form.mission")) + "</th>" +
+                "<th>" + esc(TF("logbook.form.takeoff")) + "</th><th>" + esc(TF("logbook.form.landing")) + "</th>" +
+                "<th>" + esc(TF("logbook.form.day")) + "</th><th>" + esc(TF("logbook.form.night")) + "</th>" +
+                "<th>" + esc(TF("logbook.form.total")) + "</th><th>" + esc(TF("logbook.form.landings")) + "</th>" +
+                "<th>" + esc(TF("logbook.form.remarks")) + "</th></tr></thead><tbody>" + rows + "</tbody><tfoot>" +
+                totals(TF("logbook.form.total_month"), mo.totals) + totals(TF("logbook.form.total_to_date"), mo.to_date) +
+            "</tfoot></table>" +
+            '<div class="form-foot"><span class="certify">' + esc(TF("logbook.form.certify")) + "</span>" +
+                '<span class="signature"><span class="line"></span>' + esc(data.pilot.name) + ", " + esc(data.pilot.rank) + "</span>" +
+                '<span class="page">' + esc(TF("logbook.form.page", {n: i + 1, of: data.months.length})) + "</span></div>" +
+            "</section>";
+    });
+    el("lb-sheets").innerHTML = sheets.join("") || '<p class="state-message">' + esc(i18n.t("logbook.empty")) + "</p>";
+})();

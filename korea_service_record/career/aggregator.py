@@ -249,6 +249,17 @@ def _pos_at(fixes, t: float):
     return a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k, a[3] + (b[3] - a[3]) * k
 
 
+def _seconds(clock: str) -> float:
+    """'HH:MM[:SS]' as seconds of the day."""
+    try:
+        parts = [int(n) for n in clock.split(":")]
+    except ValueError:
+        return 0.0
+    while len(parts) < 3:
+        parts.append(0)
+    return parts[0] * 3600.0 + parts[1] * 60.0 + parts[2]
+
+
 def _clock(start: str, offset_s: Optional[float]) -> str:
     """Mission start time plus an offset in seconds, as HH:MM:SS."""
     if offset_s is None:
@@ -1772,6 +1783,110 @@ class CareerAggregator:
                 "losses": losses,
                 "bases": sorted(bases.values(), key=lambda b: b["first"]),
                 "pilot_id": pilot_id,
+            }
+
+    def logbook(self, career_id: str, pilot_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+        """
+        The pilot's individual flight record, month by month: every sortie
+        with its date, aircraft and tail number, mission, take-off and
+        landing (the player's, from the flight log; the AI have none), the
+        hours - the corrected ones when the career is - split day/night by
+        the clock, landings, and a remarks line built from what the sortie
+        did to him and he to the enemy. Totals per month and to date.
+        """
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            career = db.career()
+            pilot = db.pilot(pilot_id) if pilot_id is not None else db.player()
+            if career is None or pilot is None:
+                return None
+            missions = {m["id"]: m for m in db.missions()}
+            planes = {p["id"]: p for p in db.query("SELECT id, slot, config, tcode FROM plane")}
+            fields = [f for f in self.overlay.features() if f["kind"] == "airfield" and f["name"]]
+
+            def station(m) -> str:
+                pts = parse_route(m["route"])
+                if not pts or not fields:
+                    return ""
+                p = pts[0]
+                near = min(fields, key=lambda f: (f["x"] - p["x"]) ** 2 + (f["z"] - p["z"]) ** 2)
+                return near["name"]
+
+            kills_by_sortie: Dict[int, List[str]] = {}
+            for e in db.query("""SELECT s.id AS sid, e.tpar1 AS target FROM event e
+                                 JOIN sortie s ON s.missionId = e.missionId AND s.pilotId = e.pilotId
+                                 WHERE e.type = 0 AND e.isDeleted = 0 AND e.pilotId = ? ORDER BY e.id""",
+                              (pilot["id"],)):
+                info = self.objects.describe(e["target"])
+                if info["aircraft"] and not info["parked"]:
+                    kills_by_sortie.setdefault(e["sid"], []).append(info["name"])
+
+            months: Dict[str, Dict[str, Any]] = {}
+            to_date = {"hours": 0.0, "day": 0.0, "night": 0.0, "sorties": 0, "landings": 0, "air": 0, "ground": 0}
+            for s in db.sorties(pilot["id"]):
+                m = missions.get(s["missionId"])
+                if m is None:
+                    continue
+                key = m["date"][:7]
+                month = months.setdefault(key, {"month": key, "station": station(m), "rows": [],
+                                                "totals": {"hours": 0.0, "day": 0.0, "night": 0.0, "sorties": 0,
+                                                           "landings": 0, "air": 0, "ground": 0}})
+                plane = planes.get(s["planeId"])
+                plane_key = PurePath(plane["config"]).stem if plane and plane["config"] else ""
+                flight = None
+                if pilot["isPlayer"]:
+                    flight = self._shifted_log(db, m["id"], self.flightlogs.for_sortie(
+                        s["date"][:10], s["date"][11:16]))
+                start = s["date"][11:]
+                secs = float(s["flightTime"] or 0)
+                hours = secs / 3600.0
+                # Day and night by the clock: the hours outside 05:30-19:30.
+                t0 = _seconds(start) + (flight.takeoff_s if flight and flight.takeoff_s is not None else 0)
+                t1 = t0 + secs
+                night = max(0.0, min(t1, 5.5 * 3600) - t0) + max(0.0, t1 - max(t0, 19.5 * 3600))
+                night_h = min(hours, night / 3600.0)
+                ks = KillStats(s["killStats"])
+                air, ground = ks.airborne, ks.ground_targets
+                returned = s["status"] == 0
+                # The remarks are composed on the page in the form's language:
+                # the kills by name, the ground count, hits taken, the outcome.
+                row = {
+                    "date": m["date"], "day": int(m["date"][8:10]),
+                    "aircraft": self.objects.describe(plane_key)["name"] if plane_key else "",
+                    "code": _tail_code(plane["tcode"], plane_key) if plane else "",
+                    "mission": self.locale.mission_type_name(m["type"]), "number": m["missionNum"],
+                    "takeoff": _clock(start, flight.takeoff_s)[:5] if flight and flight.takeoff_s is not None else "",
+                    "landing": _clock(start, flight.landing_s)[:5] if flight and flight.landing_s is not None else "",
+                    "hours": round(hours, 1), "night_h": round(night_h, 1), "day_h": round(hours - night_h, 1),
+                    "landings": 1 if returned else 0, "air": air, "ground": ground,
+                    "remarks": kills_by_sortie.get(s["id"], []),
+                    "hits": sum(b.hits for b in flight.damage) if flight and flight.damage else 0,
+                    "outcome": "bailed" if flight and flight.ejected else ("ok" if returned else "missing"),
+                    "rank": self.locale.rank_name(pilot["country"], s["rankId"]),
+                }
+                month["rows"].append(row)
+                for tot in (month["totals"], to_date):
+                    tot["hours"] += hours; tot["day"] += hours - night_h; tot["night"] += night_h
+                    tot["sorties"] += 1; tot["landings"] += row["landings"]; tot["air"] += air; tot["ground"] += ground
+                month["to_date"] = {k: (round(v, 1) if isinstance(v, float) else v) for k, v in to_date.items()}
+            for month in months.values():
+                month["totals"] = {k: (round(v, 1) if isinstance(v, float) else v) for k, v in month["totals"].items()}
+
+            country = int(pilot["country"])
+            return {
+                "career_id": career_id,
+                "pilot": {"id": pilot["id"], "name": f"{pilot['name']} {pilot['lastName']}".strip(),
+                          "last": pilot["lastName"], "first": pilot["name"],
+                          "rank": self.locale.rank_name(country, pilot["rankId"]), "country": country,
+                          "is_player": bool(pilot["isPlayer"])},
+                "organization": meta.squadron_name,
+                "aircraft": self.objects.describe(PurePath(planes[next(iter(planes))]["config"]).stem)["name"] if planes else "",
+                "form": {601: "usaf", 501: "sov", 503: "dprk"}.get(country, "usaf"),
+                "months": [months[k] for k in sorted(months)],
+                "as_of": career["currentDate"],
+                "corrected": getattr(db, "_corr", None) is not None,
             }
 
     def mission_track(self, career_id: str, mission_id: int) -> Optional[Dict[str, Any]]:

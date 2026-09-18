@@ -63,6 +63,16 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
     else:
         logger.warning("No IL-2 Korea installation found")
 
+    def aggregator_for(language: str) -> CareerAggregator:
+        """The aggregator for one language, built on first use."""
+        cache = app.config["AGGREGATORS"]
+        if language not in cache:
+            cache[language] = CareerAggregator(
+                resolved, lang=game_code(language),
+                corrections_on=lambda: app.config["SETTINGS"].corrected_times)
+            logger.info("Built aggregator for %s (game locale %s)", language, game_code(language))
+        return cache[language]
+
     def aggregator(career_id: Optional[str] = None) -> Optional[CareerAggregator]:
         """
         The aggregator for the language this request should render in.
@@ -110,6 +120,13 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         # the previous version token and defeat the whole mechanism.
         return Response(html, mimetype="text/html",
                         headers={"Cache-Control": "no-store"})
+
+    @app.route("/logbook")
+    def logbook_page():
+        """The flight record on its own page, so it prints as the form."""
+        html = (Path(app.static_folder) / "logbook.html").read_text(encoding="utf-8")
+        html = html.replace("__ASSET_VERSION__", asset_version())
+        return Response(html, mimetype="text/html", headers={"Cache-Control": "no-store"})
 
     @app.route("/api/icon/<kind>/<ident>")
     def api_icon(kind: str, ident: str):
@@ -398,6 +415,27 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         data = agg.career_map(career_id, pilot_id)
         if data is None:
             return jsonify({"error": "career_not_found"}), 404
+        return jsonify(data)
+
+    @app.route("/api/logbook/<path:career_id>")
+    @app.route("/api/logbook/<path:career_id>/<int:pilot_id>")
+    def api_logbook(career_id: str, pilot_id: Optional[int] = None):
+        """
+        The individual flight record. The form's own language wins over
+        the page's - an AF Form 5 is an English document, a Soviet flight
+        book a Russian one - so the names of aircraft and missions are read
+        in that language; the KPA book has no fixed language here and
+        follows the page.
+        """
+        agg = aggregator(career_id)
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        data = agg.logbook(career_id, pilot_id)
+        if data is None:
+            return jsonify({"error": "pilot_not_found"}), 404
+        wanted = {"usaf": "en", "sov": "ru"}.get(data["form"])
+        if wanted and wanted != app.config["SETTINGS"].resolve(career_id):
+            data = aggregator_for(wanted).logbook(career_id, pilot_id) or data
         return jsonify(data)
 
     @app.route("/api/track/<path:career_id>/<int:mission_id>")
