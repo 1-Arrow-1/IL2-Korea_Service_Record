@@ -1,4 +1,18 @@
 {
+ "valour": {
+  "air": "Prosiguiendo sus ataques a baja altura a través de las defensas, destruyó {ground_n} vehículos, cañones e instalaciones enemigas y, en la misma acción, derribó {air_list}.",
+  "ground": "Prosiguiendo sus ataques a baja altura a través de las defensas, destruyó {ground_n} vehículos, cañones e instalaciones enemigas.",
+  "air_only": "Con su sección bajo ataque, viró contra los cazas enemigos y derribó {air_list}, deshaciendo su ataque.",
+  "hits": "Su avión recibió {hits} impactos del fuego enemigo; aun así permaneció sobre el objetivo hasta agotar su munición y llevó el avión de vuelta a su base.",
+  "bailed": "Su avión, alcanzado repetidamente y dañado sin control, le obligó a saltar en paracaídas sobre territorio enemigo.",
+  "lost": "No regresó de esta misión."
+ },
+ "wound": {
+  "hits": "Su avión recibió {hits} impactos del fuego enemigo y resultó herido; continuó la misión y llevó el avión de vuelta a su base.",
+  "bailed": "Herido, con el avión dañado sin control, saltó en paracaídas sobre territorio enemigo.",
+  "lost": "No regresó de esta misión.",
+  "plain": "Resultó herido por el fuego enemigo en el curso de la acción."
+ },
  "decimal": ",",
  "months": [
   "enero",

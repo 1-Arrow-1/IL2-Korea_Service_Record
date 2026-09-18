@@ -1,4 +1,18 @@
 {
+ "valour": {
+  "air": "Im Tiefangriff durch die Abwehr hindurch vernichtete er {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen und schoss im selben Gefecht {air_list} ab.",
+  "ground": "Im Tiefangriff durch die Abwehr hindurch vernichtete er {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen.",
+  "air_only": "Als sein Schwarm angegriffen wurde, drehte er in die feindlichen Jäger hinein und schoss {air_list} ab, wodurch der Angriff zerschlagen wurde.",
+  "hits": "Sein Flugzeug wurde {hits} Mal von feindlichem Feuer getroffen; dennoch blieb er über dem Ziel, bis seine Munition verschossen war, und brachte die Maschine zum Stützpunkt zurück.",
+  "bailed": "Sein mehrfach getroffenes, nicht mehr steuerbares Flugzeug zwang ihn zum Ausstieg über feindlichem Gebiet.",
+  "lost": "Von diesem Einsatz kehrte er nicht zurück."
+ },
+ "wound": {
+  "hits": "Sein Flugzeug wurde {hits} Mal von feindlichem Feuer getroffen, und er wurde verwundet; er führte den Auftrag zu Ende und brachte die Maschine zum Stützpunkt zurück.",
+  "bailed": "Verwundet und mit einem nicht mehr steuerbaren Flugzeug stieg er über feindlichem Gebiet aus.",
+  "lost": "Von diesem Einsatz kehrte er nicht zurück.",
+  "plain": "Er wurde im Verlauf des Gefechts durch feindliches Feuer verwundet."
+ },
  "decimal": ",",
  "months": [
   "Januar",

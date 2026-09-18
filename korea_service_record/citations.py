@@ -25,9 +25,9 @@ FOLDER = Path(__file__).resolve().parent / "locales" / "citations"
 # for a service medal, which states only what it is for.
 _USAF_SORTIE = {"moh": (601026, 601041), "dsc": (601021, 601022, 601023, 601024, 601025),
                 "silver_star": (601018, 601019, 601020, 601050, 601051),
-                "dfc": (601011, 601012, 601013, 601014, 601015, 601016),
                 "bsm_v": (601058, 601059, 601060, 601061, 601062), "purple_heart": (601028, 601029, 601030)}
 _USAF_PERIOD = {"bsm": (601008, 601009, 601010), "air_medal": (601002, 601003, 601004, 601005, 601006, 601007),
+                "dfc": (601011, 601012, 601013, 601014, 601015, 601016),
                 "commendation": (601054, 601055, 601056, 601057), "lom": (601017,), "dsm": (601052,)}
 _USAF_SERVICE = {"ndsm": (601053,), "ksm": tuple(range(601031, 601039)), "un": (601039,)}
 _USAF_UNIT = {"duc": (601042, 601044, 601045, 601046), "rok_puc": (601043, 601047, 601048, 601049)}
@@ -49,6 +49,10 @@ for nation, table, kind in (("usaf", _USAF_SORTIE, "sortie"), ("usaf", _USAF_PER
     for family, ids in table.items():
         for aid in ids:
             FAMILY[aid] = (nation, family, kind)
+
+# How the day is told: the air fight first (the default), the attack under
+# fire first (the Bronze Star with V), or the wound alone (the Purple Heart).
+STYLE = {"bsm_v": "valour", "purple_heart": "wound", "courage": "valour"}
 
 # The numeral of a repeat Soviet order, as the citation names it.
 ORDER_NUMERAL = {501018: 2, 501020: 3}
@@ -114,18 +118,44 @@ def compose(lang: str, award_id: int, facts: Dict[str, Any]) -> Optional[Dict[st
         facts["air_list"] = items[0] if items else ""
     deed_t = texts.get("deed", {})
     deed: List[str] = []
+    style = STYLE.get(family)
+    outcome = facts.get("outcome")
     if kind == "sortie" and facts.get("has_sortie"):
         deed.append(_fill(deed_t["leader" if facts.get("leader") else "member"], facts))
-        if items:
-            deed.append(_fill(deed_t["air"], facts))
-        if facts.get("ground_n"):
-            deed.append(_fill(deed_t["ground_flak" if facts.get("hits") else "ground"], facts))
-        if facts.get("hits") and facts.get("outcome") == "ok":
-            deed.append(_fill(deed_t["hits"], facts))
-        if facts.get("outcome") == "bailed":
-            deed.append(_fill(deed_t["bailed"], facts))
-        elif facts.get("outcome") == "missing":
-            deed.append(_fill(deed_t["lost"], facts))
+        st = texts.get(style, {}) if style else {}
+        if style == "wound":
+            if outcome == "bailed":
+                deed.append(_fill(st["bailed"], facts))
+            elif outcome == "missing":
+                deed.append(_fill(st["lost"], facts))
+            elif facts.get("hits"):
+                deed.append(_fill(st["hits"], facts))
+            else:
+                deed.append(_fill(st["plain"], facts))
+        elif style == "valour":
+            if facts.get("ground_n") and items:
+                deed.append(_fill(st["air"], facts))
+            elif facts.get("ground_n"):
+                deed.append(_fill(st["ground"], facts))
+            elif items:
+                deed.append(_fill(st["air_only"], facts))
+            if outcome == "bailed":
+                deed.append(_fill(st["bailed"], facts))
+            elif outcome == "missing":
+                deed.append(_fill(st["lost"], facts))
+            elif facts.get("hits"):
+                deed.append(_fill(st["hits"], facts))
+        else:
+            if items:
+                deed.append(_fill(deed_t["air"], facts))
+            if facts.get("ground_n"):
+                deed.append(_fill(deed_t["ground_flak" if facts.get("hits") else "ground"], facts))
+            if facts.get("hits") and outcome == "ok":
+                deed.append(_fill(deed_t["hits"], facts))
+            if outcome == "bailed":
+                deed.append(_fill(deed_t["bailed"], facts))
+            elif outcome == "missing":
+                deed.append(_fill(deed_t["lost"], facts))
     elif kind == "unit":
         deed.append(_fill(deed_t["unit_period"], facts))
     elif kind == "period" and facts.get("missions"):

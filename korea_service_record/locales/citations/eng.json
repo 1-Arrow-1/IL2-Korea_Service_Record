@@ -1,4 +1,18 @@
 {
+ "valour": {
+  "air": "Pressing his attacks at low level through the defences, he destroyed {ground_n} enemy vehicles, guns and installations, and in the same action shot down {air_list}.",
+  "ground": "Pressing his attacks at low level through the defences, he destroyed {ground_n} enemy vehicles, guns and installations.",
+  "air_only": "With his flight under attack he turned into the enemy fighters and shot down {air_list}, breaking up their attack.",
+  "hits": "His aircraft was struck {hits} times by enemy fire, yet he remained over the target until his ordnance was expended and brought the aircraft back to base.",
+  "bailed": "His aircraft, struck repeatedly and damaged beyond control, forced him to bail out over hostile territory.",
+  "lost": "He did not return from this mission."
+ },
+ "wound": {
+  "hits": "His aircraft was struck {hits} times by enemy fire and he was wounded; he continued the mission and brought the aircraft back to base.",
+  "bailed": "Wounded, his aircraft damaged beyond control, he bailed out over hostile territory.",
+  "lost": "He did not return from this mission.",
+  "plain": "He was wounded by enemy fire in the course of the action."
+ },
  "decimal": ".",
  "months": [
   "January",
@@ -24,7 +38,7 @@
  "deed": {
   "leader": "On that date {rank} {name} led a flight of {flight} {aircraft}s on the \"{target}\" mission near {place}.",
   "member": "On that date {rank} {name} flew as a member of a flight of {flight} {aircraft}s on the \"{target}\" mission near {place}.",
-  "air": "In the engagement that followed he destroyed {air_list}.",
+  "air": "In the engagement that followed he attacked the enemy fighters and destroyed {air_list}.",
   "ground_flak": "Pressing his attacks through intense anti-aircraft fire, he destroyed {ground_n} enemy vehicles, guns and installations.",
   "ground": "He destroyed {ground_n} enemy vehicles, guns and installations.",
   "hits": "His aircraft was struck {hits} times by enemy fire; he continued the mission and brought it back to base.",

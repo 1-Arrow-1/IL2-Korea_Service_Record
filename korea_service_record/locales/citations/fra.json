@@ -1,4 +1,18 @@
 {
+ "valour": {
+  "air": "Poursuivant ses attaques à basse altitude à travers les défenses, il détruisit {ground_n} véhicules, pièces et installations ennemis et, dans la même action, abattit {air_list}.",
+  "ground": "Poursuivant ses attaques à basse altitude à travers les défenses, il détruisit {ground_n} véhicules, pièces et installations ennemis.",
+  "air_only": "Sa patrouille attaquée, il fit face aux chasseurs ennemis et en abattit {air_list}, brisant leur attaque.",
+  "hits": "Son appareil fut touché {hits} fois par le feu ennemi ; il resta pourtant sur l’objectif jusqu’à épuisement de ses munitions et ramena l’appareil à sa base.",
+  "bailed": "Son appareil, touché à plusieurs reprises et devenu incontrôlable, le contraignit à sauter en parachute au-dessus du territoire ennemi.",
+  "lost": "Il n’est pas rentré de cette mission."
+ },
+ "wound": {
+  "hits": "Son appareil fut touché {hits} fois par le feu ennemi et il fut blessé ; il poursuivit la mission et ramena l’appareil à sa base.",
+  "bailed": "Blessé, son appareil devenu incontrôlable, il sauta en parachute au-dessus du territoire ennemi.",
+  "lost": "Il n’est pas rentré de cette mission.",
+  "plain": "Il fut blessé par le feu ennemi au cours de l’action."
+ },
  "decimal": ",",
  "months": [
   "janvier",
