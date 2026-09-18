@@ -1,0 +1,175 @@
+{
+ "decimal": ".",
+ "months": [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+ ],
+ "date": "{d} {month} {y}",
+ "list": {
+  "sep": ", ",
+  "last": " and ",
+  "item": "{n} {type}"
+ },
+ "heading": "Citation",
+ "deed": {
+  "leader": "On that date {rank} {name} led a flight of {flight} {aircraft}s on the \"{target}\" mission near {place}.",
+  "member": "On that date {rank} {name} flew as a member of a flight of {flight} {aircraft}s on the \"{target}\" mission near {place}.",
+  "air": "In the engagement that followed he destroyed {air_list}.",
+  "ground_flak": "Pressing his attacks through intense anti-aircraft fire, he destroyed {ground_n} enemy vehicles, guns and installations.",
+  "ground": "He destroyed {ground_n} enemy vehicles, guns and installations.",
+  "hits": "His aircraft was struck {hits} times by enemy fire; he continued the mission and brought it back to base.",
+  "bailed": "With his aircraft damaged beyond control he was forced to bail out over hostile territory.",
+  "lost": "He did not return from this mission.",
+  "period": "During the period {period_from} to {period_to} {rank} {name} flew {missions} combat missions, {hours} hours over hostile territory, and destroyed {air_total} enemy aircraft and {ground_total} vehicles, guns and installations.",
+  "period_air": "During the period {period_from} to {period_to} {rank} {name} flew {missions} combat missions, {hours} hours over hostile territory, and destroyed {air_total} enemy aircraft.",
+  "period_ground": "During the period {period_from} to {period_to} {rank} {name} flew {missions} combat missions, {hours} hours over hostile territory, and destroyed {ground_total} enemy vehicles, guns and installations.",
+  "period_plain": "During the period {period_from} to {period_to} {rank} {name} flew {missions} combat missions, {hours} hours over hostile territory.",
+  "unit_period": "During the period {period_from} to {period_to} the squadron flew {sorties_unit} combat sorties and destroyed {air_total} enemy aircraft and {ground_total} vehicles, guns and installations, in the face of determined opposition."
+ },
+ "usaf": {
+  "moh": [
+   "The President of the United States, in the name of Congress, takes pride in presenting the Medal of Honor to {rank} {name}, United States Air Force, for conspicuous gallantry and intrepidity at the risk of his life above and beyond the call of duty while serving as pilot of an {aircraft} with the {unit}, in action near {place}, Korea, on {date}.",
+   "By his gallantry and devotion to duty {rank} {name} upheld the highest traditions of the military service and reflected great credit upon himself, the Far East Air Forces and the United States Air Force."
+  ],
+  "dsc": [
+   "The President of the United States takes pleasure in presenting the Distinguished Service Cross to {rank} {name}, United States Air Force, for extraordinary heroism in connection with military operations against an armed enemy of the United Nations while serving as pilot of an {aircraft} with the {unit}, in action near {place}, Korea, on {date}.",
+   "The extraordinary heroism displayed by {rank} {name} reflects great credit upon himself, the Far East Air Forces and the United States Air Force."
+  ],
+  "silver_star": [
+   "The President of the United States takes pleasure in presenting the Silver Star to {rank} {name}, United States Air Force, for gallantry in action against an enemy of the United Nations while serving as pilot of an {aircraft} with the {unit}, in action near {place}, Korea, on {date}.",
+   "The gallantry displayed by {rank} {name} reflects great credit upon himself, the Far East Air Forces and the United States Air Force."
+  ],
+  "dfc": [
+   "The President of the United States takes pleasure in presenting the Distinguished Flying Cross to {rank} {name}, United States Air Force, for extraordinary achievement while participating in aerial flight as pilot of an {aircraft} with the {unit}, in action near {place}, Korea, on {date}.",
+   "The skill and courage displayed by {rank} {name} reflect great credit upon himself, the Far East Air Forces and the United States Air Force."
+  ],
+  "bsm_v": [
+   "The President of the United States takes pleasure in presenting the Bronze Star Medal with \"V\" device to {rank} {name}, United States Air Force, for heroism in connection with military operations against an armed enemy while serving as pilot of an {aircraft} with the {unit}, in action near {place}, Korea, on {date}.",
+   "The heroism displayed by {rank} {name} reflects great credit upon himself and the United States Air Force."
+  ],
+  "bsm": [
+   "The President of the United States takes pleasure in presenting the Bronze Star Medal to {rank} {name}, United States Air Force, for meritorious service in connection with military operations against an armed enemy while serving with the {unit} in Korea.",
+   "The meritorious service of {rank} {name} reflects great credit upon himself and the United States Air Force."
+  ],
+  "air_medal": [
+   "The President of the United States takes pleasure in presenting the Air Medal to {rank} {name}, United States Air Force, for meritorious achievement while participating in aerial flight as pilot of an {aircraft} with the {unit} in Korea.",
+   "The professional skill and airmanship displayed by {rank} {name} reflect great credit upon himself, the Far East Air Forces and the United States Air Force."
+  ],
+  "commendation": [
+   "{rank} {name}, United States Air Force, is awarded the Commendation Ribbon with Metal Pendant for meritorious service as pilot of an {aircraft} with the {unit} in Korea.",
+   "His devotion to duty reflects credit upon himself and the United States Air Force."
+  ],
+  "purple_heart": [
+   "{rank} {name}, United States Air Force, is awarded the Purple Heart for wounds received in action against an enemy of the United Nations near {place}, Korea, on {date}, while serving as pilot of an {aircraft} with the {unit}.",
+   ""
+  ],
+  "lom": [
+   "The President of the United States takes pleasure in presenting the Legion of Merit to {rank} {name}, United States Air Force, for exceptionally meritorious conduct in the performance of outstanding service as commanding officer of the {unit} in Korea.",
+   "The leadership and devotion to duty of {rank} {name} reflect great credit upon himself, the Far East Air Forces and the United States Air Force."
+  ],
+  "dsm": [
+   "The President of the United States takes pleasure in presenting the Distinguished Service Medal to {rank} {name}, United States Air Force, for exceptionally meritorious service in a duty of great responsibility as commander of the {unit} in Korea.",
+   "The distinguished service of {rank} {name} reflects great credit upon himself and the United States Air Force."
+  ],
+  "duc": [
+   "The {unit} is cited for extraordinary heroism in action against an armed enemy of the United Nations in Korea. {deed}",
+   "The gallantry, determination and esprit de corps displayed by the members of the squadron reflect great credit upon themselves, the Far East Air Forces and the United States Air Force."
+  ],
+  "rok_puc": [
+   "The President of the Republic of Korea cites the {unit}, United States Air Force, for exceptionally meritorious service and heroism in the defence of the Republic of Korea. {deed}",
+   "The squadron's achievements reflect great credit upon its members and upon the United States Air Force, and have earned the gratitude of the Korean people."
+  ],
+  "ndsm": [
+   "The National Defense Service Medal is awarded to {rank} {name} for honorable active service in the armed forces of the United States during the Korean emergency.",
+   ""
+  ],
+  "ksm": [
+   "The Korean Service Medal is awarded to {rank} {name} for service in the Korean theatre with the {unit} during the period {period_from} to {period_to}.",
+   ""
+  ],
+  "un": [
+   "The United Nations Service Medal is awarded to {rank} {name} for service in Korea with the {unit} under the flag of the United Nations.",
+   ""
+  ]
+ },
+ "sov": {
+  "hero": [
+   "By decree of the Presidium of the Supreme Soviet of the USSR of {date}, for the exemplary performance of combat missions and for the courage and heroism shown in them, {rank} {name} is awarded the title of Hero of the Soviet Union with the Order of Lenin and the Gold Star medal.",
+   ""
+  ],
+  "lenin": [
+   "By decree of the Presidium of the Supreme Soviet of the USSR of {date}, for the exemplary performance of combat missions of the command and for the valour and courage shown in them, {rank} {name} is awarded the Order of Lenin.",
+   ""
+  ],
+  "red_banner": [
+   "By decree of the Presidium of the Supreme Soviet of the USSR of {date}, for the exemplary performance of combat missions of the command and for the valour and courage shown in them, {rank} {name} is awarded the Order of the Red Banner{order}.",
+   ""
+  ],
+  "suvorov": [
+   "By decree of the Presidium of the Supreme Soviet of the USSR of {date}, for skilful leadership in combat and the successes achieved, {rank} {name} is awarded the Order of Suvorov, 3rd class.",
+   ""
+  ],
+  "nevsky": [
+   "By decree of the Presidium of the Supreme Soviet of the USSR of {date}, for initiative and courage in command and for the successful actions of his unit, {rank} {name} is awarded the Order of Alexander Nevsky.",
+   ""
+  ],
+  "red_star": [
+   "By decree of the Presidium of the Supreme Soviet of the USSR of {date}, for the exemplary performance of combat missions and for the courage shown in them, {rank} {name} is awarded the Order of the Red Star.",
+   ""
+  ],
+  "courage": [
+   "By order of {date}, for the courage and bravery shown in combat with the enemy, {rank} {name} is awarded the medal For Courage.",
+   ""
+  ],
+  "battle_merit": [
+   "By order of {date}, for skilful and determined action in the performance of combat missions, {rank} {name} is awarded the medal For Battle Merit.",
+   ""
+  ]
+ },
+ "dprk": {
+  "hero_k": [
+   "By decree of the Presidium of the Supreme People's Assembly of {date}, for exceptional heroism in the Fatherland Liberation War, {rank} {name} is awarded the title Hero of the Democratic People's Republic of Korea with the Gold Star medal and the Order of the National Flag.",
+   ""
+  ],
+  "freedom": [
+   "By decree of the Presidium of the Supreme People's Assembly of {date}, for distinguished service in combat, {rank} {name} is awarded the Order of Freedom and Independence.",
+   ""
+  ],
+  "soldiers_honour": [
+   "By decree of the Presidium of the Supreme People's Assembly of {date}, for bravery in combat against the enemy, {rank} {name} is awarded the Order of Soldier's Honour.",
+   ""
+  ],
+  "merit_k": [
+   "By order of {date}, for merit in combat, {rank} {name} is awarded the Military Merit Medal.",
+   ""
+  ],
+  "flw": [
+   "{rank} {name} is awarded the medal for the Fatherland Liberation War 1950-1953 for service in the war with the {unit}.",
+   ""
+  ]
+ },
+ "prc": {
+  "merit_c": [
+   "By order of the Chinese People's Volunteers of {date}, for merit in combat, {name} is awarded the Military Merit Medal.",
+   ""
+  ],
+  "liberation_c": [
+   "{name} is awarded the commemorative medal for the Liberation of North China for service in the campaign.",
+   ""
+  ],
+  "oppose_c": [
+   "{name} is awarded the commemorative medal Oppose America, Aid Korea for service with the Chinese People's Volunteers in Korea.",
+   ""
+  ]
+ }
+}

@@ -36,7 +36,7 @@ from ..gamedata import (COUNTRY_FLAGS, COUNTRY_NAMES, COUNTRY_SEALS, COUNTRY_STA
 from ..geo import (MapTiles, Overlay, WAYPOINT_TAKEOFF, WAYPOINT_LANDING,
                    parse_point, parse_route)
 from ..icons import IconLibrary
-from .. import corrections, ribbons
+from .. import citations, corrections, ribbons
 from .. import medals as medal_art
 
 # KOREA_PREVIEW_RACK=all|sov|dprk: every ladder of that country at its top
@@ -1797,6 +1797,113 @@ class CareerAggregator:
                 "bases": sorted(bases.values(), key=lambda b: b["first"]),
                 "pilot_id": pilot_id,
             }
+
+    def citation(self, career_id: str, pilot_id: int, award_id: int,
+                 earned: str) -> Optional[Dict[str, Any]]:
+        """
+        The citation for one of a pilot's decorations: the facts of the day
+        it was earned (the sortie with the best result that day - kills by
+        name, ground targets, hits taken, the outcome, the flight's size,
+        the nearest town) or of the period up to it, composed in the
+        language's own citation words. None when the award has no citation.
+        """
+        if award_id not in citations.FAMILY:
+            return None
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            pilot = db.pilot(pilot_id)
+            if pilot is None:
+                return None
+            texts = citations.strings(self.lang)
+            country = int(pilot["country"])
+            row = db.query_one("SELECT pilotRank FROM award WHERE pilotId=? AND type=? AND earnedDate=? ORDER BY id DESC",
+                               (pilot_id, award_id, earned))
+            rank_id = row["pilotRank"] if row and row["pilotRank"] is not None else pilot["rankId"]
+            missions = {m["id"]: m for m in db.missions()}
+            planes = {p["id"]: p for p in db.query("SELECT id, config FROM plane")}
+            sorties = [s for s in db.sorties(pilot_id) if s["missionId"] in missions and missions[s["missionId"]]["date"] <= earned]
+            unit_sorties = [s for s in db.sorties() if s["missionId"] in missions and missions[s["missionId"]]["date"] <= earned]
+
+            def plane_name(s) -> str:
+                p = planes.get(s["planeId"]) if s else None
+                key = PurePath(p["config"]).stem if p and p["config"] else ""
+                return self.objects.describe(key)["name"] if key else ""
+
+            features = self.overlay.features()
+            def place_of(m) -> str:
+                pt = self._target_point(db, m["targetId"]) if m else None
+                if pt is None:
+                    pts = parse_route(m["route"]) if m else []
+                    pt = next((p for p in pts if p["type"] == WAYPOINT_TARGET), None)
+                if pt is None or not features:
+                    return ""
+                towns = [f for f in features if f["kind"] in ("city", "town") and f["name"]]
+                fields = [f for f in features if f["kind"] == "airfield" and f["name"]]
+                def dist(f):
+                    return ((f["x"] - pt["x"]) ** 2 + (f["z"] - pt["z"]) ** 2) ** 0.5
+                near_town = min(towns, key=dist) if towns else None
+                near_field = min(fields, key=dist) if fields else None
+                if near_town and (near_field is None or dist(near_town) <= 15000 or dist(near_town) <= dist(near_field)):
+                    return near_town["name"]
+                if near_field:
+                    return re.sub(r"^K-\d+\s+", "", near_field["name"])
+                return near_town["name"] if near_town else ""
+
+            facts: Dict[str, Any] = {
+                "rank": self.locale.rank_name(country, rank_id),
+                "name": f"{pilot['name']} {pilot['lastName']}".strip(),
+                "unit": meta.squadron_name,
+                "date": citations.format_date(texts, earned),
+                "aircraft": plane_name(sorties[-1]) if sorties else "",
+                "has_sortie": False, "kills": {}, "ground_n": 0, "hits": 0, "outcome": "ok",
+            }
+            # The day's sortie: the one with the most in it.
+            day = [s for s in sorties if missions[s["missionId"]]["date"] == earned]
+            if day:
+                best = max(day, key=lambda s: (KillStats(s["killStats"]).airborne, KillStats(s["killStats"]).ground_targets))
+                m = missions[best["missionId"]]
+                kills: Dict[str, int] = {}
+                for e in db.query("SELECT tpar1 AS target FROM event WHERE type=0 AND isDeleted=0 AND pilotId=? AND missionId=? ORDER BY id",
+                                  (pilot_id, m["id"])):
+                    info = self.objects.describe(e["target"])
+                    if info["aircraft"] and not info["parked"]:
+                        kills[info["name"]] = kills.get(info["name"], 0) + 1
+                flight = None
+                if pilot["isPlayer"]:
+                    flight = self.flightlogs.for_sortie(best["date"][:10], best["date"][11:16])
+                facts.update({
+                    "has_sortie": True, "leader": bool(pilot["isPlayer"]),
+                    "flight": sum(1 for s in unit_sorties if s["missionId"] == m["id"]),
+                    "aircraft": plane_name(best), "target": self.locale.mission_type_name(m["type"]),
+                    "place": place_of(m), "kills": kills,
+                    "ground_n": KillStats(best["killStats"]).ground_targets,
+                    "hits": sum(b.hits for b in flight.damage) if flight and flight.damage else 0,
+                    "outcome": "bailed" if flight and flight.ejected else ("ok" if best["status"] == 0 else "missing"),
+                })
+            elif sorties:
+                facts["place"] = place_of(missions[sorties[-1]["missionId"]])
+            # The period up to the day.
+            if sorties:
+                ks = [KillStats(s["killStats"]) for s in sorties]
+                facts.update({
+                    "period_from": citations.format_date(texts, missions[sorties[0]["missionId"]]["date"]),
+                    "period_to": facts["date"], "missions": len(sorties),
+                    "hours": f"{sum(float(s['flightTime'] or 0) for s in sorties) / 3600:.1f}".replace(".", texts.get("decimal", ".")),
+                    "air_total": sum(k.airborne for k in ks), "ground_total": sum(k.ground_targets for k in ks),
+                })
+            if unit_sorties:
+                uk = [KillStats(s["killStats"]) for s in unit_sorties]
+                facts.update({
+                    "sorties_unit": len(unit_sorties),
+                    "period_from": facts.get("period_from") or citations.format_date(texts, missions[unit_sorties[0]["missionId"]]["date"]),
+                    "period_to": facts["date"],
+                })
+                if citations.FAMILY[award_id][2] == "unit":
+                    facts["air_total"] = sum(k.airborne for k in uk)
+                    facts["ground_total"] = sum(k.ground_targets for k in uk)
+            return citations.compose(self.lang, award_id, facts)
 
     def logbook(self, career_id: str, pilot_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
         """

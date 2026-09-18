@@ -1,0 +1,175 @@
+{
+ "decimal": ",",
+ "months": [
+  "Januar",
+  "Februar",
+  "März",
+  "April",
+  "Mai",
+  "Juni",
+  "Juli",
+  "August",
+  "September",
+  "Oktober",
+  "November",
+  "Dezember"
+ ],
+ "date": "{d}. {month} {y}",
+ "list": {
+  "sep": ", ",
+  "last": " und ",
+  "item": "{n} {type}"
+ },
+ "heading": "Verleihungsbegründung",
+ "deed": {
+  "leader": "An diesem Tag führte {rank} {name} einen Schwarm von {flight} {aircraft} beim Einsatz „{target}“ nahe {place}.",
+  "member": "An diesem Tag flog {rank} {name} in einem Schwarm von {flight} {aircraft} beim Einsatz „{target}“ nahe {place}.",
+  "air": "Im folgenden Luftkampf schoss er {air_list} ab.",
+  "ground_flak": "Unter starkem Flakfeuer setzte er seine Angriffe fort und vernichtete {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen.",
+  "ground": "Er vernichtete {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen.",
+  "hits": "Sein Flugzeug wurde {hits} Mal von feindlichem Feuer getroffen; er führte den Auftrag zu Ende und brachte es zum Stützpunkt zurück.",
+  "bailed": "Mit einem nicht mehr steuerbaren Flugzeug musste er über feindlichem Gebiet aussteigen.",
+  "lost": "Von diesem Einsatz kehrte er nicht zurück.",
+  "period": "Im Zeitraum vom {period_from} bis {period_to} flog {rank} {name} {missions} Feindflüge mit {hours} Stunden über feindlichem Gebiet und vernichtete {air_total} feindliche Flugzeuge sowie {ground_total} Fahrzeuge, Geschütze und Anlagen.",
+  "period_air": "Im Zeitraum vom {period_from} bis {period_to} flog {rank} {name} {missions} Feindflüge mit {hours} Stunden über feindlichem Gebiet und schoss {air_total} feindliche Flugzeuge ab.",
+  "period_ground": "Im Zeitraum vom {period_from} bis {period_to} flog {rank} {name} {missions} Feindflüge mit {hours} Stunden über feindlichem Gebiet und vernichtete {ground_total} feindliche Fahrzeuge, Geschütze und Anlagen.",
+  "period_plain": "Im Zeitraum vom {period_from} bis {period_to} flog {rank} {name} {missions} Feindflüge mit {hours} Stunden über feindlichem Gebiet.",
+  "unit_period": "Im Zeitraum vom {period_from} bis {period_to} flog die Staffel {sorties_unit} Feindflüge und vernichtete gegen entschlossenen Widerstand {air_total} feindliche Flugzeuge sowie {ground_total} Fahrzeuge, Geschütze und Anlagen."
+ },
+ "usaf": {
+  "moh": [
+   "Der Präsident der Vereinigten Staaten verleiht im Namen des Kongresses {rank} {name}, United States Air Force, die Medal of Honor für hervorragende Tapferkeit und Unerschrockenheit unter Einsatz seines Lebens weit über die Pflicht hinaus als Pilot einer {aircraft} der {unit} im Einsatz nahe {place}, Korea, am {date}.",
+   "Durch seine Tapferkeit und Pflichttreue hat {rank} {name} die höchsten Traditionen des Soldatenstandes gewahrt und sich, den Far East Air Forces und der United States Air Force große Ehre erwiesen."
+  ],
+  "dsc": [
+   "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, das Distinguished Service Cross für außerordentlichen Heldenmut in Kampfhandlungen gegen einen bewaffneten Feind der Vereinten Nationen als Pilot einer {aircraft} der {unit} im Einsatz nahe {place}, Korea, am {date}.",
+   "Der außerordentliche Heldenmut von {rank} {name} erweist ihm, den Far East Air Forces und der United States Air Force große Ehre."
+  ],
+  "silver_star": [
+   "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, den Silver Star für Tapferkeit vor dem Feind als Pilot einer {aircraft} der {unit} im Einsatz nahe {place}, Korea, am {date}.",
+   "Die von {rank} {name} bewiesene Tapferkeit erweist ihm, den Far East Air Forces und der United States Air Force große Ehre."
+  ],
+  "dfc": [
+   "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, das Distinguished Flying Cross für außerordentliche Leistung im Flugdienst als Pilot einer {aircraft} der {unit} im Einsatz nahe {place}, Korea, am {date}.",
+   "Das von {rank} {name} bewiesene Können und sein Mut erweisen ihm, den Far East Air Forces und der United States Air Force große Ehre."
+  ],
+  "bsm_v": [
+   "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, die Bronze Star Medal mit „V“ für Heldenmut in Kampfhandlungen gegen einen bewaffneten Feind als Pilot einer {aircraft} der {unit} im Einsatz nahe {place}, Korea, am {date}.",
+   "Der von {rank} {name} bewiesene Heldenmut erweist ihm und der United States Air Force große Ehre."
+  ],
+  "bsm": [
+   "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, die Bronze Star Medal für verdienstvollen Dienst in Kampfhandlungen gegen einen bewaffneten Feind bei der {unit} in Korea.",
+   "Der verdienstvolle Dienst von {rank} {name} erweist ihm und der United States Air Force große Ehre."
+  ],
+  "air_medal": [
+   "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, die Air Medal für verdienstvolle Leistung im Flugdienst als Pilot einer {aircraft} der {unit} in Korea.",
+   "Das fliegerische Können von {rank} {name} erweist ihm, den Far East Air Forces und der United States Air Force große Ehre."
+  ],
+  "commendation": [
+   "{rank} {name}, United States Air Force, wird für verdienstvollen Dienst als Pilot einer {aircraft} der {unit} in Korea das Commendation Ribbon mit Anhänger verliehen.",
+   "Seine Pflichttreue erweist ihm und der United States Air Force Ehre."
+  ],
+  "purple_heart": [
+   "{rank} {name}, United States Air Force, wird das Purple Heart für Verwundungen verliehen, die er im Kampf gegen einen Feind der Vereinten Nationen nahe {place}, Korea, am {date} als Pilot einer {aircraft} der {unit} erlitt.",
+   ""
+  ],
+  "lom": [
+   "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, die Legion of Merit für außergewöhnlich verdienstvolles Verhalten in herausragendem Dienst als Kommandeur der {unit} in Korea.",
+   "Führung und Pflichttreue von {rank} {name} erweisen ihm, den Far East Air Forces und der United States Air Force große Ehre."
+  ],
+  "dsm": [
+   "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, die Distinguished Service Medal für außergewöhnlich verdienstvollen Dienst in einer Stellung großer Verantwortung als Kommandeur der {unit} in Korea.",
+   "Der herausragende Dienst von {rank} {name} erweist ihm und der United States Air Force große Ehre."
+  ],
+  "duc": [
+   "Die {unit} wird für außerordentlichen Heldenmut in Kampfhandlungen gegen einen bewaffneten Feind der Vereinten Nationen in Korea ausgezeichnet. {deed}",
+   "Tapferkeit, Entschlossenheit und Korpsgeist der Angehörigen der Staffel erweisen ihnen, den Far East Air Forces und der United States Air Force große Ehre."
+  ],
+  "rok_puc": [
+   "Der Präsident der Republik Korea zeichnet die {unit}, United States Air Force, für außergewöhnlich verdienstvollen Dienst und Heldenmut bei der Verteidigung der Republik Korea aus. {deed}",
+   "Die Leistungen der Staffel erweisen ihren Angehörigen und der United States Air Force große Ehre und haben ihnen die Dankbarkeit des koreanischen Volkes eingetragen."
+  ],
+  "ndsm": [
+   "{rank} {name} wird die National Defense Service Medal für ehrenvollen aktiven Dienst in den Streitkräften der Vereinigten Staaten während des Korea-Notstands verliehen.",
+   ""
+  ],
+  "ksm": [
+   "{rank} {name} wird die Korean Service Medal für Dienst im koreanischen Kriegsgebiet bei der {unit} im Zeitraum vom {period_from} bis {period_to} verliehen.",
+   ""
+  ],
+  "un": [
+   "{rank} {name} wird die United Nations Service Medal für Dienst in Korea bei der {unit} unter der Flagge der Vereinten Nationen verliehen.",
+   ""
+  ]
+ },
+ "sov": {
+  "hero": [
+   "Durch Erlass des Präsidiums des Obersten Sowjets der UdSSR vom {date} wird {rank} {name} für die vorbildliche Erfüllung von Kampfaufträgen und den dabei bewiesenen Mut und Heldenmut der Titel Held der Sowjetunion mit dem Leninorden und der Medaille Goldener Stern verliehen.",
+   ""
+  ],
+  "lenin": [
+   "Durch Erlass des Präsidiums des Obersten Sowjets der UdSSR vom {date} wird {rank} {name} für die vorbildliche Erfüllung der Kampfaufträge des Kommandos und die dabei bewiesene Tapferkeit der Leninorden verliehen.",
+   ""
+  ],
+  "red_banner": [
+   "Durch Erlass des Präsidiums des Obersten Sowjets der UdSSR vom {date} wird {rank} {name} für die vorbildliche Erfüllung der Kampfaufträge des Kommandos und die dabei bewiesene Tapferkeit der Rotbannerorden{order} verliehen.",
+   ""
+  ],
+  "suvorov": [
+   "Durch Erlass des Präsidiums des Obersten Sowjets der UdSSR vom {date} wird {rank} {name} für geschickte Führung im Gefecht und die erzielten Erfolge der Suworow-Orden 3. Klasse verliehen.",
+   ""
+  ],
+  "nevsky": [
+   "Durch Erlass des Präsidiums des Obersten Sowjets der UdSSR vom {date} wird {rank} {name} für Initiative und Mut in der Führung und die erfolgreichen Handlungen seiner Einheit der Alexander-Newski-Orden verliehen.",
+   ""
+  ],
+  "red_star": [
+   "Durch Erlass des Präsidiums des Obersten Sowjets der UdSSR vom {date} wird {rank} {name} für die vorbildliche Erfüllung von Kampfaufträgen und den dabei bewiesenen Mut der Orden des Roten Sterns verliehen.",
+   ""
+  ],
+  "courage": [
+   "Durch Befehl vom {date} wird {rank} {name} für den im Kampf mit dem Feind bewiesenen Mut die Medaille „Für Tapferkeit“ verliehen.",
+   ""
+  ],
+  "battle_merit": [
+   "Durch Befehl vom {date} wird {rank} {name} für geschicktes und entschlossenes Handeln bei der Erfüllung von Kampfaufträgen die Medaille „Für Verdienste im Kampf“ verliehen.",
+   ""
+  ]
+ },
+ "dprk": {
+  "hero_k": [
+   "Durch Erlass des Präsidiums der Obersten Volksversammlung vom {date} wird {rank} {name} für außergewöhnlichen Heldenmut im Vaterländischen Befreiungskrieg der Titel Held der Demokratischen Volksrepublik Korea mit der Medaille Goldener Stern und dem Orden der Nationalflagge verliehen.",
+   ""
+  ],
+  "freedom": [
+   "Durch Erlass des Präsidiums der Obersten Volksversammlung vom {date} wird {rank} {name} für hervorragenden Einsatz im Kampf der Orden für Freiheit und Unabhängigkeit verliehen.",
+   ""
+  ],
+  "soldiers_honour": [
+   "Durch Erlass des Präsidiums der Obersten Volksversammlung vom {date} wird {rank} {name} für Tapferkeit im Kampf gegen den Feind der Orden der Soldatenehre verliehen.",
+   ""
+  ],
+  "merit_k": [
+   "Durch Befehl vom {date} wird {rank} {name} für Verdienste im Kampf die Militärverdienstmedaille verliehen.",
+   ""
+  ],
+  "flw": [
+   "{rank} {name} wird die Medaille für den Vaterländischen Befreiungskrieg 1950–1953 für den Dienst im Krieg bei der {unit} verliehen.",
+   ""
+  ]
+ },
+ "prc": {
+  "merit_c": [
+   "Durch Befehl der Chinesischen Volksfreiwilligen vom {date} wird {name} für Verdienste im Kampf die Militärverdienstmedaille verliehen.",
+   ""
+  ],
+  "liberation_c": [
+   "{name} wird die Gedenkmedaille für die Befreiung Nordchinas für den Dienst im Feldzug verliehen.",
+   ""
+  ],
+  "oppose_c": [
+   "{name} wird die Gedenkmedaille „Widersteht Amerika, helft Korea“ für den Dienst bei den Chinesischen Volksfreiwilligen in Korea verliehen.",
+   ""
+  ]
+ }
+}

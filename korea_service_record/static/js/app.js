@@ -54,14 +54,18 @@
 
     // Artwork sliced out of the game's own atlases. A missing icon 404s, and
     // onerror hides it so the text beside it simply stands alone.
-    const icon = (kind, ident, height, cls, title) =>
+    const icon = (kind, ident, height, cls, title, extra) =>
         (ident === null || ident === undefined || ident === "")
             ? ""
             : '<img class="' + cls + ' emblem" src="/api/icon/' + kind + "/" +
               encodeURIComponent(ident) + "?h=" + height + '" alt="" title="' +
               esc(title || "") + '" data-kind="' + kind + '" data-id="' +
-              esc(ident) + '" data-title="' + esc(title || "") +
-              '" onerror="this.style.display=&quot;none&quot;">';
+              esc(ident) + '" data-title="' + esc(title || "") + '" ' + (extra || "") +
+              ' onerror="this.style.display=&quot;none&quot;">';
+    // A decoration's icon that also says whose it is and when it was earned,
+    // so the lightbox can fetch its citation.
+    const wornBy = (pilotId, earned) => pilotId == null ? "" :
+        'data-pilot="' + esc(pilotId) + '" data-earned="' + esc(earned || "") + '"';
 
     // The game numbers scheduled missions up from 1 and unscheduled ones -
     // scrambles, urgent tasks - DOWN from -1, in a series of their own. Shown
@@ -75,7 +79,7 @@
     // Every icon is clickable: full-size art plus the game's own description.
     // The name comes from the page rather than the API, because the page knows
     // the squadron as "39th FIS USAF" while the id alone gives "Squadron 601039".
-    async function openLightbox(kind, ident, title) {
+    async function openLightbox(kind, ident, title, worn) {
         const box = el("lightbox");
         el("lb-title").textContent = title || "";
         el("lb-sub").textContent = "";
@@ -107,6 +111,26 @@
                     node.textContent = text;
                     desc.appendChild(node);
                 });
+            }
+            // The citation: why this man got it, from what he did that day
+            // or over the period. Only for a decoration someone holds.
+            if (kind === "award" && worn && currentCareer) {
+                const c = await getJSON("/api/citation/" + encodeURIComponent(currentCareer) + "/" +
+                    encodeURIComponent(worn.pilot) + "/" + encodeURIComponent(ident) +
+                    "?earned=" + encodeURIComponent(worn.earned || ""));
+                if (c && c.paragraphs && c.paragraphs.length) {
+                    const quote = document.createElement("blockquote");
+                    quote.className = "citation";
+                    const head = document.createElement("h3");
+                    head.textContent = c.heading;
+                    quote.appendChild(head);
+                    c.paragraphs.forEach((text) => {
+                        const node = document.createElement("p");
+                        node.textContent = text;
+                        quote.appendChild(node);
+                    });
+                    desc.appendChild(quote);
+                }
             }
         } catch (err) {
             el("lb-desc").textContent = T("record.error", {reason: err.message});
@@ -434,7 +458,7 @@
         const folded = history.length
             ? '<ol class="award-history" hidden>' + history.map(function (h) {
                 return '<li class="with-icon">' +
-                    icon("award", h.type, 56, "award-icon small", h.name) +
+                    icon("award", h.type, 56, "award-icon small", h.name, wornBy(award.pilot_id, h.earned)) +
                     "<div>" +
                     '<span class="award-name">' + esc(h.name) + "</span>" +
                     '<span class="award-dates">' + esc(T("awards.earned", {date: h.earned})) +
@@ -442,7 +466,7 @@
             }).join("") + "</ol>"
             : "";
         return '<li class="with-icon' + (history.length ? " has-history" : "") + '">' +
-            icon("award", award.type, 88, "award-icon", award.name) +
+            icon("award", award.type, 88, "award-icon", award.name, wornBy(award.pilot_id, award.earned)) +
             "<div>" +
             '<span class="award-name">' + esc(award.name) + badge + "</span>" +
             '<span class="award-dates">' + esc(T("awards.earned", {date: award.earned})) +
@@ -992,7 +1016,7 @@
                 ? d.promotions.map(promotionItem).join("")
                 : '<li class="muted">' + esc(T("awards.none_yet")) + "</li>";
             el("d-awards").innerHTML = d.awards.length
-                ? d.awards.map(awardItem).join("")
+                ? d.awards.map((a) => awardItem(Object.assign({pilot_id: d.player ? d.player.id : null}, a))).join("")
                 : '<li class="muted">' + esc(T("awards.none_yet")) + "</li>";
 
             el("d-combat-strip").innerHTML = statStrip(d.combat.headline);
@@ -1289,7 +1313,7 @@
                 (p.state_since ? ", " + p.state_since : "");
             const awards = p.awards_list.length
                 ? p.awards_list.map((a) =>
-                    icon("award", a.type, 56, "award-icon", a.name)).join("")
+                    icon("award", a.type, 56, "award-icon", a.name, wornBy(p.id, a.earned))).join("")
                 : '<span class="muted">No awards yet.</span>';
             const promos = p.promotions_list.length
                 ? p.promotions_list.map((r) =>
@@ -1663,7 +1687,8 @@
         }
         const img = event.target.closest && event.target.closest("img.emblem");
         if (img) {
-            openLightbox(img.dataset.kind, img.dataset.id, img.dataset.title);
+            openLightbox(img.dataset.kind, img.dataset.id, img.dataset.title,
+                img.dataset.pilot ? {pilot: img.dataset.pilot, earned: img.dataset.earned} : null);
             return;
         }
         if (event.target.closest && event.target.closest("[data-close]")) {

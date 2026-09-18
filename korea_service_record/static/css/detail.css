@@ -210,6 +210,15 @@ table.roster td.award-cell { white-space: normal; }
 }
 .mini-table td { text-align: right; color: var(--ink-strong); padding: 0.3rem 0; }
 
+/* ----------------------------------------------------------- citation -- */
+/* Set apart from the game's description: a rule, a small heading, and the
+   text in the record's own italic, as a citation was read out. */
+/* .citation is also the squadron citation row on the record; here it is a quotation. */
+.lightbox-desc .citation { display: block; margin: 1.1rem 0 0; padding: 0.8rem 0 0; border-top: 1px solid var(--border-soft); }
+.lightbox-desc .citation h3 { font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-dark);
+    font-weight: normal; margin: 0 0 0.4rem; }
+.lightbox-desc .citation p { font-style: italic; color: var(--ink-strong); margin: 0 0 0.6rem; line-height: 1.5; }
+
 /* ------------------------------------------------------------- closed -- */
 .state-message.closed { margin: 4rem auto; max-width: 34rem; text-align: center; font-size: 1.15rem; }
 

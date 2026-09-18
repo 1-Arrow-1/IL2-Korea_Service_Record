@@ -417,6 +417,16 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             return jsonify({"error": "career_not_found"}), 404
         return jsonify(data)
 
+    @app.route("/api/citation/<path:career_id>/<int:pilot_id>/<int:award_id>")
+    def api_citation(career_id: str, pilot_id: int, award_id: int):
+        """The written citation for one of a pilot's decorations."""
+        agg = aggregator(career_id)
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        earned = request.args.get("earned", "")
+        data = agg.citation(career_id, pilot_id, award_id, earned)
+        return jsonify(data or {})
+
     @app.route("/api/logbook/<path:career_id>")
     @app.route("/api/logbook/<path:career_id>/<int:pilot_id>")
     def api_logbook(career_id: str, pilot_id: Optional[int] = None):
