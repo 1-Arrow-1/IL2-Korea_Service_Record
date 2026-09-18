@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 import logging
 import math
 import struct
@@ -471,6 +472,120 @@ def awards_since_apply(db_path: Path, data: Dict[str, Any]) -> List[Dict[str, An
         if r["id"] not in before]
     con.close()
     return rows
+
+
+# ---------------------------------------------------------------------------
+# Awards that only the added hours earned
+# ---------------------------------------------------------------------------
+
+_TOKEN = re.compile(r"\s*(>=|<=|==|!=|<>|&&|\|\||[-+*/()<>=&|!]|\d+(?:\.\d+)?|[A-Za-z_]\w*)")
+_PREC = {"|": 1, "&": 2, "=": 3, "!": 3, "<": 3, ">": 3, "{": 3, "}": 3, "+": 4, "-": 4, "*": 5, "/": 5}
+_ALIAS = {">=": "}", "<=": "{", "==": "=", "!=": "!", "<>": "!", "&&": "&", "||": "|"}
+
+
+def evaluate(expr: str, values: Dict[str, float]) -> float:
+    """
+    The award engine's expression language, as the game reads it: the
+    comparison and logic operators with their two-character spellings,
+    identifiers case-insensitive, an unknown identifier 0. Comparisons yield
+    1 or 0. Precedence: * / over + - over comparisons over & over |.
+    """
+    out: List[Any] = []
+    ops: List[str] = []
+    vals = {k.lower(): float(v) for k, v in values.items()}
+
+    def apply(op: str) -> None:
+        b = out.pop(); a = out.pop()
+        out.append({"+": a + b, "-": a - b, "*": a * b, "/": a / b if b else 0.0,
+                    "=": float(a == b), "!": float(a != b), "<": float(a < b), ">": float(a > b),
+                    "{": float(a <= b), "}": float(a >= b),
+                    "&": float(bool(a) and bool(b)), "|": float(bool(a) or bool(b))}[op])
+
+    pos = 0
+    while pos < len(expr):
+        m = _TOKEN.match(expr, pos)
+        if not m:
+            break
+        pos = m.end()
+        tok = _ALIAS.get(m.group(1), m.group(1))
+        if tok == "(":
+            ops.append(tok)
+        elif tok == ")":
+            while ops and ops[-1] != "(":
+                apply(ops.pop())
+            if ops:
+                ops.pop()
+        elif tok in _PREC:
+            while ops and ops[-1] != "(" and _PREC[ops[-1]] >= _PREC[tok]:
+                apply(ops.pop())
+            ops.append(tok)
+        elif tok[0].isdigit():
+            out.append(float(tok))
+        else:
+            out.append(vals.get(tok.lower(), 0.0))
+    while ops:
+        apply(ops.pop())
+    return out[-1] if out else 0.0
+
+
+def hour_awards(db_path: Path, data: Dict[str, Any], awards_cfg) -> List[Dict[str, Any]]:
+    """
+    The awards granted since the correction that the added hours alone
+    earned: those whose condition mentions FlTime, fails with the pilot's
+    own hours at the date it was earned, and passes with the credited ones.
+    Everything else in the condition is taken as it stood that day - kills
+    by category, sorties flown and completed, the rank the award recorded -
+    and a chance term counts as open, so an award that had any other route
+    to it is left alone.
+    """
+    import sqlite3
+    from .career.killstats import KillStats
+    rows = awards_since_apply(db_path, data)
+    if not rows:
+        return []
+    corrected: Dict[int, Dict[str, float]] = {}
+    for entry in data.get("missions", {}).values():
+        for sid, d in entry.get("durations", {}).items():
+            corrected[int(sid)] = d
+    con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    con.row_factory = sqlite3.Row
+    out: List[Dict[str, Any]] = []
+    try:
+        for row in rows:
+            defn = awards_cfg.get(row["type"]) if awards_cfg else None
+            cond = defn.in_proc if defn else ""
+            if "fltime" not in cond.lower():
+                continue
+            sorties = con.execute(
+                "SELECT s.id, s.flightTime, s.killStats, s.status FROM sortie s JOIN mission m ON m.id=s.missionId "
+                "WHERE s.pilotId=? AND s.isDeleted=0 AND m.date<=? ORDER BY s.id",
+                (row["pilotId"], row["earnedDate"])).fetchall()
+            raw = credited = 0.0
+            stats = {"airobj": 0, "grobj": 0, "seaobj": 0, "bldobj": 0, "sorties": 0, "complsorties": 0}
+            for s in sorties:
+                d = corrected.get(s["id"])
+                raw += float(d["orig"]) if d else float(s["flightTime"] or 0)
+                credited += float(d["credited"]) if d else float(s["flightTime"] or 0)
+                ks = KillStats(s["killStats"])
+                cats = ks.category_totals()
+                stats["airobj"] += ks.airborne
+                stats["grobj"] += ks.get("Materiel") + ks.static_air
+                stats["bldobj"] += ks.get("Building")
+                stats["seaobj"] += cats.get("naval", 0)
+                stats["sorties"] += 1
+                stats["complsorties"] += 1 if s["status"] == 0 else 0
+            base = dict(stats, country=row["type"] // 1000, cdate=int(str(row["earnedDate"]).replace(".", "")),
+                        rankid=0, rnd=0)
+            rank = con.execute("SELECT pilotRank FROM award WHERE id=?", (row["id"],)).fetchone()
+            if rank and rank[0] is not None:
+                base["rankid"] = rank[0]
+            without = evaluate(cond, dict(base, fltime=raw / 3600.0))
+            with_hours = evaluate(cond, dict(base, fltime=credited / 3600.0))
+            if not without and with_hours:
+                out.append(dict(row, hours_raw=raw / 3600.0, hours_credited=credited / 3600.0))
+    finally:
+        con.close()
+    return out
 
 
 def withdraw_award(db_path: Path, award_id: int) -> None:

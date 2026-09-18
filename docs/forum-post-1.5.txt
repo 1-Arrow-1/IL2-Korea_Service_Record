@@ -121,8 +121,11 @@ the game at all — you can look before you decide, and a career you never apply
 written. Once you have applied to a career, the switch locks on for it, since the corrected
 figures are then the ones in the file. Second, the game hands out some awards on flight
 time. Applying hours can therefore earn a pilot an Air Medal the next day that he would not
-have had; the Helper lists awards granted since the correction and lets you withdraw any of
-them if you feel they were not earned. I leave that to your conscience.
+have had. The Helper lists every award granted since the correction and lets you withdraw
+any of them; and when you restore, the ones that the added hours alone earned — the
+condition met with the credited hours and not with the pilot's own, no kills or sorties
+that would have earned it another way — are withdrawn automatically, since the hours that
+earned them are gone. It tells you which before it does it.
 
 
 ALSO

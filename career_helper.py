@@ -101,6 +101,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "restore": "Restore game hours",
         "apply_confirm": "Write the corrected times of {n} mission(s) into the career and keep it corrected from now on? A backup is taken first.",
         "restore_confirm": "Put the game's own times back for all {n} corrected mission(s) and stop correcting this career? A backup is taken first.",
+        "restore_awards": "{m} award(s) were earned on the added hours alone and will be withdrawn with them:",
+        "restore_awards_done": "{m} award(s) withdrawn.",
         "applied_done": "Credited hours applied to {n} missions. Backup: {backup}",
         "restored_done": "Game hours restored for {n} missions. Backup: {backup}",
         "no_times": "No warped missions found - either you fly the whole route, or nothing has been flown yet.",
@@ -152,6 +154,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "restore": "Spielstunden zurücksetzen",
         "apply_confirm": "Die korrigierten Zeiten von {n} Einsatz/Einsätzen in die Laufbahn schreiben und sie ab jetzt korrigiert halten? Vorher wird gesichert.",
         "restore_confirm": "Die Originalzeiten des Spiels für alle {n} korrigierten Einsätze zurücksetzen und die Korrektur dieser Laufbahn beenden? Vorher wird gesichert.",
+        "restore_awards": "{m} Auszeichnung(en) wurden allein durch die hinzugefügten Stunden verliehen und werden mit ihnen entzogen:",
+        "restore_awards_done": "{m} Auszeichnung(en) entzogen.",
         "applied_done": "Angerechnete Stunden für {n} Einsätze übernommen. Sicherung: {backup}",
         "restored_done": "Spielstunden für {n} Einsätze wiederhergestellt. Sicherung: {backup}",
         "no_times": "Keine Einsätze mit Zeitsprung gefunden - entweder fliegen Sie die ganze Strecke, oder es wurde noch nichts geflogen.",
@@ -203,6 +207,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "restore": "Restaurar horas del juego",
         "apply_confirm": "¿Escribir los tiempos corregidos de {n} misión(es) en la carrera y mantenerla corregida a partir de ahora? Antes se hace una copia de seguridad.",
         "restore_confirm": "¿Devolver los tiempos originales del juego a las {n} misiones corregidas y dejar de corregir esta carrera? Antes se hace una copia de seguridad.",
+        "restore_awards": "{m} condecoración(es) se obtuvieron solo por las horas añadidas y se retirarán con ellas:",
+        "restore_awards_done": "{m} condecoración(es) retirada(s).",
         "applied_done": "Horas acreditadas aplicadas a {n} misiones. Copia de seguridad: {backup}",
         "restored_done": "Horas del juego restauradas en {n} misiones. Copia de seguridad: {backup}",
         "no_times": "No se encontraron misiones con salto: o vuela toda la ruta, o aún no se ha volado nada.",
@@ -254,6 +260,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "restore": "Rétablir les heures du jeu",
         "apply_confirm": "Écrire les temps corrigés de {n} mission(s) dans la carrière et la maintenir corrigée désormais ? Une sauvegarde est faite d’abord.",
         "restore_confirm": "Remettre les temps d’origine du jeu pour les {n} missions corrigées et cesser de corriger cette carrière ? Une sauvegarde est faite d’abord.",
+        "restore_awards": "{m} décoration(s) n’ont été obtenues que par les heures ajoutées et seront retirées avec elles :",
+        "restore_awards_done": "{m} décoration(s) retirée(s).",
         "applied_done": "Heures créditées appliquées à {n} missions. Sauvegarde : {backup}",
         "restored_done": "Heures du jeu rétablies pour {n} missions. Sauvegarde : {backup}",
         "no_times": "Aucune mission avec saut trouvée : soit vous volez toute la route, soit rien n’a encore été volé.",
@@ -305,6 +313,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "restore": "Вернуть часы игры",
         "apply_confirm": "Записать исправленное время {n} вылет(ов) в карьеру и держать её исправленной с этого момента? Сначала будет сделана резервная копия.",
         "restore_confirm": "Вернуть исходное время игры для всех {n} исправленных вылетов и прекратить исправление этой карьеры? Сначала будет сделана резервная копия.",
+        "restore_awards": "{m} наград(ы) были получены только за добавленные часы и будут отозваны вместе с ними:",
+        "restore_awards_done": "Отозвано наград: {m}.",
         "applied_done": "Зачтённые часы применены к {n} вылетам. Резервная копия: {backup}",
         "restored_done": "Часы игры возвращены для {n} вылетов. Резервная копия: {backup}",
         "no_times": "Вылетов с перемоткой не найдено — либо вы летаете весь маршрут, либо ещё ничего не налётано.",
@@ -356,6 +366,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "restore": "恢复游戏小时数",
         "apply_confirm": "将 {n} 个任务的修正时间写入生涯并从此保持修正状态？会先备份。",
         "restore_confirm": "还原全部 {n} 个已修正任务的游戏原始时间并停止修正此生涯？会先备份。",
+        "restore_awards": "有 {m} 项奖励仅凭添加的小时数获得，将随之撤销：",
+        "restore_awards_done": "已撤销 {m} 项奖励。",
         "applied_done": "已将计入小时数应用于 {n} 个任务。备份：{backup}",
         "restored_done": "已恢复 {n} 个任务的游戏小时数。备份：{backup}",
         "no_times": "未找到跳跃任务——您要么飞完了全程，要么尚未出击。",
@@ -455,14 +467,30 @@ class Career:
         corrections.save(self.name, data)
         return backup, done
 
-    def restore_hours(self):
+    def hour_awards(self, game: Optional[Path]):
+        """Awards since the correction that only the added hours earned."""
+        data = corrections.load(self.name)
+        cfg = None
+        if game is not None:
+            from korea_service_record.gamedata import AwardsConfig
+            path = game / "data" / "scg" / "2" / "awards.cfg"
+            if path.is_file():
+                cfg = AwardsConfig(path)
+        return corrections.hour_awards(self.path, data, cfg) if data and cfg else []
+
+    def restore_hours(self, game: Optional[Path] = None):
+        """Every original back; the awards the added hours alone earned are
+        taken back with them, since the hours that earned them are gone."""
         backup = self.backup()
         data = corrections.load(self.name) or {"missions": {}}
+        withdrawn = self.hour_awards(game)
         keys = [k for k, e in data["missions"].items() if e.get("applied")]
         done = corrections.restore_hours(self.path, data, keys)
+        for a in withdrawn:
+            corrections.withdraw_award(self.path, a["id"])
         data["auto"] = False
         corrections.save(self.name, data)
-        return backup, done
+        return backup, done, withdrawn
 
     def award_points(self) -> int:
         with self._open() as con:
@@ -781,17 +809,29 @@ class App(tk.Tk):
 
     def _restore_hours(self) -> None:
         keys = self._ft_selected(want_applied=True, everything=True)
-        if not keys or not messagebox.askyesno(self.t["title"], self.t["restore_confirm"].format(n=len(keys))):
+        if not keys:
+            return
+        game = find_game_dir()
+        try:
+            due = self.career.hour_awards(game)
+        except sqlite3.Error:
+            due = []
+        text = self.t["restore_confirm"].format(n=len(keys))
+        if due:
+            text += "\n\n" + self.t["restore_awards"].format(m=len(due)) + "\n" + "\n".join(
+                f"  #{a['id']}  pilot {a['pilotId']}  award {a['type']}  {a['earnedDate']}" for a in due)
+        if not messagebox.askyesno(self.t["title"], text):
             return
         try:
-            backup, done = self.career.restore_hours()
+            backup, done, withdrawn = self.career.restore_hours(game)
         except sqlite3.OperationalError:
             messagebox.showerror(self.t["title"], self.t["locked"])
             return
         except Exception as exc:          # noqa: BLE001
             messagebox.showerror(self.t["title"], self.t["failed"].format(error=exc))
             return
-        self.status.set(self.t["restored_done"].format(n=len(done), backup=backup))
+        self.status.set(self.t["restored_done"].format(n=len(done), backup=backup) +
+                        ("  " + self.t["restore_awards_done"].format(m=len(withdrawn)) if withdrawn else ""))
         self._fill_times()
 
     def _withdraw(self) -> None:
