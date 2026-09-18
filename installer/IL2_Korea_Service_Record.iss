@@ -75,7 +75,7 @@ english.ComponentMod=Awards mod (adds decorations to the career)
 english.ComponentModExtended=Extended promotions: earned on merit, with two flag ranks for every nation (recommended)
 english.ComponentModStock=Stock promotions, corrected: the original criteria, with the missing promotion out of Major restored
 english.ModsDisabled=Modifications are currently switched off in IL-2 Korea.%n%nThe awards mod will be installed, but the game will ignore it until you turn modifications on:%n%n    Settings  ->  General  ->  Enable modifications%n%nInstall it anyway?
-english.RemovePhotosTitle=Also remove your pilot photographs and settings?%n%nLocation: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nYES deletes them.%nNO keeps them for a future install.
+english.RemovePhotosTitle=Also remove your pilot photographs and settings?%n%nLocation: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nYES deletes them.%nNO keeps them for a future install.%n%nFlight-time corrections and career backups are always kept: they record changes made to the game's own career files.
 english.CreateDesktopIcon=Create a &desktop icon
 
 german.IL2PageTitle=IL-2 Korea Installation auswählen
@@ -87,7 +87,7 @@ german.ComponentMod=Auszeichnungs-Mod (ergänzt Orden in der Karriere)
 german.ComponentModExtended=Erweiterte Beförderungen: nach Verdienst, mit zwei Generalsrängen für jede Nation (empfohlen)
 german.ComponentModStock=Originale Beförderungen, korrigiert: die ursprünglichen Kriterien, mit der fehlenden Beförderung vom Major wiederhergestellt
 german.ModsDisabled=Modifikationen sind in IL-2 Korea derzeit ausgeschaltet.%n%nDer Auszeichnungs-Mod wird installiert, das Spiel ignoriert ihn jedoch, bis Sie Modifikationen einschalten:%n%n    Einstellungen  ->  Allgemein  ->  Modifikationen aktivieren%n%nTrotzdem installieren?
-german.RemovePhotosTitle=Auch Ihre Pilotenfotos und Einstellungen entfernen?%n%nSpeicherort: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nJA löscht sie.%nNEIN behält sie für eine spätere Installation.
+german.RemovePhotosTitle=Auch Ihre Pilotenfotos und Einstellungen entfernen?%n%nSpeicherort: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nJA löscht sie.%nNEIN behält sie für eine spätere Installation.%n%nFlugzeit-Korrekturen und Laufbahn-Sicherungen bleiben immer erhalten: sie dokumentieren Änderungen an den Laufbahndateien des Spiels.
 german.CreateDesktopIcon=&Desktop-Symbol erstellen
 
 french.IL2PageTitle=Sélectionnez votre installation d'IL-2 Corée
@@ -99,7 +99,7 @@ french.ComponentMod=Mod de décorations (ajoute des décorations à la carrière
 french.ComponentModExtended=Promotions étendues : au mérite, avec deux grades d'officier général pour chaque nation (recommandé)
 french.ComponentModStock=Promotions d'origine, corrigées : les critères initiaux, avec la promotion manquante depuis Commandant rétablie
 french.ModsDisabled=Les modifications sont actuellement désactivées dans IL-2 Corée.%n%nLe mod sera installé, mais le jeu l'ignorera tant que vous n'aurez pas activé les modifications :%n%n    Paramètres  ->  Général  ->  Activer les modifications%n%nInstaller quand même ?
-french.RemovePhotosTitle=Supprimer aussi vos photographies de pilote et vos réglages ?%n%nEmplacement : %%LOCALAPPDATA%%\IL2KoreaTracker%n%nOUI les supprime.%nNON les conserve.
+french.RemovePhotosTitle=Supprimer aussi vos photographies de pilote et vos réglages ?%n%nEmplacement : %%LOCALAPPDATA%%\IL2KoreaTracker%n%nOUI les supprime.%nNON les conserve.%n%nLes corrections de temps de vol et les sauvegardes de carrière sont toujours conservées : elles consignent des modifications faites aux fichiers de carrière du jeu.
 french.CreateDesktopIcon=Créer une icône sur le &Bureau
 
 spanish.IL2PageTitle=Seleccione su instalación de IL-2 Corea
@@ -111,7 +111,7 @@ spanish.ComponentMod=Mod de condecoraciones (añade condecoraciones a la carrera
 spanish.ComponentModExtended=Ascensos ampliados: por méritos, con dos rangos de oficial general para cada nación (recomendado)
 spanish.ComponentModStock=Ascensos originales, corregidos: los criterios iniciales, con el ascenso desde Mayor que faltaba restaurado
 spanish.ModsDisabled=Las modificaciones están desactivadas en IL-2 Corea.%n%nEl mod se instalará, pero el juego lo ignorará hasta que active las modificaciones:%n%n    Ajustes  ->  General  ->  Activar modificaciones%n%n¿Instalar de todos modos?
-spanish.RemovePhotosTitle=¿Eliminar también sus fotografías de piloto y ajustes?%n%nUbicación: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nSÍ los elimina.%nNO los conserva.
+spanish.RemovePhotosTitle=¿Eliminar también sus fotografías de piloto y ajustes?%n%nUbicación: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nSÍ los elimina.%nNO los conserva.%n%nLas correcciones de tiempo de vuelo y las copias de seguridad de carrera se conservan siempre: registran cambios hechos en los archivos de carrera del propio juego.
 spanish.CreateDesktopIcon=Crear un icono en el &escritorio
 
 russian.IL2PageTitle=Выберите установку IL-2 Корея
@@ -123,7 +123,7 @@ russian.ComponentMod=Мод наград (добавляет награды в �
 russian.ComponentModExtended=Расширенные повышения: по заслугам, с двумя генеральскими званиями для каждой страны (рекомендуется)
 russian.ComponentModStock=Исходные повышения, исправленные: прежние критерии, с восстановленным повышением из майоров
 russian.ModsDisabled=Модификации в IL-2 Корея сейчас отключены.%n%nМод будет установлен, но игра не увидит его, пока вы не включите модификации:%n%n    Настройки  ->  Общие  ->  Включить модификации%n%nВсё равно установить?
-russian.RemovePhotosTitle=Удалить также фотографии лётчиков и настройки?%n%nРасположение: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nДА удалит их.%nНЕТ сохранит.
+russian.RemovePhotosTitle=Удалить также фотографии лётчиков и настройки?%n%nРасположение: %%LOCALAPPDATA%%\IL2KoreaTracker%n%nДА удалит их.%nНЕТ сохранит.%n%nИсправления лётного времени и резервные копии карьер сохраняются всегда: они фиксируют изменения, внесённые в файлы карьер самой игры.
 russian.CreateDesktopIcon=Создать значок на &рабочем столе
 
 chinesesimplified.IL2PageTitle=选择您的 IL-2 朝鲜 安装位置
@@ -135,7 +135,7 @@ chinesesimplified.ComponentMod=勋章模组（为生涯增加勋章）
 chinesesimplified.ComponentModExtended=扩展晋升：按功绩晋升，每个国家增加两个将官军衔（推荐）
 chinesesimplified.ComponentModStock=原版晋升（已修正）：保留原有条件，并恢复缺失的少校晋升
 chinesesimplified.ModsDisabled=IL-2 朝鲜 当前已关闭模组功能。%n%n模组仍会安装，但在您启用模组之前游戏不会读取它：%n%n    设置  ->  常规  ->  启用模组%n%n仍要安装吗？
-chinesesimplified.RemovePhotosTitle=同时删除您的飞行员照片与设置？%n%n位置：%%LOCALAPPDATA%%\IL2KoreaTracker%n%n是：删除。%n否：保留以备将来安装。
+chinesesimplified.RemovePhotosTitle=同时删除您的飞行员照片与设置？%n%n位置：%%LOCALAPPDATA%%\IL2KoreaTracker%n%n是：删除。%n否：保留以备将来安装。%n%n飞行时间修正和生涯备份始终保留：它们记录了对游戏本身生涯文件所做的更改。
 chinesesimplified.CreateDesktopIcon=创建桌面图标(&D)
 
 [Types]
@@ -497,7 +497,18 @@ begin
     and with them gone the game falls back to the archives by itself.
     Photographs and settings are different — they live outside both folders,
     they are the user's own, and they outlive the application on purpose. }
+  { Never the corrections and backups: they record changes the Career Helper
+    made to the game's own career files, and without them a corrected career
+    could not be told from an original one, let alone restored. }
   if CurUninstallStep = usUninstall then
     if MsgBox(CustomMessage('RemovePhotosTitle'), mbConfirmation, MB_YESNO) = IDYES then
-      DelTree(ExpandConstant('{localappdata}\IL2KoreaTracker'), True, True, True);
+    begin
+      DelTree(ExpandConstant('{localappdata}\IL2KoreaTracker\photos'), True, True, True);
+      DelTree(ExpandConstant('{localappdata}\IL2KoreaTracker\assets'), True, True, True);
+      DelTree(ExpandConstant('{localappdata}\IL2KoreaTracker\award'), True, True, True);
+      DelTree(ExpandConstant('{localappdata}\IL2KoreaTracker\rank'), True, True, True);
+      DelTree(ExpandConstant('{localappdata}\IL2KoreaTracker\squadron'), True, True, True);
+      DeleteFile(ExpandConstant('{localappdata}\IL2KoreaTracker\settings.json'));
+      DeleteFile(ExpandConstant('{localappdata}\IL2KoreaTracker\tracker.log'));
+    end;
 end;
