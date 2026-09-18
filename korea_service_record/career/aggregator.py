@@ -249,6 +249,19 @@ def _pos_at(fixes, t: float):
     return a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k, a[3] + (b[3] - a[3]) * k
 
 
+# The mission symbol the AF Form 5 carried in its remarks: the USAF's own
+# operational shorthand of the period for the game's mission types -
+# intercepts, combat air patrol, close air support, fighter sweep, armed
+# reconnaissance, escort, ground attack, interdiction, airfield strike.
+MISSION_SYMBOL = {
+    1101: "INT", 1102: "INT", 1103: "INT", 1104: "INT", 1108: "INT", 1105: "CAP",
+    1121: "CAP", 1124: "CAP", 1125: "CAP", 1122: "CAS", 1123: "FS", 1126: "FS", 1128: "AR", 1207: "AR",
+    1151: "ESC", 1152: "ESC", 1153: "ESC", 1154: "ESC", 1155: "ESC", 1156: "ESC",
+    1201: "GA", 1202: "GA", 1203: "GA", 1204: "CAS", 1208: "GA", 1209: "GA",
+    1205: "INTD", 1215: "INTD", 1206: "AF",
+}
+
+
 def _seconds(clock: str) -> float:
     """'HH:MM[:SS]' as seconds of the day."""
     try:
@@ -1857,6 +1870,7 @@ class CareerAggregator:
                     "aircraft": self.objects.describe(plane_key)["name"] if plane_key else "",
                     "code": _tail_code(plane["tcode"], plane_key) if plane else "",
                     "mission": self.locale.mission_type_name(m["type"]), "number": m["missionNum"],
+                    "symbol": MISSION_SYMBOL.get(m["type"], ""),
                     "takeoff": _clock(start, flight.takeoff_s)[:5] if flight and flight.takeoff_s is not None else "",
                     "landing": _clock(start, flight.landing_s)[:5] if flight and flight.landing_s is not None else "",
                     "hours": round(hours, 1), "night_h": round(night_h, 1), "day_h": round(hours - night_h, 1),

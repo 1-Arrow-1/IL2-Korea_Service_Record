@@ -63,16 +63,15 @@
         return d.toLocaleDateString(formLang, {month: "long", year: "numeric", timeZone: "UTC"});
     };
     const tenths = (h) => (h == null ? "" : (+h).toFixed(1));
+    // Remarks as a real form had them: the mission symbol (USAF only) and
+    // the aircraft destroyed, nothing else.
     const remarks = (r) => {
         const out = [];
+        if (data.form === "usaf" && r.symbol) out.push(r.symbol);
         const kills = {};
         (r.remarks || []).forEach((k) => { if (typeof k === "string") kills[k] = (kills[k] || 0) + 1; });
-        Object.keys(kills).forEach((name) => out.push((kills[name] > 1 ? kills[name] + " × " : "") + name + " " + TF("logbook.form.destroyed")));
-        if (r.ground) out.push(TF("logbook.form.ground", {n: r.ground}));
-        if (r.hits) out.push(TF("logbook.form.hits", {n: r.hits}));
-        if (r.outcome === "bailed") out.push(TF("logbook.form.bailed"));
-        if (r.outcome === "missing") out.push(TF("logbook.form.missing"));
-        return out.join("; ");
+        Object.keys(kills).forEach((name) => out.push((kills[name] > 1 ? kills[name] + " × " : "1 ") + name + " " + TF("logbook.form.destroyed")));
+        return out.join(" · ");
     };
 
     const sheets = data.months.map((mo, i) => {
