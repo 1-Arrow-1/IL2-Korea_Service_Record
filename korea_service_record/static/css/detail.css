@@ -225,26 +225,15 @@ table.roster td.award-cell { white-space: normal; }
 .tunic-coat { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
 .tunic-right, .tunic-left { position: absolute; bottom: 53.6%; width: 34.8%; display: flex; flex-direction: column;
     align-items: center; }
-/* Well under the lapel: on a coat the inner ribbon and the wing's inboard
-   tip disappear beneath the fold. */
-.tunic-right { left: 69.5%; transform: translateX(-50%); }
+/* Centred over the pocket, a touch inboard: the lapel then covers the wing's
+   inboard third and the edge of the inner ribbon, as on a real coat. */
+.tunic-right { left: 74.5%; transform: translateX(-50%); }
 .tunic-left { left: 16.8%; bottom: 55.4%; transform: translateX(-50%); }
-/* The wearer's left lapel, cut from the same photograph and laid over the
-   rack: its outer edge runs from the notch (74%, 11%) down to the top
-   button (46%, 63%). Everything left of that line is the coat's own front,
-   which the overlay repeats on itself invisibly. */
+/* The wearer's left lapel, cut from the photograph (lapel_usaf.png, same
+   crop as the coat) and laid over the rack. Its shadow comes from its own
+   silhouette, so it lands on ribbons and cloth alike, as a real one does. */
 .tunic-lapel { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;
-    clip-path: polygon(40% 0, 60% 0, 74% 11%, 68% 20%, 63% 30%, 57% 40%, 52% 50%, 46% 63%,
-                       48% 50%, 43% 40%, 37% 30%, 32% 20%, 26% 11%); }
-/* The shadow the fold throws on the ribbons: the same edge pushed outward
-   by 2.5% and blurred, painted beneath the lapel image so it lands on the
-   ribbons only - the lapel covers its inner side. */
-.tunic-lapel-shadow { position: absolute; inset: 0; pointer-events: none; filter: blur(7px); }
-.tunic-lapel-shadow::before { content: ""; position: absolute; inset: 0; background: rgba(8, 10, 18, 0.5);
-    /* Only alongside the wings and the rows (23%..47% down the image): the
-       lapel's own shadow is already in the photograph elsewhere. The blur
-       sits on the parent so the clipped shape is what gets feathered. */
-    clip-path: polygon(46% 23%, 67.8% 23%, 64.3% 30%, 58.3% 40%, 54.8% 47%, 46% 47%); }
+    filter: drop-shadow(-3px 3px 5px rgba(0, 0, 0, 0.55)); }
 .tunic .ribbon-group { width: 100%; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45)); }
 .tunic .ribbon-row .ribbon { margin: -1.2% -1.44%; }
 .tunic .ribbon-row .ribbon.sov { margin: -1.2% -1.5%; }
