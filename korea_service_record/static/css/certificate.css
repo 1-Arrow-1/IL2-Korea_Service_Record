@@ -1,0 +1,82 @@
+/**
+ * The award certificate: a landscape sheet, 11 x 8.5 in, typed in the
+ * period's faces. With a drawn template the sheet is the picture and the
+ * text sits in its clear middle band; without one, a parchment made here
+ * with the game's medal at the top and a drawn seal below.
+ */
+
+.certificate-page { background: var(--desk); padding: 1rem 1rem 3rem; }
+.certificate-bar { display: flex; align-items: center; gap: 1rem; max-width: 1100px; margin: 0 auto 1rem; }
+.certificate-bar .ct-spacer { flex: 1; }
+
+.sheet {
+    position: relative; max-width: 1100px; margin: 0 auto; aspect-ratio: 2200 / 1700;
+    background: #f3ecdc; color: #1f140a; box-shadow: var(--shadow-soft);
+    background-size: 100% 100%; background-repeat: no-repeat;
+}
+/* Parchment, when there is no drawn sheet: a mottled cream with a faint vignette. */
+.sheet:not(.drawn) {
+    background-image:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.35), transparent 60%),
+        radial-gradient(ellipse at 70% 80%, rgba(120, 90, 40, 0.10), transparent 55%),
+        radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(110, 80, 40, 0.18) 100%),
+        linear-gradient(115deg, rgba(120, 95, 50, 0.05) 0 12%, transparent 12% 31%, rgba(120, 95, 50, 0.04) 31% 47%, transparent 47% 72%, rgba(120, 95, 50, 0.05) 72% 100%);
+}
+.ct-medal { position: absolute; left: 50%; top: 4%; height: 22%; width: auto; transform: translateX(-50%);
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
+.ct-medal.small { height: 16%; top: 3%; }
+
+/* The text band: 28% to 78% of the height on a drawn sheet, the same here. */
+.ct-text { position: absolute; left: 8%; right: 8%; top: 28%; bottom: 20%; text-align: center; display: flex;
+    flex-direction: column; justify-content: flex-start; gap: 0.15em; font-size: calc(1100px * 0.012); }
+@media (max-width: 1140px) { .ct-text { font-size: 1.15vw; } }
+.ct-country { font-family: 'Times New Roman', Georgia, serif; font-size: 2.1em; letter-spacing: 0.08em; }
+.ct-established { font-family: 'Courier New', Courier, monospace; font-size: 0.95em; letter-spacing: 0.04em; max-width: 78%; margin: 0 auto; line-height: 1.35; }
+.ct-name { font-family: 'Times New Roman', Georgia, serif; font-size: 3.2em; letter-spacing: 0.06em; margin-top: 0.15em; line-height: 1.1; }
+.ct-cluster { font-family: 'Times New Roman', Georgia, serif; font-size: 1.25em; letter-spacing: 0.12em; }
+.ct-to { font-family: 'Courier New', Courier, monospace; font-size: 1em; margin-top: 0.3em; }
+.ct-recipient { font-family: 'Courier New', Courier, monospace; font-size: 1.5em; letter-spacing: 0.06em; }
+.ct-service { font-family: 'Courier New', Courier, monospace; font-size: 0.95em; letter-spacing: 0.06em; }
+.ct-for { font-family: 'Courier New', Courier, monospace; font-size: 1.25em; text-align: left; margin-top: 0.6em; line-height: 1.35; }
+.ct-for-label { margin-right: 0.6em; }
+.ct-deed { font-family: 'Courier New', Courier, monospace; font-size: 1.05em; text-align: left; line-height: 1.4; margin-top: 0.2em; }
+.ct-given { font-family: 'Times New Roman', Georgia, serif; font-size: 1.7em; letter-spacing: 0.05em; margin-top: auto; }
+.ct-on { font-family: 'Times New Roman', Georgia, serif; font-size: 1.7em; letter-spacing: 0.05em; }
+
+.ct-seal { position: absolute; left: 50%; bottom: 4%; width: 9%; transform: translateX(-50%); }
+.ct-seal svg { width: 100%; height: auto; fill: none; stroke: #8a7038; stroke-width: 1.5; }
+.ct-seal svg circle:first-child { fill: #c9a85a; stroke: #7a5f2a; }
+.ct-seal svg circle + circle { fill: #b8963f; }
+.ct-seal svg path { fill: #e6cf85; stroke: #7a5f2a; stroke-width: 0.8; }
+.ct-seal svg text { font-family: Arial, Helvetica, sans-serif; font-size: 7px; fill: #5a4022; stroke: none; letter-spacing: 0.08em; }
+
+.ct-signature { position: absolute; right: 8%; bottom: 6%; width: 28%; display: flex; flex-direction: column; align-items: center;
+    font-size: calc(1100px * 0.012); }
+@media (max-width: 1140px) { .ct-signature { font-size: 1.15vw; } }
+.ct-sign { font-family: 'Segoe Script', 'Brush Script MT', 'Lucida Handwriting', cursive; font-size: 2.2em; color: #1c2a4a;
+    transform: rotate(-3deg); margin-bottom: -0.35em; }
+.ct-sign-line { display: block; width: 100%; border-bottom: 1px solid #1f140a; }
+.ct-sign-title { font-family: 'Courier New', Courier, monospace; font-size: 0.8em; letter-spacing: 0.06em; margin-top: 0.3em; text-align: center; }
+
+/* The decree: a plain typed page with a heading, the text, place and date,
+   and the signatures of the Presidium. */
+.sheet.decree { aspect-ratio: 1700 / 2200; max-width: 800px; }
+.sheet.decree .ct-text { top: 21%; bottom: 8%; left: 10%; right: 10%; font-size: calc(800px * 0.016); gap: 0.3em; }
+@media (max-width: 840px) { .sheet.decree .ct-text { font-size: 1.6vw; } }
+.sheet.decree .ct-title { font-family: 'Times New Roman', Georgia, serif; font-size: 1.5em; letter-spacing: 0.1em; }
+.sheet.decree .ct-subject { font-family: 'Times New Roman', Georgia, serif; font-size: 1.15em; font-style: italic; margin-bottom: 1em; }
+.sheet.decree .ct-para { font-family: 'Times New Roman', Georgia, serif; font-size: 1.05em; text-align: justify; text-indent: 2em; line-height: 1.5; }
+.sheet.decree .ct-place { font-family: 'Times New Roman', Georgia, serif; margin-top: auto; text-align: left; }
+.sheet.decree .ct-signers { display: flex; justify-content: space-between; gap: 2rem; margin-top: 1.2em; }
+.sheet.decree .ct-signer { display: flex; flex-direction: column; align-items: flex-start; text-align: left; max-width: 48%; }
+.sheet.decree .ct-signer .ct-sign { font-size: 1.8em; }
+.sheet.decree .ct-signer .ct-sign-title { font-family: 'Times New Roman', Georgia, serif; font-size: 0.85em; letter-spacing: 0; }
+
+@media print {
+    @page { size: landscape; margin: 6mm; }
+    .no-print { display: none !important; }
+    .certificate-page { background: #fff; padding: 0; }
+    .sheet { box-shadow: none; max-width: none; width: 100%; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .sheet.decree { max-width: 60%; margin: 0 auto; }
+    .ct-text, .ct-signature { font-size: 1.15vw; }
+}

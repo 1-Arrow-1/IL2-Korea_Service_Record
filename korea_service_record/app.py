@@ -424,8 +424,18 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if agg is None:
             return jsonify({"error": "game_not_found"}), 404
         earned = request.args.get("earned", "")
+        wanted = request.args.get("lang")
+        if wanted in ("en", "de", "es", "fr", "ru", "zh"):
+            agg = aggregator_for(wanted)
         data = agg.citation(career_id, pilot_id, award_id, earned)
         return jsonify(data or {})
+
+    @app.route("/certificate")
+    def certificate_page():
+        """The award's certificate or decree on its own page, to print."""
+        html = (Path(app.static_folder) / "certificate.html").read_text(encoding="utf-8")
+        html = html.replace("__ASSET_VERSION__", asset_version())
+        return Response(html, mimetype="text/html", headers={"Cache-Control": "no-store"})
 
     @app.route("/api/logbook/<path:career_id>")
     @app.route("/api/logbook/<path:career_id>/<int:pilot_id>")

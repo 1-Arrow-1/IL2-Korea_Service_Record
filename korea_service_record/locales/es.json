@@ -142,6 +142,8 @@
     "tunic_caption_sov_full": "Guerrera de la Fuerza Aérea soviética, modelo 1943, con órdenes y medallas. Órdenes y medallas en sus monturas pentagonales sobre el pecho izquierdo, cinco por fila, con la Estrella de Oro de Héroe encima; las órdenes de tornillo, sin cinta, prendidas a la derecha.",
     "tunic_caption_dprk": "Guerrera de la Fuerza Aérea del Ejército Popular de Corea. Pasadores sobre el pecho izquierdo con la estrella de Héroe de la República encima, llevada en su forma real; los pasadores de las órdenes sin cinta a la derecha, según las normas soviéticas que adoptó el Ejército Popular.",
     "tunic_caption_dprk_full": "Guerrera de la Fuerza Aérea del Ejército Popular de Corea, con órdenes y medallas. Las dos medallas en sus monturas sobre el pecho izquierdo bajo la estrella de Héroe de la República; las órdenes de tornillo, sin cinta, prendidas a la derecha bajo la insignia de piloto.",
+    "certificate": "Diploma",
+    "certificate_hint": "El diploma de esta condecoración en su propia página, listo para imprimir",
     "dress_service": "Uniforme de servicio",
     "dress_full": "Uniforme de gala",
     "pending_note": "{count} condecoraciones esperan puntos; usted tiene {points}."
@@ -259,6 +261,11 @@
       "certify": "Certifico que los asientos anteriores son correctos.",
       "page": "Hoja {n} de {of}"
     }
+  },
+  "certificate": {
+    "back": "Hoja de Servicios",
+    "print": "Imprimir",
+    "failed": "No se pudo leer el diploma."
   },
   "map": {
     "heading": "Mapa de operaciones",

@@ -119,17 +119,15 @@
                     encodeURIComponent(worn.pilot) + "/" + encodeURIComponent(ident) +
                     "?earned=" + encodeURIComponent(worn.earned || ""));
                 if (c && c.paragraphs && c.paragraphs.length) {
-                    const quote = document.createElement("blockquote");
-                    quote.className = "citation";
-                    const head = document.createElement("h3");
-                    head.textContent = c.heading;
-                    quote.appendChild(head);
-                    c.paragraphs.forEach((text) => {
-                        const node = document.createElement("p");
-                        node.textContent = text;
-                        quote.appendChild(node);
-                    });
-                    desc.appendChild(quote);
+                    // The certificate the award came with, on its own page.
+                    const link = document.createElement("a");
+                    link.className = "nav-btn small certificate-link";
+                    link.target = "_blank"; link.rel = "noopener";
+                    link.href = "/certificate?career=" + encodeURIComponent(currentCareer) + "&pilot=" + encodeURIComponent(worn.pilot) +
+                        "&award=" + encodeURIComponent(ident) + "&earned=" + encodeURIComponent(worn.earned || "");
+                    link.textContent = T("awards.certificate");
+                    link.title = T("awards.certificate_hint");
+                    desc.appendChild(link);
                 }
             }
         } catch (err) {

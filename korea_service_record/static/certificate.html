@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate</title>
+    <link rel="icon" href="/static/images/icon.png?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/main.css?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/certificate.css?v=__ASSET_VERSION__">
+</head>
+<body class="certificate-page">
+    <!-- The document an award came with: the American certificate (typed
+         over a drawn sheet where one exists in images/certificates/, over a
+         plain parchment otherwise), or the decree of a Soviet-pattern
+         nation. Printed landscape, one page. -->
+    <div class="certificate-bar no-print">
+        <a id="ct-back" class="nav-btn" href="/">&larr; <span data-i18n="certificate.back">Service Record</span></a>
+        <span class="ct-spacer"></span>
+        <button id="ct-print" class="nav-btn" data-i18n="certificate.print">Print</button>
+    </div>
+    <main id="ct-sheet"></main>
+    <p id="ct-state" class="state-message" hidden></p>
+<script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/certificate.js?v=__ASSET_VERSION__"></script>
+</body>
+</html>

@@ -142,6 +142,8 @@
     "tunic_caption_sov_full": "Vareuse des forces aériennes soviétiques, modèle 1943, avec ordres et médailles. Ordres et médailles sur leurs montures pentagonales sur la poitrine gauche, cinq par rangée, l’Étoile d’or de Héros au-dessus ; les ordres à vis, sans ruban, épinglés à droite.",
     "tunic_caption_dprk": "Vareuse des forces aériennes de l’Armée populaire de Corée. Barrettes sur la poitrine gauche, l’étoile de Héros de la République portée en nature au-dessus ; les barrettes des ordres portés sans ruban à droite, selon les règles soviétiques reprises par l’Armée populaire.",
     "tunic_caption_dprk_full": "Vareuse des forces aériennes de l’Armée populaire de Corée, avec ordres et médailles. Les deux médailles sur leurs montures sur la poitrine gauche sous l’étoile de Héros de la République ; les ordres à vis, sans ruban, épinglés à droite sous l’insigne de pilote.",
+    "certificate": "Diplôme",
+    "certificate_hint": "Le diplôme de cette décoration sur sa propre page, prêt à imprimer",
     "dress_service": "Tenue de service",
     "dress_full": "Grande tenue",
     "pending_note": "{count} décorations attendent des points ; vous en avez {points}."
@@ -259,6 +261,11 @@
       "certify": "Je certifie exactes les inscriptions ci-dessus.",
       "page": "Feuillet {n} sur {of}"
     }
+  },
+  "certificate": {
+    "back": "État de service",
+    "print": "Imprimer",
+    "failed": "Le diplôme n’a pas pu être lu."
   },
   "map": {
     "heading": "Carte des opérations",

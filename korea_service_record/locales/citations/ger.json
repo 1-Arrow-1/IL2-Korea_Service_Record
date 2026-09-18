@@ -185,5 +185,47 @@
    "{name} wird die Gedenkmedaille „Widersteht Amerika, helft Korea“ für den Dienst bei den Chinesischen Volksfreiwilligen in Korea verliehen.",
    ""
   ]
+ },
+ "certificate": {},
+ "decree": {
+  "title": {
+   "sov": "ERLASS DES PRÄSIDIUMS DES OBERSTEN SOWJETS DER UdSSR",
+   "dprk": "ERLASS DES PRÄSIDIUMS DER OBERSTEN VOLKSVERSAMMLUNG",
+   "prc": "BEFEHL DER CHINESISCHEN VOLKSFREIWILLIGEN"
+  },
+  "subject": "Über die Auszeichnung von {rank} {name}",
+  "place": {
+   "sov": "Moskau, Kreml",
+   "dprk": "Pjöngjang",
+   "prc": "Hauptquartier der Chinesischen Volksfreiwilligen"
+  },
+  "signers": {
+   "sov": [
+    [
+     "N. Schwernik",
+     "Vorsitzender des Präsidiums des Obersten Sowjets der UdSSR"
+    ],
+    [
+     "A. Gorkin",
+     "Sekretär des Präsidiums"
+    ]
+   ],
+   "dprk": [
+    [
+     "Kim Tu-bong",
+     "Vorsitzender des Präsidiums der Obersten Volksversammlung"
+    ],
+    [
+     "Kang Ryang-uk",
+     "Sekretär des Präsidiums"
+    ]
+   ],
+   "prc": [
+    [
+     "Peng Dehuai",
+     "Kommandeur der Chinesischen Volksfreiwilligen"
+    ]
+   ]
+  }
  }
 }

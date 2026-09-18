@@ -1818,9 +1818,10 @@ class CareerAggregator:
                 return None
             texts = citations.strings(self.lang)
             country = int(pilot["country"])
-            row = db.query_one("SELECT pilotRank FROM award WHERE pilotId=? AND type=? AND earnedDate=? ORDER BY id DESC",
+            row = db.query_one("SELECT pilotRank, receivedDate FROM award WHERE pilotId=? AND type=? AND earnedDate=? ORDER BY id DESC",
                                (pilot_id, award_id, earned))
             rank_id = row["pilotRank"] if row and row["pilotRank"] is not None else pilot["rankId"]
+            received = (row["receivedDate"] if row and row["receivedDate"] else earned) or earned
             missions = {m["id"]: m for m in db.missions()}
             planes = {p["id"]: p for p in db.query("SELECT id, config FROM plane")}
             sorties = [s for s in db.sorties(pilot_id) if s["missionId"] in missions and missions[s["missionId"]]["date"] <= earned]
@@ -1855,7 +1856,7 @@ class CareerAggregator:
                 "rank": self.locale.rank_name(country, rank_id),
                 "name": f"{pilot['name']} {pilot['lastName']}".strip(),
                 "unit": meta.squadron_name,
-                "date": citations.format_date(texts, earned),
+                "date": citations.format_date(texts, earned), "earned_raw": earned,
                 "aircraft": plane_name(sorties[-1]) if sorties else "",
                 "has_sortie": False, "kills": {}, "ground_n": 0, "hits": 0, "outcome": "ok",
             }
@@ -1903,7 +1904,12 @@ class CareerAggregator:
                 if citations.FAMILY[award_id][2] == "unit":
                     facts["air_total"] = sum(k.airborne for k in uk)
                     facts["ground_total"] = sum(k.ground_targets for k in uk)
-            return citations.compose(self.lang, award_id, facts)
+            out = citations.compose(self.lang, award_id, facts)
+            if out is not None:
+                out["certificate"] = citations.certificate(self.lang, award_id, facts, received, out["paragraphs"])
+                out["icon"] = f"/api/icon/award/{award_id}"
+                out["award_name"] = self.award_name(award_id)
+            return out
 
     def logbook(self, career_id: str, pilot_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
         """

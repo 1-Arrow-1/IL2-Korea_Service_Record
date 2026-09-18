@@ -185,5 +185,209 @@
    "{name} is awarded the commemorative medal Oppose America, Aid Korea for service with the Chinese People's Volunteers in Korea.",
    ""
   ]
+ },
+ "certificate": {
+  "country": "THE UNITED STATES OF AMERICA",
+  "service": "UNITED STATES AIR FORCE",
+  "to": "TO",
+  "for": "FOR:",
+  "given": "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
+  "on": "ON THIS {day} DAY OF {month} {year}",
+  "ordinal": {
+   "1": "1ST",
+   "2": "2ND",
+   "3": "3RD",
+   "21": "21ST",
+   "22": "22ND",
+   "23": "23RD",
+   "31": "31ST"
+  },
+  "seal": "DEPARTMENT OF THE AIR FORCE",
+  "cluster": {
+   "1": "FIRST OAK LEAF CLUSTER",
+   "2": "SECOND OAK LEAF CLUSTER",
+   "3": "THIRD OAK LEAF CLUSTER",
+   "4": "FOURTH OAK LEAF CLUSTER",
+   "5": "FIFTH OAK LEAF CLUSTER"
+  },
+  "cluster_silver": "SILVER OAK LEAF CLUSTER",
+  "star": {
+   "1": "FIRST BRONZE SERVICE STAR",
+   "2": "SECOND BRONZE SERVICE STAR",
+   "3": "THIRD BRONZE SERVICE STAR",
+   "4": "FOURTH BRONZE SERVICE STAR",
+   "5": "SILVER SERVICE STAR",
+   "6": "SILVER AND ONE BRONZE SERVICE STAR",
+   "7": "SILVER AND TWO BRONZE SERVICE STARS"
+  },
+  "unit_to": "TO THE",
+  "names": {
+   "moh": "MEDAL OF HONOR",
+   "dsc": "DISTINGUISHED SERVICE CROSS",
+   "dsm": "DISTINGUISHED SERVICE MEDAL",
+   "silver_star": "SILVER STAR",
+   "lom": "LEGION OF MERIT",
+   "dfc": "DISTINGUISHED FLYING CROSS",
+   "bsm_v": "BRONZE STAR MEDAL WITH \"V\" DEVICE",
+   "bsm": "BRONZE STAR MEDAL",
+   "air_medal": "AIR MEDAL",
+   "commendation": "COMMENDATION RIBBON WITH METAL PENDANT",
+   "purple_heart": "PURPLE HEART",
+   "duc": "DISTINGUISHED UNIT CITATION",
+   "rok_puc": "REPUBLIC OF KOREA PRESIDENTIAL UNIT CITATION",
+   "ndsm": "NATIONAL DEFENSE SERVICE MEDAL",
+   "ksm": "KOREAN SERVICE MEDAL",
+   "un": "UNITED NATIONS SERVICE MEDAL"
+  },
+  "established": {
+   "moh": "ESTABLISHED BY ACT OF CONGRESS JULY 12, 1862 AND AWARDED BY THE PRESIDENT OF THE UNITED STATES IN THE NAME OF CONGRESS",
+   "dsc": "ESTABLISHED BY PRESIDENT WOODROW WILSON ON JANUARY 2, 1918 AND AWARDED BY THE PRESIDENT OF THE UNITED STATES AUTHORIZED BY AN ACT OF CONGRESS",
+   "dsm": "ESTABLISHED BY ACT OF CONGRESS JULY 9, 1918 AND AWARDED BY THE PRESIDENT OF THE UNITED STATES",
+   "silver_star": "ESTABLISHED BY ACT OF CONGRESS JULY 9, 1918 AND AWARDED BY THE PRESIDENT OF THE UNITED STATES",
+   "lom": "ESTABLISHED BY ACT OF CONGRESS JULY 20, 1942 AND AWARDED BY THE PRESIDENT OF THE UNITED STATES",
+   "dfc": "ESTABLISHED BY ACT OF CONGRESS JULY 2, 1926 AND AWARDED BY THE PRESIDENT OF THE UNITED STATES",
+   "bsm_v": "ESTABLISHED BY EXECUTIVE ORDER 9419, FEBRUARY 4, 1944 AND AWARDED IN THE NAME OF THE PRESIDENT OF THE UNITED STATES",
+   "bsm": "ESTABLISHED BY EXECUTIVE ORDER 9419, FEBRUARY 4, 1944 AND AWARDED IN THE NAME OF THE PRESIDENT OF THE UNITED STATES",
+   "air_medal": "ESTABLISHED BY EXECUTIVE ORDER 9158, MAY 11, 1942 AND AWARDED IN THE NAME OF THE PRESIDENT OF THE UNITED STATES",
+   "commendation": "ESTABLISHED BY THE WAR DEPARTMENT DECEMBER 18, 1945 AND AWARDED BY THE COMMANDING GENERAL",
+   "purple_heart": "ESTABLISHED BY GENERAL GEORGE WASHINGTON AT NEWBURGH, NEW YORK, AUGUST 7, 1782 AND AWARDED IN THE NAME OF THE PRESIDENT OF THE UNITED STATES",
+   "duc": "ESTABLISHED BY EXECUTIVE ORDER 9075, FEBRUARY 26, 1942 AND AWARDED BY THE DEPARTMENT OF THE AIR FORCE",
+   "rok_puc": "AWARDED BY THE PRESIDENT OF THE REPUBLIC OF KOREA",
+   "ndsm": "ESTABLISHED BY EXECUTIVE ORDER 10448, APRIL 22, 1953",
+   "ksm": "ESTABLISHED BY EXECUTIVE ORDER 10179, NOVEMBER 8, 1950",
+   "un": "ESTABLISHED BY THE GENERAL ASSEMBLY OF THE UNITED NATIONS DECEMBER 12, 1950"
+  },
+  "reason": {
+   "moh": "CONSPICUOUS GALLANTRY AND INTREPIDITY AT THE RISK OF HIS LIFE ABOVE AND BEYOND THE CALL OF DUTY.",
+   "dsc": "EXTRAORDINARY HEROISM WHILE ENGAGED IN COMBAT ACTION AGAINST HOSTILE ENEMY FORCES.",
+   "dsm": "EXCEPTIONALLY MERITORIOUS SERVICE IN A DUTY OF GREAT RESPONSIBILITY.",
+   "silver_star": "GALLANTRY IN ACTION AGAINST AN ENEMY OF THE UNITED NATIONS.",
+   "lom": "EXCEPTIONALLY MERITORIOUS CONDUCT IN THE PERFORMANCE OF OUTSTANDING SERVICES.",
+   "dfc": "EXTRAORDINARY ACHIEVEMENT WHILE PARTICIPATING IN AERIAL FLIGHT.",
+   "bsm_v": "HEROISM IN CONNECTION WITH MILITARY OPERATIONS AGAINST AN ARMED ENEMY.",
+   "bsm": "MERITORIOUS SERVICE IN CONNECTION WITH MILITARY OPERATIONS AGAINST AN ARMED ENEMY.",
+   "air_medal": "MERITORIOUS ACHIEVEMENT WHILE PARTICIPATING IN AERIAL FLIGHT.",
+   "commendation": "MERITORIOUS SERVICE.",
+   "purple_heart": "WOUNDS RECEIVED IN ACTION AGAINST AN ENEMY OF THE UNITED NATIONS.",
+   "duc": "EXTRAORDINARY HEROISM IN ACTION AGAINST AN ARMED ENEMY OF THE UNITED NATIONS.",
+   "rok_puc": "EXCEPTIONALLY MERITORIOUS SERVICE AND HEROISM IN THE DEFENSE OF THE REPUBLIC OF KOREA.",
+   "ndsm": "HONORABLE ACTIVE SERVICE DURING THE KOREAN EMERGENCY.",
+   "ksm": "SERVICE IN THE KOREAN THEATER OF OPERATIONS.",
+   "un": "SERVICE IN KOREA UNDER THE FLAG OF THE UNITED NATIONS."
+  },
+  "signers": {
+   "president": [
+    [
+     "1953.01.20",
+     "Harry S. Truman",
+     "PRESIDENT OF THE UNITED STATES"
+    ],
+    [
+     "9999.12.31",
+     "Dwight D. Eisenhower",
+     "PRESIDENT OF THE UNITED STATES"
+    ]
+   ],
+   "secretary": [
+    [
+     "1953.02.04",
+     "Thomas K. Finletter",
+     "SECRETARY OF THE AIR FORCE"
+    ],
+    [
+     "9999.12.31",
+     "Harold E. Talbott",
+     "SECRETARY OF THE AIR FORCE"
+    ]
+   ],
+   "fifth": [
+    [
+     "1951.05.31",
+     "Earle E. Partridge",
+     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE"
+    ],
+    [
+     "1952.05.29",
+     "Frank F. Everest",
+     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE"
+    ],
+    [
+     "1953.05.30",
+     "Glenn O. Barcus",
+     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE"
+    ],
+    [
+     "9999.12.31",
+     "Samuel E. Anderson",
+     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE"
+    ]
+   ],
+   "rok": [
+    [
+     "9999.12.31",
+     "Syngman Rhee",
+     "PRESIDENT OF THE REPUBLIC OF KOREA"
+    ]
+   ]
+  },
+  "signer_of": {
+   "moh": "president",
+   "dsc": "secretary",
+   "dsm": "secretary",
+   "silver_star": "secretary",
+   "lom": "secretary",
+   "dfc": "fifth",
+   "bsm_v": "fifth",
+   "bsm": "fifth",
+   "air_medal": "fifth",
+   "commendation": "fifth",
+   "purple_heart": "secretary",
+   "duc": "secretary",
+   "rok_puc": "rok",
+   "ndsm": "fifth",
+   "ksm": "fifth",
+   "un": "fifth"
+  }
+ },
+ "decree": {
+  "title": {
+   "sov": "DECREE OF THE PRESIDIUM OF THE SUPREME SOVIET OF THE USSR",
+   "dprk": "DECREE OF THE PRESIDIUM OF THE SUPREME PEOPLE'S ASSEMBLY",
+   "prc": "ORDER OF THE CHINESE PEOPLE'S VOLUNTEERS"
+  },
+  "subject": "On the decoration of {rank} {name}",
+  "place": {
+   "sov": "Moscow, the Kremlin",
+   "dprk": "Pyongyang",
+   "prc": "Headquarters, Chinese People's Volunteers"
+  },
+  "signers": {
+   "sov": [
+    [
+     "N. Shvernik",
+     "Chairman of the Presidium of the Supreme Soviet of the USSR"
+    ],
+    [
+     "A. Gorkin",
+     "Secretary of the Presidium"
+    ]
+   ],
+   "dprk": [
+    [
+     "Kim Tu-bong",
+     "Chairman of the Presidium of the Supreme People's Assembly"
+    ],
+    [
+     "Kang Ryang-uk",
+     "Secretary of the Presidium"
+    ]
+   ],
+   "prc": [
+    [
+     "Peng Dehuai",
+     "Commander, Chinese People's Volunteers"
+    ]
+   ]
+  }
  }
 }

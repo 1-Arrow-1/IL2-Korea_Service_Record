@@ -142,6 +142,8 @@
     "tunic_caption_sov_full": "Kitel der sowjetischen Luftstreitkräfte, Muster 1943, mit Orden und Medaillen. Orden und Medaillen an ihren fünfeckigen Spangen über der linken Brust, zu fünft in der Reihe, darüber der Goldene Stern des Helden; die Schraubscheiben-Orden ohne Band rechts angesteckt.",
     "tunic_caption_dprk": "Uniformrock der Luftstreitkräfte der Koreanischen Volksarmee. Bandspangen über der linken Brust, darüber der Stern des Helden der Republik im Original; die Spangen der ohne Band getragenen Orden rechts, nach den sowjetischen Regeln, die die Volksarmee übernahm.",
     "tunic_caption_dprk_full": "Uniformrock der Luftstreitkräfte der Koreanischen Volksarmee mit Orden und Medaillen. Die beiden Medaillen an ihren Spangen über der linken Brust unter dem Stern des Helden der Republik; die Schraubscheiben-Orden ohne Band rechts unter dem Fliegerabzeichen angesteckt.",
+    "certificate": "Urkunde",
+    "certificate_hint": "Die Verleihungsurkunde zu dieser Auszeichnung auf eigener Seite - zum Drucken",
     "dress_service": "Dienstanzug",
     "dress_full": "Große Uniform",
     "pending_note": "{count} Auszeichnungen warten auf Auszeichnungspunkte; Sie haben {points}."
@@ -259,6 +261,11 @@
       "certify": "Die Richtigkeit der Eintragungen wird bestätigt.",
       "page": "Blatt {n} von {of}"
     }
+  },
+  "certificate": {
+    "back": "Dienstakte",
+    "print": "Drucken",
+    "failed": "Die Urkunde konnte nicht gelesen werden."
   },
   "map": {
     "heading": "Einsatzkarte",

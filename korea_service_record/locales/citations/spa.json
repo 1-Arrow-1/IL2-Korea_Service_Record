@@ -185,5 +185,47 @@
    "Se concede a {name} la medalla conmemorativa «Resistir a América, Ayudar a Corea» por servicio con los Voluntarios del Pueblo Chino en Corea.",
    ""
   ]
+ },
+ "certificate": {},
+ "decree": {
+  "title": {
+   "sov": "DECRETO DEL PRESÍDIUM DEL SÓVIET SUPREMO DE LA URSS",
+   "dprk": "DECRETO DEL PRESÍDIUM DE LA ASAMBLEA POPULAR SUPREMA",
+   "prc": "ORDEN DE LOS VOLUNTARIOS DEL PUEBLO CHINO"
+  },
+  "subject": "Sobre la condecoración del {rank} {name}",
+  "place": {
+   "sov": "Moscú, el Kremlin",
+   "dprk": "Pionyang",
+   "prc": "Cuartel General de los Voluntarios del Pueblo Chino"
+  },
+  "signers": {
+   "sov": [
+    [
+     "N. Shvérnik",
+     "Presidente del Presídium del Sóviet Supremo de la URSS"
+    ],
+    [
+     "A. Gorkin",
+     "Secretario del Presídium"
+    ]
+   ],
+   "dprk": [
+    [
+     "Kim Tu-bong",
+     "Presidente del Presídium de la Asamblea Popular Suprema"
+    ],
+    [
+     "Kang Ryang-uk",
+     "Secretario del Presídium"
+    ]
+   ],
+   "prc": [
+    [
+     "Peng Dehuai",
+     "Comandante de los Voluntarios del Pueblo Chino"
+    ]
+   ]
+  }
  }
 }

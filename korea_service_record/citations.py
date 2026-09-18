@@ -91,6 +91,81 @@ def _fill(template: str, facts: Dict[str, Any]) -> str:
     return template.format_map(_Safe(facts))
 
 
+_LADDERS = {}
+for _table in (_USAF_SORTIE, _USAF_PERIOD, _USAF_UNIT, _USAF_SERVICE):
+    _LADDERS.update(_table)
+# Twin ids for one rung (the Bronze Star V ladder): both count as that rung.
+_RUNG = {601058: 0, 601059: 1, 601061: 1, 601060: 2, 601062: 2}
+
+
+def _rung(award_id: int) -> int:
+    """How far up its ladder an award sits: 0 for the decoration itself."""
+    if award_id in _RUNG:
+        return _RUNG[award_id]
+    fam = FAMILY.get(award_id)
+    ids = _LADDERS.get(fam[1], ()) if fam else ()
+    return ids.index(award_id) if award_id in ids else 0
+
+
+def _ordinal(cert: Dict[str, Any], day: int) -> str:
+    return cert.get("ordinal", {}).get(str(day), f"{day}TH")
+
+
+def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
+                paragraphs: List[str]) -> Optional[Dict[str, Any]]:
+    """
+    The document the award came with. For the USAF the certificate, an
+    English document whatever the page's language: the decoration named
+    with its cluster or star, the man, the reason, the deed, the date it
+    was given and the signature of the man who signed such certificates
+    on that date. For the Soviet-pattern nations the decree, in the page's
+    language, with the citation as its text.
+    """
+    fam = FAMILY.get(award_id)
+    if fam is None:
+        return None
+    nation, family, kind = fam
+    if nation == "usaf":
+        cert = strings("eng").get("certificate") or {}
+        if not cert:
+            return None
+        rung = _rung(award_id)
+        if family == "ksm":
+            cluster = cert["star"].get(str(rung), "") if rung else ""
+        elif rung and (family, award_id) in (("dfc", 601016), ("air_medal", 601007)):
+            cluster = cert["cluster_silver"]
+        else:
+            cluster = cert["cluster"].get(str(rung), "") if rung else ""
+        try:
+            y, m, d = (int(n) for n in (received or facts.get("earned_raw") or "").split(".")[:3])
+            given_on = cert["on"].format(day=_ordinal(cert, d), month=strings("eng")["months"][m - 1].upper(), year=y)
+        except (ValueError, IndexError):
+            given_on = ""
+        who = cert["signers"].get(cert["signer_of"].get(family, "fifth"), [])
+        signer = next((s for s in who if received <= s[0]), who[-1] if who else ["", ""])
+        unit = kind == "unit"
+        return {
+            "form": "usaf", "country": cert["country"], "established": cert["established"].get(family, ""),
+            "name": cert["names"].get(family, ""), "cluster": cluster,
+            "to": cert["unit_to"] if unit else cert["to"],
+            "recipient": (facts.get("unit") if unit else f"{facts.get('rank', '')} {facts.get('name', '')}".strip()).upper(),
+            "service": "" if unit else cert["service"], "for": cert["for"], "reason": cert["reason"].get(family, ""),
+            "deed": paragraphs[1] if len(paragraphs) > 2 else "",
+            "given": cert["given"], "on": given_on, "seal": cert["seal"],
+            "signer": signer[1], "signer_title": signer[2] if len(signer) > 2 else "",
+        }
+    texts = strings(lang)
+    dec = texts.get("decree") or strings("eng").get("decree") or {}
+    if not dec:
+        return None
+    return {
+        "form": "decree", "title": dec["title"].get(nation, ""),
+        "subject": _fill(dec["subject"], facts), "paragraphs": paragraphs,
+        "place": dec["place"].get(nation, ""), "date": format_date(texts, received or facts.get("earned_raw", "")),
+        "signers": dec["signers"].get(nation, []),
+    }
+
+
 def compose(lang: str, award_id: int, facts: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     The citation for one award as paragraphs, or None when the award has

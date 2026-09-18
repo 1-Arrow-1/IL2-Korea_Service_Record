@@ -218,6 +218,7 @@ table.roster td.award-cell { white-space: normal; }
 .lightbox-desc .citation h3 { font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-dark);
     font-weight: normal; margin: 0 0 0.4rem; }
 .lightbox-desc .citation p { font-style: italic; color: var(--ink-strong); margin: 0 0 0.6rem; line-height: 1.5; }
+.lightbox-desc .certificate-link { display: inline-block; margin-top: 0.8rem; }
 
 /* ------------------------------------------------------------- closed -- */
 .state-message.closed { margin: 4rem auto; max-width: 34rem; text-align: center; font-size: 1.15rem; }

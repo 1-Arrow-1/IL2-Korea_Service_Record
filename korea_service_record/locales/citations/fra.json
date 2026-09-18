@@ -185,5 +185,47 @@
    "{name} reçoit la médaille commémorative « Résister à l’Amérique, aider la Corée » pour service avec les Volontaires du peuple chinois en Corée.",
    ""
   ]
+ },
+ "certificate": {},
+ "decree": {
+  "title": {
+   "sov": "DÉCRET DU PRÆSIDIUM DU SOVIET SUPRÊME DE L’URSS",
+   "dprk": "DÉCRET DU PRÆSIDIUM DE L’ASSEMBLÉE POPULAIRE SUPRÊME",
+   "prc": "ORDRE DES VOLONTAIRES DU PEUPLE CHINOIS"
+  },
+  "subject": "Sur la décoration du {rank} {name}",
+  "place": {
+   "sov": "Moscou, le Kremlin",
+   "dprk": "Pyongyang",
+   "prc": "Quartier général des Volontaires du peuple chinois"
+  },
+  "signers": {
+   "sov": [
+    [
+     "N. Chvernik",
+     "Président du Præsidium du Soviet suprême de l’URSS"
+    ],
+    [
+     "A. Gorkine",
+     "Secrétaire du Præsidium"
+    ]
+   ],
+   "dprk": [
+    [
+     "Kim Tu-bong",
+     "Président du Præsidium de l’Assemblée populaire suprême"
+    ],
+    [
+     "Kang Ryang-uk",
+     "Secrétaire du Præsidium"
+    ]
+   ],
+   "prc": [
+    [
+     "Peng Dehuai",
+     "Commandant des Volontaires du peuple chinois"
+    ]
+   ]
+  }
  }
 }

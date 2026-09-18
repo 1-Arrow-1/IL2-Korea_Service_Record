@@ -142,6 +142,8 @@
     "tunic_caption_sov_full": "Soviet Air Force kitel, 1943 pattern, with orders and medals. Orders and medals on their pentagonal mounts over the left breast, five to a row, the Gold Star of a Hero above; the screw-back orders, which have no ribbon, pinned over the right.",
     "tunic_caption_dprk": "Korean People's Army Air Force tunic. Ribbon bars over the left breast with the Hero of the Republic's star worn in kind above them; the bars of the orders worn without ribbon on the right, after the Soviet rules the KPA took over.",
     "tunic_caption_dprk_full": "Korean People's Army Air Force tunic, with orders and medals. The two medals on their mounts over the left breast under the Hero of the Republic's star; the screw-back orders, which have no ribbon, pinned over the right under the pilot's badge.",
+    "certificate": "Certificate",
+    "certificate_hint": "The certificate this decoration came with, on its own page - ready to print",
     "dress_service": "Service dress",
     "dress_full": "Full dress",
     "pending_note": "{count} awards are waiting on award points; you have {points}."
@@ -259,6 +261,11 @@
       "certify": "I certify that the above entries are correct.",
       "page": "Sheet {n} of {of}"
     }
+  },
+  "certificate": {
+    "back": "Service Record",
+    "print": "Print",
+    "failed": "The certificate could not be read."
   },
   "map": {
     "heading": "Operations Map",
