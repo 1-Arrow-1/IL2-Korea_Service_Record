@@ -228,7 +228,8 @@ table.roster td.award-cell { white-space: normal; }
 /* Centred over the pocket, a touch inboard: the lapel then covers the wing's
    inboard third and the edge of the inner ribbon, as on a real coat. */
 .tunic-right { left: 74.5%; transform: translateX(-50%); }
-.tunic-left { left: 16.8%; bottom: 55.4%; transform: translateX(-50%); }
+/* The right pocket runs out of the frame; its button (14.2%) is its centre. */
+.tunic-left { left: 14.2%; bottom: 55.4%; transform: translateX(-50%); }
 /* The wearer's left lapel, cut from the photograph (lapel_usaf.png, same
    crop as the coat) and laid over the rack. No added shadow: the photograph
    already carries the lapel's own, and a synthetic one read as a dark rim. */
