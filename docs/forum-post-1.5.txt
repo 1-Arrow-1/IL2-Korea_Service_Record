@@ -152,7 +152,7 @@ page of the GitHub repository.
 The fingerprint of the setup program, for anyone who wants to check the file they downloaded
 against the one I built (see the 1.4 post for how):
 
-    6b9094e5c90827731c4b70295261e37b02c071c5d35a5476da6e29856d6f289a
+    fda89298b27d683b6bd9888a477d461b82f50dfd0a2dc2ccf3cb35240a14ccab
 
     Get-FileHash IL2_Korea_Service_Record_Setup_v1.5.0.exe
 
