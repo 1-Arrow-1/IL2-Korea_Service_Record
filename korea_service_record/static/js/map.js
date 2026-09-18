@@ -169,6 +169,74 @@
             {className: "map-tip", direction: "top", offset: [0, -8]});
     }
 
+    // The positions the log recorded, joined in time order (the game logs
+    // no periodic fixes, only events, so this is a sequence, not a flown
+    // track), each time skip as a dashed jump between where the aircraft
+    // was and where it reappeared, and the marks (take-off, landing, hits
+    // taken, bail-out) where they happened. The line names the time and
+    // altitude of the nearest logged position under the pointer.
+    const MARKS = {
+        takeoff: '<svg viewBox="0 0 16 16"><path d="M8 3l5 10H3z"/></svg>',
+        landing: '<svg viewBox="0 0 16 16"><path d="M8 13L3 3h10z"/></svg>',
+        hit: '<svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg>',
+        bailout: '<svg viewBox="0 0 16 16"><path d="M3 8a5 5 0 0 1 10 0zM3 8l5 6 5-6M8 8v6"/></svg>',
+        loss: '<svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13"/></svg>'
+    };
+    function trackLayer(track, T) {
+        const group = L.layerGroup();
+        (track.segments || []).forEach((seg) => {
+            const pts = seg.points.map((p) => toLatLng(p[0], p[1]));
+            if (seg.warp) {
+                L.polyline(pts, {className: "map-warp", weight: 2, dashArray: "5 7", interactive: true})
+                    .bindTooltip(T("map.warp_tip", {from: seg.points[0][2], to: seg.points[1][2], km: seg.km}),
+                        {sticky: true, className: "map-tip"})
+                    .addTo(group);
+                return;
+            }
+            const line = L.polyline(pts, {className: "map-track", weight: 2, dashArray: "1 5", interactive: true}).addTo(group);
+            line.bindTooltip("", {sticky: true, className: "map-tip"});
+            line.on("mousemove", (e) => {
+                let best = null, bd = Infinity;
+                seg.points.forEach((p, i) => {
+                    const d = Math.pow(pts[i][0] - e.latlng.lat, 2) + Math.pow(pts[i][1] - e.latlng.lng, 2);
+                    if (d < bd) { bd = d; best = p; }
+                });
+                if (best) line.setTooltipContent(T("map.track_tip", {clock: best[2], alt: best[3]}));
+            });
+        });
+        (track.marks || []).forEach((mk) => {
+            let text;
+            if (mk.kind === "hit") {
+                text = (mk.own ? T("map.hit_own") : T("map.hit_tip", {attacker: mk.attacker || "?"})) +
+                    " · " + mk.hits + " · " + mk.amount + "%";
+            } else {
+                text = T("map." + mk.kind);
+            }
+            L.marker(toLatLng(mk.x, mk.z), {
+                icon: L.divIcon({className: "map-mark " + mk.kind, html: MARKS[mk.kind] || "", iconSize: [16, 16], iconAnchor: [8, 8]}),
+                keyboard: false
+            }).bindTooltip(text + " · " + mk.clock + (mk.alt ? " · " + mk.alt + " m" : ""),
+                {className: "map-tip", direction: "top", offset: [0, -8]}).addTo(group);
+        });
+        return group;
+    }
+
+    // One of ours, lost: a cross where it came down.
+    function lossMarker(l, T) {
+        const m = L.marker(toLatLng(l.x, l.z), {
+            icon: L.divIcon({className: "map-mark loss", html: MARKS.loss, iconSize: [16, 16], iconAnchor: [8, 8]}),
+            keyboard: false
+        });
+        m.bindTooltip(T("map.loss_tip", {pilot: esc(l.pilot), plane: esc(l.plane)}) +
+            (l.alt ? " · " + l.alt + " m" : "") +
+            (l.number ? "<br>" + T("debrief.mission", {number: l.number}) + " · " + l.date : ""),
+            {className: "map-tip", direction: "top", offset: [0, -8]});
+        if (l.mission_id) {
+            m.on("click", () => document.dispatchEvent(new CustomEvent("map:mission", {detail: l.mission_id})));
+        }
+        return m;
+    }
+
     function fitTo(map, layers, pad) {
         let bounds = null;
         const walk = (l) => {
@@ -182,5 +250,5 @@
     }
 
     window.KoreaMap = {createMap, overlayFeatures, labelLayer, routeLayer, targetMarker,
-                       groundMarker, victoryMarker, baseMarker, fitTo, toLatLng};
+                       groundMarker, victoryMarker, baseMarker, trackLayer, lossMarker, fitTo, toLatLng};
 })();

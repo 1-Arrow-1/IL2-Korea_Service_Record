@@ -47,6 +47,29 @@
 .map-victory { stroke: var(--paper-panel); stroke-width: 1.5; fill: var(--bad); fill-opacity: 0.85; }
 .map-victory.mine { fill: #1f140a; stroke: var(--bad); stroke-width: 2; }
 .map-ground { stroke: none; fill: var(--accent-dark); fill-opacity: 0.55; }
+/* The positions the log recorded, joined in time order - the game logs no
+   periodic fixes, only events, so this is a sequence, not a flown track -
+   and the time skips between them as dashed jumps in the same ink. */
+.map-track { stroke: #1c3a5e; stroke-opacity: 0.7; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.map-warp { stroke: #1c3a5e; stroke-opacity: 0.6; fill: none; }
+.map-mark svg { width: 16px; height: 16px; fill: none; stroke-width: 2; }
+.map-mark.takeoff svg, .map-mark.landing svg { fill: #1c3a5e; stroke: var(--paper-panel); stroke-width: 1; }
+.map-mark.hit svg { stroke: var(--bad); }
+.map-mark.bailout svg { stroke: #1c3a5e; }
+.map-mark.loss svg { stroke: #1f140a; stroke-width: 2.5; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; margin: -1rem 0 1.2rem; font-size: 0.78rem; color: var(--ink-muted); }
+.map-legend[hidden] { display: none; }
+.legend-item { display: inline-flex; align-items: center; gap: 0.35rem; }
+.legend-item i { display: inline-block; width: 22px; height: 0; border-top: 2.5px solid var(--bad); }
+.legend-item i.legend-track { border-top: 2px dotted #1c3a5e; }
+.legend-item i.legend-warp { border-top: 2px dashed #1c3a5e; }
+.legend-item i.legend-hit, .legend-item i.legend-loss { width: 10px; height: 10px; border: 0; position: relative; }
+.legend-item i.legend-hit::before, .legend-item i.legend-hit::after,
+.legend-item i.legend-loss::before, .legend-item i.legend-loss::after {
+    content: ""; position: absolute; left: -1px; top: 4px; width: 12px; height: 2px; background: var(--bad); }
+.legend-item i.legend-hit::before, .legend-item i.legend-loss::before { transform: rotate(45deg); }
+.legend-item i.legend-hit::after, .legend-item i.legend-loss::after { transform: rotate(-45deg); }
+.legend-item i.legend-loss::before, .legend-item i.legend-loss::after { background: #1f140a; }
 
 .map-wp span {
     display: block; width: 18px; height: 18px; line-height: 18px; text-align: center;

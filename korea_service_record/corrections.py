@@ -126,10 +126,15 @@ def warps_of(entry: Dict[str, Any]) -> List[Warp]:
 # ---------------------------------------------------------------------------
 
 def player_fixes(log_path: Path) -> List[Tuple[float, float, float]]:
-    """(t_s, x, z) of the human's aircraft, in order, from every record that
-    carries its id and a position."""
+    """(t_s, x, z) of the human's aircraft, in order."""
+    return [(t, x, z) for t, x, z, _y in player_track(log_path)]
+
+
+def player_track(log_path: Path) -> List[Tuple[float, float, float, float]]:
+    """(t_s, x, z, altitude) of the human's aircraft, in order, from every
+    record that carries its id and a position."""
     player: Optional[int] = None
-    fixes: List[Tuple[float, float, float]] = []
+    fixes: List[Tuple[float, float, float, float]] = []
     pending: List[Tuple[int, bytes]] = []
     try:
         with open(log_path, "rb") as fh:
@@ -162,9 +167,9 @@ def player_fixes(log_path: Path) -> List[Tuple[float, float, float]]:
     for tick, payload in pending:
         if struct.unpack_from("<i", payload, 0)[0] != player:
             continue
-        x, _y, z = struct.unpack_from("<3f", payload, 4)
+        x, y, z = struct.unpack_from("<3f", payload, 4)
         if 0.0 < x < 500_000.0 and 0.0 < z < 500_000.0:
-            fixes.append((tick / 50.0, x, z))
+            fixes.append((tick / 50.0, x, z, y))
     fixes.sort()
     return fixes
 

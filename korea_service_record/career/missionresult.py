@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 # events.type — 0 is the only value seen in a career, on rows that are plainly
 # kills (they carry a target, an actor and a position).
 EVENT_KILL = 0
+EVENT_LOSS = 2          # one of ours shot down or crashed, with the position
 
 # AI personage ids are not random: "00000000-0000-0000-0000-300000000000" is
 # formation slot 3. The human's row carries a real account guid instead.
@@ -117,6 +118,24 @@ class MissionResult:
                 "x": int(_number(row.get("x", "0"))),
                 "z": int(_number(row.get("z", "0"))),
                 "actor_user": _unquote(row.get("actorUserId", "")),
+            })
+        return out
+
+    def losses(self) -> List[Dict[str, Any]]:
+        """Our own aircraft lost (event type 2), each with its position and
+        the pilot's name."""
+        out = []
+        for row in _rows(self.sections.get("events", "")):
+            if int(_number(row.get("type", "-1"), -1)) != EVENT_LOSS:
+                continue
+            name = urllib.parse.unquote(row.get("targetName", "")).split(",")[0]
+            out.append({
+                "tick": int(_number(row.get("date", "0"))),
+                "plane": row.get("targetType", ""),
+                "pilot": "".join(ch for ch in name if ch >= " ").strip(),
+                "altitude": int(_number(row.get("y", "0"))),
+                "x": int(_number(row.get("x", "0"))),
+                "z": int(_number(row.get("z", "0"))),
             })
         return out
 

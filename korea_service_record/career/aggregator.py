@@ -20,6 +20,7 @@ modules (killstats, attributes, events) so this file stays about assembly.
 """
 
 import json
+import math
 import logging
 import os
 import re
@@ -216,6 +217,36 @@ def _humanise(key: str) -> str:
 
 def _hours(seconds: Optional[int]) -> float:
     return round((seconds or 0) / 3600.0, 1)
+
+
+def _thin(fixes, point, step_m: float = 150.0, step_s: float = 15.0) -> List[list]:
+    """The fixes worth drawing: the first, the last, and any at least
+    step_m from the last kept or step_s after it - a straight leg at 30
+    fixes a second would otherwise be thousands of points."""
+    if not fixes:
+        return []
+    kept = [fixes[0]]
+    for f in fixes[1:-1]:
+        last = kept[-1]
+        if math.hypot(f[1] - last[1], f[2] - last[2]) >= step_m or f[0] - last[0] >= step_s:
+            kept.append(f)
+    if len(fixes) > 1:
+        kept.append(fixes[-1])
+    return [point(f) for f in kept]
+
+
+def _pos_at(fixes, t: float):
+    """Where the aircraft was at t, interpolated between the fixes round it."""
+    import bisect
+    times = [f[0] for f in fixes]
+    i = bisect.bisect_left(times, t)
+    if i <= 0:
+        return fixes[0][1], fixes[0][2], fixes[0][3]
+    if i >= len(fixes):
+        return fixes[-1][1], fixes[-1][2], fixes[-1][3]
+    a, b = fixes[i - 1], fixes[i]
+    k = 0.0 if b[0] == a[0] else (t - a[0]) / (b[0] - a[0])
+    return a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k, a[3] + (b[3] - a[3]) * k
 
 
 def _clock(start: str, offset_s: Optional[float]) -> str:
@@ -1713,12 +1744,109 @@ class CareerAggregator:
                         "pilot_id": pid,
                     })
 
+            # Our own losses, where they fell.
+            by_name = {v: k for k, v in names.items()}
+            losses = []
+            for mid in sorted(flown_ids):
+                m = missions.get(mid)
+                if m is None:
+                    continue
+                seen_loss = set()
+                for e in MissionResult(m["result"]).losses():
+                    pid = by_name.get(e["pilot"])
+                    # Only the squadron's own men (the blob also lists other
+                    # friendly aircraft in the area), once each per mission.
+                    if pid is None or pid in seen_loss or (pilot_id is not None and pid != pilot_id):
+                        continue
+                    seen_loss.add(pid)
+                    losses.append({
+                        "mission_id": mid, "number": m["missionNum"], "date": m["date"],
+                        "x": e["x"], "z": e["z"], "alt": e["altitude"],
+                        "pilot": e["pilot"], "pilot_id": pid,
+                        "plane": self.objects.describe(e["plane"])["name"],
+                    })
+
             return {
                 "routes": routes,
                 "victories": victories,
+                "losses": losses,
                 "bases": sorted(bases.values(), key=lambda b: b["first"]),
                 "pilot_id": pilot_id,
             }
+
+    def mission_track(self, career_id: str, mission_id: int) -> Optional[Dict[str, Any]]:
+        """
+        The player's flown track for one mission, from the flight log: the
+        fixes as flown segments, the warps as jumps between them, and the
+        moments worth a mark on it - take-off, landing, every burst of damage
+        taken, the bail-out - placed where the aircraft was at the time. The
+        clock is the mission's, re-timed with the warps when the career is
+        corrected, as the debrief's own times are. Our losses ride along, so
+        the mission map can show them without a log.
+        """
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            mission = db.query_one("SELECT id, date, startTime, route, result FROM mission WHERE id=?",
+                                   (mission_id,))
+            player = db.player()
+            if mission is None or player is None:
+                return None
+            names = {f"{p['name']} {p['lastName']}".strip() for p in db.pilots(True)}
+            losses, seen_loss = [], set()
+            for e in MissionResult(mission["result"]).losses():
+                if e["pilot"] not in names or e["pilot"] in seen_loss:
+                    continue
+                seen_loss.add(e["pilot"])
+                losses.append({"x": e["x"], "z": e["z"], "alt": e["altitude"], "pilot": e["pilot"],
+                               "plane": self.objects.describe(e["plane"])["name"]})
+            out: Dict[str, Any] = {"mission_id": mission_id, "segments": [], "marks": [], "losses": losses}
+            sortie = db.query_one("SELECT date FROM sortie WHERE missionId=? AND pilotId=? AND isDeleted=0",
+                                  (mission_id, player["id"]))
+            log = self.flightlogs.for_sortie(sortie["date"][:10], sortie["date"][11:16]) if sortie else None
+            if log is None:
+                return out
+            fixes = corrections.player_track(log.path)
+            if len(fixes) < 2:
+                return out
+            correction = db.correction_for(mission_id)
+            warps = corrections.warps_of(correction) if correction else []
+            start = (mission["startTime"] or "")[11:]
+            clock = lambda t: _clock(start, corrections.offset(warps, t) if warps else t)   # noqa: E731
+
+            jumps = {j[0] for j in corrections.find_warps([(t, x, z) for t, x, z, _ in fixes],
+                                                          parse_route(mission["route"]))}
+            point = lambda f: [round(f[1]), round(f[2]), clock(f[0]), round(f[3])]           # noqa: E731
+            segments: List[Dict[str, Any]] = []
+            current: List[Tuple[float, float, float, float]] = [fixes[0]]
+            for a, b in zip(fixes, fixes[1:]):
+                if a[0] in jumps:
+                    segments.append({"warp": False, "points": _thin(current, point)})
+                    segments.append({"warp": True, "points": [point(a), point(b)],
+                                     "km": round(math.hypot(b[1] - a[1], b[2] - a[2]) / 1000, 1)})
+                    current = [b]
+                else:
+                    current.append(b)
+            segments.append({"warp": False, "points": _thin(current, point)})
+            out["segments"] = [s for s in segments if len(s["points"]) >= 2]
+
+            marks: List[Dict[str, Any]] = []
+            def mark(kind: str, t: Optional[float], **extra) -> None:
+                if t is None:
+                    return
+                x, z, alt = _pos_at(fixes, t)
+                marks.append(dict(kind=kind, x=round(x), z=round(z), alt=round(alt), clock=clock(t), **extra))
+            mark("takeoff", log.takeoff_s)
+            mark("landing", log.landing_s)
+            for burst in log.damage:
+                mark("hit", burst.at_s, hits=burst.hits,
+                     attacker=("" if burst.attacker in ("", "*self*") else self.objects.describe(burst.attacker)["name"]),
+                     own=burst.attacker == "*self*", amount=round(burst.amount * 100))
+            if log.ejected:
+                mark("bailout", log.ejected_s if log.ejected_s is not None else fixes[-1][0])
+            out["marks"] = marks
+            return out
 
     # -- detail page -------------------------------------------------------
 

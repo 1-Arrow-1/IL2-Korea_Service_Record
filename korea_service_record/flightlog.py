@@ -77,6 +77,7 @@ class SortieLog(NamedTuple):
     plane: str
     damage: List["DamageBurst"] = []
     damage_by_pilot: Dict[str, List["DamageBurst"]] = {}
+    ejected_s: Optional[float] = None
 
     @property
     def outcome(self) -> str:
@@ -146,6 +147,7 @@ def read_log(path: Path) -> Optional[SortieLog]:
     player_bot: Optional[int] = None
     takeoff = landing = None
     ejected = False
+    ejected_s: Optional[float] = None
     # AType 2 is [float amount][attacker][target][x][y][z]. Collected for
     # everyone because the player's own object id is not known until the
     # AType 10 that names him, which need not come first.
@@ -203,6 +205,8 @@ def read_log(path: Path) -> Optional[SortieLog]:
             elif atype == 18 and player_bot is not None:
                 if _Reader(payload).int32() == player_bot:
                     ejected = True
+                    if ejected_s is None:
+                        ejected_s = tick / TICKS_PER_SECOND
         except (struct.error, IndexError):
             continue                            # a short record is not fatal
 
@@ -214,7 +218,7 @@ def read_log(path: Path) -> Optional[SortieLog]:
         if bursts:
             by_pilot[who] = bursts
     return SortieLog(path, date, time, takeoff, landing, ejected, plane,
-                     _bursts(harm, player_plid, named), by_pilot)
+                     _bursts(harm, player_plid, named), by_pilot, ejected_s)
 
 
 def _pilot_name(raw: str) -> str:

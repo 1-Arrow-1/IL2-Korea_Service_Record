@@ -525,7 +525,7 @@
         el("d-map-whose").textContent = "";
         if (!opsMap) {
             opsMap = KoreaMap.createMap(box);
-            ["routes", "victories", "targets", "labels"].forEach((name) => {
+            ["routes", "victories", "losses", "targets", "labels"].forEach((name) => {
                 el("map-" + name).addEventListener("change", applyOpsLayers);
             });
         }
@@ -547,6 +547,7 @@
                 if (subjectId != null && v.pilot_id === subjectId) m.options.className += " mine";
                 return m;
             }));
+            opsLayers.losses = L.layerGroup((data.losses || []).map((l) => KoreaMap.lossMarker(l, T)));
             opsLayers.bases = L.layerGroup(data.bases.map((b) => KoreaMap.baseMarker(b, T)));
             el("d-map-count").textContent =
                 "(" + T("map.count", {sorties: data.routes.length, victories: data.victories.length}) + ")";
@@ -563,6 +564,7 @@
         if (!opsMap) return;
         const want = {
             routes: el("map-routes").checked, victories: el("map-victories").checked,
+            losses: el("map-losses").checked,
             targets: el("map-targets").checked, labels: el("map-labels").checked, bases: true
         };
         Object.keys(opsLayers).forEach((name) => {
@@ -575,7 +577,8 @@
     // The mission's own map in the modal: the briefed route with numbered
     // turning points, the target, and every kill where it fell.
     let missionMap = null;
-    function renderMissionMap(m) {
+    let missionMapId = 0;
+    function renderMissionMap(m, careerId) {
         const box = el("mb-map");
         if (!box || !window.L || !window.KoreaMap) return;
         if (missionMap) { missionMap.remove(); missionMap = null; }
@@ -598,6 +601,35 @@
         });
         missionMap.invalidateSize();
         KoreaMap.fitTo(missionMap, [route, kills], 0.12);
+        // The flown track and our losses come separately: they are read
+        // from the flight log, and the modal is up before that is done.
+        const mapId = ++missionMapId;
+        const legend = el("mb-legend");
+        if (legend) legend.hidden = true;
+        if (!careerId) return;
+        getJSON("/api/track/" + encodeURIComponent(careerId) + "/" + m.id).then((track) => {
+            if (!missionMap || mapId !== missionMapId) return;
+            const layers = [];
+            if (track.segments && track.segments.length) {
+                layers.push(KoreaMap.trackLayer(track, T).addTo(missionMap));
+            }
+            if (track.losses && track.losses.length) {
+                layers.push(L.layerGroup(track.losses.map((l) => KoreaMap.lossMarker(l, T))).addTo(missionMap));
+            }
+            if (legend) {
+                const items = [["route", T("map.legend_route")]];
+                if (track.segments && track.segments.length) {
+                    items.push(["track", T("map.track")]);
+                    if (track.segments.some((s) => s.warp)) items.push(["warp", T("map.warp")]);
+                }
+                if ((track.marks || []).some((k) => k.kind === "hit")) items.push(["hit", T("map.hits")]);
+                if (track.losses && track.losses.length) items.push(["loss", T("map.losses")]);
+                legend.innerHTML = items.map(([cls, label]) =>
+                    '<span class="legend-item"><i class="legend-' + cls + '"></i>' + esc(label) + "</span>").join("");
+                legend.hidden = false;
+            }
+            if (layers.length) KoreaMap.fitTo(missionMap, [route, kills].concat(layers), 0.12);
+        }).catch((err) => console.error("track", err));
     }
 
     // The squadron's aircraft: strength, the repair queue with the game's own
@@ -1199,6 +1231,7 @@
                                                  failed: m.obj_failure})) + "</p>" +
                 '<div class="mb-brief">' + brief + "</div>" +
                 '<div id="mb-map" class="map-view mission"></div>' +
+                '<div id="mb-legend" class="map-legend" hidden></div>' +
                 "<h3>" + esc(T("debrief.pilots_on_mission")) + "</h3>" +
                 '<div class="table-scroll"><table class="roster mission-roster"><thead><tr>' +
                     "<th></th><th>" + esc(T("debrief.rank")) + "</th><th>" +
@@ -1212,7 +1245,7 @@
                 "<h3>" + esc(T("debrief.combat_log")) +
                     ' <span class="count">(' + m.log.length + ")</span></h3>" +
                 '<div class="mb-log">' + log + "</div>";
-            renderMissionMap(m);
+            renderMissionMap(m, careerId);
         } catch (err) {
             el("mb-body").innerHTML =
                 '<p class="state-message">Could not open that mission: ' +
