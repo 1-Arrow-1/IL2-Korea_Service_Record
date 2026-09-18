@@ -78,9 +78,12 @@
         const head = data.form === "usaf" ? '<div class="form-title"><span>' + esc(TF("logbook.form.title")) + "</span>" +
                 '<span class="form-no">' + esc(TF("logbook.form.form_no")) + "</span></div>"
             : '<div class="form-title book"><span>' + esc(TF("logbook.form.title")) + "</span></div>";
+        // The grade as it stood that month, from the month's last sortie -
+        // a promotion in May must not rewrite April's sheet.
+        const grade = (mo.rows.length && mo.rows[mo.rows.length - 1].rank) || data.pilot.rank;
         const fields = [
             [TF("logbook.form.name"), data.form === "usaf" ? data.pilot.last + ", " + data.pilot.first : data.pilot.name],
-            [TF("logbook.form.grade"), data.pilot.rank],
+            [TF("logbook.form.grade"), grade],
             [TF("logbook.form.organization"), data.organization],
             [TF("logbook.form.station"), mo.station],
             [TF("logbook.form.aircraft_type"), data.aircraft],
@@ -115,7 +118,7 @@
                 totals(TF("logbook.form.total_month"), mo.totals) + totals(TF("logbook.form.total_to_date"), mo.to_date) +
             "</tfoot></table>" +
             '<div class="form-foot"><span class="certify">' + esc(TF("logbook.form.certify")) + "</span>" +
-                '<span class="signature"><span class="line"></span>' + esc(data.pilot.name) + ", " + esc(data.pilot.rank) + "</span>" +
+                '<span class="signature"><span class="line"></span>' + esc(data.pilot.name) + ", " + esc(grade) + "</span>" +
                 '<span class="page">' + esc(TF("logbook.form.page", {n: i + 1, of: data.months.length})) + "</span></div>" +
             "</section>";
     });
