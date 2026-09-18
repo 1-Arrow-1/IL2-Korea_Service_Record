@@ -217,7 +217,6 @@ Source: "mod\README.txt"; DestDir: "{app}"; DestName: "Awards mod - manual insta
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autoprograms}\{#MyAppName} - Career Helper"; Filename: "{app}\IL2_Korea_Career_Helper.exe"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 

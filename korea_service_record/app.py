@@ -149,7 +149,7 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if cmd is None:
             return jsonify({"ok": False, "reason": "no helper"}), 404
         try:
-            subprocess.Popen(cmd, cwd=str(Path(cmd[0]).parent), close_fds=True)
+            subprocess.Popen(cmd + ["--from-tracker"], cwd=str(Path(cmd[0]).parent), close_fds=True)
         except OSError as exc:
             logger.warning("Career Helper failed to start: %s", exc)
             return jsonify({"ok": False, "reason": str(exc)}), 500

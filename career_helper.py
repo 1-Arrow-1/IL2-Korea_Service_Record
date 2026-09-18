@@ -109,6 +109,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "auto": "Keep this career corrected automatically: the Service Record applies new missions when it reads the career (backup first; skipped while the game holds the file).",
         "auto_on": "Automatic correction is on for this career.",
         "auto_off": "Automatic correction is off for this career.",
+        "open_from_tracker": "Please open the Career Helper from the Service Record - the button in its header.",
+        "needs_mod": "The Career Helper is part of the awards mod. Install the mod component of the Service Record setup and enable modifications in IL-2 Korea.",
         "withdrawn": "{n} awards withdrawn. Backup: {backup}",
     },
     "de": {
@@ -159,6 +161,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "auto": "Diese Laufbahn automatisch korrigiert halten: die Dienstakte übernimmt neue Einsätze beim Lesen der Laufbahn (vorher Sicherung; übersprungen, solange das Spiel die Datei hält).",
         "auto_on": "Automatische Korrektur für diese Laufbahn ist eingeschaltet.",
         "auto_off": "Automatische Korrektur für diese Laufbahn ist ausgeschaltet.",
+        "open_from_tracker": "Bitte öffnen Sie den Laufbahn-Helfer aus der Dienstakte - über die Schaltfläche in ihrer Kopfzeile.",
+        "needs_mod": "Der Laufbahn-Helfer gehört zum Auszeichnungs-Mod. Installieren Sie die Mod-Komponente des Dienstakte-Setups und aktivieren Sie Modifikationen in IL-2 Korea.",
         "withdrawn": "{n} Auszeichnungen entzogen. Sicherung: {backup}",
     },
     "es": {
@@ -209,6 +213,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "auto": "Mantener esta carrera corregida automáticamente: la Hoja de Servicios aplica las misiones nuevas al leer la carrera (copia de seguridad previa; se omite mientras el juego tenga el archivo abierto).",
         "auto_on": "La corrección automática está activada para esta carrera.",
         "auto_off": "La corrección automática está desactivada para esta carrera.",
+        "open_from_tracker": "Abra el Asistente de carrera desde la Hoja de Servicios: el botón de su cabecera.",
+        "needs_mod": "El Asistente de carrera forma parte del mod de condecoraciones. Instale el componente del mod en el instalador de la Hoja de Servicios y active las modificaciones en IL-2 Korea.",
         "withdrawn": "{n} condecoraciones retiradas. Copia de seguridad: {backup}",
     },
     "fr": {
@@ -259,6 +265,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "auto": "Garder cette carrière corrigée automatiquement : l’état de service applique les nouvelles missions quand il lit la carrière (sauvegarde d’abord ; ignoré tant que le jeu tient le fichier).",
         "auto_on": "La correction automatique est activée pour cette carrière.",
         "auto_off": "La correction automatique est désactivée pour cette carrière.",
+        "open_from_tracker": "Ouvrez l’assistant de carrière depuis l’état de service : le bouton de son en-tête.",
+        "needs_mod": "L’assistant de carrière fait partie du mod de décorations. Installez le composant mod de l’installateur de l’état de service et activez les modifications dans IL-2 Korea.",
         "withdrawn": "{n} décorations retirées. Sauvegarde : {backup}",
     },
     "ru": {
@@ -309,6 +317,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "auto": "Держать эту карьеру исправленной автоматически: послужной список применяет новые вылеты при чтении карьеры (сначала резервная копия; пропускается, пока файл занят игрой).",
         "auto_on": "Автоматическое исправление для этой карьеры включено.",
         "auto_off": "Автоматическое исправление для этой карьеры выключено.",
+        "open_from_tracker": "Откройте помощник карьеры из послужного списка — кнопкой в его шапке.",
+        "needs_mod": "Помощник карьеры — часть мода наград. Установите компонент мода в установщике послужного списка и включите модификации в IL-2 Korea.",
         "withdrawn": "Отозвано наград: {n}. Резервная копия: {backup}",
     },
     "zh": {
@@ -359,6 +369,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "auto": "自动保持此生涯为修正状态：服役记录在读取生涯时自动应用新任务（先备份；游戏占用文件时跳过）。",
         "auto_on": "此生涯的自动修正已开启。",
         "auto_off": "此生涯的自动修正已关闭。",
+        "open_from_tracker": "请从服役记录中打开生涯助手——其页眉中的按钮。",
+        "needs_mod": "生涯助手是奖励模组的一部分。请在服役记录安装程序中安装模组组件，并在 IL-2 Korea 中启用修改。",
         "withdrawn": "已撤销 {n} 项奖励。备份：{backup}",
     },
 }
@@ -830,7 +842,34 @@ class App(tk.Tk):
         self.status.set(self.t["points_added"].format(points=points, backup=backup))
 
 
+MOD_MARKER = b"[Award=601042]"     # the Distinguished Unit Citation: only the awards mod defines it
+
+
+def mod_installed(game: Optional[Path]) -> bool:
+    """The awards mod's live awards.cfg is in the game folder."""
+    if game is None:
+        return False
+    cfg = game / "data" / "scg" / "2" / "awards.cfg"
+    try:
+        return MOD_MARKER in cfg.read_bytes()
+    except OSError:
+        return False
+
+
 def main() -> int:
+    # Meant to be opened from the Service Record, and only where the awards
+    # mod is installed: award points buy decorations the mod adds, revival
+    # and re-timing belong with it. Neither check is a lock - both are a
+    # polite door, so the helper is not used as a bare cheat tool.
+    t = STRINGS[pick_language()]
+    root = tk.Tk(); root.withdraw()
+    if "--from-tracker" not in sys.argv:
+        messagebox.showinfo(t["title"], t["open_from_tracker"])
+        return 2
+    if not mod_installed(find_game_dir()):
+        messagebox.showinfo(t["title"], t["needs_mod"])
+        return 3
+    root.destroy()
     app = App()
     app.mainloop()
     return 0
