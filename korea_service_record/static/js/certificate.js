@@ -48,14 +48,22 @@
     const family = data.family || "";
     const template = "/static/images/certificates/" + family + ".png";
     const decreeTemplate = "/static/images/certificates/decree_" + ({"501": "sov", "503": "dprk", "502": "prc"}[String(awardId).slice(0, 3)] || "sov") + ".png";
-    const exists = (url) => new Promise((ok) => { const im = new Image(); im.onload = () => ok(true); im.onerror = () => ok(false); im.src = url; });
+    // A drawn sheet brings its own shape: the page takes the picture's aspect.
+    const exists = (url) => new Promise((ok) => {
+        const im = new Image();
+        im.onload = () => ok({w: im.naturalWidth, h: im.naturalHeight});
+        im.onerror = () => ok(null);
+        im.src = url;
+    });
 
     if (c.form === "usaf") {
         const drawn = await exists(template);
+        const portrait = drawn && drawn.h > drawn.w;
+        const style = drawn ? ' style="background-image:url(\'' + template + '\');aspect-ratio:' + drawn.w + ' / ' + drawn.h + '"' : "";
         const line = (cls, text) => text ? '<div class="' + cls + '">' + esc(text) + "</div>" : "";
         const nameBlock = line("ct-to", c.to) + line("ct-recipient", c.name) + line("ct-service", c.service);
         el("ct-sheet").innerHTML =
-            '<section class="sheet usaf' + (drawn ? " drawn" : "") + '"' + (drawn ? ' style="background-image:url(\'' + template + '\')"' : "") + ">" +
+            '<section class="sheet usaf ' + esc(family) + (drawn ? " drawn" : "") + (portrait ? " portrait" : "") + '"' + style + ">" +
                 (drawn ? "" : '<img class="ct-medal" src="' + esc(data.icon) + '" alt="">') +
                 '<div class="ct-text">' +
                     line("ct-country", c.header) +
