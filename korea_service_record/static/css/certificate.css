@@ -62,7 +62,7 @@
 .ct-signature.right { right: 8%; }
 .ct-signature.left { left: 8%; }
 @media (max-width: 1140px) { .ct-signature { font-size: 1.15vw; } }
-.ct-sign { font-family: 'Segoe Script', 'Brush Script MT', 'Lucida Handwriting', cursive; font-size: 2.2em; color: #1c2a4a;
+.ct-sign { font-family: 'Segoe Script', 'Brush Script MT', 'Lucida Handwriting', cursive; font-size: 1.7em; white-space: nowrap; color: #1c2a4a;
     transform: rotate(-3deg); margin-bottom: -0.35em; }
 .ct-sign-line { display: block; width: 100%; border-bottom: 1px solid #1f140a; }
 .ct-sign-title { font-family: 'Courier New', Courier, monospace; font-size: 0.8em; letter-spacing: 0.06em; margin-top: 0.3em; text-align: center; }
