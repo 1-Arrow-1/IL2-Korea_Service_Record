@@ -27,7 +27,7 @@
 .ct-medal.small { height: 16%; top: 3%; }
 
 /* The text band: 28% to 78% of the height on a drawn sheet, the same here. */
-.ct-text { position: absolute; left: 8%; right: 8%; top: 28%; bottom: 20%; text-align: center; display: flex;
+.ct-text { position: absolute; left: 8%; right: 8%; top: 28%; bottom: 16%; text-align: center; display: flex;
     flex-direction: column; justify-content: flex-start; gap: 0.15em; font-size: calc(1100px * 0.012); }
 @media (max-width: 1140px) { .ct-text { font-size: 1.15vw; } }
 /* The forms' three voices: the engraved serif of the headings, the small
@@ -55,8 +55,12 @@
 .ct-seal svg path { fill: #e6cf85; stroke: #7a5f2a; stroke-width: 0.8; }
 .ct-seal svg text { font-family: Arial, Helvetica, sans-serif; font-size: 7px; fill: #5a4022; stroke: none; letter-spacing: 0.08em; }
 
-.ct-signature { position: absolute; right: 8%; bottom: 6%; width: 28%; display: flex; flex-direction: column; align-items: center;
+/* Signatures: the right one always, a left one on the forms that were
+   countersigned; the "given" lines sit above them. */
+.ct-signature { position: absolute; bottom: 5%; width: 26%; display: flex; flex-direction: column; align-items: center;
     font-size: calc(1100px * 0.012); }
+.ct-signature.right { right: 8%; }
+.ct-signature.left { left: 8%; }
 @media (max-width: 1140px) { .ct-signature { font-size: 1.15vw; } }
 .ct-sign { font-family: 'Segoe Script', 'Brush Script MT', 'Lucida Handwriting', cursive; font-size: 2.2em; color: #1c2a4a;
     transform: rotate(-3deg); margin-bottom: -0.35em; }

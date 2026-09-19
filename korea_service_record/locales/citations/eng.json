@@ -207,7 +207,10 @@
      "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
      "THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
-    "signer": "secretary"
+    "signer": [
+     "chief",
+     "secretary"
+    ]
    },
    "dsc": {
     "header": "THE UNITED STATES OF AMERICA",
@@ -225,7 +228,10 @@
      "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
      "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
-    "signer": "secretary"
+    "signer": [
+     "chief",
+     "secretary"
+    ]
    },
    "dsm": {
     "header": "THE UNITED STATES OF AMERICA",
@@ -243,7 +249,10 @@
      "GIVEN IN THE CITY OF WASHINGTON",
      "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
-    "signer": "secretary"
+    "signer": [
+     "chief",
+     "secretary"
+    ]
    },
    "silver_star": {
     "header": "THE UNITED STATES OF AMERICA",
@@ -262,7 +271,10 @@
      "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
      "THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
-    "signer": "secretary"
+    "signer": [
+     "chief",
+     "secretary"
+    ]
    },
    "lom": {
     "header": "THE UNITED STATES OF AMERICA",
@@ -280,7 +292,10 @@
      "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
      "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
-    "signer": "secretary"
+    "signer": [
+     "chief",
+     "secretary"
+    ]
    },
    "dfc": {
     "header": "THE UNITED STATES OF AMERICA",
@@ -397,7 +412,10 @@
      "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON, DC",
      "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
-    "signer": "secretary"
+    "signer": [
+     "chief",
+     "secretary"
+    ]
    },
    "duc": {
     "header": "THE UNITED STATES OF AMERICA",
@@ -415,7 +433,10 @@
      "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
      "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
-    "signer": "president"
+    "signer": [
+     "secretary",
+     "president"
+    ]
    },
    "rok_puc": {
     "header": "REPUBLIC OF KOREA",
@@ -557,6 +578,18 @@
      "9999.12.31",
      "Samuel E. Anderson",
      "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE"
+    ]
+   ],
+   "chief": [
+    [
+     "1953.06.30",
+     "Hoyt S. Vandenberg",
+     "GENERAL, USAF, CHIEF OF STAFF"
+    ],
+    [
+     "9999.12.31",
+     "Nathan F. Twining",
+     "GENERAL, USAF, CHIEF OF STAFF"
     ]
    ],
    "rok": [

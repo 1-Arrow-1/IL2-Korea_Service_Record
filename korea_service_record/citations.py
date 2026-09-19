@@ -183,8 +183,15 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             if reason and reason[0].isupper() and not reason.isupper():
                 clause = clause.lower().replace("oak leaf cluster", "Oak Leaf Cluster").replace(medal.lower(), medal.title())
             reason = reason.rstrip(".") + clause
-        who = cert["signers"].get(form.get("signer", "fifth"), [])
-        signer = next((s for s in who if received <= s[0]), who[-1] if who else ["", "", ""])
+        offices = form.get("signer", "fifth")
+        if isinstance(offices, str):
+            offices = ["", offices]                      # right-hand signature only
+        signers = []
+        for office in offices:
+            who = cert["signers"].get(office, []) if office else []
+            s_ = next((s for s in who if received <= s[0]), who[-1] if who else ["", "", ""])
+            signers.append({"name": s_[1], "title": s_[2] if len(s_) > 2 else ""})
+        signer = signers[-1]
         return {
             "form": "usaf",
             "header": form.get("header", ""),
@@ -201,7 +208,8 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             "deed": paragraphs[1] if len(paragraphs) > 2 else "",
             "close": [_fill(line, fill) for line in form.get("close", "").split(chr(10)) if line],
             "given": given, "seal": cert.get("seal", ""),
-            "signer": signer[1], "signer_title": signer[2] if len(signer) > 2 else "",
+            "signer": signer["name"], "signer_title": signer["title"],
+            "signers": signers,                          # [left, right]
         }
     texts = strings(lang)
     dec = texts.get("decree") or strings("eng").get("decree") or {}
