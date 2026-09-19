@@ -255,8 +255,26 @@ def compose(lang: str, award_id: int, facts: Dict[str, Any]) -> Optional[Dict[st
     deed: List[str] = []
     style = STYLE.get(family)
     outcome = facts.get("outcome")
+    # Several phrasings per sentence, one chosen by the mission (and the
+    # award, so two decorations for one day do not read alike): stable
+    # for a given citation, different from day to day.
+    variants = texts.get("variants", {})
+    seed = int(facts.get("seed") or 0) * 1000003 + (award_id % 97) * 7919
+
+    def pick(slot: str, fallback: str) -> str:
+        options = variants.get(slot) or ([deed_t[fallback]] if fallback in deed_t else [])
+        if not options:
+            return ""
+        # A small hash per slot, so the slots of one citation do not all
+        # land on the same index.
+        h = seed
+        for ch in slot:
+            h = (h * 31 + ord(ch)) % 2147483647
+        return options[h % len(options)]
+
     if kind == "sortie" and facts.get("has_sortie"):
-        deed.append(_fill(deed_t["leader" if facts.get("leader") else "member"], facts))
+        deed.append(_fill(pick("opening_leader" if facts.get("leader") else "opening_member",
+                               "leader" if facts.get("leader") else "member"), facts))
         st = texts.get(style, {}) if style else {}
         if style == "wound":
             if outcome == "bailed":
@@ -281,22 +299,34 @@ def compose(lang: str, award_id: int, facts: Dict[str, Any]) -> Optional[Dict[st
             elif facts.get("hits"):
                 deed.append(_fill(st["hits"], facts))
         else:
-            if items:
-                deed.append(_fill(deed_t["air"], facts))
+            air_n = sum(kills.values())
+            if air_n >= 3:
+                # "3 enemy aircraft: 3 Yak-9P" says it twice; with one type
+                # the list becomes the type alone.
+                one_type = len(kills) == 1
+                deed.append(_fill(pick("air_many", "air"), dict(facts, air_n=air_n,
+                                  air_list=(next(iter(kills)) + "s") if one_type else facts["air_list"])))
+            elif items:
+                deed.append(_fill(pick("air", "air"), facts))
             if facts.get("ground_n"):
-                deed.append(_fill(deed_t["ground_flak" if facts.get("hits") else "ground"], facts))
+                deed.append(_fill(pick("ground_flak", "ground_flak") if facts.get("hits") else pick("ground", "ground"), facts))
+            if facts.get("wingman"):
+                deed.append(_fill(pick("wingman", "wingman"), facts))
             if facts.get("hits") and outcome == "ok":
-                deed.append(_fill(deed_t["hits"], facts))
+                deed.append(_fill(pick("hits", "hits"), facts))
             if outcome == "bailed":
-                deed.append(_fill(deed_t["bailed"], facts))
+                deed.append(_fill(pick("bailed", "bailed"), facts))
             elif outcome == "missing":
-                deed.append(_fill(deed_t["lost"], facts))
+                deed.append(_fill(pick("lost", "lost"), facts))
     elif kind == "unit":
         deed.append(_fill(deed_t["unit_period"], facts))
     elif kind == "period" and facts.get("missions"):
         air, ground = facts.get("air_total") or 0, facts.get("ground_total") or 0
-        key = "period" if air and ground else "period_air" if air else "period_ground" if ground else "period_plain"
-        deed.append(_fill(deed_t.get(key) or deed_t["period"], facts))
+        if air and ground:
+            deed.append(_fill(pick("period", "period"), facts))
+        else:
+            key = "period_air" if air else "period_ground" if ground else "period_plain"
+            deed.append(_fill(deed_t.get(key) or deed_t["period"], facts))
     facts["deed"] = " ".join(deed)
     opening = _fill(template[0], facts).strip()
     closing = _fill(template[1], facts).strip() if len(template) > 1 else ""

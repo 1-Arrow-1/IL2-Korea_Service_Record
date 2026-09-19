@@ -227,5 +227,59 @@
     ]
    ]
   }
+ },
+ "variants": {
+  "opening_leader": [
+   "Ce jour-là, le {rank} {name} menait une patrouille de {flight} {aircraft} en mission « {target} » près de {place}.",
+   "Le {date}, le {rank} {name} conduisait {flight} {aircraft} du {unit} en mission « {target} » dans le secteur de {place}.",
+   "Ce jour-là, à la tête d’une patrouille de {flight} {aircraft}, le {rank} {name} mena la mission « {target} » aux abords de {place}."
+  ],
+  "opening_member": [
+   "Ce jour-là, le {rank} {name} volait au sein d’une patrouille de {flight} {aircraft} en mission « {target} » près de {place}.",
+   "Le {date}, le {rank} {name} était l’un des {flight} pilotes de {aircraft} du {unit} envoyés en mission « {target} » dans le secteur de {place}.",
+   "Ce jour-là, le {rank} {name} volait en équipier dans une formation de {flight} {aircraft} en mission « {target} » vers {place}."
+  ],
+  "air": [
+   "Dans l’engagement qui suivit, il attaqua les chasseurs ennemis et abattit {air_list}.",
+   "Lorsque des chasseurs ennemis interceptèrent la patrouille, il les engagea aussitôt et abattit {air_list}.",
+   "Apercevant des avions ennemis, il fit face et, dans le combat qui suivit, détruisit {air_list}."
+  ],
+  "air_many": [
+   "En un seul engagement, il détruisit {air_n} avions ennemis : {air_list}.",
+   "Attaqué par des chasseurs ennemis supérieurs en nombre, il les combattit tout au long de l’engagement et en détruisit {air_n}, {air_list}.",
+   "Dans le combat tournoyant qui suivit, il abattit {air_n} avions ennemis, {air_list}, avant de rompre faute de carburant."
+  ],
+  "ground": [
+   "Il détruisit {ground_n} véhicules, pièces et installations ennemis.",
+   "Ses attaques détruisirent {ground_n} véhicules, pièces et installations ennemis.",
+   "Revenant sans cesse sur l’objectif, il laissa {ground_n} véhicules, pièces et installations ennemis détruits."
+  ],
+  "ground_flak": [
+   "Poursuivant ses attaques sous un feu antiaérien intense, il détruisit {ground_n} véhicules, pièces et installations ennemis.",
+   "Malgré un feu antiaérien nourri et précis, il effectua des passes répétées sur l’objectif et détruisit {ground_n} véhicules, pièces et installations ennemis.",
+   "Sans se soucier du feu antiaérien dirigé contre son appareil, il poussa ses attaques jusqu’à la destruction de {ground_n} véhicules, pièces et installations ennemis."
+  ],
+  "hits": [
+   "Son appareil fut touché {hits} fois par le feu ennemi ; il poursuivit la mission et le ramena à sa base.",
+   "Bien que son appareil eût reçu {hits} coups du feu ennemi, il acheva sa mission et ramena l’appareil endommagé en territoire ami.",
+   "Son appareil percé de {hits} impacts, il resta avec sa patrouille jusqu’à l’accomplissement de la mission et se posa sans encombre."
+  ],
+  "bailed": [
+   "Son appareil endommagé n’obéissant plus, il dut sauter en parachute au-dessus du territoire ennemi.",
+   "Son appareil, mis hors d’état par le feu ennemi, ne pouvait plus voler ; il l’abandonna en parachute au-dessus des lignes ennemies."
+  ],
+  "lost": [
+   "Il n’est pas rentré de cette mission.",
+   "Il fut perdu au cours de cette mission."
+  ],
+  "wingman": [
+   "Lorsque {wingman} fut abattu, il couvrit le parachute jusqu’à ce que le carburant l’obligeât à se retirer.",
+   "Dans la même action, {wingman}, de sa patrouille, fut perdu."
+  ],
+  "period": [
+   "Du {period_from} au {period_to}, le {rank} {name} a accompli {missions} missions de combat, {hours} heures au-dessus du territoire ennemi, et détruit {air_total} avions ennemis ainsi que {ground_total} véhicules, pièces et installations.",
+   "Entre le {period_from} et le {period_to}, le {rank} {name} a accompli {missions} missions de combat contre l’ennemi, dont {hours} heures au-dessus du territoire hostile, détruisant {air_total} avions ennemis et {ground_total} véhicules, pièces et installations.",
+   "En {missions} missions de combat entre le {period_from} et le {period_to}, {hours} heures au-dessus du territoire ennemi, le {rank} {name} a détruit {air_total} avions ennemis et {ground_total} véhicules, pièces et installations."
+  ]
  }
 }

@@ -227,5 +227,59 @@
     ]
    ]
   }
+ },
+ "variants": {
+  "opening_leader": [
+   "当日，{rank}{name}率领 {flight} 架 {aircraft} 编队，在 {place} 附近执行“{target}”任务。",
+   "{date}，{rank}{name}率领{unit}的 {flight} 架 {aircraft}，在 {place} 地区执行“{target}”任务。",
+   "当日，{rank}{name}作为 {flight} 架 {aircraft} 编队的长机，飞往 {place} 一带执行“{target}”任务。"
+  ],
+  "opening_member": [
+   "当日，{rank}{name}作为 {flight} 架 {aircraft} 编队的一员，在 {place} 附近执行“{target}”任务。",
+   "{date}，{rank}{name}是{unit}派往 {place} 地区执行“{target}”任务的 {flight} 名 {aircraft} 飞行员之一。",
+   "当日，{rank}{name}作为僚机，随 {flight} 架 {aircraft} 编队飞往 {place} 一带执行“{target}”任务。"
+  ],
+  "air": [
+   "在随后的空战中，他攻击敌方战斗机并击落{air_list}。",
+   "敌方战斗机拦截编队时，他立即迎战并击落{air_list}。",
+   "发现敌机后，他迎头转向，在随后的空战中击落{air_list}。"
+  ],
+  "air_many": [
+   "在一次空战中他击落敌机 {air_n} 架：{air_list}。",
+   "面对数量占优的敌方战斗机，他战至最后并击落其中 {air_n} 架，{air_list}。",
+   "在随后的缠斗中他击落敌机 {air_n} 架，{air_list}，直至燃油不足才脱离战斗。"
+  ],
+  "ground": [
+   "他摧毁敌方车辆、火炮和设施 {ground_n} 个。",
+   "他的攻击共摧毁敌方车辆、火炮和设施 {ground_n} 个。",
+   "他一次次返回目标上空，共摧毁敌方车辆、火炮和设施 {ground_n} 个。"
+  ],
+  "ground_flak": [
+   "他冒着猛烈的高射炮火持续攻击，摧毁敌方车辆、火炮和设施 {ground_n} 个。",
+   "尽管高射炮火猛烈而精准，他仍多次俯冲攻击目标，摧毁敌方车辆、火炮和设施 {ground_n} 个。",
+   "他不顾射向座机的高射炮火，坚持攻击，直至摧毁敌方车辆、火炮和设施 {ground_n} 个。"
+  ],
+  "hits": [
+   "其座机被敌方火力击中 {hits} 次，他仍完成任务并将飞机带回基地。",
+   "尽管座机中弹 {hits} 处，他仍完成任务，并将受损的飞机带回友方领土。",
+   "座机被击穿 {hits} 处，他仍留在编队中直至任务完成，并安全着陆。"
+  ],
+  "bailed": [
+   "座机受损失控，他被迫在敌方领土上空跳伞。",
+   "座机被敌方火力击毁无法继续飞行，他在敌占区上空跳伞。"
+  ],
+  "lost": [
+   "他未能从此次任务返航。",
+   "他在此次任务中失踪。"
+  ],
+  "wingman": [
+   "{wingman}被击落后，他掩护降落伞直至燃油耗尽才离开。",
+   "同一战斗中，其编队的{wingman}损失。"
+  ],
+  "period": [
+   "自 {period_from} 至 {period_to}，{rank}{name}执行战斗任务 {missions} 次，在敌方领土上空飞行 {hours} 小时，击落敌机 {air_total} 架，摧毁车辆、火炮和设施 {ground_total} 个。",
+   "在 {period_from} 至 {period_to} 期间，{rank}{name}完成对敌战斗任务 {missions} 次，其中 {hours} 小时在敌方领土上空，击落敌机 {air_total} 架，摧毁车辆、火炮和设施 {ground_total} 个。",
+   "{rank}{name}在 {period_from} 至 {period_to} 的 {missions} 次战斗任务中，在敌方领土上空飞行 {hours} 小时，击落敌机 {air_total} 架，摧毁车辆、火炮和设施 {ground_total} 个。"
+  ]
  }
 }

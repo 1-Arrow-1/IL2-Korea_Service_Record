@@ -1823,6 +1823,7 @@ class CareerAggregator:
             rank_id = row["pilotRank"] if row and row["pilotRank"] is not None else pilot["rankId"]
             received = (row["receivedDate"] if row and row["receivedDate"] else earned) or earned
             missions = {m["id"]: m for m in db.missions()}
+            names = {p["id"]: f"{p['name']} {p['lastName']}".strip() for p in db.pilots(True)}
             planes = {p["id"]: p for p in db.query("SELECT id, config FROM plane")}
             sorties = [s for s in db.sorties(pilot_id) if s["missionId"] in missions and missions[s["missionId"]]["date"] <= earned]
             unit_sorties = [s for s in db.sorties() if s["missionId"] in missions and missions[s["missionId"]]["date"] <= earned]
@@ -1874,7 +1875,11 @@ class CareerAggregator:
                 flight = None
                 if pilot["isPlayer"]:
                     flight = self.flightlogs.for_sortie(best["date"][:10], best["date"][11:16])
+                # A flight-mate lost on the same mission, by name.
+                lost_mates = [e["pilot"] for e in MissionResult(m["result"]).losses()
+                              if e["pilot"] != facts["name"] and e["pilot"] in names.values()]
                 facts.update({
+                    "seed": m["id"], "wingman": lost_mates[0] if lost_mates else "",
                     "has_sortie": True, "leader": bool(pilot["isPlayer"]),
                     "flight": sum(1 for s in unit_sorties if s["missionId"] == m["id"]),
                     "aircraft": plane_name(best), "target": self.locale.mission_type_name(m["type"]),
@@ -1888,6 +1893,7 @@ class CareerAggregator:
             # The period up to the day.
             if sorties:
                 ks = [KillStats(s["killStats"]) for s in sorties]
+                facts.setdefault("seed", sorties[-1]["missionId"])
                 facts.update({
                     "period_from": citations.format_date(texts, missions[sorties[0]["missionId"]]["date"]),
                     "period_from_raw": missions[sorties[0]["missionId"]]["date"],

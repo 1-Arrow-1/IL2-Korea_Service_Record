@@ -227,5 +227,59 @@
     ]
    ]
   }
+ },
+ "variants": {
+  "opening_leader": [
+   "Ese día el {rank} {name} mandó una sección de {flight} {aircraft} en una misión «{target}» cerca de {place}.",
+   "El {date} el {rank} {name} mandaba {flight} {aircraft} del {unit} en la misión «{target}» en la zona de {place}.",
+   "Ese día, a la cabeza de una sección de {flight} {aircraft}, el {rank} {name} llevó la misión «{target}» a las inmediaciones de {place}."
+  ],
+  "opening_member": [
+   "Ese día el {rank} {name} voló en una sección de {flight} {aircraft} en una misión «{target}» cerca de {place}.",
+   "El {date} el {rank} {name} era uno de los {flight} pilotos de {aircraft} del {unit} enviados a la misión «{target}» en la zona de {place}.",
+   "Ese día el {rank} {name} voló como punto en una formación de {flight} {aircraft} en la misión «{target}» hacia {place}."
+  ],
+  "air": [
+   "En el combate que siguió atacó a los cazas enemigos y derribó {air_list}.",
+   "Cuando cazas enemigos interceptaron la sección, los combatió de inmediato y derribó {air_list}.",
+   "Al avistar aviones enemigos viró contra ellos y, en el combate que siguió, destruyó {air_list}."
+  ],
+  "air_many": [
+   "En un solo combate destruyó {air_n} aviones enemigos: {air_list}.",
+   "Atacado por un número superior de cazas enemigos, los combatió durante todo el enfrentamiento y destruyó {air_n} de ellos, {air_list}.",
+   "En el combate que siguió derribó {air_n} aviones enemigos, {air_list}, antes de retirarse por falta de combustible."
+  ],
+  "ground": [
+   "Destruyó {ground_n} vehículos, cañones e instalaciones enemigas.",
+   "Sus ataques destruyeron {ground_n} vehículos, cañones e instalaciones enemigas.",
+   "Volviendo una y otra vez sobre el objetivo, dejó destruidos {ground_n} vehículos, cañones e instalaciones enemigas."
+  ],
+  "ground_flak": [
+   "Prosiguiendo sus ataques bajo intenso fuego antiaéreo, destruyó {ground_n} vehículos, cañones e instalaciones enemigas.",
+   "Pese al fuego antiaéreo intenso y preciso, hizo repetidas pasadas sobre el objetivo y destruyó {ground_n} vehículos, cañones e instalaciones enemigas.",
+   "Sin atender al fuego antiaéreo dirigido contra su avión, llevó sus ataques hasta destruir {ground_n} vehículos, cañones e instalaciones enemigas."
+  ],
+  "hits": [
+   "Su avión recibió {hits} impactos del fuego enemigo; continuó la misión y lo llevó de vuelta a su base.",
+   "Aunque su avión recibió {hits} impactos del fuego enemigo, completó la misión y devolvió el avión dañado a territorio amigo.",
+   "Con su avión agujereado {hits} veces por el fuego enemigo permaneció con su sección hasta completar la misión, y aterrizó sin novedad."
+  ],
+  "bailed": [
+   "Con el avión dañado sin control, se vio obligado a saltar en paracaídas sobre territorio enemigo.",
+   "Su avión, inutilizado por el fuego enemigo, ya no podía volar, y lo abandonó en paracaídas sobre terreno enemigo."
+  ],
+  "lost": [
+   "No regresó de esta misión.",
+   "Se perdió en esta misión."
+  ],
+  "wingman": [
+   "Cuando {wingman} fue derribado, cubrió el paracaídas hasta que el combustible le obligó a retirarse.",
+   "En la misma acción se perdió {wingman}, de su sección."
+  ],
+  "period": [
+   "Durante el período del {period_from} al {period_to} el {rank} {name} voló {missions} misiones de combate, {hours} horas sobre territorio enemigo, y destruyó {air_total} aviones enemigos y {ground_total} vehículos, cañones e instalaciones.",
+   "Entre el {period_from} y el {period_to} el {rank} {name} completó {missions} misiones de combate contra el enemigo, {hours} horas de ellas sobre territorio hostil, destruyendo {air_total} aviones enemigos y {ground_total} vehículos, cañones e instalaciones.",
+   "En {missions} misiones de combate entre el {period_from} y el {period_to}, {hours} horas sobre territorio enemigo, el {rank} {name} destruyó {air_total} aviones enemigos y {ground_total} vehículos, cañones e instalaciones."
+  ]
  }
 }

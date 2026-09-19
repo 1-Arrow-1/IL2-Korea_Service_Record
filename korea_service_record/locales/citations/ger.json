@@ -227,5 +227,59 @@
     ]
    ]
   }
+ },
+ "variants": {
+  "opening_leader": [
+   "An diesem Tag führte {rank} {name} einen Schwarm von {flight} {aircraft} beim Einsatz „{target}“ nahe {place}.",
+   "Am {date} führte {rank} {name} {flight} {aircraft} der {unit} beim Einsatz „{target}“ im Raum {place}.",
+   "An der Spitze eines Schwarms von {flight} {aircraft} flog {rank} {name} an diesem Tag den Einsatz „{target}“ in den Raum {place}."
+  ],
+  "opening_member": [
+   "An diesem Tag flog {rank} {name} in einem Schwarm von {flight} {aircraft} beim Einsatz „{target}“ nahe {place}.",
+   "Am {date} war {rank} {name} einer von {flight} {aircraft}-Piloten der {unit} beim Einsatz „{target}“ im Raum {place}.",
+   "An diesem Tag flog {rank} {name} als Rottenflieger in einem Verband von {flight} {aircraft} den Einsatz „{target}“ in den Raum {place}."
+  ],
+  "air": [
+   "Im folgenden Luftkampf griff er die feindlichen Jäger an und schoss {air_list} ab.",
+   "Als feindliche Jäger den Schwarm abfingen, nahm er sofort den Kampf auf und schoss {air_list} ab.",
+   "Beim Sichten feindlicher Flugzeuge drehte er in sie hinein und vernichtete im folgenden Kampf {air_list}."
+  ],
+  "air_many": [
+   "In einem einzigen Gefecht vernichtete er {air_n} feindliche Flugzeuge: {air_list}.",
+   "Von einer Übermacht feindlicher Jäger angegriffen, kämpfte er das Gefecht durch und schoss {air_n} von ihnen ab, {air_list}.",
+   "Im folgenden Kurvenkampf schoss er {air_n} feindliche Flugzeuge ab, {air_list}, ehe der Treibstoff ihn zum Abbruch zwang."
+  ],
+  "ground": [
+   "Er vernichtete {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen.",
+   "Seine Angriffe vernichteten {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen.",
+   "In immer neuen Anflügen auf das Ziel vernichtete er {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen."
+  ],
+  "ground_flak": [
+   "Unter starkem Flakfeuer setzte er seine Angriffe fort und vernichtete {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen.",
+   "Trotz schwerer und gut liegender Flak flog er wiederholt Angriffe auf das Ziel und vernichtete {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen.",
+   "Ohne Rücksicht auf das Flakfeuer, das seiner Maschine galt, trug er seine Angriffe vor, bis {ground_n} feindliche Fahrzeuge, Geschütze und Anlagen vernichtet waren."
+  ],
+  "hits": [
+   "Sein Flugzeug wurde {hits} Mal von feindlichem Feuer getroffen; er führte den Auftrag zu Ende und brachte es zum Stützpunkt zurück.",
+   "Obwohl sein Flugzeug {hits} Treffer erhielt, führte er den Auftrag zu Ende und brachte die beschädigte Maschine über eigenes Gebiet zurück.",
+   "Mit {hits} Treffern im Flugzeug blieb er bei seinem Schwarm, bis der Auftrag erfüllt war, und landete sicher."
+  ],
+  "bailed": [
+   "Mit einem nicht mehr steuerbaren Flugzeug musste er über feindlichem Gebiet aussteigen.",
+   "Sein vom Feindfeuer zerschossenes Flugzeug war nicht mehr zu halten; er verließ es mit dem Fallschirm über feindlichem Gebiet."
+  ],
+  "lost": [
+   "Von diesem Einsatz kehrte er nicht zurück.",
+   "Bei diesem Einsatz ging er verloren."
+  ],
+  "wingman": [
+   "Als {wingman} abgeschossen wurde, deckte er den Fallschirm, bis der Treibstoff ihn zum Abflug zwang.",
+   "Im selben Gefecht ging {wingman} aus seinem Schwarm verloren."
+  ],
+  "period": [
+   "Im Zeitraum vom {period_from} bis {period_to} flog {rank} {name} {missions} Feindflüge mit {hours} Stunden über feindlichem Gebiet und vernichtete {air_total} feindliche Flugzeuge sowie {ground_total} Fahrzeuge, Geschütze und Anlagen.",
+   "Zwischen dem {period_from} und dem {period_to} führte {rank} {name} {missions} Feindflüge gegen den Gegner durch, {hours} Stunden davon über feindlichem Gebiet, und vernichtete {air_total} feindliche Flugzeuge sowie {ground_total} Fahrzeuge, Geschütze und Anlagen.",
+   "In {missions} Feindflügen zwischen dem {period_from} und dem {period_to}, {hours} Stunden über feindlichem Gebiet, vernichtete {rank} {name} {air_total} feindliche Flugzeuge sowie {ground_total} Fahrzeuge, Geschütze und Anlagen."
+  ]
  }
 }

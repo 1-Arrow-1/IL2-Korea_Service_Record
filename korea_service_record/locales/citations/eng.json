@@ -667,5 +667,59 @@
     ]
    ]
   }
+ },
+ "variants": {
+  "opening_leader": [
+   "On that date {rank} {name} led a flight of {flight} {aircraft}s on the \"{target}\" mission near {place}.",
+   "On {date} {rank} {name} was leading {flight} {aircraft}s of the {unit} on the \"{target}\" mission in the area of {place}.",
+   "That day, at the head of a flight of {flight} {aircraft}s, {rank} {name} took the \"{target}\" mission to the vicinity of {place}."
+  ],
+  "opening_member": [
+   "On that date {rank} {name} flew as a member of a flight of {flight} {aircraft}s on the \"{target}\" mission near {place}.",
+   "On {date} {rank} {name} was one of {flight} {aircraft} pilots of the {unit} sent on the \"{target}\" mission in the area of {place}.",
+   "That day {rank} {name} flew wing in a formation of {flight} {aircraft}s on the \"{target}\" mission to the vicinity of {place}."
+  ],
+  "air": [
+   "In the engagement that followed he attacked the enemy fighters and destroyed {air_list}.",
+   "When enemy fighters intercepted the flight he engaged them at once and shot down {air_list}.",
+   "Sighting enemy aircraft, he turned into them and in the fight that followed destroyed {air_list}."
+  ],
+  "air_many": [
+   "In a single engagement he destroyed {air_n} enemy aircraft: {air_list}.",
+   "Attacked by a superior number of enemy fighters, he fought them for the length of the engagement and destroyed {air_n} of them, {air_list}.",
+   "In the running fight that followed he shot down {air_n} enemy aircraft, {air_list}, before breaking off for lack of fuel."
+  ],
+  "ground": [
+   "He destroyed {ground_n} enemy vehicles, guns and installations.",
+   "His attacks accounted for {ground_n} enemy vehicles, guns and installations.",
+   "Returning again and again to the target, he left {ground_n} enemy vehicles, guns and installations destroyed."
+  ],
+  "ground_flak": [
+   "Pressing his attacks through intense anti-aircraft fire, he destroyed {ground_n} enemy vehicles, guns and installations.",
+   "Despite heavy and accurate anti-aircraft fire he made repeated passes over the target and destroyed {ground_n} enemy vehicles, guns and installations.",
+   "Disregarding the anti-aircraft fire directed at his aircraft, he pressed home his attacks until {ground_n} enemy vehicles, guns and installations had been destroyed."
+  ],
+  "hits": [
+   "His aircraft was struck {hits} times by enemy fire; he continued the mission and brought it back to base.",
+   "Although his aircraft took {hits} hits from enemy fire, he completed his mission and returned the damaged aircraft to friendly territory.",
+   "With his aircraft holed {hits} times by enemy fire he remained with his flight until the mission was complete, and landed safely."
+  ],
+  "bailed": [
+   "With his aircraft damaged beyond control he was forced to bail out over hostile territory.",
+   "His aircraft, crippled by enemy fire, could no longer be flown, and he abandoned it by parachute over enemy-held ground."
+  ],
+  "lost": [
+   "He did not return from this mission.",
+   "He was lost on this mission."
+  ],
+  "wingman": [
+   "When {wingman} was shot down he covered the descending parachute until his fuel forced him to leave.",
+   "In the same action {wingman} of his flight was lost."
+  ],
+  "period": [
+   "During the period {period_from} to {period_to} {rank} {name} flew {missions} combat missions, {hours} hours over hostile territory, and destroyed {air_total} enemy aircraft and {ground_total} vehicles, guns and installations.",
+   "Between {period_from} and {period_to} {rank} {name} completed {missions} combat missions against the enemy, {hours} hours of them over hostile territory, destroying {air_total} enemy aircraft and {ground_total} vehicles, guns and installations.",
+   "In {missions} combat missions between {period_from} and {period_to}, {hours} hours over enemy territory, {rank} {name} destroyed {air_total} enemy aircraft and {ground_total} vehicles, guns and installations."
+  ]
  }
 }
