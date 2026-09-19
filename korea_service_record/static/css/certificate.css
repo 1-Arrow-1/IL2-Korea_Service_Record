@@ -30,18 +30,23 @@
 .ct-text { position: absolute; left: 8%; right: 8%; top: 28%; bottom: 20%; text-align: center; display: flex;
     flex-direction: column; justify-content: flex-start; gap: 0.15em; font-size: calc(1100px * 0.012); }
 @media (max-width: 1140px) { .ct-text { font-size: 1.15vw; } }
+/* The forms' three voices: the engraved serif of the headings, the small
+   printed lines of the preamble, and the typewriter of what was filled in. */
 .ct-country { font-family: 'Times New Roman', Georgia, serif; font-size: 2.1em; letter-spacing: 0.08em; }
-.ct-established { font-family: 'Courier New', Courier, monospace; font-size: 0.95em; letter-spacing: 0.04em; max-width: 78%; margin: 0 auto; line-height: 1.35; }
-.ct-name { font-family: 'Times New Roman', Georgia, serif; font-size: 3.2em; letter-spacing: 0.06em; margin-top: 0.15em; line-height: 1.1; }
+.ct-pre, .ct-sub { font-family: 'Times New Roman', Georgia, serif; font-size: 0.92em; letter-spacing: 0.04em; max-width: 84%; margin: 0 auto; line-height: 1.35; }
+.ct-name { font-family: 'Times New Roman', Georgia, serif; font-size: 3em; letter-spacing: 0.06em; margin-top: 0.15em; line-height: 1.1; }
 .ct-cluster { font-family: 'Times New Roman', Georgia, serif; font-size: 1.25em; letter-spacing: 0.12em; }
-.ct-to { font-family: 'Courier New', Courier, monospace; font-size: 1em; margin-top: 0.3em; }
+.ct-to { font-family: 'Times New Roman', Georgia, serif; font-size: 1.1em; letter-spacing: 0.1em; margin-top: 0.3em; }
 .ct-recipient { font-family: 'Courier New', Courier, monospace; font-size: 1.5em; letter-spacing: 0.06em; }
-.ct-service { font-family: 'Courier New', Courier, monospace; font-size: 0.95em; letter-spacing: 0.06em; }
-.ct-for { font-family: 'Courier New', Courier, monospace; font-size: 1.25em; text-align: left; margin-top: 0.6em; line-height: 1.35; }
+.ct-service { font-family: 'Courier New', Courier, monospace; font-size: 0.9em; letter-spacing: 0.1em; }
+.ct-for { font-family: 'Courier New', Courier, monospace; font-size: 1.15em; text-align: left; margin-top: 0.6em; line-height: 1.45; }
+.ct-for.centred { text-align: center; }
 .ct-for-label { margin-right: 0.6em; }
-.ct-deed { font-family: 'Courier New', Courier, monospace; font-size: 1.05em; text-align: left; line-height: 1.4; margin-top: 0.2em; }
-.ct-given { font-family: 'Times New Roman', Georgia, serif; font-size: 1.7em; letter-spacing: 0.05em; margin-top: auto; }
-.ct-on { font-family: 'Times New Roman', Georgia, serif; font-size: 1.7em; letter-spacing: 0.05em; }
+.ct-where { font-family: 'Times New Roman', Georgia, serif; font-size: 1.15em; font-style: italic; }
+.ct-deed { font-family: 'Courier New', Courier, monospace; font-size: 1em; text-align: left; line-height: 1.4; margin-top: 0.3em; }
+.ct-close { font-family: 'Courier New', Courier, monospace; font-size: 1.05em; text-align: left; line-height: 1.4; margin-top: 0.3em; }
+.ct-given-block { margin-top: auto; text-align: left; }
+.ct-given { font-family: 'Times New Roman', Georgia, serif; font-size: 1.4em; letter-spacing: 0.05em; }
 
 .ct-seal { position: absolute; left: 50%; bottom: 4%; width: 9%; transform: translateX(-50%); }
 .ct-seal svg { width: 100%; height: auto; fill: none; stroke: #8a7038; stroke-width: 1.5; }

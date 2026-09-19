@@ -1890,6 +1890,7 @@ class CareerAggregator:
                 ks = [KillStats(s["killStats"]) for s in sorties]
                 facts.update({
                     "period_from": citations.format_date(texts, missions[sorties[0]["missionId"]]["date"]),
+                    "period_from_raw": missions[sorties[0]["missionId"]]["date"],
                     "period_to": facts["date"], "missions": len(sorties),
                     "hours": f"{sum(float(s['flightTime'] or 0) for s in sorties) / 3600:.1f}".replace(".", texts.get("decimal", ".")),
                     "air_total": sum(k.airborne for k in ks), "ground_total": sum(k.ground_targets for k in ks),
@@ -1899,6 +1900,7 @@ class CareerAggregator:
                 facts.update({
                     "sorties_unit": len(unit_sorties),
                     "period_from": facts.get("period_from") or citations.format_date(texts, missions[unit_sorties[0]["missionId"]]["date"]),
+                    "period_from_raw": facts.get("period_from_raw") or missions[unit_sorties[0]["missionId"]]["date"],
                     "period_to": facts["date"],
                 })
                 if citations.FAMILY[award_id][2] == "unit":

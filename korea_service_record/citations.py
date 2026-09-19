@@ -111,15 +111,34 @@ def _ordinal(cert: Dict[str, Any], day: int) -> str:
     return cert.get("ordinal", {}).get(str(day), f"{day}TH")
 
 
+def _caps_date(ymd: str) -> str:
+    """'1951.04.23' -> '23 APRIL 1951', as the forms type it."""
+    try:
+        y, m, d = (int(n) for n in ymd.split(".")[:3])
+        return f"{d} {strings('eng')['months'][m - 1].upper()} {y}"
+    except (ValueError, IndexError, KeyError):
+        return ymd
+
+
+def _title_date(ymd: str) -> str:
+    """'1951.04.23' -> '23 April 1951'."""
+    try:
+        y, m, d = (int(n) for n in ymd.split(".")[:3])
+        return f"{d} {strings('eng')['months'][m - 1]} {y}"
+    except (ValueError, IndexError, KeyError):
+        return ymd
+
+
 def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
                 paragraphs: List[str]) -> Optional[Dict[str, Any]]:
     """
-    The document the award came with. For the USAF the certificate, an
-    English document whatever the page's language: the decoration named
-    with its cluster or star, the man, the reason, the deed, the date it
-    was given and the signature of the man who signed such certificates
-    on that date. For the Soviet-pattern nations the decree, in the page's
-    language, with the citation as its text.
+    The document the award came with. For the USAF the certificate, in the
+    words of the real form for that decoration (transcribed from the
+    forms, one line structure each), an English document whatever the
+    page's language: the man, the reason with when and where, the deed,
+    the date it was given and the signature of the man who signed such
+    certificates on that date. For the Soviet-pattern nations the decree,
+    in the page's language, with the citation as its text.
     """
     fam = FAMILY.get(award_id)
     if fam is None:
@@ -127,7 +146,8 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
     nation, family, kind = fam
     if nation == "usaf":
         cert = strings("eng").get("certificate") or {}
-        if not cert:
+        form = cert.get("forms", {}).get(family)
+        if not form:
             return None
         rung = _rung(award_id)
         if family == "ksm":
@@ -136,22 +156,41 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             cluster = cert["cluster_silver"]
         else:
             cluster = cert["cluster"].get(str(rung), "") if rung else ""
+        rank = facts.get("rank", ""); name = facts.get("name", "")
+        # The forms type in capitals; the placeholders are filled to match.
+        fill = {
+            "RANK": rank.upper(), "NAME": name.upper(), "UNIT": (facts.get("unit") or "").upper(),
+            "AIRCRAFT": (facts.get("aircraft") or "").upper(), "PLACE": (facts.get("place") or "").upper(),
+            "DATE": _caps_date(facts.get("earned_raw", "")),
+            "FROM": _caps_date(facts.get("period_from_raw", "")), "TO": _caps_date(facts.get("earned_raw", "")),
+            "POSSESSIVE": f"{rank} {name.split()[-1] if name else ''}".strip().upper() + "'S",
+            "Place": facts.get("place") or "", "Date": _title_date(facts.get("earned_raw", "")),
+        }
+        given = []
         try:
             y, m, d = (int(n) for n in (received or facts.get("earned_raw") or "").split(".")[:3])
-            given_on = cert["on"].format(day=_ordinal(cert, d), month=strings("eng")["months"][m - 1].upper(), year=y)
+            fill.update({"DAY": _ordinal(cert, d), "MONTH": strings("eng")["months"][m - 1].upper(), "YEAR": str(y)})
         except (ValueError, IndexError):
-            given_on = ""
-        who = cert["signers"].get(cert["signer_of"].get(family, "fifth"), [])
-        signer = next((s for s in who if received <= s[0]), who[-1] if who else ["", ""])
-        unit = kind == "unit"
+            fill.update({"DAY": "", "MONTH": "", "YEAR": ""})
+        given = [_fill(line, fill) for line in form.get("given", [])]
+        who = cert["signers"].get(form.get("signer", "fifth"), [])
+        signer = next((s for s in who if received <= s[0]), who[-1] if who else ["", "", ""])
         return {
-            "form": "usaf", "country": cert["country"], "established": cert["established"].get(family, ""),
-            "name": cert["names"].get(family, ""), "cluster": cluster,
-            "to": cert["unit_to"] if unit else cert["to"],
-            "recipient": (facts.get("unit") if unit else f"{facts.get('rank', '')} {facts.get('name', '')}".strip()).upper(),
-            "service": "" if unit else cert["service"], "for": cert["for"], "reason": cert["reason"].get(family, ""),
+            "form": "usaf",
+            "header": form.get("header", ""),
+            "pre": [_fill(line, fill) for line in form.get("pre", [])],
+            "name_first": bool(form.get("name_first")),
+            "title": form.get("title", ""), "cluster": cluster,
+            "sub": [_fill(line, fill) for line in form.get("sub", [])],
+            "to": form.get("to", ""),
+            "name": _fill(form.get("name", "{RANK} {NAME}"), fill),
+            "service": form.get("service", ""),
+            "for": form.get("for", ""),
+            "reason": _fill(form.get("reason", ""), fill),
+            "where": _fill(form.get("where", ""), fill),
             "deed": paragraphs[1] if len(paragraphs) > 2 else "",
-            "given": cert["given"], "on": given_on, "seal": cert["seal"],
+            "close": _fill(form.get("close", ""), fill),
+            "given": given, "seal": cert.get("seal", ""),
             "signer": signer[1], "signer_title": signer[2] if len(signer) > 2 else "",
         }
     texts = strings(lang)

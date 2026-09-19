@@ -42,7 +42,7 @@
         return;
     }
     const c = data.certificate;
-    document.title = (c.name || c.title || "") + " — " + (c.recipient || "");
+    document.title = (c.title || "") + " — " + (c.name || c.subject || "");
 
     // A drawn sheet for this family, if the artist has made one.
     const family = data.family || "";
@@ -52,21 +52,25 @@
 
     if (c.form === "usaf") {
         const drawn = await exists(template);
+        const line = (cls, text) => text ? '<div class="' + cls + '">' + esc(text) + "</div>" : "";
+        const nameBlock = line("ct-to", c.to) + line("ct-recipient", c.name) + line("ct-service", c.service);
         el("ct-sheet").innerHTML =
             '<section class="sheet usaf' + (drawn ? " drawn" : "") + '"' + (drawn ? ' style="background-image:url(\'' + template + '\')"' : "") + ">" +
                 (drawn ? "" : '<img class="ct-medal" src="' + esc(data.icon) + '" alt="">') +
                 '<div class="ct-text">' +
-                    '<div class="ct-country">' + esc(c.country) + "</div>" +
-                    '<div class="ct-established">' + esc(c.established) + "</div>" +
-                    '<div class="ct-name">' + esc(c.name) + "</div>" +
-                    (c.cluster ? '<div class="ct-cluster">' + esc(c.cluster) + "</div>" : "") +
-                    '<div class="ct-to">' + esc(c.to) + "</div>" +
-                    '<div class="ct-recipient">' + esc(c.recipient) + "</div>" +
-                    (c.service ? '<div class="ct-service">' + esc(c.service) + "</div>" : "") +
-                    '<div class="ct-for"><span class="ct-for-label">' + esc(c.for) + "</span> " + esc(c.reason) + "</div>" +
-                    (c.deed ? '<div class="ct-deed">' + esc(c.deed) + "</div>" : "") +
-                    '<div class="ct-given">' + esc(c.given) + "</div>" +
-                    '<div class="ct-on">' + esc(c.on) + "</div>" +
+                    line("ct-country", c.header) +
+                    (c.pre || []).map((t) => line("ct-pre", t)).join("") +
+                    (c.name_first ? nameBlock : "") +
+                    line("ct-name", c.title) +
+                    line("ct-cluster", c.cluster) +
+                    (c.sub || []).map((t) => line("ct-sub", t)).join("") +
+                    (c.name_first ? "" : nameBlock) +
+                    '<div class="ct-for' + (c.for && !c.for.endsWith(":") ? " centred" : "") + '">' +
+                        (c.for ? '<span class="ct-for-label">' + esc(c.for) + "</span> " : "") + esc(c.reason) + "</div>" +
+                    line("ct-where", c.where) +
+                    line("ct-deed", c.deed) +
+                    line("ct-close", c.close) +
+                    '<div class="ct-given-block">' + (c.given || []).map((t) => line("ct-given", t)).join("") + "</div>" +
                 "</div>" +
                 (drawn ? "" :
                     '<div class="ct-seal"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="38"/>' +
