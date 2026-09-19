@@ -76,7 +76,9 @@
                     '<div class="ct-seal"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="38"/>' +
                     '<path d="M50 22l7.6 16.2 17.8 2.2-13.1 12.3 3.4 17.6L50 61.6l-15.7 8.7 3.4-17.6-13.1-12.3 17.8-2.2z"/></svg></div>') +
                 (c.signers || [{}, {name: c.signer, title: c.signer_title}]).map((s, i) => s && s.name ?
-                    '<div class="ct-signature ' + (i === 0 ? "left" : "right") + '"><span class="ct-sign">' + esc(s.name) + '</span><span class="ct-sign-line"></span>' +
+                    '<div class="ct-signature ' + (i === 0 ? "left" : "right") + '">' +
+                    (s.image ? '<img class="ct-sign-image" src="' + esc(s.image) + '" alt="' + esc(s.name) + '">' : '<span class="ct-sign">' + esc(s.name) + "</span>") +
+                    '<span class="ct-sign-line"></span>' +
                     '<span class="ct-sign-title">' + esc(s.title) + "</span></div>" : "").join("") +
             "</section>";
     } else {

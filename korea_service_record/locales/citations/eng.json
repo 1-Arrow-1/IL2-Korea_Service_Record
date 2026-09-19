@@ -538,77 +538,90 @@
     [
      "1953.01.20",
      "Harry S. Truman",
-     "PRESIDENT OF THE UNITED STATES"
+     "PRESIDENT OF THE UNITED STATES",
+     "truman"
     ],
     [
      "9999.12.31",
      "Dwight D. Eisenhower",
-     "PRESIDENT OF THE UNITED STATES"
+     "PRESIDENT OF THE UNITED STATES",
+     "eisenhower"
     ]
    ],
    "secretary": [
     [
      "1953.02.04",
      "Thomas K. Finletter",
-     "SECRETARY OF THE AIR FORCE"
+     "SECRETARY OF THE AIR FORCE",
+     "finletter"
     ],
     [
      "9999.12.31",
      "Harold E. Talbott",
-     "SECRETARY OF THE AIR FORCE"
+     "SECRETARY OF THE AIR FORCE",
+     "talbott"
     ]
    ],
    "fifth": [
     [
      "1951.05.31",
      "Earle E. Partridge",
-     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE"
+     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE",
+     "partridge"
     ],
     [
      "1952.05.29",
      "Frank F. Everest",
-     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE"
+     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE",
+     "everest"
     ],
     [
      "1953.05.30",
      "Glenn O. Barcus",
-     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE"
+     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE",
+     "barcus"
     ],
     [
      "9999.12.31",
      "Samuel E. Anderson",
-     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE"
+     "LIEUTENANT GENERAL, USAF, COMMANDING FIFTH AIR FORCE",
+     "anderson"
     ]
    ],
    "chief": [
     [
      "1953.06.30",
      "Hoyt S. Vandenberg",
-     "GENERAL, USAF, CHIEF OF STAFF"
+     "GENERAL, USAF, CHIEF OF STAFF",
+     "vandenberg"
     ],
     [
      "9999.12.31",
      "Nathan F. Twining",
-     "GENERAL, USAF, CHIEF OF STAFF"
+     "GENERAL, USAF, CHIEF OF STAFF",
+     "twining"
     ]
    ],
    "rok": [
     [
      "9999.12.31",
      "Syngman Rhee",
-     "PRESIDENT OF THE REPUBLIC OF KOREA"
+     "PRESIDENT OF THE REPUBLIC OF KOREA",
+     "rhee"
     ]
    ],
    "un": [
     [
      "1953.04.10",
      "Trygve Lie",
-     "SECRETARY-GENERAL OF THE UNITED NATIONS"
+     "SECRETARY-GENERAL OF THE UNITED NATIONS",
+     "lie"
     ],
     [
      "9999.12.31",
      "Dag Hammarskjöld",
-     "SECRETARY-GENERAL OF THE UNITED NATIONS"
+     "SECRETARY-GENERAL OF THE UNITED NATIONS",
+     "hammarskjold"
     ]
    ]
   }

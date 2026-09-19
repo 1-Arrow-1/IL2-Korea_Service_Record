@@ -190,7 +190,9 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
         for office in offices:
             who = cert["signers"].get(office, []) if office else []
             s_ = next((s for s in who if received <= s[0]), who[-1] if who else ["", "", ""])
-            signers.append({"name": s_[1], "title": s_[2] if len(s_) > 2 else ""})
+            signers.append({"name": s_[1], "title": s_[2] if len(s_) > 2 else "",
+                            "image": f"/static/images/signatures/{s_[3]}.png" if len(s_) > 3 and
+                            (Path(__file__).resolve().parent / "static" / "images" / "signatures" / f"{s_[3]}.png").is_file() else ""})
         signer = signers[-1]
         return {
             "form": "usaf",
