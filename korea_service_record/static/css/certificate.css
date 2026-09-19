@@ -45,15 +45,16 @@
 
 /* Distinguished Unit Citation: the text block runs 12-86% of the width,
    the typed lines justified across it as on the form. */
-.sheet.portrait.duc .ct-text > * { left: 12%; right: 13.5%; }
+.sheet.portrait.duc .ct-text > * { left: 13%; right: 13%; }
 .sheet.portrait.duc .ct-country { top: 19.6%; font-size: 1.9em; letter-spacing: 0.06em; }
-.sheet.portrait.duc .ct-pre { top: 23.4%; font-size: 1.25em; text-align: justify; text-align-last: left; line-height: 1.75; letter-spacing: 0.05em; }
-.sheet.portrait.duc .ct-name { top: 30.8%; font-size: 3.3em; letter-spacing: 0.04em; }
+.sheet.portrait.duc .ct-pre { top: 23.4%; font-size: 1.3em; text-align: justify; text-align-last: left; line-height: 1.7; letter-spacing: 0.04em; }
+.sheet.portrait.duc .ct-unit { top: 44.2%; font-size: 1.2em; font-family: 'Courier New', Courier, monospace; letter-spacing: 0.06em; }
+.sheet.portrait.duc .ct-name { top: 30.4%; font-size: 3.55em; letter-spacing: 0.055em; white-space: nowrap; }
 .sheet.portrait.duc .ct-to { top: 37.2%; font-size: 1.5em; }
 .sheet.portrait.duc .ct-recipient { top: 40.8%; font-size: 1.5em; }
 .sheet.portrait.duc .ct-service { top: 47.6%; font-size: 1.2em; }
-.sheet.portrait.duc .ct-for { top: 52.4%; font-family: 'Times New Roman', Georgia, serif; font-size: 1.5em; line-height: 1; }
-.sheet.portrait.duc .ct-for-label { display: block; margin: 0 0 2.3em; }
+.sheet.portrait.duc .ct-for { top: 52.6%; font-family: 'Times New Roman', Georgia, serif; font-size: 1.95em; font-weight: bold; line-height: 1; letter-spacing: 0.03em; }
+.sheet.portrait.duc .ct-for-label { display: block; margin: 0 0 0.85em; }
 .sheet.portrait.duc .ct-close { top: 60.4%; font-size: 1.35em; text-align: justify; text-align-last: left; line-height: 1.85; letter-spacing: 0.06em; }
 .sheet.portrait.duc .ct-given-block { position: absolute; top: 71.2%; }
 .sheet.portrait.duc .ct-given-block .ct-given { position: static; display: block; font-size: 1.75em; letter-spacing: 0.04em; margin-bottom: 0.55em; }

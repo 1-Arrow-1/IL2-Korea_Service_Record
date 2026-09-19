@@ -61,7 +61,7 @@
         const portrait = drawn && drawn.h > drawn.w;
         const style = drawn ? ' style="background-image:url(\'' + template + '\');aspect-ratio:' + drawn.w + ' / ' + drawn.h + '"' : "";
         const line = (cls, text) => text ? '<div class="' + cls + '">' + esc(text) + "</div>" : "";
-        const nameBlock = line("ct-to", c.to) + line("ct-recipient", c.name) + line("ct-service", c.service);
+        const nameBlock = line("ct-to", c.to) + line("ct-recipient", c.name) + line("ct-unit", c.unit_line) + line("ct-service", c.service);
         el("ct-sheet").innerHTML =
             '<section class="sheet usaf ' + esc(family) + (drawn ? " drawn" : "") + (portrait ? " portrait" : "") + '"' + style + ">" +
                 (drawn ? "" : '<img class="ct-medal" src="' + esc(data.icon) + '" alt="">') +
