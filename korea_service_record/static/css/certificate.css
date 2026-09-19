@@ -27,6 +27,7 @@
 .ct-medal.small { height: 16%; top: 3%; }
 
 /* The text band: 28% to 78% of the height on a drawn sheet, the same here. */
+.sheet.drawn .ct-text { top: 30%; }
 .ct-text { position: absolute; left: 8%; right: 8%; top: 28%; bottom: 16%; text-align: center; display: flex;
     flex-direction: column; justify-content: flex-start; gap: 0.15em; font-size: calc(1100px * 0.012); }
 @media (max-width: 1140px) { .ct-text { font-size: 1.15vw; } }
