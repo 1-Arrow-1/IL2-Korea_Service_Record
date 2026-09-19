@@ -151,11 +151,11 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             return None
         rung = _rung(award_id)
         if family == "ksm":
-            cluster = cert["star"].get(str(rung), "") if rung else ""
+            device = cert["star"].get(str(rung), "") if rung else ""
         elif rung and (family, award_id) in (("dfc", 601016), ("air_medal", 601007)):
-            cluster = cert["cluster_silver"]
+            device = cert["cluster_silver"]
         else:
-            cluster = cert["cluster"].get(str(rung), "") if rung else ""
+            device = cert["cluster"].get(str(rung), "") if rung else ""
         rank = facts.get("rank", ""); name = facts.get("name", "")
         # The forms type in capitals; the placeholders are filled to match.
         fill = {
@@ -174,6 +174,15 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
         except (ValueError, IndexError):
             fill.update({"DAY": "", "MONTH": "", "YEAR": ""})
         given = [_fill(line, fill) for line in form.get("given", [])]
+        reason = _fill(form.get("reason", ""), fill)
+        if device:
+            # The medal as the form names it, without its article.
+            medal = form.get("title", "")
+            medal = medal[4:] if medal.startswith("THE ") else medal
+            clause = _fill(cert["repeat"], {"DEVICE": device, "MEDAL": medal})
+            if reason and reason[0].isupper() and not reason.isupper():
+                clause = clause.lower().replace("oak leaf cluster", "Oak Leaf Cluster").replace(medal.lower(), medal.title())
+            reason = reason.rstrip(".") + clause
         who = cert["signers"].get(form.get("signer", "fifth"), [])
         signer = next((s for s in who if received <= s[0]), who[-1] if who else ["", "", ""])
         return {
@@ -181,13 +190,13 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             "header": form.get("header", ""),
             "pre": [_fill(line, fill) for line in form.get("pre", [])],
             "name_first": bool(form.get("name_first")),
-            "title": form.get("title", ""), "cluster": cluster,
+            "title": form.get("title", ""), "cluster": "",
             "sub": [_fill(line, fill) for line in form.get("sub", [])],
             "to": form.get("to", ""),
             "name": _fill(form.get("name", "{RANK} {NAME}"), fill),
             "service": form.get("service", ""),
             "for": form.get("for", ""),
-            "reason": _fill(form.get("reason", ""), fill),
+            "reason": reason,
             "where": _fill(form.get("where", ""), fill),
             "deed": paragraphs[1] if len(paragraphs) > 2 else "",
             "close": [_fill(line, fill) for line in form.get("close", "").split(chr(10)) if line],
