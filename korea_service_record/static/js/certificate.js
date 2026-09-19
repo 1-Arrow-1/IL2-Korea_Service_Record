@@ -69,7 +69,7 @@
                         (c.for ? '<span class="ct-for-label">' + esc(c.for) + "</span> " : "") + esc(c.reason) + "</div>" +
                     line("ct-where", c.where) +
                     line("ct-deed", c.deed) +
-                    line("ct-close", c.close) +
+                    (Array.isArray(c.close) ? c.close : [c.close]).map((t) => line("ct-close", t)).join("") +
                     '<div class="ct-given-block">' + (c.given || []).map((t) => line("ct-given", t)).join("") + "</div>" +
                 "</div>" +
                 (drawn ? "" :

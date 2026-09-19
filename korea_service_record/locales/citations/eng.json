@@ -285,15 +285,15 @@
    "dfc": {
     "header": "THE UNITED STATES OF AMERICA",
     "pre": [
-     "AUTHORIZED BY ACT OF CONGRESS ON 2 JULY 1926 AND AWARDED IN THE NAME OF",
-     "THE PRESIDENT OF THE UNITED STATES OF AMERICA"
+     "ENACTED BY PRESIDENT CALVIN COOLIDGE ON MAY 2, 1927, AND WAR DEPARTMENT GENERAL ORDER (G.O. 8)",
+     "AND AMENDED BY EXECUTIVE ORDER 7786 ON JANUARY 8, 1938"
     ],
     "title": "DISTINGUISHED FLYING CROSS",
-    "to": "TO",
+    "to": "PRESENTED TO",
     "name": "{RANK} {NAME}",
     "service": "UNITED STATES AIR FORCE",
     "for": "FOR:",
-    "reason": "EXTRAORDINARY ACHIEVEMENT WHILE PARTICIPATING IN AERIAL FLIGHT AS PILOT OF AN {AIRCRAFT} WITH THE {UNIT} IN KOREA FROM {FROM} TO {TO}.",
+    "reason": "HEROISM AND EXTRAORDINARY ACHIEVEMENT IN AERIAL FLIGHT IN KOREA DURING COMBAT OPERATIONS FROM {FROM} TO {TO}, AS PILOT OF AN {AIRCRAFT} WITH THE {UNIT}.",
     "given": [
      "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
      "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
@@ -400,37 +400,38 @@
     "signer": "secretary"
    },
    "duc": {
-    "header": "DEPARTMENT OF THE AIR FORCE",
+    "header": "THE UNITED STATES OF AMERICA",
     "pre": [
-     "BY DIRECTION OF THE SECRETARY OF THE AIR FORCE, UNDER THE PROVISIONS OF EXECUTIVE ORDER 9075",
-     "THE FOLLOWING UNIT IS CITED FOR"
+     "BY VIRTUE OF THE AUTHORITY VESTED IN ME AS PRESIDENT AND AS COMMANDER IN-CHIEF OF THE ARMED FORCES OF THE UNITED STATES OF AMERICA, I HAVE TODAY AWARDED THE"
     ],
     "title": "DISTINGUISHED UNIT CITATION",
-    "to": "",
+    "to": "TO",
     "name": "{UNIT}",
-    "service": "",
-    "for": "",
-    "reason": "EXTRAORDINARY HEROISM IN ACTION AGAINST AN ARMED ENEMY OF THE UNITED NATIONS IN KOREA FROM {FROM} TO {TO}.",
+    "service": "UNITED STATES AIR FORCE",
+    "for": "FOR",
+    "reason": "EXTRAORDINARY HEROISM",
+    "close": "AND OUTSTANDING PERFORMANCE OF DUTY DURING COMBAT OPERATIONS AGAINST HOSTILE ENEMY FORCES IN KOREA, FROM {FROM} TO {TO}.",
     "given": [
-     "GIVEN IN THE CITY OF WASHINGTON",
+     "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
      "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
-    "signer": "secretary"
+    "signer": "president"
    },
    "rok_puc": {
     "header": "REPUBLIC OF KOREA",
     "pre": [
-     "THE PRESIDENT OF THE REPUBLIC OF KOREA CITES"
+     "THE PRESIDENT OF THE REPUBLIC OF KOREA TAKES PRIDE IN",
+     "AWARDING THE"
     ],
     "title": "PRESIDENTIAL UNIT CITATION",
-    "to": "THE",
-    "name": "{UNIT}",
-    "service": "UNITED STATES AIR FORCE",
-    "for": "FOR:",
-    "reason": "EXCEPTIONALLY MERITORIOUS SERVICE AND HEROISM IN THE DEFENSE OF THE REPUBLIC OF KOREA FROM {FROM} TO {TO}.",
+    "to": "TO",
+    "name": "{UNIT}, FIFTH AIR FORCE",
+    "service": "U.S. FAR EAST AIR FORCES, KOREA",
+    "for": "FOR",
+    "reason": "Extraordinary Heroism while Engaged in Battle against Hostile Enemy Forces in Connection with Air and Ground Combat Operations in the Republic of Korea, from {From} to {To}.",
+    "close": "In Defense of the People of the Republic of Korea and the Free World\nAuthorized by the Minister of Defense",
     "given": [
-     "GIVEN AT SEOUL",
-     "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
+     "GIVEN ON THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
     "signer": "rok"
    },

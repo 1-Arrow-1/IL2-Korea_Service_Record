@@ -165,6 +165,7 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             "FROM": _caps_date(facts.get("period_from_raw", "")), "TO": _caps_date(facts.get("earned_raw", "")),
             "POSSESSIVE": f"{rank} {name.split()[-1] if name else ''}".strip().upper() + "'S",
             "Place": facts.get("place") or "", "Date": _title_date(facts.get("earned_raw", "")),
+            "From": _title_date(facts.get("period_from_raw", "")), "To": _title_date(facts.get("earned_raw", "")),
         }
         given = []
         try:
@@ -189,7 +190,7 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             "reason": _fill(form.get("reason", ""), fill),
             "where": _fill(form.get("where", ""), fill),
             "deed": paragraphs[1] if len(paragraphs) > 2 else "",
-            "close": _fill(form.get("close", ""), fill),
+            "close": [_fill(line, fill) for line in form.get("close", "").split(chr(10)) if line],
             "given": given, "seal": cert.get("seal", ""),
             "signer": signer[1], "signer_title": signer[2] if len(signer) > 2 else "",
         }
