@@ -33,48 +33,51 @@
 .sheet.drawn.moh .ct-text { top: 30%; }
 /* Portrait sheets: the Distinguished Unit Citation (Army PUC form) and the
    Republic of Korea's citation. Each line is placed where the filled form
-   has it, in percent of the sheet's height (measured off the scans). */
+   has it, in percent of the sheet's height, and sized to the form's own
+   letter heights (both measured off the scans). Sizes are in vh-like
+   units of the sheet: 1em here = 1% of the sheet's height. */
 .sheet.portrait { max-width: 760px; }
-.sheet.portrait .ct-text { position: static; display: block; font-size: calc(760px * 0.0135); }
-@media (max-width: 800px) { .sheet.portrait .ct-text { font-size: 1.35vw; } }
-.sheet.portrait .ct-text > * { position: absolute; left: 9%; right: 9%; margin: 0; max-width: none; text-align: center; }
-.sheet.portrait .ct-signature { font-size: calc(760px * 0.0135); width: 30%; }
-@media (max-width: 800px) { .sheet.portrait .ct-signature { font-size: 1.35vw; } }
+.sheet.portrait .ct-text { position: static; display: block; font-size: calc(760px * 1.2853 / 100); }
+@media (max-width: 800px) { .sheet.portrait .ct-text { font-size: 1.2853vw; } }
+.sheet.portrait .ct-text > * { position: absolute; margin: 0; max-width: none; text-align: center; }
+.sheet.portrait .ct-signature { font-size: calc(760px * 1.2853 / 100); width: 30%; }
+@media (max-width: 800px) { .sheet.portrait .ct-signature { font-size: 1.2853vw; } }
 
-/* Distinguished Unit Citation. */
-.sheet.portrait.duc .ct-country { top: 19.5%; font-size: 1.5em; }
-.sheet.portrait.duc .ct-pre { top: 23.5%; font-size: 1em; text-align: justify; line-height: 1.5; }
-.sheet.portrait.duc .ct-name { top: 31%; font-size: 2.4em; }
-.sheet.portrait.duc .ct-to { top: 37%; }
-.sheet.portrait.duc .ct-recipient { top: 40.5%; font-size: 1.2em; }
-.sheet.portrait.duc .ct-service { top: 47.5%; }
-.sheet.portrait.duc .ct-for { top: 52%; font-family: 'Times New Roman', Georgia, serif; font-size: 1.1em; }
-.sheet.portrait.duc .ct-for-label { display: block; margin: 0 0 1.2em; }
-.sheet.portrait.duc .ct-close { top: 60.5%; text-align: justify; line-height: 1.75; }
-.sheet.portrait.duc .ct-given-block { top: 71%; }
-.sheet.portrait.duc .ct-given { font-size: 1.2em; }
-.sheet.portrait.duc .ct-given-block { position: absolute; }
-.sheet.portrait.duc .ct-given-block .ct-given { position: static; display: block; margin-bottom: 0.9em; }
+/* Distinguished Unit Citation: the text block runs 12-86% of the width,
+   the typed lines justified across it as on the form. */
+.sheet.portrait.duc .ct-text > * { left: 12%; right: 13.5%; }
+.sheet.portrait.duc .ct-country { top: 19.6%; font-size: 1.9em; letter-spacing: 0.06em; }
+.sheet.portrait.duc .ct-pre { top: 23.4%; font-size: 1.25em; text-align: justify; text-align-last: left; line-height: 1.75; letter-spacing: 0.05em; }
+.sheet.portrait.duc .ct-name { top: 30.8%; font-size: 3.3em; letter-spacing: 0.04em; }
+.sheet.portrait.duc .ct-to { top: 37.2%; font-size: 1.5em; }
+.sheet.portrait.duc .ct-recipient { top: 40.8%; font-size: 1.5em; }
+.sheet.portrait.duc .ct-service { top: 47.6%; font-size: 1.2em; }
+.sheet.portrait.duc .ct-for { top: 52.4%; font-family: 'Times New Roman', Georgia, serif; font-size: 1.5em; line-height: 1; }
+.sheet.portrait.duc .ct-for-label { display: block; margin: 0 0 2.3em; }
+.sheet.portrait.duc .ct-close { top: 60.4%; font-size: 1.35em; text-align: justify; text-align-last: left; line-height: 1.85; letter-spacing: 0.06em; }
+.sheet.portrait.duc .ct-given-block { position: absolute; top: 71.2%; }
+.sheet.portrait.duc .ct-given-block .ct-given { position: static; display: block; font-size: 1.75em; letter-spacing: 0.04em; margin-bottom: 0.55em; }
 .sheet.portrait.duc .ct-signature { bottom: 8.5%; }
 .sheet.portrait.duc .ct-signature.left { left: 6%; }
 .sheet.portrait.duc .ct-signature.right { right: 6%; }
 
 /* Republic of Korea Presidential Unit Citation: the form's sans faces; the
-   ribbon bar is on the sheet at 22-28%, the seal behind the middle. */
-.sheet.portrait.rok_puc .ct-country { top: 11%; font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 2.6em; letter-spacing: 0.02em; }
-.sheet.portrait.rok_puc .ct-pre { top: 16.2%; font-family: Arial, Helvetica, sans-serif; font-size: 0.85em; }
-.sheet.portrait.rok_puc .ct-pre + .ct-pre { top: 18.4%; }
-.sheet.portrait.rok_puc .ct-name { top: 29.5%; font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 2.2em; }
-.sheet.portrait.rok_puc .ct-to { top: 36%; font-family: 'Times New Roman', Georgia, serif; }
-.sheet.portrait.rok_puc .ct-recipient { top: 41%; font-family: 'Times New Roman', Georgia, serif; font-size: 1em; letter-spacing: 0.04em; }
-.sheet.portrait.rok_puc .ct-service { top: 45.5%; font-family: 'Times New Roman', Georgia, serif; font-size: 0.9em; letter-spacing: 0.04em; }
-.sheet.portrait.rok_puc .ct-for { top: 54%; font-family: Arial, Helvetica, sans-serif; font-size: 1em; line-height: 1.5; }
-.sheet.portrait.rok_puc .ct-for-label { display: block; font-weight: bold; margin: 0 0 1.1em; }
+   text block runs 15-86% of the width, between the ribbons. */
+.sheet.portrait.rok_puc .ct-text > * { left: 15%; right: 14%; }
+.sheet.portrait.rok_puc .ct-country { top: 10.2%; font-family: 'Arial Narrow', 'Liberation Sans Narrow', Arial, sans-serif; font-weight: bold; font-size: 4.2em; letter-spacing: 0.01em; line-height: 1; white-space: nowrap; }
+.sheet.portrait.rok_puc .ct-pre { top: 16.4%; font-family: Arial, Helvetica, sans-serif; font-size: 1.15em; line-height: 1; }
+.sheet.portrait.rok_puc .ct-pre + .ct-pre { top: 18.9%; }
+.sheet.portrait.rok_puc .ct-name { top: 29.2%; font-family: 'Arial Narrow', 'Liberation Sans Narrow', Arial, sans-serif; font-weight: bold; font-size: 3.4em; line-height: 1; white-space: nowrap; letter-spacing: -0.01em; }
+.sheet.portrait.rok_puc .ct-to { top: 36.4%; font-family: 'Times New Roman', Georgia, serif; font-size: 1.5em; line-height: 1; }
+.sheet.portrait.rok_puc .ct-recipient { top: 41.3%; font-family: 'Times New Roman', Georgia, serif; font-size: 1.55em; letter-spacing: 0.02em; line-height: 1; }
+.sheet.portrait.rok_puc .ct-service { top: 45.7%; font-family: 'Times New Roman', Georgia, serif; font-size: 1.3em; letter-spacing: 0.02em; line-height: 1; }
+.sheet.portrait.rok_puc .ct-for { top: 54.2%; font-family: Arial, Helvetica, sans-serif; font-size: 1.55em; line-height: 1.4; text-align: left; }
+.sheet.portrait.rok_puc .ct-for-label { display: block; text-align: center; font-weight: bold; margin: 0 0 1.35em; }
 .sheet.portrait.rok_puc .ct-deed { display: none; }
-.sheet.portrait.rok_puc .ct-close { top: 65.5%; font-family: Arial, Helvetica, sans-serif; font-size: 0.95em; }
-.sheet.portrait.rok_puc .ct-close + .ct-close { top: 69.5%; font-style: italic; }
-.sheet.portrait.rok_puc .ct-given-block { top: 73%; }
-.sheet.portrait.rok_puc .ct-given { font-size: 1.15em; }
+.sheet.portrait.rok_puc .ct-close { top: 65.6%; font-family: Arial, Helvetica, sans-serif; font-size: 1.5em; line-height: 1; white-space: nowrap; }
+.sheet.portrait.rok_puc .ct-close + .ct-close { top: 69.6%; font-style: italic; font-size: 1.4em; }
+.sheet.portrait.rok_puc .ct-given-block { top: 73.3%; }
+.sheet.portrait.rok_puc .ct-given { font-size: 1.6em; line-height: 1; letter-spacing: 0.02em; }
 /* The form's own signature block is printed on the sheet at the foot
    (Rhee's name and title); the drawn signature sits on its line. */
 .sheet.portrait.rok_puc .ct-signature.right { right: auto; left: 50%; transform: translateX(-50%); bottom: 18%; width: 24%; }
