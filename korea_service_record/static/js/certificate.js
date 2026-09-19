@@ -30,8 +30,10 @@
     try {
         if (!careerId || !pilotId || !awardId) throw new Error("missing");
         // The certificate reads in English; the decree in the page's language.
+        // The certificate is an English document, the наградной лист a Russian
+        // one: the record is read in that language for it.
         const country = String(awardId).slice(0, 3);
-        const lang = country === "601" ? "en" : pageLang;
+        const lang = country === "601" ? "en" : (country === "501" || country === "503") ? "ru" : pageLang;
         const r = await fetch("/api/citation/" + encodeURIComponent(careerId) + "/" + encodeURIComponent(pilotId) + "/" +
             encodeURIComponent(awardId) + "?earned=" + encodeURIComponent(earned) + "&lang=" + encodeURIComponent(lang));
         if (!r.ok) throw new Error(r.status);
@@ -42,7 +44,7 @@
         return;
     }
     const c = data.certificate;
-    document.title = (c.title || "") + " — " + (c.name || c.subject || "");
+    document.title = (c.title || c.to || "") + " — " + (c.name || c.subject || "");
 
     // A drawn sheet for this family, if the artist has made one.
     const family = data.family || "";
@@ -88,6 +90,23 @@
                     (s.image ? '<img class="ct-sign-image" src="' + esc(s.image) + '" alt="' + esc(s.name) + '">' : '<span class="ct-sign">' + esc(s.name) + "</span>") +
                     '<span class="ct-sign-line"></span>' +
                     '<span class="ct-sign-title">' + esc(s.title) + "</span></div>" : "").join("") +
+            "</section>";
+    } else if (c.form === "nagradnoy") {
+        // The award sheet: typed onto the printed form along its rules, in
+        // a hand, as the originals were filled.
+        const form = "/static/images/certificates/nagradnoy_list.png";
+        const drawn = await exists(form);
+        const f = (cls, text) => '<div class="nl ' + cls + '">' + esc(text) + "</div>";
+        const deedLines = [];
+        (c.deed || []).concat([c.conclusion]).forEach((par) => { if (par) deedLines.push(par); });
+        el("ct-sheet").innerHTML =
+            '<section class="sheet nagradnoy' + (drawn ? " drawn" : "") + '"' + (drawn ? ' style="background-image:url(\'' + form + '\');aspect-ratio:' + drawn.w + ' / ' + drawn.h + '"' : "") + ">" +
+                f("nl-name", c.name) + f("nl-rank", c.rank) + f("nl-post", c.post) + f("nl-to", c.to) +
+                f("nl-since", c.since) + f("nl-battles", c.battles) + f("nl-wounds", c.wounds) + f("nl-held", c.held) +
+                '<div class="nl nl-deed">' + deedLines.map((t) => "<p>" + esc(t) + "</p>").join("") + "</div>" +
+                f("nl-commander", c.commander) +
+                '<div class="nl nl-sign"><span class="ct-sign">' + esc(c.commander_name) + "</span></div>" +
+                f("nl-date", c.date) +
             "</section>";
     } else {
         const drawn = await exists(decreeTemplate);

@@ -1853,10 +1853,20 @@ class CareerAggregator:
                     return re.sub(r"^K-\d+\s+", "", near_field["name"])
                 return near_town["name"] if near_town else ""
 
+            # For the Soviet form: what he held before this award, whether
+            # he was wounded up to then, and who commands the squadron.
+            held_before = [r["type"] for r in db.awards(pilot_id, include_removed=True)
+                           if r["category"] != 1 and (r["earnedDate"] or "") < earned and r["type"] != award_id]
+            wound = db.query_one("SELECT date FROM event WHERE type=5 AND pilotId=? AND isDeleted=0 AND date<=? ORDER BY date DESC",
+                                 (pilot_id, earned + " 23:59:59"))
+            commander = db.query_one("SELECT name, lastName FROM pilot WHERE isPlayer=1 AND isDeleted=0")
             facts: Dict[str, Any] = {
                 "rank": self.locale.rank_name(country, rank_id),
                 "name": f"{pilot['name']} {pilot['lastName']}".strip(),
                 "unit": meta.squadron_name,
+                "held_before": held_before,
+                "wound_date": (wound["date"] or "")[:10] if wound else "",
+                "commander": f"{commander['name']} {commander['lastName']}".strip() if commander else "",
                 "date": citations.format_date(texts, earned), "earned_raw": earned,
                 "aircraft": plane_name(sorties[-1]) if sorties else "",
                 "has_sortie": False, "kills": {}, "ground_n": 0, "hits": 0, "outcome": "ok",

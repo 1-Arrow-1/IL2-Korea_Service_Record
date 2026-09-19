@@ -214,15 +214,35 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             "signer": signer["name"], "signer_title": signer["title"],
             "signers": signers,                          # [left, right]
         }
-    texts = strings(lang)
-    dec = texts.get("decree") or strings("eng").get("decree") or {}
-    if not dec:
+    # Soviet pattern: the award recommendation sheet (наградной лист), a
+    # Russian document whatever the page's language - the commander's
+    # form with the man's particulars, the deed in the commander's words
+    # and his conclusion. The KPA used the Soviet form.
+    n = strings("rus").get("nagradnoy") or {}
+    if not n:
         return None
+    ru = strings("rus")
+    deed = compose("rus", award_id, facts) or {}
+    rus_facts = dict(facts)
+    fam_key = family
+    held = [n["held"].get(FAMILY[a][1], "") for a in facts.get("held_before", []) if a in FAMILY and FAMILY[a][1] in n["held"]]
+    held = [h for h in held if h]
+    date_raw = received or facts.get("earned_raw", "")
     return {
-        "form": "decree", "title": dec["title"].get(nation, ""),
-        "subject": _fill(dec["subject"], facts), "paragraphs": paragraphs,
-        "place": dec["place"].get(nation, ""), "date": format_date(texts, received or facts.get("earned_raw", "")),
-        "signers": dec["signers"].get(nation, []),
+        "form": "nagradnoy",
+        "name": facts.get("name_ru") or facts.get("name", ""),
+        "rank": facts.get("rank_ru") or facts.get("rank", ""),
+        "post": _fill(n["post"], {"unit": facts.get("unit", "")}),
+        "to": n["to"].get(fam_key, ""),
+        "since": _fill(n["since"], {"from": format_date(ru, facts.get("period_from_raw", "") or date_raw)}),
+        "battles": _fill(n["battles"], {"from": format_date(ru, facts.get("period_from_raw", "") or date_raw), "to": format_date(ru, date_raw)}),
+        "wounds": _fill(n["wounded"], {"date": format_date(ru, facts["wound_date"])}) if facts.get("wound_date") else n["not_wounded"],
+        "held": ", ".join(held) if held else n["not_awarded"],
+        "deed": [p_ for p_ in (deed.get("paragraphs") or [])[1:2]],
+        "conclusion": _fill(n["conclusion"], {"reason": n["reason"].get(kind, n["reason"]["period"]), "worthy": n["worthy"].get(fam_key, "")}),
+        "commander": _fill(n["commander"], {"unit": facts.get("unit", "")}),
+        "commander_name": facts.get("commander", ""),
+        "date": format_date(ru, date_raw),
     }
 
 

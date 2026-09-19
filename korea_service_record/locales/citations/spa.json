@@ -281,5 +281,81 @@
    "Entre el {period_from} y el {period_to} el {rank} {name} completó {missions} misiones de combate contra el enemigo, {hours} horas de ellas sobre territorio hostil, destruyendo {air_total} aviones enemigos y {ground_total} vehículos, cañones e instalaciones.",
    "En {missions} misiones de combate entre el {period_from} y el {period_to}, {hours} horas sobre territorio enemigo, el {rank} {name} destruyó {air_total} aviones enemigos y {ground_total} vehículos, cañones e instalaciones."
   ]
+ },
+ "nagradnoy": {
+  "to": {
+   "hero": "званию Героя Советского Союза",
+   "lenin": "ордену Ленина",
+   "red_banner": "ордену Красного Знамени",
+   "suvorov": "ордену Суворова III степени",
+   "nevsky": "ордену Александра Невского",
+   "red_star": "ордену Красной Звезды",
+   "courage": "медали «За отвагу»",
+   "battle_merit": "медали «За боевые заслуги»",
+   "hero_k": "званию Героя КНДР",
+   "freedom": "ордену Свободы и Независимости",
+   "soldiers_honour": "ордену Солдатской Славы",
+   "merit_k": "медали «За боевые заслуги»",
+   "flw": "медали «За Отечественную освободительную войну»"
+  },
+  "worthy": {
+   "hero": "присвоения звания Героя Советского Союза",
+   "lenin": "орденом Ленина",
+   "red_banner": "орденом Красного Знамени",
+   "suvorov": "орденом Суворова III степени",
+   "nevsky": "орденом Александра Невского",
+   "red_star": "орденом Красной Звезды",
+   "courage": "медалью «За отвагу»",
+   "battle_merit": "медалью «За боевые заслуги»",
+   "hero_k": "присвоения звания Героя КНДР",
+   "freedom": "орденом Свободы и Независимости",
+   "soldiers_honour": "орденом Солдатской Славы",
+   "merit_k": "медалью «За боевые заслуги»",
+   "flw": "медалью «За Отечественную освободительную войну»"
+  },
+  "held": {
+   "hero": "Герой Советского Союза",
+   "lenin": "орден Ленина",
+   "red_banner": "орден Красного Знамени",
+   "suvorov": "орден Суворова III ст.",
+   "nevsky": "орден Александра Невского",
+   "red_star": "орден Красной Звезды",
+   "courage": "медаль «За отвагу»",
+   "battle_merit": "медаль «За боевые заслуги»",
+   "hero_k": "Герой КНДР",
+   "freedom": "орден Свободы и Независимости",
+   "soldiers_honour": "орден Солдатской Славы",
+   "merit_k": "медаль «За боевые заслуги»",
+   "flw": "медаль «За Отечественную освободительную войну»"
+  },
+  "repeat": " (повторно)",
+  "post": "лётчик, {unit}",
+  "since": "с {from}",
+  "battles": "Корея, с {from} по {to}",
+  "wounded": "имеет ({date})",
+  "not_wounded": "не имеет",
+  "not_awarded": "не награждён",
+  "conclusion": "Вывод: за {reason} достоин награждения {worthy}.",
+  "reason": {
+   "sortie": "проявленные в бою мужество и отвагу",
+   "period": "образцовое выполнение боевых заданий командования и проявленные при этом доблесть и мужество",
+   "service": "участие в боевых действиях"
+  },
+  "commander": "Командир {unit}",
+  "date": "{d} {month} {y} г.",
+  "months": [
+   "января",
+   "февраля",
+   "марта",
+   "апреля",
+   "мая",
+   "июня",
+   "июля",
+   "августа",
+   "сентября",
+   "октября",
+   "ноября",
+   "декабря"
+  ]
  }
 }
