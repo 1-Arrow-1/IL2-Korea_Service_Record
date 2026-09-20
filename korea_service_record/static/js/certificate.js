@@ -101,7 +101,7 @@
         const tip = (cls) => {
             const k = cls.replace("nl-", ""); let t = i18n.t("certificate.sheet." + k);
             if (!t || t.startsWith("certificate.")) return "";
-            const v = tr[k] || (k === "name" ? c.name : k === "rank" ? c.rank : k === "born" ? c.born : k === "sign" ? c.commander_name : k === "commissar" ? c.commissar : "");
+            const v = tr[k] || (k === "born" ? c.born : k === "commissar" ? (c.commissar_tr || c.commissar) : "");
             return ' title="' + esc(t + (v ? ": " + v : "")) + '"';
         };
         const f = (cls, text) => text ? '<div class="nl ' + cls + '"' + tip(cls) + ">" + esc(text) + "</div>" : "";

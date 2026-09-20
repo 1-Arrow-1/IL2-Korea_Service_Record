@@ -84,6 +84,22 @@ def format_date(texts: Dict[str, Any], ymd: str) -> str:
         return ymd
 
 
+_CYR = dict(zip("абвгдеёжзийклмнопрстуфхцчшщъыьэюя", ["a", "b", "v", "g", "d", "e", "yo", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "shch", "", "y", "", "e", "yu", "ya"]))
+
+
+def _latin(text: str) -> str:
+    """Cyrillic transliterated for a reader of the Latin alphabet; other text untouched."""
+    out = []
+    for ch in text:
+        low = ch.lower()
+        if low in _CYR:
+            t = _CYR[low]
+            out.append(t.capitalize() if ch.isupper() else t)
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
 def _fill(template: str, facts: Dict[str, Any]) -> str:
     class _Safe(dict):
         def __missing__(self, key):
@@ -249,6 +265,9 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
     held_tr = ([bio_tr["prior"]] if bio_tr.get("prior") else []) + [facts.get("held_names", {}).get(a, "") for a in facts.get("held_before", []) if a in FAMILY and FAMILY[a][1] in n["held"]]
     held_tr = [h for h in held_tr if h]
     translation = {
+        "name": _latin(facts.get("name", "")) if lang != "rus" else facts.get("name", ""),
+        "rank": facts.get("rank_tr", ""),
+        "sign": _latin(facts.get("commander", "")) if lang != "rus" else facts.get("commander", ""),
         "to": facts.get("award_name_tr", ""),
         "post": _fill(tr.get("post", "pilot, {unit}"), {"unit": facts.get("unit", "")}),
         "nationality": bio_tr.get("nationality", ""), "party": bio_tr.get("party", ""),
@@ -279,6 +298,7 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
         "commander": _fill(n["commander"], {"unit": facts.get("unit", "")}),
         "commander_name": facts.get("commander", ""),
         "commissar": n["commissars"][sum(ord(ch) for ch in facts.get("unit", "")) % len(n["commissars"])] if n.get("commissars") else "",
+        "commissar_tr": _latin(n["commissars"][sum(ord(ch) for ch in facts.get("unit", "")) % len(n["commissars"])]) if n.get("commissars") and lang != "rus" else "",
         "date": format_date(ru, date_raw),
     }
 

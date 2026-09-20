@@ -1869,6 +1869,7 @@ class CareerAggregator:
                 "unit": meta.squadron_name,
                 "bio_id": desc.get("biographyId", ""), "birth_date": desc.get("birthDate", ""),
                 "award_name_tr": self.award_name(award_id),
+                "rank_tr": self.locale.rank_name(country, rank_id),
                 "held_names": {a: self.award_name(a) for a in held_before},
                 "held_before": held_before,
                 "wound_date": (wound["date"] or "")[:10] if wound else "",
