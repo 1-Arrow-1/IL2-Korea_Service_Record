@@ -606,8 +606,9 @@
         if (missionMap) { missionMap.remove(); missionMap = null; }
         if (!m.route || !m.route.length) { box.hidden = true; return; }
         box.hidden = false;
-        // Buttons and double-click zoom; not the wheel, which scrolls the modal.
-        missionMap = KoreaMap.createMap(box, {scrollWheelZoom: false});
+        // The wheel zooms the map, as on the operations map; Leaflet keeps
+        // the event, so the modal does not scroll under it.
+        missionMap = KoreaMap.createMap(box, {scrollWheelZoom: true});
         const route = KoreaMap.routeLayer({points: m.route.map((p) => [p.x, p.z, p.type])}, false, T).addTo(missionMap);
         const target = KoreaMap.targetMarker(m.target, false);
         if (target) target.addTo(missionMap);
