@@ -141,29 +141,36 @@
 .sheet.decree .ct-signer .ct-sign-title { font-family: 'Times New Roman', Georgia, serif; font-size: 0.85em; letter-spacing: 0; }
 
 /* The наградной лист: fields placed on the printed form's rules (measured
-   off the blank), written in a hand in blue-black ink. 1em = 1% of the
-   sheet's height. */
+   off the blank), typed on a Cyrillic machine in black. 1em = 1% of the
+   sheet's height. Each field is anchored by its bottom to its rule, so
+   the baseline sits on the rule whatever the face's size. */
 .sheet.nagradnoy { max-width: 760px; aspect-ratio: 1086 / 1448; font-size: calc(760px * 1.3333 / 100); }
 @media (max-width: 800px) { .sheet.nagradnoy { font-size: 1.3333vw; } }
-.sheet.nagradnoy .nl { position: absolute; font-family: 'Segoe Script', 'Brush Script MT', 'Lucida Handwriting', cursive;
-    color: #1c2a5e; font-size: 1.35em; line-height: 1; white-space: nowrap; }
-.sheet.nagradnoy .nl-name { left: 34%; top: 13.35%; }
-.sheet.nagradnoy .nl-rank { left: 26%; top: 16.35%; }
-.sheet.nagradnoy .nl-post { left: 28%; top: 19.25%; }
-.sheet.nagradnoy .nl-to { left: 53%; top: 25.05%; }
-.sheet.nagradnoy .nl-since { left: 29%; top: 31.85%; }
-.sheet.nagradnoy .nl-battles { left: 40%; top: 35.05%; }
-.sheet.nagradnoy .nl-wounds { left: 40%; top: 40.65%; }
-.sheet.nagradnoy .nl-held { left: 49%; top: 43.55%; font-size: 1.15em; max-width: 43%; white-space: normal; line-height: 1.1; }
-/* The deed on the ruled lines: 3.05% apart from 67.6%. */
-/* The ruled lines run every 3.05% of the height from 67.6%: a line of the
-   hand sits just above each rule. */
-.sheet.nagradnoy .nl-deed { left: 10%; width: 82%; top: 66.3%; white-space: normal; font-size: 1.25em; line-height: 2.44em; }
+.sheet.nagradnoy .nl { position: absolute; font-family: 'Courier New', Courier, monospace; font-weight: bold;
+    color: #23222a; font-size: 1.15em; line-height: 1.1; white-space: nowrap; letter-spacing: 0.02em; padding-bottom: 0.15em; }
+.sheet.nagradnoy .nl-name { left: 34%; bottom: calc(100% - 14.09%); }
+.sheet.nagradnoy .nl-rank { left: 26%; bottom: calc(100% - 17.09%); }
+.sheet.nagradnoy .nl-post { left: 28%; bottom: calc(100% - 19.82%); }
+.sheet.nagradnoy .nl-to { left: 53%; bottom: calc(100% - 25.69%); }
+.sheet.nagradnoy .nl-since { left: 29%; bottom: calc(100% - 32.25%); }
+.sheet.nagradnoy .nl-battles { left: 40%; bottom: calc(100% - 35.29%); }
+.sheet.nagradnoy .nl-wounds { left: 40%; bottom: calc(100% - 40.75%); }
+.sheet.nagradnoy .nl-held { left: 49%; bottom: calc(100% - 43.96%); font-size: 1em; max-width: 43%; }
+/* The ruled lines: 67.75, 70.37, 73.20, 75.69, 78.38, 81.15, 83.91, 86.46,
+   89.02% - a pitch of 2.66%. Each typed line is set on its own rule. */
+.sheet.nagradnoy .nl-deed { left: 10%; width: 82%; white-space: normal; font-size: 1.1em; padding: 0; }
+/* line pitch and start in sheet units: the sheet is 1448 high for 1086
+   wide, so 2.66% of the height is 3.547% of the width (cqw = the sheet). */
+.sheet.nagradnoy { container-type: inline-size; }
+.sheet.nagradnoy .nl-deed { line-height: 3.547cqw; top: calc(67.75% - 2.66% * 0.72); }
 .sheet.nagradnoy .nl-deed p { margin: 0; text-indent: 2em; }
-.sheet.nagradnoy .nl-commander { left: 24%; top: 94.4%; font-size: 1.05em; }
-.sheet.nagradnoy .nl-sign { left: 24%; top: 92.2%; }
-.sheet.nagradnoy .nl-sign .ct-sign { font-size: 1.6em; transform: none; margin: 0; }
-.sheet.nagradnoy .nl-date { left: 10%; top: 97.2%; font-size: 1.1em; }
+.sheet.nagradnoy .nl-commander { display: none; }
+.sheet.nagradnoy .nl-sign { left: 26%; bottom: calc(100% - 95.7%); padding-bottom: 0; }
+.sheet.nagradnoy .nl-sign .ct-sign { font-family: 'Segoe Script', 'Brush Script MT', cursive; font-weight: normal; color: #1c2a5e; font-size: 1.5em; transform: none; margin: 0; line-height: 1; }
+.sheet.nagradnoy .nl-date { left: 10%; bottom: calc(100% - 98.2%); font-size: 0.95em; }
+/* The unit's stamp, a little askew over the commander's signature. */
+.sheet.nagradnoy .nl-seal { position: absolute; left: 9%; top: 85%; width: 13%; opacity: 0.8; transform: rotate(-8deg);
+    mix-blend-mode: multiply; pointer-events: none; }
 
 @media print {
     @page { size: landscape; margin: 6mm; }

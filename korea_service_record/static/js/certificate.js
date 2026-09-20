@@ -107,6 +107,7 @@
                 f("nl-commander", c.commander) +
                 '<div class="nl nl-sign"><span class="ct-sign">' + esc(c.commander_name) + "</span></div>" +
                 f("nl-date", c.date) +
+                '<img class="nl-seal" src="/static/images/certificates/ussr_seal.png" alt="">' +
             "</section>";
     } else {
         const drawn = await exists(decreeTemplate);
