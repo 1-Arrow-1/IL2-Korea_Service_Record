@@ -224,6 +224,16 @@
     // Ours, lost: a cross where each came down. Two lost at the same spot
     // and moment - a collision within the flight - share one cross with a
     // count, or the second would hide under the first.
+    // The front line of the mission's day, from the career generator's
+    // own table - the line the game drew that mission against.
+    function frontLayer(points, T) {
+        const line = L.polyline(points.map((p) => toLatLng(p[0], p[1])), {
+            className: "map-front", weight: 3, interactive: true,
+        });
+        line.bindTooltip(T("map.front"), {sticky: true, direction: "top"});
+        return line;
+    }
+
     function lossLayer(losses, T) {
         const group = L.layerGroup();
         const spots = new Map();
@@ -264,5 +274,5 @@
     }
 
     window.KoreaMap = {createMap, overlayFeatures, labelLayer, routeLayer, targetMarker,
-                       groundMarker, victoryMarker, baseMarker, trackLayer, lossLayer, fitTo, toLatLng};
+                       groundMarker, victoryMarker, baseMarker, trackLayer, lossLayer, frontLayer, fitTo, toLatLng};
 })();

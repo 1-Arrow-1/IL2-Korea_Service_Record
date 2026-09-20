@@ -26,7 +26,7 @@ import json
 import logging
 import re
 from pathlib import Path
-from typing import Dict, List, NamedTuple, Optional
+from typing import Dict, List, NamedTuple, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -119,6 +119,50 @@ def resolve_game_dir(start: Path) -> Optional[Path]:
 
 
 # ---------------------------------------------------------------------------
+# frontline.cfg
+# ---------------------------------------------------------------------------
+
+
+class FrontLines:
+    """
+    The career generator's front lines, ``scg/2/frontline.cfg`` inside
+    Missions.gtp: one ``[frontline]`` block per period, ``period="from","to"``
+    inclusive, and the line as ``p=x,z`` points in the flight log's metres.
+    Each block is closed into a polygon by way of the map's corners; those
+    corner points are dropped for drawing.
+    """
+
+    VPATH = "scg/2/frontline.cfg"
+    EDGE = 499199
+
+    def __init__(self, resolver: Optional["AssetResolver"]):
+        self.periods: List[Tuple[str, str, List[List[int]]]] = []
+        text = resolver.read_text(self.VPATH) if resolver is not None else None
+        if text:
+            self._parse(text)
+
+    def _parse(self, text: str) -> None:
+        for block in re.findall(r"\[frontline\](.*?)\[end\]", text, re.S):
+            period = re.search(r'period\s*=\s*"([\d.]+)"\s*,\s*"([\d.]+)"', block)
+            if not period:
+                continue
+            points = [[int(x), int(z)] for x, z in re.findall(r"p\s*=\s*(-?\d+)\s*,\s*(-?\d+)", block)]
+            on_edge = lambda pt: pt[0] <= 0 or pt[1] <= 0 or pt[0] >= self.EDGE or pt[1] >= self.EDGE
+            while points and on_edge(points[0]):
+                points.pop(0)
+            while points and on_edge(points[-1]):
+                points.pop()
+            if points:
+                self.periods.append((period.group(1), period.group(2), points))
+
+    def for_date(self, date: str) -> List[List[int]]:
+        """The line in force on a career date (``1951.04.23``), or []."""
+        for start, end, points in self.periods:
+            if start <= date[:10] <= end:
+                return points
+        return []
+
+
 # awards.cfg
 # ---------------------------------------------------------------------------
 

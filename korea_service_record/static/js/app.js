@@ -632,6 +632,9 @@
         getJSON("/api/track/" + encodeURIComponent(careerId) + "/" + m.id).then((track) => {
             if (!missionMap || mapId !== missionMapId) return;
             const layers = [];
+            if (track.front && track.front.length > 1) {
+                KoreaMap.frontLayer(track.front, T).addTo(missionMap);   // not fitted: it spans the map
+            }
             if (track.segments && track.segments.length) {
                 layers.push(KoreaMap.trackLayer(track, T).addTo(missionMap));
             }
@@ -646,6 +649,7 @@
                 }
                 if ((track.marks || []).some((k) => k.kind === "hit")) items.push(["hit", T("map.hits")]);
                 if (track.losses && track.losses.length) items.push(["loss", T("map.losses")]);
+                if (track.front && track.front.length > 1) items.push(["front", T("map.front")]);
                 legend.innerHTML = items.map(([cls, label]) =>
                     '<span class="legend-item"><i class="legend-' + cls + '"></i>' + esc(label) + "</span>").join("");
                 legend.hidden = false;

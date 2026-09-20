@@ -31,7 +31,7 @@ from typing import Any, Dict, List, Optional
 
 from ..assets import AssetResolver
 from ..flightlog import SELF as SELF_DAMAGE, FlightLogIndex
-from ..gamedata import (COUNTRY_FLAGS, COUNTRY_NAMES, COUNTRY_SEALS, COUNTRY_STAMPS, AwardsConfig,
+from ..gamedata import (COUNTRY_FLAGS, COUNTRY_NAMES, COUNTRY_SEALS, COUNTRY_STAMPS, AwardsConfig, FrontLines,
                         LocaleStrings, MissionDescriptions, DEFAULT_TVD, PLANE_TYPES)
 from ..geo import (MapTiles, Overlay, WAYPOINT_TAKEOFF, WAYPOINT_LANDING,
                    parse_point, parse_route)
@@ -326,6 +326,7 @@ class CareerAggregator:
         self.awards_cfg = AwardsConfig(
             self.game_dir / "data" / "scg" / str(DEFAULT_TVD) / "awards.cfg",
             resolver=self.resolver)
+        self.frontlines = FrontLines(self.resolver)
 
     # -- helpers -----------------------------------------------------------
 
@@ -2068,7 +2069,8 @@ class CareerAggregator:
                 seen_loss.add(e["pilot"])
                 losses.append({"x": e["x"], "z": e["z"], "alt": e["altitude"], "pilot": e["pilot"],
                                "plane": self.objects.describe(e["plane"])["name"]})
-            out: Dict[str, Any] = {"mission_id": mission_id, "segments": [], "marks": [], "losses": losses}
+            out: Dict[str, Any] = {"mission_id": mission_id, "segments": [], "marks": [], "losses": losses,
+                                   "front": self.frontlines.for_date(mission["date"] or "")}
             sortie = db.query_one("SELECT date FROM sortie WHERE missionId=? AND pilotId=? AND isDeleted=0",
                                   (mission_id, player["id"]))
             log = self.flightlogs.for_sortie(sortie["date"][:10], sortie["date"][11:16]) if sortie else None

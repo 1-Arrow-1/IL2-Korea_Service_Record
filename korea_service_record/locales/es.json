@@ -263,7 +263,24 @@
     }
   },
   "certificate": {
-    "sheet": {"name": "Apellido, nombre y patronímico", "rank": "Grado militar", "post": "Cargo y unidad", "to": "Propuesto para", "born": "Año de nacimiento", "nationality": "Nacionalidad", "since": "En el ejército desde", "party": "Afiliación política", "battles": "Participación en combates (dónde, cuándo)", "wounds": "Heridas y contusiones", "held": "Condecoraciones anteriores (por qué méritos)", "rvk": "Comisariado militar de distrito que lo reclutó", "deed": "Exposición breve y concreta de la hazaña o méritos personales; conclusión del jefe", "sign": "Jefe de la unidad", "commissar": "Comisario militar", "date": "Fecha de la propuesta"},
+    "sheet": {
+      "name": "Apellido, nombre y patronímico",
+      "rank": "Grado militar",
+      "post": "Cargo y unidad",
+      "to": "Propuesto para",
+      "born": "Año de nacimiento",
+      "nationality": "Nacionalidad",
+      "since": "En el ejército desde",
+      "party": "Afiliación política",
+      "battles": "Participación en combates (dónde, cuándo)",
+      "wounds": "Heridas y contusiones",
+      "held": "Condecoraciones anteriores (por qué méritos)",
+      "rvk": "Comisariado militar de distrito que lo reclutó",
+      "deed": "Exposición breve y concreta de la hazaña o méritos personales; conclusión del jefe",
+      "sign": "Jefe de la unidad",
+      "commissar": "Comisario militar",
+      "date": "Fecha de la propuesta"
+    },
     "back": "Hoja de Servicios",
     "print": "Imprimir",
     "failed": "No se pudo leer el diploma."
@@ -290,7 +307,8 @@
     "hit_tip": "Alcanzado por {attacker}",
     "hit_own": "Propia munición",
     "loss_tip": "{pilot} perdido · {plane}",
-    "target_tip": "{ground} objetivos terrestres, {air} aeronaves destruidas"
+    "target_tip": "{ground} objetivos terrestres, {air} aeronaves destruidas",
+    "front": "Línea del frente"
   },
   "aircraft": {
     "heading": "Aeronaves",

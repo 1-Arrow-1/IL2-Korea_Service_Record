@@ -263,7 +263,24 @@
     }
   },
   "certificate": {
-    "sheet": {"name": "Nom, prénom et patronyme", "rank": "Grade militaire", "post": "Fonction et unité", "to": "Proposé pour", "born": "Année de naissance", "nationality": "Nationalité", "since": "Dans l’armée depuis", "party": "Appartenance au Parti", "battles": "Participation aux combats (où, quand)", "wounds": "Blessures et commotions", "held": "Décorations antérieures (pour quels faits)", "rvk": "Commissariat militaire de district ayant procédé à l’appel", "deed": "Exposé bref et concret de l’exploit ou des mérites personnels ; conclusion du commandant", "sign": "Commandant de l’unité", "commissar": "Commissaire militaire", "date": "Date de la proposition"},
+    "sheet": {
+      "name": "Nom, prénom et patronyme",
+      "rank": "Grade militaire",
+      "post": "Fonction et unité",
+      "to": "Proposé pour",
+      "born": "Année de naissance",
+      "nationality": "Nationalité",
+      "since": "Dans l’armée depuis",
+      "party": "Appartenance au Parti",
+      "battles": "Participation aux combats (où, quand)",
+      "wounds": "Blessures et commotions",
+      "held": "Décorations antérieures (pour quels faits)",
+      "rvk": "Commissariat militaire de district ayant procédé à l’appel",
+      "deed": "Exposé bref et concret de l’exploit ou des mérites personnels ; conclusion du commandant",
+      "sign": "Commandant de l’unité",
+      "commissar": "Commissaire militaire",
+      "date": "Date de la proposition"
+    },
     "back": "État de service",
     "print": "Imprimer",
     "failed": "Le diplôme n’a pas pu être lu."
@@ -290,7 +307,8 @@
     "hit_tip": "Touché par {attacker}",
     "hit_own": "Propres munitions",
     "loss_tip": "{pilot} perdu · {plane}",
-    "target_tip": "{ground} cibles au sol, {air} appareils détruits"
+    "target_tip": "{ground} cibles au sol, {air} appareils détruits",
+    "front": "Ligne de front"
   },
   "aircraft": {
     "heading": "Appareils",

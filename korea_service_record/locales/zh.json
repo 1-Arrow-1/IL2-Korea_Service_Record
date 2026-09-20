@@ -263,7 +263,24 @@
     }
   },
   "certificate": {
-    "sheet": {"name": "姓、名和父称", "rank": "军衔", "post": "职务与部队", "to": "拟授予", "born": "出生年份", "nationality": "民族", "since": "入伍时间", "party": "党派", "battles": "参加战斗（地点、时间）", "wounds": "负伤与震伤", "held": "以往受奖（因何功绩）", "rvk": "征召的区兵役委员会", "deed": "个人战功或功绩的简要具体陈述；指挥员结论", "sign": "部队指挥员", "commissar": "军事委员", "date": "呈报日期"},
+    "sheet": {
+      "name": "姓、名和父称",
+      "rank": "军衔",
+      "post": "职务与部队",
+      "to": "拟授予",
+      "born": "出生年份",
+      "nationality": "民族",
+      "since": "入伍时间",
+      "party": "党派",
+      "battles": "参加战斗（地点、时间）",
+      "wounds": "负伤与震伤",
+      "held": "以往受奖（因何功绩）",
+      "rvk": "征召的区兵役委员会",
+      "deed": "个人战功或功绩的简要具体陈述；指挥员结论",
+      "sign": "部队指挥员",
+      "commissar": "军事委员",
+      "date": "呈报日期"
+    },
     "back": "服役记录",
     "print": "打印",
     "failed": "无法读取证书。"
@@ -290,7 +307,8 @@
     "hit_tip": "被 {attacker} 击中",
     "hit_own": "己方武器误伤",
     "loss_tip": "{pilot} 损失 · {plane}",
-    "target_tip": "摧毁地面目标 {ground} 个，飞机 {air} 架"
+    "target_tip": "摧毁地面目标 {ground} 个，飞机 {air} 架",
+    "front": "前线"
   },
   "aircraft": {
     "heading": "飞机",

@@ -52,6 +52,7 @@
    and the time skips between them as dashed jumps in the same ink. */
 .map-track { stroke: #1c3a5e; stroke-opacity: 0.7; fill: none; stroke-linejoin: round; stroke-linecap: round; }
 .map-warp { stroke: #1c3a5e; stroke-opacity: 0.6; fill: none; }
+.map-front { stroke: #b3261e; stroke-opacity: 0.85; fill: none; stroke-linejoin: round; stroke-dasharray: 10 4 2 4; }
 .map-mark svg { width: 16px; height: 16px; fill: none; stroke-width: 2; }
 .map-mark.takeoff svg, .map-mark.landing svg { fill: #1c3a5e; stroke: var(--paper-panel); stroke-width: 1; }
 .map-mark.hit svg { stroke: var(--bad); }
@@ -65,6 +66,7 @@
 .legend-item i { display: inline-block; width: 22px; height: 0; border-top: 2.5px solid var(--bad); }
 .legend-item i.legend-track { border-top: 2px dotted #1c3a5e; }
 .legend-item i.legend-warp { border-top: 2px dashed #1c3a5e; }
+.legend-item i.legend-front { border-top: 3px dashed #b3261e; }
 .legend-item i.legend-hit, .legend-item i.legend-loss { width: 10px; height: 10px; border: 0; position: relative; }
 .legend-item i.legend-hit::before, .legend-item i.legend-hit::after,
 .legend-item i.legend-loss::before, .legend-item i.legend-loss::after {
