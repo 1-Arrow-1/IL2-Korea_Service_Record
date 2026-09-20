@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import locale
 import sqlite3
+from datetime import datetime
 import sys
 import tkinter as tk
 from pathlib import Path
@@ -62,6 +63,18 @@ STATE_NAMES = {2: "kia", 3: "mia"}
 
 STRINGS: Dict[str, Dict[str, str]] = {
     "en": {
+        'tab_captured': 'Captured',
+        'captured_intro': 'A pilot who bailed out or crash-landed over enemy ground: the game lets him walk back to the squadron in a couple of days. Mark him captured instead - the game then treats it like a loss (for the player: "Commander Captured", with a new commander to assign). Only a pilot\'s latest sortie counts.',
+        'col_sortie': 'Sortie',
+        'col_fate': 'Fate',
+        'col_can2': 'Possible',
+        'fate_evading': 'evading, back on {date}',
+        'fate_lost_plane': 'aircraft lost, pilot back',
+        'no_later': 'no - he has flown since',
+        'no_candidates': 'Nobody went down over enemy ground in this career.',
+        'capture': 'Mark as captured',
+        'capture_confirm': 'Mark {name} as captured on {date}? The game will list him as missing in action.',
+        'captured_done': '{name} is now missing in action - captured. Backup: {backup}',
         "title": "IL-2 Korea Career Helper",
         "career": "Career",
         "no_game": "No IL-2 Korea installation found.",
@@ -115,6 +128,18 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "withdrawn": "{n} awards withdrawn. Backup: {backup}",
     },
     "de": {
+        'tab_captured': 'Gefangen',
+        'captured_intro': 'Ein Pilot, der über Feindgebiet abgesprungen oder notgelandet ist: das Spiel lässt ihn in ein paar Tagen zur Staffel zurückkehren. Stattdessen als gefangen markieren - das Spiel behandelt es dann wie einen Verlust (beim Spieler: „Kommandeur gefangen“, ein neuer Kommandeur ist zu ernennen). Nur der letzte Einsatz eines Piloten zählt.',
+        'col_sortie': 'Einsatz',
+        'col_fate': 'Verbleib',
+        'col_can2': 'Möglich',
+        'fate_evading': 'auf dem Rückweg, zurück am {date}',
+        'fate_lost_plane': 'Flugzeug verloren, Pilot zurück',
+        'no_later': 'nein - er ist seitdem geflogen',
+        'no_candidates': 'In dieser Laufbahn ist niemand über Feindgebiet abgestürzt.',
+        'capture': 'Als gefangen markieren',
+        'capture_confirm': '{name} am {date} als gefangen markieren? Das Spiel führt ihn dann als vermisst.',
+        'captured_done': '{name} gilt jetzt als vermisst - in Gefangenschaft. Sicherung: {backup}',
         "title": "IL-2 Korea Laufbahn-Helfer",
         "career": "Laufbahn",
         "no_game": "Keine IL-2-Korea-Installation gefunden.",
@@ -168,6 +193,18 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "withdrawn": "{n} Auszeichnungen entzogen. Sicherung: {backup}",
     },
     "es": {
+        'tab_captured': 'Capturado',
+        'captured_intro': 'Un piloto que saltó en paracaídas o aterrizó forzosamente sobre terreno enemigo: el juego le deja volver al escuadrón en un par de días. Márquelo como capturado en su lugar: el juego lo trata entonces como una baja (para el jugador: «Comandante capturado», con un nuevo comandante que asignar). Solo cuenta la última salida de cada piloto.',
+        'col_sortie': 'Salida',
+        'col_fate': 'Destino',
+        'col_can2': 'Posible',
+        'fate_evading': 'evadiéndose, de vuelta el {date}',
+        'fate_lost_plane': 'avión perdido, piloto de vuelta',
+        'no_later': 'no - ha volado desde entonces',
+        'no_candidates': 'Nadie ha caído sobre terreno enemigo en esta carrera.',
+        'capture': 'Marcar como capturado',
+        'capture_confirm': '¿Marcar a {name} como capturado el {date}? El juego lo listará como desaparecido en combate.',
+        'captured_done': '{name} figura ahora como desaparecido en combate: capturado. Copia de seguridad: {backup}',
         "title": "Asistente de carrera IL-2 Korea",
         "career": "Carrera",
         "no_game": "No se encontró ninguna instalación de IL-2 Korea.",
@@ -221,6 +258,18 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "withdrawn": "{n} condecoraciones retiradas. Copia de seguridad: {backup}",
     },
     "fr": {
+        'tab_captured': 'Capturé',
+        'captured_intro': 'Un pilote qui a sauté ou s’est posé en catastrophe en territoire ennemi : le jeu le laisse regagner l’escadron en quelques jours. Marquez-le plutôt comme capturé : le jeu le traite alors comme une perte (pour le joueur : « Commandant capturé », avec un nouveau commandant à nommer). Seule la dernière sortie d’un pilote compte.',
+        'col_sortie': 'Sortie',
+        'col_fate': 'Sort',
+        'col_can2': 'Possible',
+        'fate_evading': 'en évasion, de retour le {date}',
+        'fate_lost_plane': 'appareil perdu, pilote rentré',
+        'no_later': 'non - il a volé depuis',
+        'no_candidates': 'Personne n’est tombé en territoire ennemi dans cette carrière.',
+        'capture': 'Marquer comme capturé',
+        'capture_confirm': 'Marquer {name} comme capturé le {date} ? Le jeu le portera disparu au combat.',
+        'captured_done': '{name} est désormais porté disparu - capturé. Sauvegarde : {backup}',
         "title": "Assistant de carrière IL-2 Korea",
         "career": "Carrière",
         "no_game": "Aucune installation d’IL-2 Korea trouvée.",
@@ -274,6 +323,18 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "withdrawn": "{n} décorations retirées. Sauvegarde : {backup}",
     },
     "ru": {
+        'tab_captured': 'В плену',
+        'captured_intro': 'Лётчик, выпрыгнувший с парашютом или севший на вынужденную над территорией противника: игра даёт ему вернуться в часть через пару дней. Вместо этого отметьте его пленённым — игра посчитает это потерей (для игрока: «Командир взят в плен», нужно назначить нового командира). Учитывается только последний вылет лётчика.',
+        'col_sortie': 'Вылет',
+        'col_fate': 'Судьба',
+        'col_can2': 'Возможно',
+        'fate_evading': 'выходит к своим, вернётся {date}',
+        'fate_lost_plane': 'самолёт потерян, лётчик вернулся',
+        'no_later': 'нет — он летал после этого',
+        'no_candidates': 'В этой карьере никто не был сбит над территорией противника.',
+        'capture': 'Отметить как пленённого',
+        'capture_confirm': 'Отметить {name} пленённым {date}? Игра будет считать его пропавшим без вести.',
+        'captured_done': '{name} теперь числится пропавшим без вести — в плену. Резервная копия: {backup}',
         "title": "Помощник карьеры IL-2 Korea",
         "career": "Карьера",
         "no_game": "Установка IL-2 Korea не найдена.",
@@ -327,6 +388,18 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "withdrawn": "Отозвано наград: {n}. Резервная копия: {backup}",
     },
     "zh": {
+        'tab_captured': '被俘',
+        'captured_intro': '在敌方地域跳伞或迫降的飞行员：游戏会让他在几天后自行返回中队。可改为将其标记为被俘——游戏随后按损失处理（对玩家而言：“指挥官被俘”，需指定新指挥官）。只计入飞行员的最后一次出击。',
+        'col_sortie': '出击',
+        'col_fate': '下落',
+        'col_can2': '可行',
+        'fate_evading': '正在归队，{date} 返回',
+        'fate_lost_plane': '飞机损失，飞行员已返回',
+        'no_later': '否——此后他仍有出击',
+        'no_candidates': '本生涯中无人在敌方地域坠落。',
+        'capture': '标记为被俘',
+        'capture_confirm': '将 {name} 标记为于 {date} 被俘？游戏将把他列为作战失踪。',
+        'captured_done': '{name} 现已列为作战失踪——被俘。备份：{backup}',
         "title": "IL-2 Korea 生涯助手",
         "career": "生涯",
         "no_game": "未找到 IL-2 Korea 安装。",
@@ -444,6 +517,35 @@ class Career:
                 })
         return out
 
+    def downed_pilots(self) -> List[Dict]:
+        """
+        Pilots who went down over enemy ground and are still on the roll:
+        the game's evaders (state 1, walking back) and anyone whose aircraft
+        was lost on a sortie he survived. Capturable only while that sortie
+        is his latest - he has not flown since.
+        """
+        out = []
+        with self._open() as con:
+            latest = {r["pilotId"]: r["id"] for r in con.execute(
+                "SELECT pilotId, MAX(id) AS id FROM sortie WHERE isDeleted=0 GROUP BY pilotId")}
+            rows = con.execute(
+                """SELECT s.id, s.pilotId, s.missionId, s.status, s.planeStatus, s.date,
+                          p.name, p.lastName, p.state, p.stateEndDate
+                   FROM sortie s JOIN pilot p ON p.id = s.pilotId
+                   WHERE s.isDeleted=0 AND p.isDeleted=0 AND p.state IN (0, 1)
+                     AND (s.status = 1 OR s.planeStatus = 3) AND s.status NOT IN (2, 3)
+                   ORDER BY s.date DESC, s.id DESC""")
+            for r in rows:
+                out.append({
+                    "id": r["id"], "pilot_id": r["pilotId"], "mission_id": r["missionId"],
+                    "name": f"{r['name']} {r['lastName']}".strip(),
+                    "date": (r["date"] or "")[:10],
+                    "evading": r["state"] == 1 and latest.get(r["pilotId"]) == r["id"],
+                    "back_on": (r["stateEndDate"] or "")[:10],
+                    "capturable": latest.get(r["pilotId"]) == r["id"],
+                })
+        return out
+
     # -- flight-time corrections -------------------------------------------
 
     def corrections(self):
@@ -553,6 +655,43 @@ class Career:
             con.commit()
         return backup
 
+    def capture(self, sortie_id: int) -> Path:
+        """
+        Mark the pilot of that sortie captured, the way the game books an AI
+        pilot lost over enemy territory: state 3 from the moment he went
+        down, the sortie's fate 3 and one MIA event. The game does the rest
+        (for the player: "Commander Captured" on the next day). Returns the
+        backup path; raises sqlite3.OperationalError when the game holds the file.
+        """
+        backup = self.backup()
+        with self._open(write=True) as con:
+            con.execute("BEGIN IMMEDIATE")
+            sortie = con.execute("SELECT * FROM sortie WHERE id=?", (sortie_id,)).fetchone()
+            if sortie is None or sortie["status"] in (2, 3):
+                raise ValueError("not a survivable loss")
+            pilot = con.execute("SELECT * FROM pilot WHERE id=?", (sortie["pilotId"],)).fetchone()
+            if pilot is None or pilot["state"] not in (0, 1):
+                raise ValueError("pilot not on the roll")
+            # The moment he went down: his shoot-down event on that mission,
+            # else the mission's end.
+            hit = con.execute(
+                "SELECT date FROM event WHERE type=2 AND pilotId=? AND missionId=? AND isDeleted=0 "
+                "ORDER BY id DESC LIMIT 1", (pilot["id"], sortie["missionId"])).fetchone()
+            mission = con.execute("SELECT endTime FROM mission WHERE id=?", (sortie["missionId"],)).fetchone()
+            when = (hit["date"] if hit else None) or (mission["endTime"] if mission else None) or sortie["date"]
+            con.execute("UPDATE pilot SET state=3, stateDate=?, stateEndDate='0000.00.00 00:00:00' WHERE id=?",
+                        (when, pilot["id"]))
+            con.execute("UPDATE sortie SET status=3 WHERE id=?", (sortie_id,))
+            con.execute(
+                """INSERT INTO event (date, type, pilotId, rankId, missionId, squadronId, careerId, planeId,
+                                      ipar1, ipar2, ipar3, ipar4, tpar1, tpar2, tpar3, tpar4, insdate, isDeleted)
+                   VALUES (?, 4, ?, 0, ?, ?, ?, -1, -1, -1, -1, -1, '', '', '', '', ?, 0)""",
+                (when, pilot["id"], sortie["missionId"], pilot["squadronId"],
+                 con.execute("SELECT id FROM career").fetchone()[0],
+                 datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            con.commit()
+        return backup
+
     def add_points(self, amount: int) -> Path:
         backup = self.backup()
         with self._open(write=True) as con:
@@ -623,6 +762,22 @@ class App(tk.Tk):
         self.revive_btn = ttk.Button(bottom, text=self.t["revive"], command=self._revive, state="disabled")
         self.revive_btn.pack(side="right")
 
+        # -- captured tab
+        cap = ttk.Frame(nb)
+        nb.add(cap, text=self.t["tab_captured"])
+        ttk.Label(cap, text=self.t["captured_intro"], wraplength=700).pack(anchor="w", padx=8, pady=(8, 6))
+        cols = ("name", "sortie", "fate", "can2")
+        self.cap_tree = ttk.Treeview(cap, columns=cols, show="headings", height=8, selectmode="browse")
+        for key, width in (("name", 220), ("sortie", 110), ("fate", 240), ("can2", 170)):
+            self.cap_tree.heading(key, text=self.t["col_" + key])
+            self.cap_tree.column(key, width=width, anchor="w")
+        self.cap_tree.pack(fill="both", expand=True, padx=8)
+        self.cap_tree.bind("<<TreeviewSelect>>", lambda _e: self._update_buttons())
+        capb = ttk.Frame(cap)
+        capb.pack(fill="x", padx=8, pady=8)
+        self.capture_btn = ttk.Button(capb, text=self.t["capture"], command=self._capture, state="disabled")
+        self.capture_btn.pack(side="right")
+
         # -- flight time tab
         ft = ttk.Frame(nb)
         nb.add(ft, text=self.t["tab_times"])
@@ -688,6 +843,7 @@ class App(tk.Tk):
         try:
             today = self.career.current_date()
             self.lost = self.career.lost_pilots()
+            self.downed = self.career.downed_pilots()
             points = self.career.award_points()
         except sqlite3.Error as exc:
             self.status.set(self.t["failed"].format(error=exc))
@@ -702,6 +858,12 @@ class App(tk.Tk):
             self.status.set(self.t["no_dead"])
         else:
             self.status.set("")
+        self.cap_tree.delete(*self.cap_tree.get_children())
+        for d in self.downed:
+            fate = (self.t["fate_evading"].format(date=d["back_on"]) if d["evading"]
+                    else self.t["fate_lost_plane"])
+            self.cap_tree.insert("", "end", iid=str(d["id"]), values=(
+                d["name"], d["date"], fate, self.t["yes"] if d["capturable"] else self.t["no_later"]))
         self.points_var.set(self.t["points_now"].format(points=points))
         self._update_buttons()
         self._fill_times()
@@ -712,9 +874,34 @@ class App(tk.Tk):
             return None
         return next((p for p in self.lost if str(p["id"]) == sel[0]), None)
 
+    def _selected_downed(self) -> Optional[Dict]:
+        sel = self.cap_tree.selection()
+        if not sel:
+            return None
+        return next((d for d in self.downed if str(d["id"]) == sel[0]), None)
+
     def _update_buttons(self) -> None:
         p = self._selected()
         self.revive_btn["state"] = "normal" if (p and p["revivable"]) else "disabled"
+        d = self._selected_downed()
+        self.capture_btn["state"] = "normal" if (d and d["capturable"]) else "disabled"
+
+    def _capture(self) -> None:
+        d = self._selected_downed()
+        if not d or not d["capturable"] or self.career is None:
+            return
+        if not messagebox.askyesno(self.t["title"], self.t["capture_confirm"].format(name=d["name"], date=d["date"])):
+            return
+        try:
+            backup = self.career.capture(d["id"])
+        except sqlite3.OperationalError:
+            messagebox.showerror(self.t["title"], self.t["locked"])
+            return
+        except Exception as exc:          # noqa: BLE001 - shown to the user, not hidden
+            messagebox.showerror(self.t["title"], self.t["failed"].format(error=exc))
+            return
+        self.status.set(self.t["captured_done"].format(name=d["name"], backup=backup))
+        self._select_career()
 
     # -- actions -------------------------------------------------------------------
 
