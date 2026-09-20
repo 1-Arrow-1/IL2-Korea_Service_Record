@@ -228,16 +228,28 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
     held = [n["held"].get(FAMILY[a][1], "") for a in facts.get("held_before", []) if a in FAMILY and FAMILY[a][1] in n["held"]]
     held = [h for h in held if h]
     date_raw = received or facts.get("earned_raw", "")
+    # The player's game biography gives the particulars the form asks for;
+    # an AI pilot has none, and those lines stay blank.
+    bio = (strings("rus").get("bios") or {}).get(str(facts.get("bio_id") or ""), {})
+    korea = _fill(n["battles"], {"from": format_date(ru, facts.get("period_from_raw", "") or date_raw), "to": format_date(ru, date_raw)})
+    battles = (bio["battles"] + "; " + korea) if bio.get("battles") and bio["battles"] != "не участвовал" else korea
+    prior = [bio["prior"]] if bio.get("prior") else []
+    held_all = prior + held
+    birth = facts.get("birth_date", "")
     return {
         "form": "nagradnoy",
         "name": facts.get("name_ru") or facts.get("name", ""),
         "rank": facts.get("rank_ru") or facts.get("rank", ""),
         "post": _fill(n["post"], {"unit": facts.get("unit", "")}),
         "to": n["to"].get(fam_key, ""),
-        "since": _fill(n["since"], {"from": format_date(ru, facts.get("period_from_raw", "") or date_raw)}),
-        "battles": _fill(n["battles"], {"from": format_date(ru, facts.get("period_from_raw", "") or date_raw), "to": format_date(ru, date_raw)}),
+        "born": birth[:4] if birth else "",
+        "birthplace": bio.get("born", ""),
+        "nationality": bio.get("nationality", ""),
+        "party": bio.get("party", ""),
+        "since": bio.get("since") or _fill(n["since"], {"from": format_date(ru, facts.get("period_from_raw", "") or date_raw)}),
+        "battles": battles,
         "wounds": _fill(n["wounded"], {"date": format_date(ru, facts["wound_date"])}) if facts.get("wound_date") else n["not_wounded"],
-        "held": ", ".join(held) if held else n["not_awarded"],
+        "held": ", ".join(held_all) if held_all else n["not_awarded"],
         "deed": [p_ for p_ in (deed.get("paragraphs") or [])[1:2]],
         "conclusion": _fill(n["conclusion"], {"reason": n["reason"].get(kind, n["reason"]["period"]), "worthy": n["worthy"].get(fam_key, "")}),
         "commander": _fill(n["commander"], {"unit": facts.get("unit", "")}),

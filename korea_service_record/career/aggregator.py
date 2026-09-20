@@ -1860,10 +1860,14 @@ class CareerAggregator:
             wound = db.query_one("SELECT date FROM event WHERE type=5 AND pilotId=? AND isDeleted=0 AND date<=? ORDER BY date DESC",
                                  (pilot_id, earned + " 23:59:59"))
             commander = db.query_one("SELECT name, lastName FROM pilot WHERE isPlayer=1 AND isDeleted=0")
+            # The player's description carries his biography and birth date
+            # ("biographyId=601006&birthDate=1920.02.23"); the AI have none.
+            desc = dict(urllib.parse.parse_qsl(urllib.parse.unquote(pilot["description"] or "")))
             facts: Dict[str, Any] = {
                 "rank": self.locale.rank_name(country, rank_id),
                 "name": f"{pilot['name']} {pilot['lastName']}".strip(),
                 "unit": meta.squadron_name,
+                "bio_id": desc.get("biographyId", ""), "birth_date": desc.get("birthDate", ""),
                 "held_before": held_before,
                 "wound_date": (wound["date"] or "")[:10] if wound else "",
                 "commander": f"{commander['name']} {commander['lastName']}".strip() if commander else "",

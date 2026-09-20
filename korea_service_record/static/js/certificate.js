@@ -102,7 +102,8 @@
         el("ct-sheet").innerHTML =
             '<section class="sheet nagradnoy' + (drawn ? " drawn" : "") + '"' + (drawn ? ' style="background-image:url(\'' + form + '\');aspect-ratio:' + drawn.w + ' / ' + drawn.h + '"' : "") + ">" +
                 f("nl-name", c.name) + f("nl-rank", c.rank) + f("nl-post", c.post) + f("nl-to", c.to) +
-                f("nl-since", c.since) + f("nl-battles", c.battles) + f("nl-wounds", c.wounds) + f("nl-held", c.held) +
+                f("nl-born", c.born) + f("nl-nationality", c.nationality) + f("nl-since", c.since) + f("nl-party", c.party) +
+                f("nl-battles", c.battles) + f("nl-wounds", c.wounds) + f("nl-held", c.held) + f("nl-rvk", c.birthplace ? c.birthplace + " (по месту рождения)" : "") +
                 '<div class="nl nl-deed">' + deedLines.map((t) => "<p>" + esc(t) + "</p>").join("") + "</div>" +
                 f("nl-commander", c.commander) +
                 '<div class="nl nl-sign"><span class="ct-sign">' + esc(c.commander_name) + "</span></div>" +
