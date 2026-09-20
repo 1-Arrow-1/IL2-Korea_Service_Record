@@ -153,8 +153,8 @@
 .sheet.nagradnoy .nl-post { left: 28%; bottom: calc(100% - 19.82%); }
 .sheet.nagradnoy .nl-to { left: 53%; bottom: calc(100% - 25.69%); }
 .sheet.nagradnoy .nl-born { left: 26%; bottom: calc(100% - 28.18%); }
-.sheet.nagradnoy .nl-nationality { left: 66%; bottom: calc(100% - 28.18%); }
-.sheet.nagradnoy .nl-party { left: 64%; bottom: calc(100% - 31.1%); }
+.sheet.nagradnoy .nl-nationality { left: 71%; bottom: calc(100% - 28.18%); font-size: 0.85em; max-width: 21%; white-space: normal; line-height: 1.1; }
+.sheet.nagradnoy .nl-party { left: 68%; bottom: calc(100% - 31.1%); font-size: 0.95em; }
 .sheet.nagradnoy .nl-since { left: 29%; bottom: calc(100% - 32.25%); }
 .sheet.nagradnoy .nl-battles { font-size: 0.95em; max-width: 52%; white-space: normal; line-height: 1.15; }
 .sheet.nagradnoy .nl-rvk { left: 32%; bottom: calc(100% - 49.52%); }
