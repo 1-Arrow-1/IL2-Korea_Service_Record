@@ -263,6 +263,7 @@
     }
   },
   "certificate": {
+    "sheet": {"name": "Surname, first name and patronymic", "rank": "Military rank", "post": "Post and unit", "to": "Recommended for", "born": "Year of birth", "nationality": "Nationality", "since": "In the army since", "party": "Party standing", "battles": "Participation in battles (where, when)", "wounds": "Wounds and concussions", "held": "Earlier decorations (for what)", "rvk": "Drafted by which district commissariat", "deed": "Brief, concrete account of the personal feat of arms or merits; the commander's conclusion", "sign": "Commander of the unit", "commissar": "Military commissar", "date": "Date of the recommendation"},
     "back": "Service Record",
     "print": "Print",
     "failed": "The certificate could not be read."

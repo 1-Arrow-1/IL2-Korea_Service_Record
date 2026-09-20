@@ -96,7 +96,9 @@
         // a hand, as the originals were filled.
         const form = "/static/images/certificates/nagradnoy_list.png";
         const drawn = await exists(form);
-        const f = (cls, text) => '<div class="nl ' + cls + '">' + esc(text) + "</div>";
+        // Each entry carries its meaning as a tooltip, in the page's language.
+        const tip = (cls) => { const k = cls.replace("nl-", ""); const t = i18n.t("certificate.sheet." + k); return t && !t.startsWith("certificate.") ? ' title="' + esc(t) + '"' : ""; };
+        const f = (cls, text) => text ? '<div class="nl ' + cls + '"' + tip(cls) + ">" + esc(text) + "</div>" : "";
         const deedLines = [];
         (c.deed || []).concat([c.conclusion]).forEach((par) => { if (par) deedLines.push(par); });
         el("ct-sheet").innerHTML =
@@ -104,9 +106,9 @@
                 f("nl-name", c.name) + f("nl-rank", c.rank) + f("nl-post", c.post) + f("nl-to", c.to) +
                 f("nl-born", c.born) + f("nl-nationality", c.nationality) + f("nl-since", c.since) + f("nl-party", c.party) +
                 f("nl-battles", c.battles) + f("nl-wounds", c.wounds) + f("nl-held", c.held) + f("nl-rvk", c.birthplace ? c.birthplace + " (по месту рождения)" : "") +
-                '<div class="nl nl-deed">' + deedLines.map((t) => "<p>" + esc(t) + "</p>").join("") + "</div>" +
-                f("nl-commander", c.commander) +
-                '<div class="nl nl-sign"><span class="ct-sign">' + esc(c.commander_name) + "</span></div>" +
+                '<div class="nl nl-deed"' + tip("nl-deed") + ">" + deedLines.map((t) => "<p>" + esc(t) + "</p>").join("") + "</div>" +
+                '<div class="nl nl-sign"' + tip("nl-sign") + '><span class="ct-sign">' + esc(c.commander_name) + "</span></div>" +
+                (c.commissar ? '<div class="nl nl-commissar"' + tip("nl-commissar") + '><span class="ct-sign">' + esc(c.commissar) + "</span></div>" : "") +
                 f("nl-date", c.date) +
                 '<img class="nl-seal" src="/static/images/certificates/ussr_seal.png" alt="">' +
             "</section>";

@@ -254,6 +254,7 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
         "conclusion": _fill(n["conclusion"], {"reason": n["reason"].get(kind, n["reason"]["period"]), "worthy": n["worthy"].get(fam_key, "")}),
         "commander": _fill(n["commander"], {"unit": facts.get("unit", "")}),
         "commander_name": facts.get("commander", ""),
+        "commissar": n["commissars"][sum(ord(ch) for ch in facts.get("unit", "")) % len(n["commissars"])] if n.get("commissars") else "",
         "date": format_date(ru, date_raw),
     }
 

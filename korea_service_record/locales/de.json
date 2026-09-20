@@ -263,6 +263,7 @@
     }
   },
   "certificate": {
+    "sheet": {"name": "Familienname, Vorname und Vatersname", "rank": "Dienstgrad", "post": "Dienststellung und Einheit", "to": "Vorgeschlagen für", "born": "Geburtsjahr", "nationality": "Nationalität", "since": "In der Armee seit", "party": "Parteizugehörigkeit", "battles": "Teilnahme an Kämpfen (wo, wann)", "wounds": "Verwundungen und Kontusionen", "held": "Frühere Auszeichnungen (wofür)", "rvk": "Von welchem Wehrkreiskommissariat einberufen", "deed": "Kurze, konkrete Darstellung der persönlichen Kampfleistung oder Verdienste; Schluss des Kommandeurs", "sign": "Kommandeur der Einheit", "commissar": "Militärkommissar", "date": "Datum des Vorschlags"},
     "back": "Dienstakte",
     "print": "Drucken",
     "failed": "Die Urkunde konnte nicht gelesen werden."

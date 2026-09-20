@@ -172,6 +172,9 @@
 .sheet.nagradnoy .nl-commander { display: none; }
 .sheet.nagradnoy .nl-sign { left: 26%; bottom: calc(100% - 95.7%); padding-bottom: 0; }
 .sheet.nagradnoy .nl-sign .ct-sign { font-family: 'Segoe Script', 'Brush Script MT', cursive; font-weight: normal; color: #1c2a5e; font-size: 1.5em; transform: none; margin: 0; line-height: 1; }
+.sheet.nagradnoy .nl-commissar { left: 60%; bottom: calc(100% - 95.7%); padding-bottom: 0; }
+.sheet.nagradnoy .nl-commissar .ct-sign { font-family: 'Segoe Script', 'Brush Script MT', cursive; font-weight: normal; color: #1c2a5e; font-size: 1.4em; transform: rotate(-4deg); margin: 0; line-height: 1; }
+.sheet.nagradnoy .nl[title] { cursor: help; }
 .sheet.nagradnoy .nl-date { left: 10%; bottom: calc(100% - 98.2%); font-size: 0.95em; }
 /* The unit's stamp, a little askew over the commander's signature. */
 .sheet.nagradnoy .nl-seal { position: absolute; left: 9%; top: 85%; width: 13%; opacity: 0.8; transform: rotate(-8deg);
