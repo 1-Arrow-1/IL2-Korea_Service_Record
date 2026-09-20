@@ -428,6 +428,14 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if wanted in ("en", "de", "es", "fr", "ru", "zh"):
             agg = aggregator_for(wanted)
         data = agg.citation(career_id, pilot_id, award_id, earned)
+        # The sheet keeps the form's language; its tooltips speak the page's.
+        tr = request.args.get("tr")
+        if data and tr in ("en", "de", "es", "fr", "ru", "zh") and tr != wanted:
+            other = aggregator_for(tr).citation(career_id, pilot_id, award_id, earned) or {}
+            cert = data.get("certificate") or {}
+            if cert.get("form") == "nagradnoy" and (other.get("certificate") or {}).get("form") == "nagradnoy":
+                cert["translation"] = other["certificate"].get("translation", {})
+                cert["commissar_tr"] = other["certificate"].get("commissar_tr", "")
         return jsonify(data or {})
 
     @app.route("/certificate")

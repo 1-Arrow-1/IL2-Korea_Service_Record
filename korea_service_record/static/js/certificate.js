@@ -35,7 +35,7 @@
         const country = String(awardId).slice(0, 3);
         const lang = country === "601" ? "en" : (country === "501" || country === "503") ? "ru" : pageLang;
         const r = await fetch("/api/citation/" + encodeURIComponent(careerId) + "/" + encodeURIComponent(pilotId) + "/" +
-            encodeURIComponent(awardId) + "?earned=" + encodeURIComponent(earned) + "&lang=" + encodeURIComponent(lang));
+            encodeURIComponent(awardId) + "?earned=" + encodeURIComponent(earned) + "&lang=" + encodeURIComponent(lang) + "&tr=" + encodeURIComponent(pageLang));
         if (!r.ok) throw new Error(r.status);
         data = await r.json();
         if (!data || !data.certificate) throw new Error("none");
