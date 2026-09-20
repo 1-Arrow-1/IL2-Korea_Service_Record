@@ -1061,7 +1061,10 @@
                 citations.map((ladder) =>
                     '<div class="citation-row">' + (ladder.awards || []).map((c) =>
                         '<span class="citation' + (c.current ? " current" : " retired") + '">' +
-                        icon("award", c.type, 64, "award-icon citation-icon", c.name) +
+                        // Worn by the whole unit: the certificate is made
+                        // out to the player, the squadron's commander.
+                        icon("award", c.type, 64, "award-icon citation-icon", c.name,
+                             wornBy(d.player ? d.player.id : null, c.earned)) +
                         '<span class="citation-text"><span class="award-name">' +
                         esc(c.name) + '</span><span class="award-dates">' +
                         esc(T("awards.received", {date: c.received})) +
