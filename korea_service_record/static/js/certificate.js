@@ -97,7 +97,13 @@
         const form = "/static/images/certificates/nagradnoy_list.png";
         const drawn = await exists(form);
         // Each entry carries its meaning as a tooltip, in the page's language.
-        const tip = (cls) => { const k = cls.replace("nl-", ""); const t = i18n.t("certificate.sheet." + k); return t && !t.startsWith("certificate.") ? ' title="' + esc(t) + '"' : ""; };
+        const tr = c.translation || {};
+        const tip = (cls) => {
+            const k = cls.replace("nl-", ""); let t = i18n.t("certificate.sheet." + k);
+            if (!t || t.startsWith("certificate.")) return "";
+            const v = tr[k] || (k === "name" ? c.name : k === "rank" ? c.rank : k === "born" ? c.born : k === "sign" ? c.commander_name : k === "commissar" ? c.commissar : "");
+            return ' title="' + esc(t + (v ? ": " + v : "")) + '"';
+        };
         const f = (cls, text) => text ? '<div class="nl ' + cls + '"' + tip(cls) + ">" + esc(text) + "</div>" : "";
         const deedLines = [];
         (c.deed || []).concat([c.conclusion]).forEach((par) => { if (par) deedLines.push(par); });

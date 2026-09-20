@@ -1145,5 +1145,394 @@
    "battles": "Вторая мировая война 1944–1945 гг.; Китай 1949 г.",
    "prior": ""
   }
+ },
+ "nagradnoy_tr": {
+  "post": "pilot, {unit}",
+  "since": "since {from}",
+  "battles": "Korea, {from} to {to}",
+  "wounded": "yes ({date})",
+  "not_wounded": "none",
+  "not_awarded": "none",
+  "conclusion": "Conclusion: worthy of the {award}."
+ },
+ "bios_tr": {
+  "501001": {
+   "born": "Belgorod",
+   "nationality": "Russian",
+   "party": "member of the VKP(b)",
+   "since": "April 1940",
+   "battles": "Great Patriotic War from 1943; war with Japan 1945 (Manchuria)",
+   "prior": "",
+   "none": false
+  },
+  "501002": {
+   "born": "Ust-Labinskaya stanitsa",
+   "nationality": "Russian (Cossack)",
+   "party": "member of the VKP(b)",
+   "since": "1941",
+   "battles": "Great Patriotic War from 1942 (Leningrad, Baltic, Poland, Germany); war with Japan 1945",
+   "prior": "",
+   "none": false
+  },
+  "501003": {
+   "born": "Yenakiyevo",
+   "nationality": "Ukrainian",
+   "party": "member of the VKP(b)",
+   "since": "1940",
+   "battles": "Great Patriotic War from 1941 (Kalinin Front, Kursk, Dnieper, Poland, Germany)",
+   "prior": "",
+   "none": false
+  },
+  "501004": {
+   "born": "Safonovka, Ivnya district, Kursk region",
+   "nationality": "Russian",
+   "party": "member of the VKP(b)",
+   "since": "1940",
+   "battles": "Great Patriotic War from 1942 (Kursk, Dnieper, Lvov, Vistula-Oder, Berlin); war with Japan 1945",
+   "prior": "",
+   "none": false
+  },
+  "501005": {
+   "born": "Leningrad",
+   "nationality": "Russian",
+   "party": "member of the VKP(b)",
+   "since": "1940",
+   "battles": "Great Patriotic War from 1942 (Tikhvin, Ladoga, Poland, Germany, Czechoslovakia); war with Japan 1945",
+   "prior": "",
+   "none": false
+  },
+  "501006": {
+   "born": "Leningrad",
+   "nationality": "Russian",
+   "party": "Komsomol member",
+   "since": "1941",
+   "battles": "Great Patriotic War from 1944 (Operation Bagration, Hungary); war with Japan 1945 (Manchuria, Korea)",
+   "prior": "",
+   "none": false
+  },
+  "501007": {
+   "born": "Kursk",
+   "nationality": "Russian",
+   "party": "member of the VKP(b)",
+   "since": "1940",
+   "battles": "Great Patriotic War from 1943 (Kursk, Dnieper, Belorussia, Poland, Germany, Czechoslovakia); war with Japan 1945",
+   "prior": "government decorations for the Great Patriotic War",
+   "none": false
+  },
+  "501008": {
+   "born": "Maibalyk, Korgalzhyn district, Akmola region",
+   "nationality": "Kazakh",
+   "party": "Komsomol member",
+   "since": "1941",
+   "battles": "Great Patriotic War from 1944 (Poland, Germany, Czechoslovakia)",
+   "prior": "",
+   "none": false
+  },
+  "501009": {
+   "born": "Polotsk",
+   "nationality": "Belorussian",
+   "party": "member of the VKP(b)",
+   "since": "1939",
+   "battles": "Great Patriotic War from 1942 (Leningrad air defence, Baltic, Finland, East Prussia, Germany); war with Japan 1945",
+   "prior": "two Orders of the Red Star, Order of the Patriotic War 1st and 2nd class, Order of the Red Banner, medals",
+   "none": false
+  },
+  "501010": {
+   "born": "Petrograd",
+   "nationality": "Russian",
+   "party": "member of the VKP(b)",
+   "since": "1942",
+   "battles": "Great Patriotic War from 1943 (Kursk, Ukraine, Romania, Yugoslavia, Hungary, Austria); war with Japan 1945",
+   "prior": "",
+   "none": false
+  },
+  "501011": {
+   "born": "Kazan",
+   "nationality": "Russian",
+   "party": "member of the VKP(b)",
+   "since": "1940",
+   "battles": "Great Patriotic War from 1942 (Stalingrad, Kursk, Dnieper, Romania, Hungary, Yugoslavia, Austria); war with Japan 1945",
+   "prior": "",
+   "none": false
+  },
+  "501012": {
+   "born": "a village near Tyumen",
+   "nationality": "Russian",
+   "party": "member of the VKP(b)",
+   "since": "1941",
+   "battles": "Great Patriotic War from 1944 (Ukraine, Romania, Bulgaria, Yugoslavia, Hungary, Austria); war with Japan 1945",
+   "prior": "",
+   "none": false
+  },
+  "501013": {
+   "born": "Kashira, Tula province",
+   "nationality": "Russian",
+   "party": "member of the VKP(b)",
+   "since": "1940",
+   "battles": "Great Patriotic War from 1943 (Kursk, Dnieper, Ukraine, Poland, Hungary, Czechoslovakia)",
+   "prior": "",
+   "none": false
+  },
+  "501014": {
+   "born": "Kharkov",
+   "nationality": "Ukrainian",
+   "party": "member of the VKP(b)",
+   "since": "March 1942",
+   "battles": "war with Japan 1945 (Transbaikal Front)",
+   "prior": "",
+   "none": false
+  },
+  "503001": {
+   "born": "Seoul",
+   "nationality": "Korean",
+   "party": "non-party",
+   "since": "1949 (KPA)",
+   "battles": "Sino-Japanese War from 1937 in the Kuomintang air force",
+   "prior": "",
+   "none": false
+  },
+  "503002": {
+   "born": "Sinuiju",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1945",
+   "battles": "partisan war in Manchuria to 1945",
+   "prior": "",
+   "none": false
+  },
+  "503003": {
+   "born": "Wonsan",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1949",
+   "battles": "partisan war in Manchuria (2nd Partisan Army), 1940-1945",
+   "prior": "",
+   "none": false
+  },
+  "503004": {
+   "born": "a village near Pyongyang",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1947",
+   "battles": "none",
+   "prior": "",
+   "none": true
+  },
+  "503005": {
+   "born": "Pyongyang",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1945",
+   "battles": "anti-Japanese underground, Japanese camp to 1945",
+   "prior": "",
+   "none": false
+  },
+  "503006": {
+   "born": "Hamhung",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1945",
+   "battles": "partisan war in Manchuria 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "503007": {
+   "born": "a village near Pyongyang",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1949",
+   "battles": "none",
+   "prior": "",
+   "none": true
+  },
+  "503008": {
+   "born": "Pyongyang",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1945",
+   "battles": "partisan war in Manchuria 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "503009": {
+   "born": "Pyongyang",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1949",
+   "battles": "none",
+   "prior": "",
+   "none": true
+  },
+  "503010": {
+   "born": "Wonsan",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1948",
+   "battles": "none",
+   "prior": "",
+   "none": true
+  },
+  "503011": {
+   "born": "Chongjin",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1945",
+   "battles": "partisan war in Manchuria",
+   "prior": "",
+   "none": false
+  },
+  "503012": {
+   "born": "a fishing village near Wonsan",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1949",
+   "battles": "none",
+   "prior": "",
+   "none": true
+  },
+  "503013": {
+   "born": "a village near Pyongyang",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1945",
+   "battles": "partisan war in Manchuria",
+   "prior": "",
+   "none": false
+  },
+  "503014": {
+   "born": "Wonsan",
+   "nationality": "Korean",
+   "party": "member of the Workers' Party",
+   "since": "1945",
+   "battles": "partisan war in Manchuria (United Anti-Japanese Army) to 1945",
+   "prior": "",
+   "none": false
+  },
+  "601001": {
+   "born": "near Atlanta, Georgia",
+   "nationality": "American",
+   "party": "non-party",
+   "since": "1942 (US Army Air Forces)",
+   "battles": "Second World War (North Africa, Europe) 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601002": {
+   "born": "New York",
+   "nationality": "American (Irish descent)",
+   "party": "non-party",
+   "since": "1941 (US Army Air Forces)",
+   "battles": "Second World War 1941-1945",
+   "prior": "",
+   "none": false
+  },
+  "601003": {
+   "born": "near Baton Rouge, Louisiana",
+   "nationality": "American",
+   "party": "non-party",
+   "since": "1941 (US Army Air Forces)",
+   "battles": "Second World War (Pacific) 1942-1945; China 1949",
+   "prior": "",
+   "none": false
+  },
+  "601004": {
+   "born": "Phoenix, Arizona",
+   "nationality": "American",
+   "party": "non-party",
+   "since": "1941, again from 1948",
+   "battles": "Second World War 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601005": {
+   "born": "San Francisco",
+   "nationality": "American",
+   "party": "non-party",
+   "since": "1941 (US Army Air Forces)",
+   "battles": "Second World War 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601006": {
+   "born": "Nashville, Tennessee",
+   "nationality": "American (German descent)",
+   "party": "non-party",
+   "since": "1944 (US Army Air Forces)",
+   "battles": "no combat in the Second World War (instructor pilot); China 1949",
+   "prior": "",
+   "none": false
+  },
+  "601007": {
+   "born": "Philadelphia",
+   "nationality": "American (Polish descent)",
+   "party": "non-party",
+   "since": "1941 (US Army Air Forces)",
+   "battles": "Second World War (Pacific) 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601008": {
+   "born": "Pittsburgh",
+   "nationality": "American",
+   "party": "non-party",
+   "since": "September 1939",
+   "battles": "Second World War 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601009": {
+   "born": "a village in the Appalachians",
+   "nationality": "American",
+   "party": "non-party",
+   "since": "1942 (US Army Air Forces)",
+   "battles": "Second World War 1943-1945; China 1946-1949",
+   "prior": "",
+   "none": false
+  },
+  "601010": {
+   "born": "Chicago",
+   "nationality": "American (Italian descent)",
+   "party": "non-party",
+   "since": "1941, again from 1949",
+   "battles": "Second World War (North Africa, Sicily) 1942-1945; China",
+   "prior": "",
+   "none": false
+  },
+  "601011": {
+   "born": "Minneapolis, Minnesota",
+   "nationality": "American",
+   "party": "non-party",
+   "since": "1941 (US Army Air Forces)",
+   "battles": "Second World War (North Africa, Sicily, Italy) 1943-1945",
+   "prior": "",
+   "none": false
+  },
+  "601012": {
+   "born": "New York",
+   "nationality": "American",
+   "party": "non-party",
+   "since": "1941 (US Army Air Forces)",
+   "battles": "Second World War 1942-1945; China 1947-1950",
+   "prior": "",
+   "none": false
+  },
+  "601013": {
+   "born": "Mogilev (Russian Empire)",
+   "nationality": "Jewish",
+   "party": "non-party",
+   "since": "September 1939, again from 1950",
+   "battles": "Second World War (Europe) 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601014": {
+   "born": "Gettysburg, Mississippi",
+   "nationality": "American (Black)",
+   "party": "non-party",
+   "since": "1943 (US Army Air Forces)",
+   "battles": "Second World War 1944-1945; China 1949",
+   "prior": "",
+   "none": false
+  }
  }
 }

@@ -236,8 +236,32 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
     prior = [bio["prior"]] if bio.get("prior") else []
     held_all = prior + held
     birth = facts.get("birth_date", "")
+    # The same entries in the page's language, for the tooltips: the awards
+    # by their game names in that language, the fixed phrases translated,
+    # the biography's lines from its own language table, the deed as the
+    # citation in that language.
+    texts = strings(lang)
+    tr = texts.get("nagradnoy_tr") or strings("eng").get("nagradnoy_tr") or {}
+    bio_tr = (texts.get("bios_tr") or strings("eng").get("bios_tr") or {}).get(str(facts.get("bio_id") or ""), {})
+    deed_tr = compose(lang, award_id, facts) or {}
+    korea_tr = _fill(tr.get("battles", "Korea, {from} to {to}"), {"from": format_date(texts, facts.get("period_from_raw", "") or date_raw), "to": format_date(texts, date_raw)})
+    battles_tr = ((bio_tr.get("battles", "") + "; ") if bio_tr.get("battles") and not bio_tr.get("none") else "") + korea_tr
+    held_tr = ([bio_tr["prior"]] if bio_tr.get("prior") else []) + [facts.get("held_names", {}).get(a, "") for a in facts.get("held_before", []) if a in FAMILY and FAMILY[a][1] in n["held"]]
+    held_tr = [h for h in held_tr if h]
+    translation = {
+        "to": facts.get("award_name_tr", ""),
+        "post": _fill(tr.get("post", "pilot, {unit}"), {"unit": facts.get("unit", "")}),
+        "nationality": bio_tr.get("nationality", ""), "party": bio_tr.get("party", ""),
+        "since": bio_tr.get("since", "") or _fill(tr.get("since", "since {from}"), {"from": format_date(texts, facts.get("period_from_raw", "") or date_raw)}),
+        "battles": battles_tr,
+        "wounds": _fill(tr.get("wounded", "yes ({date})"), {"date": format_date(texts, facts["wound_date"])}) if facts.get("wound_date") else tr.get("not_wounded", "none"),
+        "held": ", ".join(held_tr) if held_tr else tr.get("not_awarded", "none"),
+        "rvk": bio_tr.get("born", ""),
+        "deed": " ".join((deed_tr.get("paragraphs") or [])[1:2]) + " " + _fill(tr.get("conclusion", "Conclusion: worthy of the {award}."), {"award": facts.get("award_name_tr", "")}),
+        "date": format_date(texts, date_raw),
+    }
     return {
-        "form": "nagradnoy",
+        "form": "nagradnoy", "translation": translation,
         "name": facts.get("name_ru") or facts.get("name", ""),
         "rank": facts.get("rank_ru") or facts.get("rank", ""),
         "post": _fill(n["post"], {"unit": facts.get("unit", "")}),

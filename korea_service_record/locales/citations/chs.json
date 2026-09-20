@@ -705,5 +705,394 @@
    "battles": "Вторая мировая война 1944–1945 гг.; Китай 1949 г.",
    "prior": ""
   }
+ },
+ "nagradnoy_tr": {
+  "post": "飞行员，{unit}",
+  "since": "自 {from}",
+  "battles": "朝鲜，{from} 至 {to}",
+  "wounded": "有（{date}）",
+  "not_wounded": "无",
+  "not_awarded": "无",
+  "conclusion": "结论：应授予{award}。"
+ },
+ "bios_tr": {
+  "501001": {
+   "born": "Belgorod",
+   "nationality": "俄罗斯族",
+   "party": "联共（布）党员",
+   "since": "4月 1940",
+   "battles": "卫国战争，自 1943; 1945年对日战争 (Manchuria)",
+   "prior": "",
+   "none": false
+  },
+  "501002": {
+   "born": "Ust-Labinskaya 镇",
+   "nationality": "俄罗斯族 (哥萨克)",
+   "party": "联共（布）党员",
+   "since": "1941",
+   "battles": "卫国战争，自 1942 (Leningrad, Baltic, Poland, Germany); 1945年对日战争",
+   "prior": "",
+   "none": false
+  },
+  "501003": {
+   "born": "Yenakiyevo",
+   "nationality": "乌克兰族",
+   "party": "联共（布）党员",
+   "since": "1940",
+   "battles": "卫国战争，自 1941 (加里宁方面军, Kursk, Dnieper, Poland, Germany)",
+   "prior": "",
+   "none": false
+  },
+  "501004": {
+   "born": "Safonovka, Ivnya district, Kursk region",
+   "nationality": "俄罗斯族",
+   "party": "联共（布）党员",
+   "since": "1940",
+   "battles": "卫国战争，自 1942 (Kursk, Dnieper, Lvov, Vistula-Oder, Berlin); 1945年对日战争",
+   "prior": "",
+   "none": false
+  },
+  "501005": {
+   "born": "Leningrad",
+   "nationality": "俄罗斯族",
+   "party": "联共（布）党员",
+   "since": "1940",
+   "battles": "卫国战争，自 1942 (Tikhvin, Ladoga, Poland, Germany, Czechoslovakia); 1945年对日战争",
+   "prior": "",
+   "none": false
+  },
+  "501006": {
+   "born": "Leningrad",
+   "nationality": "俄罗斯族",
+   "party": "共青团员",
+   "since": "1941",
+   "battles": "卫国战争，自 1944 (巴格拉季昂行动, Hungary); 1945年对日战争 (Manchuria, Korea)",
+   "prior": "",
+   "none": false
+  },
+  "501007": {
+   "born": "Kursk",
+   "nationality": "俄罗斯族",
+   "party": "联共（布）党员",
+   "since": "1940",
+   "battles": "卫国战争，自 1943 (Kursk, Dnieper, Belorussia, Poland, Germany, Czechoslovakia); 1945年对日战争",
+   "prior": "卫国战争政府奖励",
+   "none": false
+  },
+  "501008": {
+   "born": "Maibalyk, Korgalzhyn district, Akmola region",
+   "nationality": "哈萨克族",
+   "party": "共青团员",
+   "since": "1941",
+   "battles": "卫国战争，自 1944 (Poland, Germany, Czechoslovakia)",
+   "prior": "",
+   "none": false
+  },
+  "501009": {
+   "born": "Polotsk",
+   "nationality": "白俄罗斯族",
+   "party": "联共（布）党员",
+   "since": "1939",
+   "battles": "卫国战争，自 1942 (列宁格勒防空, Baltic, Finland, East Prussia, Germany); 1945年对日战争",
+   "prior": "两枚红星勋章、一级和二级卫国战争勋章、红旗勋章、奖章",
+   "none": false
+  },
+  "501010": {
+   "born": "Petrograd",
+   "nationality": "俄罗斯族",
+   "party": "联共（布）党员",
+   "since": "1942",
+   "battles": "卫国战争，自 1943 (Kursk, Ukraine, Romania, Yugoslavia, Hungary, Austria); 1945年对日战争",
+   "prior": "",
+   "none": false
+  },
+  "501011": {
+   "born": "Kazan",
+   "nationality": "俄罗斯族",
+   "party": "联共（布）党员",
+   "since": "1940",
+   "battles": "卫国战争，自 1942 (Stalingrad, Kursk, Dnieper, Romania, Hungary, Yugoslavia, Austria); 1945年对日战争",
+   "prior": "",
+   "none": false
+  },
+  "501012": {
+   "born": "村，近 Tyumen",
+   "nationality": "俄罗斯族",
+   "party": "联共（布）党员",
+   "since": "1941",
+   "battles": "卫国战争，自 1944 (Ukraine, Romania, Bulgaria, Yugoslavia, Hungary, Austria); 1945年对日战争",
+   "prior": "",
+   "none": false
+  },
+  "501013": {
+   "born": "Kashira, Tula province",
+   "nationality": "俄罗斯族",
+   "party": "联共（布）党员",
+   "since": "1940",
+   "battles": "卫国战争，自 1943 (Kursk, Dnieper, Ukraine, Poland, Hungary, Czechoslovakia)",
+   "prior": "",
+   "none": false
+  },
+  "501014": {
+   "born": "Kharkov",
+   "nationality": "乌克兰族",
+   "party": "联共（布）党员",
+   "since": "3月 1942",
+   "battles": "1945年对日战争 (外贝加尔方面军)",
+   "prior": "",
+   "none": false
+  },
+  "503001": {
+   "born": "Seoul",
+   "nationality": "朝鲜族",
+   "party": "无党派",
+   "since": "1949 (KPA)",
+   "battles": "1937年起在国民党空军参加中日战争",
+   "prior": "",
+   "none": false
+  },
+  "503002": {
+   "born": "Sinuiju",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1945",
+   "battles": "满洲游击战 至1945年",
+   "prior": "",
+   "none": false
+  },
+  "503003": {
+   "born": "Wonsan",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1949",
+   "battles": "满洲游击战 （第二游击军）, 1940-1945",
+   "prior": "",
+   "none": false
+  },
+  "503004": {
+   "born": "村，近 Pyongyang",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1947",
+   "battles": "无",
+   "prior": "",
+   "none": true
+  },
+  "503005": {
+   "born": "Pyongyang",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1945",
+   "battles": "抗日地下活动，日本集中营至1945年",
+   "prior": "",
+   "none": false
+  },
+  "503006": {
+   "born": "Hamhung",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1945",
+   "battles": "满洲游击战 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "503007": {
+   "born": "村，近 Pyongyang",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1949",
+   "battles": "无",
+   "prior": "",
+   "none": true
+  },
+  "503008": {
+   "born": "Pyongyang",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1945",
+   "battles": "满洲游击战 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "503009": {
+   "born": "Pyongyang",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1949",
+   "battles": "无",
+   "prior": "",
+   "none": true
+  },
+  "503010": {
+   "born": "Wonsan",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1948",
+   "battles": "无",
+   "prior": "",
+   "none": true
+  },
+  "503011": {
+   "born": "Chongjin",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1945",
+   "battles": "满洲游击战",
+   "prior": "",
+   "none": false
+  },
+  "503012": {
+   "born": "渔村，近 Wonsan",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1949",
+   "battles": "无",
+   "prior": "",
+   "none": true
+  },
+  "503013": {
+   "born": "村，近 Pyongyang",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1945",
+   "battles": "满洲游击战",
+   "prior": "",
+   "none": false
+  },
+  "503014": {
+   "born": "Wonsan",
+   "nationality": "朝鲜族",
+   "party": "劳动党党员",
+   "since": "1945",
+   "battles": "满洲游击战 （抗日联军） 至1945年",
+   "prior": "",
+   "none": false
+  },
+  "601001": {
+   "born": "近 Atlanta, Georgia",
+   "nationality": "美国人",
+   "party": "无党派",
+   "since": "1942 (美国陆军航空队)",
+   "battles": "第二次世界大战 (北非, 欧洲) 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601002": {
+   "born": "New York",
+   "nationality": "美国人 (爱尔兰裔)",
+   "party": "无党派",
+   "since": "1941 (美国陆军航空队)",
+   "battles": "第二次世界大战 1941-1945",
+   "prior": "",
+   "none": false
+  },
+  "601003": {
+   "born": "近 Baton Rouge, Louisiana",
+   "nationality": "美国人",
+   "party": "无党派",
+   "since": "1941 (美国陆军航空队)",
+   "battles": "第二次世界大战 (太平洋) 1942-1945; 中国 1949",
+   "prior": "",
+   "none": false
+  },
+  "601004": {
+   "born": "Phoenix, Arizona",
+   "nationality": "美国人",
+   "party": "无党派",
+   "since": "1941, 再次入伍自 1948",
+   "battles": "第二次世界大战 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601005": {
+   "born": "San Francisco",
+   "nationality": "美国人",
+   "party": "无党派",
+   "since": "1941 (美国陆军航空队)",
+   "battles": "第二次世界大战 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601006": {
+   "born": "Nashville, Tennessee",
+   "nationality": "美国人 (德裔)",
+   "party": "无党派",
+   "since": "1944 (美国陆军航空队)",
+   "battles": "二战期间未参战（飞行教官）; 中国 1949",
+   "prior": "",
+   "none": false
+  },
+  "601007": {
+   "born": "Philadelphia",
+   "nationality": "美国人 (波兰裔)",
+   "party": "无党派",
+   "since": "1941 (美国陆军航空队)",
+   "battles": "第二次世界大战 (太平洋) 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601008": {
+   "born": "Pittsburgh",
+   "nationality": "美国人",
+   "party": "无党派",
+   "since": "9月 1939",
+   "battles": "第二次世界大战 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601009": {
+   "born": "阿巴拉契亚山区村庄",
+   "nationality": "美国人",
+   "party": "无党派",
+   "since": "1942 (美国陆军航空队)",
+   "battles": "第二次世界大战 1943-1945; 中国 1946-1949",
+   "prior": "",
+   "none": false
+  },
+  "601010": {
+   "born": "Chicago",
+   "nationality": "美国人 (意大利裔)",
+   "party": "无党派",
+   "since": "1941, 再次入伍自 1949",
+   "battles": "第二次世界大战 (北非, 西西里) 1942-1945; 中国",
+   "prior": "",
+   "none": false
+  },
+  "601011": {
+   "born": "Minneapolis, Minnesota",
+   "nationality": "美国人",
+   "party": "无党派",
+   "since": "1941 (美国陆军航空队)",
+   "battles": "第二次世界大战 (北非, 西西里, 意大利) 1943-1945",
+   "prior": "",
+   "none": false
+  },
+  "601012": {
+   "born": "New York",
+   "nationality": "美国人",
+   "party": "无党派",
+   "since": "1941 (美国陆军航空队)",
+   "battles": "第二次世界大战 1942-1945; 中国 1947-1950",
+   "prior": "",
+   "none": false
+  },
+  "601013": {
+   "born": "Mogilev (俄罗斯帝国)",
+   "nationality": "犹太人",
+   "party": "无党派",
+   "since": "9月 1939, 再次入伍自 1950",
+   "battles": "第二次世界大战 (欧洲) 1942-1945",
+   "prior": "",
+   "none": false
+  },
+  "601014": {
+   "born": "Gettysburg, Mississippi",
+   "nationality": "美国人 (黑人)",
+   "party": "无党派",
+   "since": "1943 (美国陆军航空队)",
+   "battles": "第二次世界大战 1944-1945; 中国 1949",
+   "prior": "",
+   "none": false
+  }
  }
 }

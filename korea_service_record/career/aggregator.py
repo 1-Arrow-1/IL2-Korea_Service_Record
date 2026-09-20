@@ -1868,6 +1868,8 @@ class CareerAggregator:
                 "name": f"{pilot['name']} {pilot['lastName']}".strip(),
                 "unit": meta.squadron_name,
                 "bio_id": desc.get("biographyId", ""), "birth_date": desc.get("birthDate", ""),
+                "award_name_tr": self.award_name(award_id),
+                "held_names": {a: self.award_name(a) for a in held_before},
                 "held_before": held_before,
                 "wound_date": (wound["date"] or "")[:10] if wound else "",
                 "commander": f"{commander['name']} {commander['lastName']}".strip() if commander else "",
