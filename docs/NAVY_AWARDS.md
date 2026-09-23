@@ -59,14 +59,16 @@ checks in HANDOFF.md. The new naval thresholds have not been flown in game.
 | Medal of Honor, repeat | >= 6 air kills in one sortie, or >= 5 while wounded | Matches existing Navy base and USAF repeat |
 | Silver Star, 3 stars | 2 air kills with `RND<500`, or 3 with `RND<700` | Matches USAF 601050 |
 | Silver Star, 4 stars | 2 air kills with `RND<400`, or 3 with `RND<600` | Matches USAF 601051 |
-| PUC: base / 1 / 2 / 3 stars | Squadron efficiency >= 3; air totals >= 50 / 110 / 180 / 260 OR surface totals >= 600 / 1300 / 2100 / 3000 | Matches DUC ladder 601042/601044–601046 |
+| PUC: base / 1 / 2 / 3 stars | Squadron efficiency >= 3; air totals >= 50 / 110 / 180 / 260 OR surface totals >= 3000 / 8000 / 14000 / 21000 | Matches DUC ladder 601042/601044–601046 |
 | NUC: base / 1 / 2 / 3 / 4 stars | Squadron efficiency >= 2 and successful operations >= 6 / 12 / 18 / 24 / 30 | Sustained operational success, distinct from the combat-output PUC |
 | Bronze Star with V / 1 / 2 gold stars | 1 air kill with `RND<300`; 25 ground/building/sea targets with `RND<200`; or wounded, still scoring, with `RND<400`. Ordinary Bronze Star sortie thresholds can advance a V holder. | Adapts the USAF V-device gameplay rules to count naval targets and retain Navy gold-star devices |
 
 Surface totals mean `GrObj+BldObj+SeaObj`. All unit awards have
 `IsSquadron=1` and use squadron-level values; sortie counters and pilot rank
-are zero in this evaluation path. NUC uses `OpSuccess`, the number of campaign
-operations recorded as successfully ended for the squadron. `OpTotal` would
+are zero in this evaluation path. NUC uses `OpGood`, the number of campaign
+operations recorded as successfully ended for the squadron
+(`OpSuccess`, named in an earlier draft, does not exist in the engine and
+reads as zero). `OpTotal` would
 also include failed operations, but is not part of the award criterion.
 Operations still underway do not count. The six-operation cadence gives each
 additional NUC another distinct block of sustained successful operations.
