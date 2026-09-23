@@ -155,7 +155,7 @@ GETTING IT
   <link>
 
   IL-2 Korea Service Record 1.6.1
-  SHA-256  875bbed0b2acee8f115a488cab2d9bee1da394da8ef7eabb8fbffb3efae8941e
+  SHA-256  4af29e153718e68d9ddd1495e8d887e7cb031bed4c70b37327e92cfca4009b2a
 
 The installer carries both the tracker and the awards mod, as before. Upgrading over 1.6 is
 safe and keeps your settings, your photographs and your flight-time corrections. If you run
