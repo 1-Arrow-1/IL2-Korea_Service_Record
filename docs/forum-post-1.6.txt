@@ -123,6 +123,32 @@ The USAF coat has been redrawn as well, and now wears the officer's rank on the 
 loops.
 
 
+THE NAVY AND THE MARINE CORPS, WITH A CAVEAT
+
+One more thing, and I will be straight about it: the Navy and the Marine Corps are in this
+release, and there is nothing you can do with them yet.
+
+The game has no naval careers — no Navy or Marine squadrons to fly — so none of it can be
+earned. It is here because the work was worth doing once rather than twice, and because on
+the day those services do arrive, this will already be waiting for them.
+
+What is in it: the naval decorations drawn and placed in the game's own atlases and named
+and described in all six languages — the Navy Cross with its gold stars, the Navy
+Distinguished Service Medal, the Commendation ladder, the Presidential Unit Citation, the
+Navy Unit Commendation, the Bronze Star with its Combat V. Their certificates on the Navy's
+own forms, signed by the Secretary of the Navy, the Chief of Naval Operations or the
+Commandant of the Marine Corps according to the date. And three more uniforms: Navy service
+dress white, Marine service green, and Marine Blue Dress "A", which is the order that
+carries large medals — each with its own rank insignia and its own rules for where things
+sit. The naval services wear their stars point down, which is the opposite of the Army and
+the Air Force, and a Marine rack hangs from the line midway between the first and second
+coat buttons rather than a set distance above the pocket.
+
+Since none of it can be earned, none of it has been tried in anger either. It has been
+checked every way I can check it from outside the game, and that is as far as it goes until
+there is a naval career to fly.
+
+
 GETTING IT
 
   <link>
