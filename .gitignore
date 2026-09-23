@@ -16,3 +16,8 @@ signed/
 *.db
 *.part
 .claude/
+
+# Notes for handing the work to another assistant: local paths and a
+# running decision log, useful here but not meant for the public repo.
+AGENTS.md
+docs/HANDOFF.md
