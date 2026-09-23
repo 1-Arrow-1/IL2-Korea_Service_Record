@@ -1,0 +1,124 @@
+IL-2 Korea Service Record 1.6 — where he flew, the hours he logged, the paper that came
+with the medal, and a word for the men who did not come back
+
+
+Gentlemen,
+
+1.6 is out. As before, everything below is new or changed since 1.5; the earlier posts
+describe the rest, and none of it has changed.
+
+
+THE MAP
+
+Every mission now has a map, and it is worth saying plainly what it does and does not show.
+The flight log the game keeps is a log of events, not a continuous track — it records the
+moment something happened, not a fix every few seconds. So the line you see is the places
+the aeroplane is known to have been, joined in the order it was there: the take-off, the
+kills, the hits it took, the bail-out if there was one, the landing. Each mark carries the
+mission clock, so you can read the sortie as it happened.
+
+Where you used the game's time skip, the jump is drawn as a dashed line rather than a solid
+one, because the aeroplane did not fly that stretch and it would be a lie to draw it as if
+it had.
+
+Two other things are on it. Your squadron's losses that day are marked with crosses, and
+where two men went down in the same place the cross carries a count. And the front line is
+drawn as it stood on the day of that mission — the game carries nine dated front lines for
+the war, from Operation Rugged in April 1951 to the armistice, and the map picks the one in
+force. It moves a great deal over two years, which is the point of drawing it per mission
+rather than once. The operations map has a toggle for the losses; the mission map zooms
+with the wheel.
+
+
+THE FLIGHT RECORD
+
+A pilot's hours were not a number in a database, they were a form, and he signed it every
+month. So there is now a flight record: AF Form 5, the individual flight record the Air
+Force actually kept, one sheet per month, with the grade he held that month, the aircraft,
+the hours by day, and the remarks column carrying the mission symbol and what he shot down.
+It pages by month and prints one sheet to a page if you want it on paper.
+
+Soviet and North Korean pilots get their own flight book instead, in their own form.
+
+The Form 5 stays in English whatever language you run the tracker in, because it is a form
+and the form was printed in English. The page around it speaks your language as usual.
+
+
+THE CITATION AND THE CERTIFICATE
+
+Every decoration now has the words that came with it.
+
+Click a medal and you get its citation, composed from what the man actually did — for an
+award earned on a single sortie, that sortie; for one earned over a period, the period; for
+a unit citation, the squadron's work. A second button opens the certificate itself, on a
+drawn form transcribed from the originals, and signed by the men who would have signed it
+on that date: Truman or Eisenhower, Finletter or Talbott, Vandenberg or Twining, and the
+Fifth Air Force commander of the day. Repeat awards are worded as the period worded them —
+"is entitled to wear a second bronze Oak Leaf Cluster in addition to the Silver Star
+previously awarded" — rather than being given a fresh certificate as if the first had not
+happened.
+
+Soviet and North Korean decorations get the наградной лист, the award recommendation sheet,
+filled out as the regimental clerk would have filled it: the man's particulars, his service,
+what he did, and the commander's conclusion, with the unit's stamp and two signatures. It
+stays in Russian, as it would have been, and every line has a translation on hover in
+whatever language you are reading.
+
+Unit citations open their certificate too.
+
+
+CAPTURED
+
+Richard and Swoose both asked for this, and they were right to.
+
+When a man is shot down over enemy ground and is not killed, the game has no way for you to
+say what became of him — he simply sits there. The Career Helper now has a Captured tab: it
+lists the pilots who went down and survived, and lets you mark one as taken prisoner. The
+game handles it properly from there; on the next day it tells you the commander has been
+captured and offers you the usual choices.
+
+It is a small thing, but a career where the missing are simply missing reads wrongly, and
+this fixes it.
+
+
+THE MEDALS
+
+All the decorations have been redrawn, and both the artwork and the way it is worn follow
+the regulations of the Korean War period rather than modern practice, which differs more
+than you would expect.
+
+The devices are sized as the regulations size them, and the difference is visible: an oak
+leaf cluster on a full-size medal is 13/32 of an inch, on a ribbon bar 5/16, so the same
+cluster is noticeably larger on the medal. A campaign star is 3/16 whatever its metal, so
+the silver star that stands for five bronze is the same size as the bronze beside it. Army
+and Air Force service stars are worn one point up. The cluster's stem points to the
+wearer's right. A Bronze Star's Combat V sits to the wearer's right of any clusters, and
+during Korea the V belonged to the Bronze Star alone — the Air Medal and the Commendation
+Medal did not get one until later.
+
+Where four clusters must go on a full-size medal they are worn three in a row with the
+fourth centred above them, not four across, and a silver campaign star sits on the centre
+line with the bronze ones around it, the first to the wearer's right. Ribbons are three to
+a row, which is the normal arrangement, going to four only when three would stack
+implausibly high. Nothing is ever shrunk to make it fit: a row of four or five medals is
+fitted by letting them overlap, with the senior one inboard and fully exposed, because that
+is how a rack is actually mounted.
+
+The USAF coat has been redrawn as well, and now wears the officer's rank on the shoulder
+loops.
+
+
+GETTING IT
+
+  <link>
+
+  IL-2 Korea Service Record 1.6.0
+  SHA-256  0ba26af9f7dd882bc9b3426df145a62297a684cf3807c58e9aea1a9f3c0d95be
+
+The installer carries both the tracker and the awards mod; the mod is optional and the
+tracker works without it. Upgrading over 1.5 is safe — your settings, your photographs and
+your flight-time corrections are kept.
+
+As ever, tell me what is wrong with it.
+
+Alex
