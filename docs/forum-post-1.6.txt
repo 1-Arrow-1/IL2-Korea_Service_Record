@@ -69,16 +69,28 @@ Unit citations open their certificate too.
 
 CAPTURED
 
-Richard and Swoose both asked for this, and they were right to.
+Swoose asked for this one, and he was right to.
 
-When a man is shot down over enemy ground and is not killed, the game has no way for you to
-say what became of him — he simply sits there. The Career Helper now has a Captured tab: it
-lists the pilots who went down and survived, and lets you mark one as taken prisoner. The
-game handles it properly from there; on the next day it tells you the commander has been
-captured and offers you the usual choices.
+A man shot down over enemy territory who survives the crash is never really lost in this
+game. It marks him as evading, and after a day or two it walks him back to his own lines
+and returns him to the squadron — the tab will even tell you the date he is due back. That
+happened often enough in Korea, and it is a fine outcome. It is just not the only one, and
+until now it was the only one available: every man who went down behind the lines
+eventually strolled home.
 
-It is a small thing, but a career where the missing are simply missing reads wrongly, and
-this fixes it.
+The Career Helper now has a Captured tab. It lists the men who went down over enemy ground
+and came through it — the evaders the game is walking back, and anyone who lost his
+aircraft on a sortie he survived — and lets you say that this one did not make it back.
+You can only do it while that sortie is still his latest, which is to say before he has
+flown again.
+
+The game takes it from there, and handles it properly. If it is the commander, the next
+day brings up the Commander Captured screen with the usual choices: postpone, end the
+career, or assign a new commander.
+
+Whether a man walked out or spent the next two years in a camp was not something the
+squadron got to choose. But you do, and a war in which nobody is ever taken prisoner reads
+wrongly.
 
 
 THE MEDALS
