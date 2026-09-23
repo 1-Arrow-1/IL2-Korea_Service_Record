@@ -288,8 +288,14 @@ table.roster td.award-cell { white-space: normal; }
    the sliver of ribbon left showing - so the medallions cover most of the
    next row's suspension ribbon while every pendant stays clear. A medal is
    52.9% of the container wide-units tall, hence the -27.35% pull. */
-.tunic[data-coat="usnavy"] .medal-row.n4 .medal + .medal { margin-left: -8.333%; }
-.tunic[data-coat="usnavy"] .medal-row.n5 .medal + .medal { margin-left: -12.5%; }
+/* The rack read small beside the supplied Medal of Honor, so a naval medal
+   in full dress is drawn 10% over its scale drawing: 27.5% of the container
+   rather than 25%, which is 8.635% of the coat and 22.04% of its height.
+   Every figure below is that one put through the same geometry, so they all
+   move together - the naval spacing M/3 and M/2, and the row pull. */
+.tunic[data-coat="usnavy"].full .medal { width: 27.5%; }
+.tunic[data-coat="usnavy"] .medal-row.n4 .medal + .medal { margin-left: -9.167%; }
+.tunic[data-coat="usnavy"] .medal-row.n5 .medal + .medal { margin-left: -13.75%; }
 /* The Marine rack is four medals wide, so a row of four is mounted plain
    and only a row of five closes up: spacing (4M - M)/4 = 3M/4, a quarter
    of a medal's overlap. */
@@ -299,8 +305,10 @@ table.roster td.award-cell { white-space: normal; }
    five, which is the 50% the regulation calls the limit. */
 .tunic[data-coat="usaf"] .medal-row.n4 .medal + .medal { margin-left: -8.333%; }
 .tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -12.5%; }
-.tunic[data-coat="usnavy"] .medal-row + .medal-row,
 .tunic[data-coat="usmc"] .medal-row + .medal-row { margin-top: -27.35%; }
+/* 58.19% of the container tall at the larger size, less the 48.3% of it the
+   next row shows. */
+.tunic[data-coat="usnavy"] .medal-row + .medal-row { margin-top: -30.09%; }
 /* On the tie below the knot, the bow largely behind the collar points. */
 .tunic-neck { position: absolute; left: 46.5%; top: 0; width: 23%; transform: translateX(-50%); }
 .tunic-neck:empty { display: none; }
@@ -335,17 +343,20 @@ table.roster td.award-cell { white-space: normal; }
    wearer's left breast pocket (62.1-93.1% of the coat, centre 77.6%), and
    the lowest row's holding bar sits a quarter inch above the pocket's top
    edge (48.0%). A medal is 7.85% of the coat wide = 1 3/8 in, so a quarter
-   inch is 1.72% of the coat's height and the medal 20.04% tall: the lowest
-   row runs 46.28-66.32%, hence bottom 33.68%. Service dress keeps the
-   ribbon rack flush with the pocket's inboard edge, as asked. */
-.tunic[data-coat="usnavy"].full .tunic-right { left: 77.6%; transform: translateX(-50%); bottom: 33.68%; }
+   inch is 1.72% of the coat's height and the medal 22.04% tall at the size
+   above: the lowest row runs 46.28-68.32%, hence bottom 31.68%. Service
+   dress keeps the ribbon rack flush with the pocket's inboard edge. */
+.tunic[data-coat="usnavy"].full .tunic-right { left: 77.6%; transform: translateX(-50%); bottom: 31.68%; }
 .tunic[data-coat="usnavy"] .tunic-left { left: 19.3%; width: 31.4%; }
-/* Full dress: the unit bars' inner edge on the other pocket's inner edge
-   (37.4%); that container stays centred, so centre = edge - half the rack. */
+/* Full dress: the unit bars centred over the wearer's right pocket, the way
+   the medals are centred over the left. Measured off the photograph, that
+   pocket's flap runs 5.44-36.72% and its body 7.04-35.83%, so its centre is
+   21.3% - not the 22.4% that setting the rack by the pocket's inner edge
+   gave, which read visibly inboard. */
 /* The unit bars ride a quarter inch above their own pocket flap (top
    48.0%), the same clearance the medal rack's holding bar keeps: bottom
    edge at 46.28%, hence bottom 53.72%. */
-.tunic[data-coat="usnavy"].full .tunic-left { left: 22.4%; bottom: 53.72%; }
+.tunic[data-coat="usnavy"].full .tunic-left { left: 21.3%; bottom: 53.72%; }
 .tunic[data-coat="usnavy"] .tunic-neck { inset: 0; width: 100%; transform: none; }
 /* Full-canvas neck overlays: the picture ignores the pointer; the hotspot,
    sized to the decoration's extent in the overlay, carries the tooltip. */
