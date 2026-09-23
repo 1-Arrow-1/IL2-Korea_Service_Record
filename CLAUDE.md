@@ -86,9 +86,24 @@ read as a hostname and renders an error page silently.
     python tools/stage_release.py
     iscc installer\IL2_Korea_Service_Record.iss
     python tools/make_release_zip.py
+    git push origin main && git push origin v1.2.3
+    gh release upload v1.2.3 "installer/Output/IL2_Korea_Service_Record_Setup_v1.2.3.exe" ^
+                             "installer/Output/IL-2 Korea Service Record v1.2.3.zip" --clobber
 
 Bump `MyAppVersion` in the .iss and `VERSION` in `make_release_zip.py`
 together. The zip is the setup exe plus a README and nothing else.
+
+**The binaries are uploaded by hand, and that is deliberate.** Pushing the tag
+makes `build.yml` open the GitHub release with generated notes, but it uploads
+nothing: the runner installs PyInstaller from PyPI and therefore builds with
+the *stock* bootloader, the fingerprint Defender keys on. Until 2026-09-23 the
+workflow did upload, so v1.6.0 and v1.6.1 both served the runner's build while
+the forum post quoted the checksum of the local one - the checksum a reader was
+invited to verify. Check what the release actually serves before posting:
+
+    python tools/ci.py releases 1
+
+and compare the digest it prints against `sha256sum` of the file you built.
 
 `stage_release.py` **without flags** copies `dist/` into
 `installer/payload/tracker`; `--refresh-mod` alone refreshes only the mod

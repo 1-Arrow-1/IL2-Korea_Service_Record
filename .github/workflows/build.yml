@@ -1,7 +1,8 @@
 # Builds the Windows release: the PyInstaller tracker, the Inno Setup
 # installer that wraps it together with the awards mod, and the zip that goes
 # on the forum. Every push and pull request builds; a tag of the form v1.2.3
-# also signs and publishes.
+# also signs and opens the release. It does not upload the binaries - see the
+# note on the publish step at the foot of this file.
 #
 # Signing is done by SignPath (certificate from SignPath Foundation) and is
 # two-step, because the installer contains the tracker exe: the exe is signed
@@ -136,11 +137,19 @@ jobs:
             installer/Output/*.exe
           if-no-files-found: error
 
+      # The release is created here but carries no binaries. The runner
+      # installs PyInstaller from PyPI, so its build uses the *stock*
+      # bootloader - the fingerprint Defender's heuristic keys on, and the
+      # reason the bootloader is compiled by hand for a release (see the
+      # Release section of CLAUDE.md). Uploading here would quietly put that
+      # build in front of everyone who follows the download link, which is
+      # what happened to 1.6.0 and to 1.6.1 until the assets were replaced.
+      # The installer that ships is built locally and uploaded by hand:
+      #     gh release upload v1.2.3 "installer/Output/..." --clobber
+      # The runner's build is still kept as a workflow artifact above, which
+      # is what it is good for: proving the tree builds on a clean machine.
       - name: Publish the release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            installer/Output/*.zip
-            installer/Output/*.exe
           generate_release_notes: true
