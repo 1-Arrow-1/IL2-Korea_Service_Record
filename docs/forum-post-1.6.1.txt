@@ -1,0 +1,148 @@
+IL-2 Korea Service Record 1.6.1 — a decoration that was being given for the wrong thing,
+two that were missing, and paperwork that did not say what it meant to say
+
+
+Gentlemen,
+
+1.6.1 is a maintenance release. No new screen, nothing to learn. It corrects a decoration
+that was being awarded for something it was never awarded for, adds the two medals that
+gap left behind, slows the unit citations down to something like the real rate, and fixes
+four faults in the citations and certificates. Everything in 1.6 is unchanged and the
+earlier posts still describe it.
+
+
+THE BRONZE STAR AND ITS "V"
+
+This is the one worth reading.
+
+The Bronze Star Medal can be given for heroism or for meritorious service, and when it is
+given for heroism it carries the bronze letter V. What I had not understood is that the
+regulations exclude participation in aerial flight from the V. An airman could earn one,
+and some did — defending the field, pulling a man out under fire, fighting after coming
+down on the wrong side — but never for anything he did in the air. Heroism in the air is
+what the Distinguished Flying Cross and the Air Medal are for, and a man does not get both
+systems for the same act.
+
+Every rung of the V ladder was firing on exactly the wrong things: one air victory, or
+twenty-five targets strafed, or being wounded while still scoring. And the paperwork
+repeated the error — the citation read "while serving as pilot of an F-86 ... in action
+near Sinuiju" and the certificate said the same, which is precisely the sentence the
+regulation forbids.
+
+It is fixed. The award now asks only for some service behind the man and then leaves it to
+chance, because the game models no ground combat and there is nothing in a career that can
+stand for the deed. The citation and the certificate use the formula the regulations give
+for an airman decorated for a non-flying act — "heroism not involving participation in
+aerial flight" — in all six languages, and the award no longer draws a narrative from that
+day's sortie, because there is no day.
+
+If you already hold one, you keep it. Nothing is taken back.
+
+
+THE SOLDIER'S MEDAL, AND THE NAVY AND MARINE CORPS MEDAL
+
+Taking the flying out of the V leaves a gap, and the period filled it with a medal of its
+own: heroism with no enemy in it at all. A man pulled from a burning aeroplane on the ramp,
+a rescue from the sea, a fire fought on the flight line.
+
+The Air Force had nothing of its own for this until the Airman's Medal of 1960, so in Korea
+an airman was given the Army's — the Soldier's Medal, authorised by Act of Congress in July
+1926. The naval services have their own, the Navy and Marine Corps Medal. Both are in now,
+worn after the Distinguished Flying Cross and before the Bronze Star, with their art, their
+names and descriptions in six languages, and their own certificate transcribed from a
+filled original.
+
+Neither citation mentions flying, for the same reason the V's no longer does.
+
+
+THE UNIT CITATIONS CAME MUCH TOO FAST
+
+The Distinguished Unit Citation and its clusters were written against the squadron's
+running total of targets destroyed, and I had guessed at the numbers. Then I measured them
+against a real squadron.
+
+Twenty-five missions of a fighter-bomber outfit working over airfields and supply dumps —
+the 12th FBS, April 1951 — came to 1,310 surface kills. Upwards of fifty a mission. The
+old ladder started at 600 and put the first cluster at 1,300, so the squadron had the
+citation and its cluster inside five weeks of a war that ran three years. The 4th Fighter-
+Interceptor Wing, the most decorated Sabre wing there was, was cited twice in the whole
+war.
+
+The thresholds are now 3,000 / 8,000 / 14,000 / 21,000. The first citation falls somewhere
+near the squadron's fifty-seventh mission instead of its seventeenth, and the third cluster
+is a long campaign's work. The air-victory route is untouched at 50 / 110 / 180 / 260 — it
+was always about right, and only looked generous because the ground route was firing six
+times sooner. Whichever fits your unit is the one that decides. The Navy's Presidential
+Unit Citation moves with it.
+
+Again, anything already awarded stays awarded.
+
+
+THE PAPERWORK
+
+Four faults, three of them found by a second pair of eyes going through the Air Force set
+one award at a time.
+
+A repeat award was resolving to the base decoration on every Air Force ladder, so a second
+Air Medal produced a certificate for a first one — no device named, no entitlement line.
+The cause was a lookup keyed by the family name of the decoration, and the Air Medal exists
+in both the Air Force and the naval tables, so one quietly overwrote the other.
+
+On the Distinguished Unit Citation and both naval unit citations the entitlement line was
+inserted in the middle of a sentence, leaving the rest of it dangling after a stray "and".
+It now closes the sentence properly and lets the order line — "By order of the Secretary of
+the Navy" — stay where it belongs, at the foot.
+
+The Navy Unit Commendation's text ran straight through the commission pennant printed on
+the blank. The heading now sits above the pennant and "Washington" below it, as the real
+form has it.
+
+And a Republic of Korea citation issued to a sailor produced "U.S. United States Naval
+Forces".
+
+Every certificate in the program — a hundred and twelve of them, Air Force and naval — was
+then measured line by line to confirm that nothing overlaps anything and nothing runs off
+the sheet.
+
+
+THE NAVAL RACK
+
+Still nothing you can earn, for the same reason as last time: the game has no naval careers
+yet. Three corrections to it all the same. The unit ribbon on the right breast was set by
+the edge of the pocket rather than its centre and sat visibly inboard. The full-size medals
+were drawn a shade small against the Medal of Honor and are now ten per cent larger. And
+the gold star on the Medal of Honor's neck pad, which marks a second award, was the wrong
+way up — a repeat star is worn with one ray down.
+
+
+A NOTE FOR ANYONE WRITING THEIR OWN AWARDS
+
+Several of the above are the same mistake in different clothes: I trusted the list of
+criteria printed at the foot of the game's own awards.cfg. Some of it is wrong. So the
+whole list has now been checked against the career processor itself, variable by variable,
+and the result is in the repository as docs/AWARD_CRITERIA.md — one table saying what each
+criterion actually measures, and whether it can be used for a squadron award, a personal
+award, or neither.
+
+The short version: one documented variable does not exist in the program at all and always
+reads as zero, several are available only to squadron awards despite the legend suggesting
+otherwise, and several that work are not documented anywhere. If you are writing award
+conditions, read that table before you spend an evening wondering why nothing fires.
+
+
+GETTING IT
+
+  <link>
+
+  IL-2 Korea Service Record 1.6.1
+  SHA-256  ae063eb9730f12da8a13ad0c9092eadd0703c035905ee4569740620c6a222df9
+
+The installer carries both the tracker and the awards mod, as before. Upgrading over 1.6 is
+safe and keeps your settings, your photographs and your flight-time corrections. If you run
+the awards mod, do install this one over it — the Bronze Star and the unit citations are
+changes to the game's award definitions, not to the tracker, and they only take effect once
+the new awards.cfg is in place.
+
+As ever, tell me what is wrong with it.
+
+Alex
