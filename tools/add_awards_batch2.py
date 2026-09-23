@@ -2,7 +2,7 @@
 Name and describe the second batch of USAF awards in six languages:
 
     601045-601046  Distinguished Unit Citation, 2nd and 3rd oak leaf cluster
-    601047-601049  ROK Presidential Unit Citation, 1st to 3rd oak leaf cluster
+    601047-601049  ROK Presidential Unit Citation, 2nd to 4th award (no devices)
     601050-601051  Silver Star, 3rd and 4th oak leaf cluster
     601052         Distinguished Service Medal
     601053         National Defense Service Medal
@@ -20,7 +20,8 @@ Eichenlaub)", French "(3e agrafe feuille de chêne)", Spanish "(Tercer Racimo
 de Hojas de Roble)", Russian "с тремя дубовыми листьями", Chinese
 "（第三枚橡叶簇）"). The three new decorations get a full description; every
 cluster rung gets the stock redirect line "#<base> // ..." that points the
-game at its base award's text, written for all six languages.
+game at its base award's text, written for all six languages. ROK citation
+repeats instead use numbered award names and authorize no ribbon devices.
 """
 
 import argparse
@@ -273,13 +274,27 @@ def names_for(base: dict, n: int, bronze: bool = False) -> dict:
     return {lang: cluster_name(lang, base[lang], n, bronze) for lang in LANGS}
 
 
+def rok_names(number: int) -> dict:
+    """Repeat citations are recorded by number, never as ribbon devices."""
+    ordinal = {2: "2nd", 3: "3rd", 4: "4th"}[number]
+    suffixes = {
+        "eng": f" ({ordinal} award)",
+        "ger": f" ({number}. Verleihung)",
+        "fra": f" ({number}e attribution)",
+        "spa": f" ({number}.ª concesión)",
+        "rus": f" ({number}-е награждение)",
+        "chs": f"（第{number}次授予）",
+    }
+    return {lang: ROK_NAMES[lang] + suffixes[lang] for lang in LANGS}
+
+
 # (award id, inserted after, names, descriptions); insertion order matters.
 AWARDS = (
     ("601045", "601044", names_for(DUC_NAMES, 2, True), redirect("601044")),
     ("601046", "601045", names_for(DUC_NAMES, 3, True), redirect("601044")),
-    ("601047", "601046", names_for(ROK_NAMES, 1, True), redirect("601043")),
-    ("601048", "601047", names_for(ROK_NAMES, 2, True), redirect("601043")),
-    ("601049", "601048", names_for(ROK_NAMES, 3, True), redirect("601043")),
+    ("601047", "601046", rok_names(2), redirect("601043")),
+    ("601048", "601047", rok_names(3), redirect("601043")),
+    ("601049", "601048", rok_names(4), redirect("601043")),
     ("601050", "601049", names_for(SILVER_STAR, 3), redirect("601018")),
     ("601051", "601050", names_for(SILVER_STAR, 4), redirect("601018")),
     ("601052", "601051", DSM_NAMES, DSM_DESCRIPTIONS),

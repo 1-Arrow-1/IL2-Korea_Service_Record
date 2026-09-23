@@ -63,7 +63,13 @@ for award in ("601027", "601040", "601041", "601042", "601043", "601044",
               # DSM, NDSM, Commendation ladder - tools/add_awards_batch2.py
               "601045", "601046", "601047", "601048", "601049", "601050", "601051",
               "601052", "601053", "601054", "601055", "601056", "601057",
-              "601058", "601059", "601060", "601061", "601062"):
+              "601058", "601059", "601060", "601061", "601062",
+              # Navy / USMC additions, shared 602 IDs for both services.
+              "602031", "602032", "602033", "602034", "602035", "602036",
+              "602037", "602038", "602039", "602040", "602041", "602042",
+              "602043", "602044", "602045", "602046", "602047",
+              # Naval Bronze Star with Combat V: five logic ids share three tiles.
+              "602048", "602049", "602050", "602051", "602052"):
     for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
         MOD_FILES[f"{award}.locale={lang}.txt"] = "nsdata/assets/awards/6xx"
 for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
