@@ -17,6 +17,11 @@ after a warp shifts by that much; the duration becomes the plan's; pilots who
 did not come back keep the time they had. Where the log is gone, the plan
 alone is used: the outbound leg's planned time against the first event.
 
+The log is what decides whether a mission was warped at all. A sortie can come
+in well under its briefing without a warp in it - the player simply ends the
+mission once the job is done - and such a sortie is left alone. Only where
+there is no usable log does the ratio of flown time to plan stand in.
+
 Nothing here writes to the game. The result is a *sidecar* - one JSON per
 career under the tracker's own folder - that records, for every corrected
 mission, the shifts and both the original and the credited durations. The
@@ -58,7 +63,9 @@ WARP_MIN_M = 5_000.0
 WARP_FACTOR = 1.5
 # Record types whose payload starts with the aircraft id and a position.
 FIX_TYPES = {5, 6, 24, 25, 26, 27, 28, 30, 31}
-# A mission counts as warped when it was flown in less than this share of the plan.
+# Fallback only. A mission counts as warped when its flight log holds a jump;
+# where the log is gone, a sortie flown in less than this share of the plan is
+# taken to have been warped.
 THRESHOLD = 0.5
 
 
@@ -251,7 +258,7 @@ def compute(db_path: Path, game_dir: Path, existing: Optional[Dict[str, Any]] = 
             continue
         est = float(m["estDuration"] or 0)
         flown = float(m["flown"] or 0)
-        if est <= 0 or flown <= 0 or flown >= est * THRESHOLD:
+        if est <= 0 or flown <= 0 or flown >= est:
             continue
         route = parse_route(m["route"])
         start = m["startTime"]
@@ -260,7 +267,17 @@ def compute(db_path: Path, game_dir: Path, existing: Optional[Dict[str, Any]] = 
         source = "plan"
 
         log = logs.for_sortie(m["sdate"][:10], m["sdate"][11:])
-        jumps = find_warps(player_fixes(log.path), route) if log else []
+        fixes = player_fixes(log.path) if log else []
+        jumps = find_warps(fixes, route) if fixes else []
+        if not jumps and (fixes or flown >= est * THRESHOLD):
+            # The log decides. Fixes and no jump in them means the mission was
+            # flown through, however far short of the briefing it came in, and
+            # nothing is owed - a plan is a plan, not a promise. Only where
+            # there is no usable log does the ratio stand in for the evidence.
+            # Deciding on the ratio first was what hid a warped mission that
+            # happened to land at 50.5% of its plan: the jumps were in its log
+            # all along, and the detector never ran (1951.05.01, 12th FBS).
+            continue
         if jumps:
             source = "log"
             for (t0, t1, x0, z0, x1, z1) in jumps:
