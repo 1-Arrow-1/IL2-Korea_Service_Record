@@ -58,6 +58,7 @@
 .sheet.portrait.duc .ct-for { top: 52.6%; font-family: 'Times New Roman', Georgia, serif; font-size: 1.85em; font-weight: normal; line-height: 1; letter-spacing: 0.05em; -webkit-text-stroke: 0.02em currentColor; }
 .sheet.portrait.duc .ct-for-label { display: block; margin: 0 0 0.85em; }
 .sheet.portrait.duc .ct-close { top: 60.4%; font-size: 1.35em; text-align: justify; text-align-last: left; line-height: 1.85; letter-spacing: 0.06em; }
+.sheet.portrait.duc.repeat-award .ct-close { top: 59.9%; line-height: 1.55; }
 .sheet.portrait.duc .ct-given-block { position: absolute; top: 71.2%; }
 .sheet.portrait.duc .ct-given-block .ct-given { position: static; display: block; font-size: 1.75em; letter-spacing: 0.04em; margin-bottom: 0.55em; }
 .sheet.portrait.duc .ct-signature { bottom: 8.5%; }
@@ -80,25 +81,65 @@
 .sheet.portrait.navy_puc .ct-for-label { display: block; text-align: center; margin-bottom: 0.9em; }
 .sheet.portrait.navy_puc .ct-deed { display: none; }
 .sheet.portrait.navy_puc .ct-close { top: 60%; font-size: 1.2em; line-height: 1.55; text-align: justify; text-align-last: center; }
+/* A repeat citation lengthens the award statement rather than the reason, so
+   the statement keeps its place and simply runs two lines further down; the
+   order line below it already sits clear of them. */
 .sheet.portrait.navy_puc .ct-close + .ct-close { top: 69%; font-style: italic; }
 .sheet.portrait.navy_puc .ct-given-block { top: 73.5%; }
 .sheet.portrait.navy_puc .ct-given { font-size: 1.45em; }
 .sheet.portrait.navy_puc .ct-signature.right { right: auto; left: 66%; transform: translateX(-50%); bottom: 7%; width: 32%; }
 
-.sheet.portrait.navy_unit_commendation .ct-country { top: 25.5%; font-size: 2em; letter-spacing: 0.07em; }
-.sheet.portrait.navy_unit_commendation .ct-pre { top: 31%; font-size: 1.15em; line-height: 1.45; }
-.sheet.portrait.navy_unit_commendation .ct-pre + .ct-pre { top: 34%; }
-.sheet.portrait.navy_unit_commendation .ct-name { top: 38%; font-size: 3em; letter-spacing: 0.045em; white-space: nowrap; }
-.sheet.portrait.navy_unit_commendation .ct-to { top: 44%; font-size: 1.4em; }
-.sheet.portrait.navy_unit_commendation .ct-recipient { top: 47.5%; font-size: 1.55em; }
-.sheet.portrait.navy_unit_commendation .ct-unit { top: 51%; font-size: 1.2em; }
-.sheet.portrait.navy_unit_commendation .ct-service { top: 54%; font-size: 1.15em; }
-.sheet.portrait.navy_unit_commendation .ct-for { top: 58%; font-size: 1.35em; line-height: 1.45; text-align: justify; text-align-last: center; }
-.sheet.portrait.navy_unit_commendation .ct-for-label { display: block; text-align: center; margin-bottom: 0.75em; }
+.sheet.portrait.navy_unit_commendation .ct-country {
+    top: 20.2%; font-size: 2.8em; letter-spacing: 0.015em;
+}
+.sheet.portrait.navy_unit_commendation .ct-pre {
+    font-family: 'Times New Roman', Georgia, serif; line-height: 1;
+}
+/* The flag is printed on the blank: Department heading above it,
+   Washington below it, then the two lines of award language. */
+.sheet.portrait.navy_unit_commendation .ct-country + .ct-pre {
+    top: 33%; font-size: 1.35em; letter-spacing: 0.04em;
+}
+.sheet.portrait.navy_unit_commendation .ct-country + .ct-pre + .ct-pre {
+    top: 36.6%; font-size: 1.2em; letter-spacing: 0.015em;
+}
+.sheet.portrait.navy_unit_commendation .ct-country + .ct-pre + .ct-pre + .ct-pre {
+    top: 39.5%; font-size: 1.2em; letter-spacing: 0.015em;
+}
+.sheet.portrait.navy_unit_commendation .ct-name {
+    top: 43.5%; font-size: 3.6em; letter-spacing: 0.015em; white-space: nowrap;
+}
+.sheet.portrait.navy_unit_commendation .ct-to { top: 49%; font-size: 1.5em; }
+.sheet.portrait.navy_unit_commendation .ct-recipient {
+    top: 52.6%; font-size: 1.7em; font-weight: bold; letter-spacing: 0.035em;
+}
+.sheet.portrait.navy_unit_commendation .ct-unit {
+    top: 56.4%; font-family: 'Courier New', Courier, monospace;
+    font-size: 1.45em; font-weight: bold; letter-spacing: 0.025em;
+}
+.sheet.portrait.navy_unit_commendation .ct-service {
+    top: 59.3%; font-size: 1.3em; letter-spacing: 0.08em;
+}
+.sheet.portrait.navy_unit_commendation .ct-for {
+    top: 62.2%; left: 8%; right: 8%; font-size: 1.4em; font-weight: bold;
+    line-height: 1.45; text-align: justify; text-align-last: center;
+}
+/* The entitlement for a repeat goes at the end of the award statement, which
+   then runs to four lines. The statement starts higher and the date block
+   moves down to make room; there is space, the signature being at 91%. */
+.sheet.portrait.navy_unit_commendation.repeat-award .ct-close { top: 68.2%; }
+.sheet.portrait.navy_unit_commendation.repeat-award .ct-given-block { top: 76%; }
+.sheet.portrait.navy_unit_commendation .ct-for-label {
+    display: block; margin-bottom: 0.75em; text-align: center;
+    font-family: 'Times New Roman', Georgia, serif; font-weight: normal;
+}
 .sheet.portrait.navy_unit_commendation .ct-deed { display: none; }
-.sheet.portrait.navy_unit_commendation .ct-close { top: 67%; font-size: 1.2em; line-height: 1.55; text-align: justify; text-align-last: center; }
-.sheet.portrait.navy_unit_commendation .ct-given-block { top: 77%; }
-.sheet.portrait.navy_unit_commendation .ct-given { font-size: 1.4em; }
+.sheet.portrait.navy_unit_commendation .ct-close {
+    top: 69.5%; left: 8%; right: 8%; font-size: 1.35em; font-weight: bold;
+    line-height: 1.65; text-align: justify; text-align-last: center;
+}
+.sheet.portrait.navy_unit_commendation .ct-given-block { top: 74.8%; }
+.sheet.portrait.navy_unit_commendation .ct-given { font-size: 1.65em; }
 .sheet.portrait.navy_unit_commendation .ct-signature.right { right: auto; left: 66%; transform: translateX(-50%); bottom: 5%; width: 32%; }
 
 /* The filled naval examples use a short award statement rather than a

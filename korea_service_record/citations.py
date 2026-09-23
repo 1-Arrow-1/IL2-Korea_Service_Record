@@ -134,12 +134,18 @@ def _fill(template: str, facts: Dict[str, Any]) -> str:
     return template.format_map(_Safe(facts))
 
 
-_LADDERS = {}
+# Resolve the rung by award id. A family name such as ``air_medal`` exists in
+# both the USAF and naval tables, so a family-keyed map lets the later naval
+# table overwrite the USAF ladder and silently treats every USAF repeat as
+# the base decoration.
+_RUNG = {}
 for _table in (_USAF_SORTIE, _USAF_PERIOD, _USAF_UNIT, _USAF_SERVICE,
                _NAVAL_SORTIE, _NAVAL_PERIOD, _NAVAL_UNIT, _NAVAL_SERVICE):
-    _LADDERS.update(_table)
+    for _ids in _table.values():
+        for _index, _award_id in enumerate(_ids):
+            _RUNG[_award_id] = _index
 # Twin ids for one rung (the Bronze Star V ladder): both count as that rung.
-_RUNG = {601058: 0, 601059: 1, 601061: 1, 601060: 2, 601062: 2}
+_RUNG.update({601058: 0, 601059: 1, 601061: 1, 601060: 2, 601062: 2})
 _RUNG.update({602048: 0, 602049: 1, 602051: 1, 602050: 2, 602052: 2})
 
 # Naval families whose citation prose follows an existing U.S. family. The
@@ -182,6 +188,10 @@ def _naval_text(text: str, texts: Dict[str, Any], country: int,
     # references such as "Air Force" with the member's actual branch.
     text = replace_term(text, "Department of the Air Force", "Department of the Navy")
     text = replace_term(text, "Secretary of the Air Force", "Secretary of the Navy")
+    # The ROK PUC form prefixes the command with "U.S.". Replace the whole
+    # phrase so a Navy form cannot become "U.S. UNITED STATES NAVAL FORCES".
+    text = replace_term(text, "U.S. Far East Air Forces",
+                        branch.get("command", "United States Naval Forces, Far East"))
     text = replace_term(text, naval.get("air_force", "United States Air Force"),
                         branch.get("service", "United States Navy"))
     text = replace_term(text, naval.get("air_command", "Far East Air Forces"),
@@ -197,11 +207,7 @@ def _naval_text(text: str, texts: Dict[str, Any], country: int,
 
 def _rung(award_id: int) -> int:
     """How far up its ladder an award sits: 0 for the decoration itself."""
-    if award_id in _RUNG:
-        return _RUNG[award_id]
-    fam = FAMILY.get(award_id)
-    ids = _LADDERS.get(fam[1], ()) if fam else ()
-    return ids.index(award_id) if award_id in ids else 0
+    return _RUNG.get(award_id, 0)
 
 
 def _ordinal(cert: Dict[str, Any], day: int) -> str:
@@ -295,6 +301,7 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             fill.update({"DAY": "", "MONTH": "", "YEAR": ""})
         given = [_fill(line, fill) for line in form.get("given", [])]
         reason = _fill(form.get("reason", ""), fill)
+        close = [_fill(line, fill) for line in form.get("close", "").split(chr(10)) if line]
         if device:
             # The medal as the form names it, without its article.
             medal = form.get("title", "")
@@ -302,7 +309,23 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             clause = _fill(cert["repeat"], {"DEVICE": device, "MEDAL": medal})
             if reason and reason[0].isupper() and not reason.isupper():
                 clause = clause.lower().replace("oak leaf cluster", "Oak Leaf Cluster").replace(medal.lower(), medal.title())
-            reason = reason.rstrip(".") + clause
+            entitlement = clause.lstrip(", ")
+            if entitlement.upper().startswith("AND "):
+                entitlement = entitlement[4:]
+            recipient = "THE RECIPIENT " if reason.isupper() else "The recipient "
+            if close:
+                # On a form with a closing block the reason is not the end of
+                # the thought - the DUC and both naval unit citations run one
+                # sentence straight through it ("EXTRAORDINARY HEROISM" / "AND
+                # OUTSTANDING PERFORMANCE OF DUTY..."), so a clause wedged in
+                # between leaves a dangling "AND". The entitlement goes after
+                # the first closing line instead, which finishes that sentence
+                # and still leaves any attestation below it - the Navy PUC signs
+                # off "BY ORDER OF THE SECRETARY OF THE NAVY", the ROK PUC
+                # "Authorized by the Minister of Defense" - as the last word.
+                close[0] = close[0].rstrip() + " " + recipient + entitlement
+            else:
+                reason = reason.rstrip(".") + ". " + recipient + entitlement
         offices = form.get("signer", "fifth")
         if isinstance(offices, str):
             offices = ["", offices]                      # right-hand signature only
@@ -325,6 +348,7 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
         return {
             "form": "usaf",
             "template": template,
+            "repeat_award": bool(device),
             "seal_overlay": ("/static/images/certificates/Navy_seal_overlay_landscape.png"
                              if seal_overlay else ""),
             "header": form.get("header", ""),
@@ -340,7 +364,7 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             "reason": reason,
             "where": _fill(form.get("where", ""), fill),
             "deed": paragraphs[1] if len(paragraphs) > 2 else "",
-            "close": [_fill(line, fill) for line in form.get("close", "").split(chr(10)) if line],
+            "close": close,
             "given": given,
             "seal": "DEPARTMENT OF THE NAVY" if is_naval else cert.get("seal", ""),
             "signer": signer["name"], "signer_title": signer["title"],
