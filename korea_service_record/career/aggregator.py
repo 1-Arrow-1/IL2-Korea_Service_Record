@@ -332,6 +332,34 @@ def _hm(seconds: Optional[int]) -> str:
     return f"{total // 3600}h {total % 3600 // 60:02d}m"
 
 
+def _landing_clock(start: str, flight, secs: Optional[float]) -> str:
+    """
+    When the wheels touched: take-off plus the sortie's credited duration.
+
+    The flight log's own landing event is the obvious thing to print, and on
+    almost every sortie it is the same moment - the game's `flightTime` equals
+    the log's take-off-to-landing span to the second. On a few it does not.
+    The career file and the flight log then disagree about the same sortie
+    before anything here touches it, and a row that takes its clock from one
+    and its hours from the other does not add up: 07:26 to 08:09 against
+    0h 57m, on the 12th FBS airfield attack of 1951.05.01.
+
+    The hours are the figure that has to stand - they are what the career file
+    carries, what the pilot screen shows and what the hours-based awards read
+    - so the landing is the one that moves. On that sortie it also lands on
+    the game's own corrected mission end, which the log's landing does not.
+
+    A man who did not come back has no landing in the log, and is not given
+    one here either.
+    """
+    if flight is None or flight.takeoff_s is None or flight.landing_s is None:
+        return _clock(start, flight.landing_s) if flight is not None else ""
+    total = float(secs or 0)
+    if total <= 0:
+        return _clock(start, flight.landing_s)
+    return _clock(start, flight.takeoff_s + total)
+
+
 def _days_between(start: str, end: str) -> int:
     """Whole days between two 'YYYY.MM.DD[ HH:MM:SS]' stamps, by the date."""
     from datetime import date
@@ -1227,7 +1255,7 @@ class CareerAggregator:
                     landing, landing_key = "landed", "landed"
             out.append({
                 "takeoff": _clock(sortie["date"][11:], flight.takeoff_s) if flight else "",
-                "landing_time": _clock(sortie["date"][11:], flight.landing_s) if flight else "",
+                "landing_time": _landing_clock(sortie["date"][11:], flight, sortie["flightTime"]),
                 "landing": landing,
                 "landing_key": landing_key,
                 "aircraft": flight.plane if flight else "",
@@ -2096,7 +2124,7 @@ class CareerAggregator:
                     "mission": self.locale.mission_type_name(m["type"]), "number": m["missionNum"],
                     "symbol": MISSION_SYMBOL.get(m["type"], ""),
                     "takeoff": _clock(start, flight.takeoff_s)[:5] if flight and flight.takeoff_s is not None else "",
-                    "landing": _clock(start, flight.landing_s)[:5] if flight and flight.landing_s is not None else "",
+                    "landing": _landing_clock(start, flight, secs)[:5],
                     "hours": round(hours, 1), "night_h": round(night_h, 1), "day_h": round(hours - night_h, 1),
                     "landings": 1 if returned else 0, "air": air, "ground": ground,
                     "remarks": kills_by_sortie.get(s["id"], []),
