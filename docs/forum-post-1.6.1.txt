@@ -6,9 +6,10 @@ Gentlemen,
 
 1.6.1 is a maintenance release. No new screen, nothing to learn. It corrects a decoration
 that was being awarded for something it was never awarded for, adds the two medals that
-gap left behind, slows the unit citations down to something like the real rate, and fixes
-four faults in the citations and certificates. Everything in 1.6 is unchanged and the
-earlier posts still describe it.
+gap left behind, slows the unit citations down to something like the real rate, fixes
+four faults in the citations and certificates, and stops the Career Helper passing over a
+mission you warped through. Everything in 1.6 is unchanged and the earlier posts still
+describe it.
 
 
 THE BRONZE STAR AND ITS "V"
@@ -105,6 +106,25 @@ then measured line by line to confirm that nothing overlaps anything and nothing
 the sheet.
 
 
+FLIGHT TIME
+
+The Career Helper offers you the missions you warped through, so that it can credit you
+the hours the game hands your wingmen for nothing. It chose which missions to offer by a
+rule of thumb — anything flown in under half the briefed time — and only read your flight
+log afterwards, to work out where the jumps had been.
+
+That is the wrong way round, and it showed. Two missions on the same day, both flown to
+50.5 per cent of their plan, both passed over: one by twelve seconds, the other by
+eighteen. The first had been flown straight through and deserved to be passed over. The
+second was warped, and its log said so plainly — two jumps, some twenty-four minutes of
+route skipped — and the detector that would have proved it never ran at all.
+
+The log decides now. Any mission that came in under its plan has its log read, and a log
+with no jump in it means the mission was flown through and nothing is owed, however far
+short of the briefing it came in: a plan is a plan, not a promise. The ratio survives
+only as a fallback, for a sortie whose log has gone.
+
+
 THE NAVAL RACK
 
 Still nothing you can earn, for the same reason as last time: the game has no naval careers
@@ -135,7 +155,7 @@ GETTING IT
   <link>
 
   IL-2 Korea Service Record 1.6.1
-  SHA-256  ae063eb9730f12da8a13ad0c9092eadd0703c035905ee4569740620c6a222df9
+  SHA-256  875bbed0b2acee8f115a488cab2d9bee1da394da8ef7eabb8fbffb3efae8941e
 
 The installer carries both the tracker and the awards mod, as before. Upgrading over 1.6 is
 safe and keeps your settings, your photographs and your flight-time corrections. If you run
