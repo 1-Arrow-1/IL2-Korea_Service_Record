@@ -25,17 +25,20 @@ FOLDER = Path(__file__).resolve().parent / "locales" / "citations"
 # for a service medal, which states only what it is for.
 _USAF_SORTIE = {"moh": (601026, 601041), "dsc": (601021, 601022, 601023, 601024, 601025),
                 "silver_star": (601018, 601019, 601020, 601050, 601051),
-                "bsm_v": (601058, 601059, 601060, 601061, 601062), "purple_heart": (601028, 601029, 601030)}
+                "purple_heart": (601028, 601029, 601030)}
 _USAF_PERIOD = {"bsm": (601008, 601009, 601010), "air_medal": (601002, 601003, 601004, 601005, 601006, 601007),
                 "dfc": (601011, 601012, 601013, 601014, 601015, 601016),
                 "commendation": (601054, 601055, 601056, 601057), "lom": (601017,), "dsm": (601052,)}
-_USAF_SERVICE = {"ndsm": (601053,), "ksm": tuple(range(601031, 601039)), "un": (601039,)}
+# bsm_v sits here, not among the sortie awards: the "V" denotes heroism
+# that did NOT involve participation in aerial flight, so its citation must
+# never narrate what the man did from the cockpit that day.
+_USAF_SERVICE = {"ndsm": (601053,), "ksm": tuple(range(601031, 601039)), "un": (601039,),
+                 "bsm_v": (601058, 601059, 601060, 601061, 601062)}
 _USAF_UNIT = {"duc": (601042, 601044, 601045, 601046), "rok_puc": (601043, 601047, 601048, 601049)}
 _NAVAL_SORTIE = {
     "moh": (602027, 602038),
     "navy_cross": (602021, 602022, 602023, 602024, 602025, 602026),
     "silver_star": (602018, 602019, 602020, 602042, 602043),
-    "bsm_v": (602048, 602049, 602050, 602051, 602052),
     "purple_heart": (602028, 602029, 602030),
 }
 _NAVAL_PERIOD = {
@@ -46,6 +49,7 @@ _NAVAL_PERIOD = {
     "lom": (602017,),
     "navy_dsm": (602031,),
 }
+_NAVAL_SERVICE = {"bsm_v": (602048, 602049, 602050, 602051, 602052)}
 _NAVAL_UNIT = {
     "navy_puc": (602033, 602039, 602040, 602041),
     "navy_unit_commendation": (602034, 602044, 602045, 602046, 602047),
@@ -63,7 +67,7 @@ FAMILY: Dict[int, tuple] = {}
 for nation, table, kind in (("usaf", _USAF_SORTIE, "sortie"), ("usaf", _USAF_PERIOD, "period"), ("usaf", _USAF_UNIT, "unit"),
                             ("usaf", _USAF_SERVICE, "service"),
                             ("naval", _NAVAL_SORTIE, "sortie"), ("naval", _NAVAL_PERIOD, "period"),
-                            ("naval", _NAVAL_UNIT, "unit"),
+                            ("naval", _NAVAL_UNIT, "unit"), ("naval", _NAVAL_SERVICE, "service"),
                             ("sov", _SOV_SORTIE, "sortie"), ("sov", _SOV_PERIOD, "period"),
                             ("dprk", _DPRK_PERIOD, "period"), ("dprk", _DPRK_SERVICE, "service"),
                             ("prc", _PRC_PERIOD, "period"), ("prc", _PRC_SERVICE, "service")):
@@ -130,7 +134,7 @@ def _fill(template: str, facts: Dict[str, Any]) -> str:
 
 _LADDERS = {}
 for _table in (_USAF_SORTIE, _USAF_PERIOD, _USAF_UNIT, _USAF_SERVICE,
-               _NAVAL_SORTIE, _NAVAL_PERIOD, _NAVAL_UNIT):
+               _NAVAL_SORTIE, _NAVAL_PERIOD, _NAVAL_UNIT, _NAVAL_SERVICE):
     _LADDERS.update(_table)
 # Twin ids for one rung (the Bronze Star V ladder): both count as that rung.
 _RUNG = {601058: 0, 601059: 1, 601061: 1, 601060: 2, 601062: 2}

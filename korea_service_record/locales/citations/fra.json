@@ -68,8 +68,8 @@
    "L’habileté et le courage du {rank} {name} font grand honneur à lui-même, aux Far East Air Forces et à l’United States Air Force."
   ],
   "bsm_v": [
-   "Le Président des États-Unis a le plaisir de décerner la Bronze Star Medal avec le « V » au {rank} {name}, United States Air Force, pour son héroïsme au cours d’opérations militaires contre un ennemi armé, comme pilote d’un {aircraft} du {unit}, en action près de {place}, Corée, le {date}.",
-   "L’héroïsme du {rank} {name} fait grand honneur à lui-même et à l’United States Air Force."
+   "Le Président des États-Unis d’Amérique a l’honneur de remettre à {rank} {name}, United States Air Force, la Bronze Star Medal avec dispositif « V » pour un acte d’héroïsme accompli hors de toute participation au vol, lié aux opérations militaires contre un ennemi armé, alors qu’il servait au sein du {unit} en Corée.",
+   "Le courage et le dévouement dont {rank} {name} a fait preuve en cette occasion font le plus grand honneur à lui-même et à l’United States Air Force."
   ],
   "bsm": [
    "Le Président des États-Unis a le plaisir de décerner la Bronze Star Medal au {rank} {name}, United States Air Force, pour services méritoires au cours d’opérations militaires contre un ennemi armé au sein du {unit} en Corée.",

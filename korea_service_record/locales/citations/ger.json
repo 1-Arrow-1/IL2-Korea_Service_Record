@@ -68,8 +68,8 @@
    "Das von {rank} {name} bewiesene Können und sein Mut erweisen ihm, den Far East Air Forces und der United States Air Force große Ehre."
   ],
   "bsm_v": [
-   "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, die Bronze Star Medal mit „V“ für Heldenmut in Kampfhandlungen gegen einen bewaffneten Feind als Pilot einer {aircraft} der {unit} im Einsatz nahe {place}, Korea, am {date}.",
-   "Der von {rank} {name} bewiesene Heldenmut erweist ihm und der United States Air Force große Ehre."
+   "Der Präsident der Vereinigten Staaten von Amerika verleiht {rank} {name}, United States Air Force, die Bronze Star Medal mit „V“-Spange für Tapferkeit außerhalb des Flugdienstes im Zusammenhang mit Kampfhandlungen gegen einen bewaffneten Feind während seiner Dienstzeit bei der {unit} in Korea.",
+   "Mut und Pflichttreue, die {rank} {name} dabei bewiesen hat, gereichen ihm selbst und der United States Air Force zur großen Ehre."
   ],
   "bsm": [
    "Der Präsident der Vereinigten Staaten verleiht {rank} {name}, United States Air Force, die Bronze Star Medal für verdienstvollen Dienst in Kampfhandlungen gegen einen bewaffneten Feind bei der {unit} in Korea.",

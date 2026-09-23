@@ -68,8 +68,8 @@
    "The skill and courage displayed by {rank} {name} reflect great credit upon himself, the Far East Air Forces and the United States Air Force."
   ],
   "bsm_v": [
-   "The President of the United States takes pleasure in presenting the Bronze Star Medal with \"V\" device to {rank} {name}, United States Air Force, for heroism in connection with military operations against an armed enemy while serving as pilot of an {aircraft} with the {unit}, in action near {place}, Korea, on {date}.",
-   "The heroism displayed by {rank} {name} reflects great credit upon himself and the United States Air Force."
+   "The President of the United States of America takes pleasure in presenting the Bronze Star Medal with “V” Device to {rank} {name}, United States Air Force, for heroism not involving participation in aerial flight, in connection with military operations against an armed enemy, while serving with the {unit} in Korea.",
+   "The courage and devotion to duty displayed by {rank} {name} on that occasion reflect great credit upon himself and the United States Air Force."
   ],
   "bsm": [
    "The President of the United States takes pleasure in presenting the Bronze Star Medal to {rank} {name}, United States Air Force, for meritorious service in connection with military operations against an armed enemy while serving with the {unit} in Korea.",
@@ -342,7 +342,7 @@
     "name": "{RANK} {NAME}",
     "service": "UNITED STATES AIR FORCE",
     "for": "",
-    "reason": "FOR HEROISM IN COMBAT ACTION AGAINST HOSTILE ENEMY FORCES ON {DATE} NEAR {PLACE}, KOREA, WHILE SERVING AS PILOT OF AN {AIRCRAFT} WITH THE {UNIT}.",
+    "reason": "FOR HEROISM NOT INVOLVING PARTICIPATION IN AERIAL FLIGHT, IN CONNECTION WITH MILITARY OPERATIONS AGAINST AN ARMED ENEMY, WHILE SERVING WITH THE {UNIT} IN KOREA.",
     "close": "THE \"V\" DEVICE FOR VALOR IS AUTHORIZED",
     "given": [
      "GIVEN IN THE CITY OF WASHINGTON, DC",

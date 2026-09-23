@@ -68,8 +68,8 @@
    "La pericia y el valor del {rank} {name} honran a sí mismo, a las Fuerzas Aéreas del Lejano Oriente y a la Fuerza Aérea de los Estados Unidos."
   ],
   "bsm_v": [
-   "El Presidente de los Estados Unidos se complace en conceder la Estrella de Bronce con distintivo «V» al {rank} {name}, Fuerza Aérea de los Estados Unidos, por heroísmo en operaciones militares contra un enemigo armado, como piloto de un {aircraft} del {unit}, en acción cerca de {place}, Corea, el {date}.",
-   "El heroísmo del {rank} {name} honra a sí mismo y a la Fuerza Aérea de los Estados Unidos."
+   "El Presidente de los Estados Unidos de América se complace en conceder a {rank} {name}, Fuerza Aérea de los Estados Unidos, la Estrella de Bronce con dispositivo «V» por heroísmo ajeno a la participación en vuelo, en relación con operaciones militares contra un enemigo armado, sirviendo con el {unit} en Corea.",
+   "El valor y la entrega al deber demostrados por {rank} {name} en aquella ocasión honran grandemente a su persona y a la Fuerza Aérea de los Estados Unidos."
   ],
   "bsm": [
    "El Presidente de los Estados Unidos se complace en conceder la Estrella de Bronce al {rank} {name}, Fuerza Aérea de los Estados Unidos, por servicio meritorio en operaciones militares contra un enemigo armado con el {unit} en Corea.",
