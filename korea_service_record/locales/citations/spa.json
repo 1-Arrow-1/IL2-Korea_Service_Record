@@ -116,6 +116,22 @@
    ""
   ]
  },
+ "naval": {
+  "air_force": "Fuerza Aérea de los Estados Unidos",
+  "air_command": "Fuerzas Aéreas del Lejano Oriente",
+  "air_force_short": "Fuerza Aérea",
+  "602": {"service": "Armada de los Estados Unidos", "service_short": "Armada", "command": "Fuerzas Navales de los Estados Unidos en Extremo Oriente"},
+  "603": {"service": "Cuerpo de Marines de los Estados Unidos", "service_short": "Cuerpo de Marines", "command": "Fuerza de Marines de la Flota del Pacífico"},
+  "awards": {
+   "dsc": "Cruz por Servicio Distinguido", "navy_cross": "Cruz de la Armada",
+   "dsm": "Medalla por Servicio Distinguido", "navy_dsm": "Medalla por Servicio Distinguido de la Armada",
+   "commendation": "Cinta de Encomio con pendiente metálico", "navy_commendation": "Medalla de Encomio de la Armada"
+  },
+  "navy_unit_commendation": [
+   "El {unit} recibe un encomio por conducta excepcionalmente meritoria y desempeño sobresaliente durante operaciones exitosas contra fuerzas enemigas en Corea. {deed}",
+   "La pericia profesional, la determinación y la devoción al deber de los miembros del escuadrón constituyen un alto honor para ellos y para {service}."
+  ]
+ },
  "sov": {
   "hero": [
    "Por decreto del Presídium del Sóviet Supremo de la URSS de {date}, por el cumplimiento ejemplar de misiones de combate y el valor y heroísmo demostrados en ellas, se concede al {rank} {name} el título de Héroe de la Unión Soviética con la Orden de Lenin y la medalla Estrella de Oro.",
@@ -296,7 +312,10 @@
    "freedom": "ордену Свободы и Независимости",
    "soldiers_honour": "ордену Солдатской Славы",
    "merit_k": "медали «За боевые заслуги»",
-   "flw": "медали «За Отечественную освободительную войну»"
+   "flw": "медали «За Отечественную освободительную войну»",
+   "merit_c": "медали «За боевые заслуги»",
+   "liberation_c": "медали «За освобождение Северного Китая»",
+   "oppose_c": "медали «За сопротивление США и помощь Корее»"
   },
   "worthy": {
    "hero": "присвоения звания Героя Советского Союза",
@@ -311,7 +330,10 @@
    "freedom": "орденом Свободы и Независимости",
    "soldiers_honour": "орденом Солдатской Славы",
    "merit_k": "медалью «За боевые заслуги»",
-   "flw": "медалью «За Отечественную освободительную войну»"
+   "flw": "медалью «За Отечественную освободительную войну»",
+   "merit_c": "медалью «За боевые заслуги»",
+   "liberation_c": "медалью «За освобождение Северного Китая»",
+   "oppose_c": "медалью «За сопротивление США и помощь Корее»"
   },
   "held": {
    "hero": "Герой Советского Союза",
@@ -326,7 +348,10 @@
    "freedom": "орден Свободы и Независимости",
    "soldiers_honour": "орден Солдатской Славы",
    "merit_k": "медаль «За боевые заслуги»",
-   "flw": "медаль «За Отечественную освободительную войну»"
+   "flw": "медаль «За Отечественную освободительную войну»",
+   "merit_c": "медаль «За боевые заслуги»",
+   "liberation_c": "медаль «За освобождение Северного Китая»",
+   "oppose_c": "медаль «За сопротивление США и помощь Корее»"
   },
   "repeat": " (повторно)",
   "post": "лётчик, {unit}",

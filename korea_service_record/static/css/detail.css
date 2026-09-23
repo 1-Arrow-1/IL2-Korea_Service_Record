@@ -234,6 +234,8 @@ table.roster td.award-cell { white-space: normal; }
 .tunic-title { margin: 0 0 0.6rem; font-size: 1.15rem; }
 .tunic { position: relative; width: 100%; aspect-ratio: 1122 / 930; overflow: hidden; border-radius: 3px; }
 .tunic-coat { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.tunic-rank { position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+    object-fit: cover; pointer-events: none; }
 .tunic-right, .tunic-left { position: absolute; bottom: 53.6%; width: 34.8%; display: flex; flex-direction: column;
     align-items: center; }
 /* Centred over the pocket, a touch inboard: the lapel then covers the wing's
@@ -246,10 +248,11 @@ table.roster td.award-cell { white-space: normal; }
    already carries the lapel's own, and a synthetic one read as a dark rim. */
 .tunic-lapel { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .tunic .ribbon-group { width: 100%; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45)); }
+/* Unit citations over the medals in full dress: a ribbon's width of air
+   between the two, so the strip reads as its own mount. */
+.tunic.full .unit-strip { margin-bottom: 3%; }
 .tunic .ribbon-row .ribbon { margin: -1.2% -1.44%; }
 .tunic .ribbon-row .ribbon.sov { margin: -1.2% -1.5%; }
-/* Four across: each bar three quarters the width, the same pull-in scaled. */
-.tunic .ribbon-group.four .ribbon-row .ribbon { width: 26%; margin: -0.9% -1.08%; }
 /* Regulation: the badge sits half an inch above the top row, centred. */
 .tunic-badge { width: 62%; height: auto; display: block; margin: 0 auto 4%;
     filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)); }
@@ -276,12 +279,110 @@ table.roster td.award-cell { white-space: normal; }
 .medal-row { position: relative; display: flex; justify-content: center; width: 100%; }
 .medal-row + .medal-row { margin-top: -25.6%; }
 .medal { position: relative; width: 25%; height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
+/* Naval mounting (docs/NAVY_RACK.md 5-7, 10-11, 16). Every medal keeps its
+   size; a row of four or five is fitted by moving the medals closer, not by
+   shrinking them, so all rows come out as wide as a row of three (75% of
+   the container). Centre-to-centre spacing is (3M - M)/(N - 1), so the pull
+   is M/3 for four and M/2 for five, M being the 25% medal. Vertically a row
+   starts 48.3% of a medal's height below the one above - the pendant plus
+   the sliver of ribbon left showing - so the medallions cover most of the
+   next row's suspension ribbon while every pendant stays clear. A medal is
+   52.9% of the container wide-units tall, hence the -27.35% pull. */
+.tunic[data-coat="usnavy"] .medal-row.n4 .medal + .medal { margin-left: -8.333%; }
+.tunic[data-coat="usnavy"] .medal-row.n5 .medal + .medal { margin-left: -12.5%; }
+/* The Marine rack is four medals wide, so a row of four is mounted plain
+   and only a row of five closes up: spacing (4M - M)/4 = 3M/4, a quarter
+   of a medal's overlap. */
+.tunic[data-coat="usmc"] .medal-row.n5 .medal + .medal { margin-left: -6.25%; }
+/* The Air Force mounts three medals to a row like the Navy, but with its
+   own overlap once a row runs wider: a third of a medal at four, a half at
+   five, which is the 50% the regulation calls the limit. */
+.tunic[data-coat="usaf"] .medal-row.n4 .medal + .medal { margin-left: -8.333%; }
+.tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -12.5%; }
+.tunic[data-coat="usnavy"] .medal-row + .medal-row,
+.tunic[data-coat="usmc"] .medal-row + .medal-row { margin-top: -27.35%; }
 /* On the tie below the knot, the bow largely behind the collar points. */
 .tunic-neck { position: absolute; left: 46.5%; top: 0; width: 23%; transform: translateX(-50%); }
 .tunic-neck:empty { display: none; }
-.tunic-collar { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .neck-medal { width: 100%; height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
 .tunic-hero, .pinned { height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
+
+/* USAF blue service coat. The revised photograph carries a flapped patch
+   pocket 60.8-92.5% of the coat (centre 76.65%) with its flap topping out
+   at 52.4%; a medal is 8.7% of the coat wide, so a quarter inch is 1.91%
+   of the height and a medal 22.2% tall. Ribbons end a quarter inch above
+   the flap (50.49%); in full dress the lowest row's bar sits there and its
+   medals end at 72.69%. Rank rides the shoulder loops and the Medal of
+   Honor's art is a full-canvas overlay, as on the naval coats. */
+.tunic[data-coat="usaf"] .tunic-right { left: 76.65%; bottom: 49.51%; }
+.tunic[data-coat="usaf"].full .tunic-right { bottom: 27.31%; }
+.tunic[data-coat="usaf"] .tunic-neck { inset: 0; width: 100%; transform: none; }
+.tunic[data-coat="usaf"] .tunic-neck, .tunic[data-coat="usaf"] .neck-medal { pointer-events: none; }
+.tunic[data-coat="usaf"] .neck-hotspot { display: block; position: absolute; pointer-events: auto;
+    left: 43.7%; top: 3.9%; width: 11.5%; height: 24.6%; }
+
+/* U.S. Navy service/full dress white. The supplied coat, shoulder-board
+   ranks and Medal of Honor are all 1122x930 overlays. Its pockets sit a
+   little farther outboard and are slightly narrower than the USAF coat's. */
+/* The rack's outer edge on the pocket's outer edge, 61.8% of the coat
+   (measured on the photograph). Ribbons fill 95.3% of their container
+   (the pull-in margins), medals all of it, hence the two offsets. */
+/* Both dresses centre on the pocket (62.1-93.1%, centre 77.6%). The base
+   rule's translateX(-50%) does the centring; the ribbons' visible bottom
+   then measures 46.31% against the flap top at 48.0%, the quarter inch. */
+.tunic[data-coat="usnavy"] .tunic-right { left: 77.6%; width: 31.4%; }
+/* Full dress follows docs/NAVY_RACK.md: the rack is centred over the
+   wearer's left breast pocket (62.1-93.1% of the coat, centre 77.6%), and
+   the lowest row's holding bar sits a quarter inch above the pocket's top
+   edge (48.0%). A medal is 7.85% of the coat wide = 1 3/8 in, so a quarter
+   inch is 1.72% of the coat's height and the medal 20.04% tall: the lowest
+   row runs 46.28-66.32%, hence bottom 33.68%. Service dress keeps the
+   ribbon rack flush with the pocket's inboard edge, as asked. */
+.tunic[data-coat="usnavy"].full .tunic-right { left: 77.6%; transform: translateX(-50%); bottom: 33.68%; }
+.tunic[data-coat="usnavy"] .tunic-left { left: 19.3%; width: 31.4%; }
+/* Full dress: the unit bars' inner edge on the other pocket's inner edge
+   (37.4%); that container stays centred, so centre = edge - half the rack. */
+/* The unit bars ride a quarter inch above their own pocket flap (top
+   48.0%), the same clearance the medal rack's holding bar keeps: bottom
+   edge at 46.28%, hence bottom 53.72%. */
+.tunic[data-coat="usnavy"].full .tunic-left { left: 22.4%; bottom: 53.72%; }
+.tunic[data-coat="usnavy"] .tunic-neck { inset: 0; width: 100%; transform: none; }
+/* Full-canvas neck overlays: the picture ignores the pointer; the hotspot,
+   sized to the decoration's extent in the overlay, carries the tooltip. */
+.neck-hotspot { display: none; }
+.tunic[data-coat="usnavy"] .tunic-neck, .tunic[data-coat="usmc"] .tunic-neck,
+.tunic[data-coat="usnavy"] .neck-medal, .tunic[data-coat="usmc"] .neck-medal { pointer-events: none; }
+.tunic[data-coat="usnavy"] .neck-hotspot, .tunic[data-coat="usmc"] .neck-hotspot { display: block; position: absolute; pointer-events: auto; }
+.tunic[data-coat="usnavy"] .neck-hotspot { left: 33.6%; top: 0; width: 32.0%; height: 25.6%; }
+.tunic[data-coat="usmc"] .neck-hotspot { left: 42.2%; top: 5.4%; width: 23.5%; height: 28.7%; }
+
+/* U.S. Marine Corps service coat. The supplied coat, collar-rank insignia
+   and Medal of Honor are full-canvas 1122x930 overlays. */
+.tunic[data-coat="usmc"] .tunic-right { left: 78.4%; width: 31%; }
+/* The Marine coat mounts by the same naval rules: pocket 62.6-93.1% of the
+   coat (centre 77.85%), flap top 46.8%, so the lowest row's bar sits at
+   45.10% and its medals end at 64.89%. */
+/* Marine full dress is Blue Dress "A": pockets 58.0-88.0% of that coat,
+   centre 73.0%, flap top 39.4%. The rack is NOT set by the pocket here -
+   the regulation puts the holding bar's upper edge on the line midway
+   between the first and second coat buttons (23.5% and 46.5% of the coat,
+   so 35.0%), the middle row taking that line when there are several. The
+   bottom below is only a starting point; app.js measures the laid-out rack
+   and shifts it onto the line. Unit citations - all of them - are centred
+   over the right breast pocket (centre 27.0%), a quarter inch above its
+   flap: that pocket is 9.0-39.0% of this coat, centre 24.0% (the coat is
+   not symmetric - the other pocket's centre is 73.0%), flap top 39.5%, and
+   an eighth of an inch is 0.85% of the height. */
+.tunic[data-coat="usmc"].full .tunic-right { left: 73.0%; transform: translateX(-50%); bottom: 42.51%; }
+.tunic[data-coat="usmc"].full .tunic-left { left: 24.0%; bottom: 60.14%; }
+.tunic[data-coat="usmc"] .tunic-left { left: 21.8%; width: 31%; }
+.tunic[data-coat="usmc"] .tunic-neck { inset: 0; width: 100%; transform: none; }
+/* Marine coat layers, bottom up: coat, medals, the wearer's left lapel
+   folding over their inboard edges, the collar rank, then the Medal of
+   Honor with its own collar. */
+.tunic[data-coat="usmc"] .tunic-lapel { z-index: 1; }
+.tunic[data-coat="usmc"] .tunic-rank { z-index: 2; }
+.tunic[data-coat="usmc"] .tunic-neck { z-index: 3; }
 
 /* The Soviet coat: M1943 kitel, photograph 1086x974, lit flat. Both
    breast containers become full overlays of the coat, so every percentage
@@ -386,6 +487,10 @@ table.roster td.award-cell { white-space: normal; }
 .ribbon-group.citations { margin-top: 0.9rem; }
 .ribbon-row { display: flex; justify-content: center; width: 100%; }
 .ribbon-row .ribbon { width: 34.6%; height: auto; display: block; margin: -1.2% -1.44%; position: relative; }
+/* A large Marine or Air Force rack goes four to a row; the bars come down
+   to 26% of the rack, which is 1 3/8 in at the coat's scale - closer to
+   true size than the three-wide rack, not a squeeze to fit. */
+.ribbon-group.four .ribbon-row .ribbon { width: 26%; margin: -0.9% -1.08%; }
 /* A unit citation's frame overhangs the bars beside and above it, as on a
    real rack, so it is painted on top of them rather than clipped by them. */
 .ribbon-row .ribbon.framed { z-index: 1; }

@@ -39,16 +39,58 @@ from ..icons import IconLibrary
 from .. import citations, corrections, ribbons
 from .. import medals as medal_art
 
-# KOREA_PREVIEW_RACK=all|sov|dprk: every ladder of that country at its top
+# KOREA_PREVIEW_RACK=all|navy|usmc|sov|dprk: every ladder of that country at its top
 # rung (plus the Command Pilot badge for the USAF), for looking at a complete
 # rack and coat without a career that earned one. Or a list of award ids,
 # comma-separated, for any other set.
 PREVIEW_RACK = {
-    "all": (601026, 601025, 601052, 601051, 601017, 601016, 601062, 601007,
+    "all": (601041, 601025, 601052, 601051, 601017, 601016, 601062, 601007,
             601057, 601030, 601053, 601038, 601039, 601040),
+    "navy": (602038, 602026, 602031, 602043, 602017, 602016, 602052, 602007,
+             602037, 602030, 601053, 601038, 601039, 602001),
+    "usmc": (602038, 602026, 602031, 602043, 602017, 602016, 602052, 602007,
+             602037, 602030, 601053, 601038, 601039, 602001),
     "sov": (501022, 501024, 501020, 501014, 501012, 501006, 501002, 501004, 501049, 501038),
     "dprk": (503007, 503006, 503005, 503004, 503003, 503002, 503008, 503001),
 }
+
+USAF_RANK_OVERLAYS = {
+    0: "usaf_2nd_Lt.png",
+    1: "usaf_1st_Lt.png",
+    2: "usaf_capt.png",
+    3: "usaf_major.png",
+    4: "usaf_Lt_Col.png",
+    5: "usaf_Col.png",
+    6: "usaf_brig_gen.png",
+    7: "usaf_maj_gen.png",
+}
+
+NAVY_RANK_OVERLAYS = {
+    0: "navy_ensign.png",
+    1: "navy_lieutenant_jr_grade.png",
+    2: "navy_lieutenant.png",
+    3: "navy_lt_commander.png",
+    4: "navy_commander.png",
+    5: "navy_captain.png",
+    6: "navy_rear_adm_LH.png",
+    7: "navy_rear_adm_UH.png",
+}
+
+USMC_RANK_OVERLAYS = {
+    0: "usmc_2nd_Lt.png",
+    1: "usmc_1st_Lt.png",
+    2: "usmc_capt.png",
+    3: "usmc_major.png",
+    4: "usmc_Lt_Col.png",
+    5: "usmc_Col.png",
+    6: "usmc_brig_gen.png",
+    7: "usmc_maj_gen.png",
+}
+# Full-size medals belong to Blue Dress "A", not the green service coat, so
+# the Marine full-dress view swaps coat, shoulder ranks and neck art. The
+# blue boards are the same eight files with _BD before the extension.
+USMC_BD_RANK_OVERLAYS = {r: n.replace(".png", "_BD.png") for r, n in USMC_RANK_OVERLAYS.items()}
+USMC_DRESS_COAT = "tunic_dress_blue_usmc.jpg"
 from ..loadouts import AmmoSchemes, parse_pilots_list
 from ..worldobjects import WorldObjectIndex, normalise as normalise_object
 from .attributes import PilotAttributes
@@ -730,8 +772,9 @@ class CareerAggregator:
             return defn.order if defn else root
         return [ladders[k] for k in sorted(ladders, key=order)]
 
-    def _ribbon_rack(self, medals: List[Dict[str, Any]],
-                     citations=()) -> Dict[str, Any]:
+    def _ribbon_rack(self, medals: List[Dict[str, Any]], citations=(),
+                     country: Optional[int] = None,
+                     rank_id: Optional[int] = None) -> Dict[str, Any]:
         """
         The ribbons worn on the tunic. Individual decorations on the left
         breast: one per ladder, highest precedence first, rows of three with
@@ -749,25 +792,50 @@ class CareerAggregator:
         if preview:
             # A developer's switch, see PREVIEW_RACK.
             medals = [{"type": t, "name": self.award_name(t), "pending": False} for t in preview]
-            citations = ([{"type": t, "category": 2, "isDeleted": 0} for t in (601046, 601049)]
-                         if preview[0] == 601026 else [])
+            if wanted in ("navy", "usmc"):
+                country = 602 if wanted == "navy" else 603
+                citations = [{"type": t, "category": 2, "isDeleted": 0}
+                             for t in (602041, 602047, 601049)]
+            elif preview[0] == 601041:
+                citations = [{"type": t, "category": 2, "isDeleted": 0}
+                             for t in (601046, 601049)]
         names = {m["type"]: m["name"] for m in medals}
         worn = ribbons.rack(m["type"] for m in medals if not m["pending"])
         unit = ribbons.rack(row["type"] for row in citations
                             if row["category"] == 2 and not row["isDeleted"])
-        # The aviator badge worn above the ribbons: the highest of the three,
-        # sliced from the game's atlas like any medal. The tunic is only drawn
-        # for the USAF - it is their coat.
+        # The aviator badge worn above the ribbons, sliced from the game's
+        # atlas like any medal. Select the service-specific badge and coat.
         held = {m["type"] for m in medals if not m["pending"]}
-        badge = next((b for b in (601040, 601027, 601001) if b in held), None)
+        country_code = (str(country) if country is not None else
+                        next((str(t)[:3] for t in list(worn) + list(unit) if t), ""))
+        badges = ((602001,) if country_code in ("602", "603") else
+                  (601040, 601027, 601001))
+        badge = next((b for b in badges if b in held), None)
         # Full dress: the awards themselves. US medals four to a row on the
         # bar with the Medal of Honor at the collar; Soviet-pattern orders
         # and medals on their mounts, five to a row, the screw-back orders
         # pinned to the right breast and the Hero's star above everything.
         held = {m["type"] for m in medals if not m["pending"]}
         kit = medal_art.wear(held)
-        country = next((str(t)[:3] for t in list(worn) + list(unit) + [badge] if t), "")
-        coat = {"601": "usaf", "501": "sov", "503": "dprk"}.get(country)
+        if not country_code and badge:
+            country_code = str(badge)[:3]
+        coat = {"601": "usaf", "602": "usnavy", "603": "usmc",
+                "501": "sov", "503": "dprk"}.get(country_code)
+        # Where unit citations are worn. Everyone mounts them in the rack in
+        # service dress - the Air Force moved them off the right breast into
+        # the ribbon group with the 1950s blue uniform, and the naval
+        # services wear them in the rack too. In full dress they part
+        # company: the Air Force keeps them with the medals on the left,
+        # while the naval services wear one - only the senior of the
+        # PUC/DUC/NUC group, per the 1951 rule - on the right breast.
+        unit_in_service = coat in ("usnavy", "usmc", "usaf")
+        # How many unit ribbons are worn in full dress, on the breast
+        # opposite the medals: the Navy one, the senior of them (the 1951
+        # rule), the Marine Corps all of them, and the Air Force none at
+        # all - having moved them into the ribbon group, it wears no
+        # separate strip beside large medals. None here means all of them.
+        unit_dress_limit = {"usnavy": 1, "usaf": 0}.get(coat)
+        service_worn = ribbons.rack(list(worn) + list(unit)) if unit_in_service else worn
         name = lambda t: names.get(t) or (self.award_name(t) if t else "")   # noqa: E731
 
         def pieces(ids):
@@ -775,23 +843,35 @@ class CareerAggregator:
             return [{"type": t, "name": name(t),
                      "w": medal_art.width_pct(self.icons, t, coat) if coat else None} for t in ids]
         return {
-            "ribbons": entries(worn),
-            "rows": ribbons.rows(len(worn)),
+            "ribbons": entries(service_worn),
+            "rows": ribbons.rows(len(service_worn), ribbons.per_row_for(coat, len(service_worn))),
+            "ribbon_per_row": ribbons.per_row_for(coat, len(service_worn)),
             "citations": entries(unit),
             "citation_rows": ribbons.rows(len(unit)),
             "medals": pieces(kit["bar"]),
-            "medal_rows": medal_art.rows(len(kit["bar"]), 5 if coat in ("sov", "dprk") else 4),
+            "medal_rows": medal_art.rows_for(coat, len(kit["bar"])),
             "pinned": pieces(kit["pinned"]),
             "hero": pieces([kit["hero"]])[0] if kit["hero"] else None,
             "wings": pieces([kit["wings"]])[0] if kit["wings"] else None,
             "stripes": pieces(kit["stripes"]),
             "neck": kit["neck"],
             "neck_name": name(kit["neck"]),
-            "neck_src": medal_art.neck_url(kit["neck"]),
+            "neck_src": medal_art.neck_url(kit["neck"], coat),
             "medal_rev": medal_art.REVISION,
+            # Shared awards - the Korean Service Medal above all - carry
+            # point-down stars for a sailor or Marine, point-up for the
+            # Air Force, so the pictures are asked for by service.
+            "svc": "navy" if coat in ("usnavy", "usmc") else "",
             "badge": badge,
             "badge_name": name(badge),
             "tunic": coat,
+            "rank_overlay": (NAVY_RANK_OVERLAYS.get(rank_id) if coat == "usnavy" else
+                             USMC_RANK_OVERLAYS.get(rank_id) if coat == "usmc" else
+                             USAF_RANK_OVERLAYS.get(rank_id) if coat == "usaf" else None),
+            "rank_overlay_full": USMC_BD_RANK_OVERLAYS.get(rank_id) if coat == "usmc" else None,
+            "dress_coat": USMC_DRESS_COAT if coat == "usmc" else None,
+            "unit_in_service": unit_in_service,
+            "unit_dress_limit": unit_dress_limit,
             "rev": ribbons.REVISION,
         }
 
@@ -1210,7 +1290,8 @@ class CareerAggregator:
                 "squadron": meta.squadron_name,
                 "combat": self._combat_results(kills)["headline"],
                 "awards_list": groups["awards"],
-                "ribbon_rack": self._ribbon_rack(groups["awards"], db.awards(-1)),
+                "ribbon_rack": self._ribbon_rack(
+                    groups["awards"], db.awards(-1), row["country"], row["rankId"]),
                 "promotions_list": groups["promotions"],
                 "incidences": self._incidences(db.events(pilot_id)),
                 "recent": self._debriefings(
@@ -1819,6 +1900,9 @@ class CareerAggregator:
                 return None
             texts = citations.strings(self.lang)
             country = int(pilot["country"])
+            preview = os.environ.get("KOREA_PREVIEW_RACK", "")
+            if preview in ("navy", "usmc"):
+                country = 602 if preview == "navy" else 603
             row = db.query_one("SELECT pilotRank, receivedDate FROM award WHERE pilotId=? AND type=? AND earnedDate=? ORDER BY id DESC",
                                (pilot_id, award_id, earned))
             rank_id = row["pilotRank"] if row and row["pilotRank"] is not None else pilot["rankId"]
@@ -1865,6 +1949,7 @@ class CareerAggregator:
             # ("biographyId=601006&birthDate=1920.02.23"); the AI have none.
             desc = dict(urllib.parse.parse_qsl(urllib.parse.unquote(pilot["description"] or "")))
             facts: Dict[str, Any] = {
+                "country": country,
                 "rank": self.locale.rank_name(country, rank_id),
                 "name": f"{pilot['name']} {pilot['lastName']}".strip(),
                 "unit": meta.squadron_name,
@@ -2206,7 +2291,9 @@ class CareerAggregator:
                 "missions_flown": self._missions_flown(sorties, {m["id"]: m for m in db.missions()}),
                 "promotions": groups["promotions"],
                 "awards": groups["awards"],
-                "ribbon_rack": self._ribbon_rack(groups["awards"], awards_by_pilot.get(-1, [])),
+                "ribbon_rack": self._ribbon_rack(
+                    groups["awards"], awards_by_pilot.get(-1, []),
+                    player["country"], player["rankId"]),
                 "corrections_applied": corrections.is_applied(corrections.load(Path(meta.path).stem)),
                 "incidences": self._incidences(db.events(pid), aircraft_flown),
                 "debriefings": debriefings,

@@ -192,7 +192,7 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         agg = aggregator()
         if agg is None:
             return ("", 404)
-        data = agg.ribbons.png(award_id)
+        data = agg.ribbons.png(award_id, request.args.get("svc") == "navy")
         if data is None:
             return ("", 404)
         return Response(data, mimetype="image/png",
@@ -204,7 +204,7 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         agg = aggregator()
         if agg is None:
             return ("", 404)
-        data = agg.medals.png(award_id)
+        data = agg.medals.png(award_id, request.args.get("svc") == "navy")
         if data is None:
             return ("", 404)
         return Response(data, mimetype="image/png",

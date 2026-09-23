@@ -25,6 +25,8 @@
 .ct-medal { position: absolute; left: 50%; top: 4%; height: 22%; width: auto; transform: translateX(-50%);
     filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
 .ct-medal.small { height: 16%; top: 3%; }
+.ct-service-seal { position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: fill; pointer-events: none; }
 
 /* The text band: 28% to 78% of the height on a drawn sheet, the same here. */
 .sheet.drawn .ct-text { top: 30%; }
@@ -61,6 +63,52 @@
 .sheet.portrait.duc .ct-signature { bottom: 8.5%; }
 .sheet.portrait.duc .ct-signature.left { left: 6%; }
 .sheet.portrait.duc .ct-signature.right { right: 6%; }
+
+/* Navy and Marine Corps unit-citation forms supplied with the naval unit
+   ribbon and Navy seal. Their reference forms use distinct layouts. */
+.sheet.portrait.navy_puc .ct-text > *,
+.sheet.portrait.navy_unit_commendation .ct-text > * { left: 12%; right: 12%; }
+.sheet.portrait.navy_puc .ct-country { top: 18%; font-size: 2em; letter-spacing: 0.07em; }
+.sheet.portrait.navy_puc .ct-pre { top: 22.2%; font-size: 1.08em; line-height: 1.45; }
+.sheet.portrait.navy_puc .ct-pre + .ct-pre { top: 24.5%; }
+.sheet.portrait.navy_puc .ct-name { top: 30.5%; font-size: 3.1em; letter-spacing: 0.045em; white-space: nowrap; }
+.sheet.portrait.navy_puc .ct-to { top: 36.5%; font-size: 1.4em; }
+.sheet.portrait.navy_puc .ct-recipient { top: 40%; font-size: 1.55em; }
+.sheet.portrait.navy_puc .ct-unit { top: 43.5%; font-size: 1.2em; }
+.sheet.portrait.navy_puc .ct-service { top: 46.5%; font-size: 1.15em; }
+.sheet.portrait.navy_puc .ct-for { top: 51%; font-size: 1.45em; line-height: 1.45; text-align: justify; text-align-last: center; }
+.sheet.portrait.navy_puc .ct-for-label { display: block; text-align: center; margin-bottom: 0.9em; }
+.sheet.portrait.navy_puc .ct-deed { display: none; }
+.sheet.portrait.navy_puc .ct-close { top: 60%; font-size: 1.2em; line-height: 1.55; text-align: justify; text-align-last: center; }
+.sheet.portrait.navy_puc .ct-close + .ct-close { top: 69%; font-style: italic; }
+.sheet.portrait.navy_puc .ct-given-block { top: 73.5%; }
+.sheet.portrait.navy_puc .ct-given { font-size: 1.45em; }
+.sheet.portrait.navy_puc .ct-signature.right { right: auto; left: 66%; transform: translateX(-50%); bottom: 7%; width: 32%; }
+
+.sheet.portrait.navy_unit_commendation .ct-country { top: 25.5%; font-size: 2em; letter-spacing: 0.07em; }
+.sheet.portrait.navy_unit_commendation .ct-pre { top: 31%; font-size: 1.15em; line-height: 1.45; }
+.sheet.portrait.navy_unit_commendation .ct-pre + .ct-pre { top: 34%; }
+.sheet.portrait.navy_unit_commendation .ct-name { top: 38%; font-size: 3em; letter-spacing: 0.045em; white-space: nowrap; }
+.sheet.portrait.navy_unit_commendation .ct-to { top: 44%; font-size: 1.4em; }
+.sheet.portrait.navy_unit_commendation .ct-recipient { top: 47.5%; font-size: 1.55em; }
+.sheet.portrait.navy_unit_commendation .ct-unit { top: 51%; font-size: 1.2em; }
+.sheet.portrait.navy_unit_commendation .ct-service { top: 54%; font-size: 1.15em; }
+.sheet.portrait.navy_unit_commendation .ct-for { top: 58%; font-size: 1.35em; line-height: 1.45; text-align: justify; text-align-last: center; }
+.sheet.portrait.navy_unit_commendation .ct-for-label { display: block; text-align: center; margin-bottom: 0.75em; }
+.sheet.portrait.navy_unit_commendation .ct-deed { display: none; }
+.sheet.portrait.navy_unit_commendation .ct-close { top: 67%; font-size: 1.2em; line-height: 1.55; text-align: justify; text-align-last: center; }
+.sheet.portrait.navy_unit_commendation .ct-given-block { top: 77%; }
+.sheet.portrait.navy_unit_commendation .ct-given { font-size: 1.4em; }
+.sheet.portrait.navy_unit_commendation .ct-signature.right { right: auto; left: 66%; transform: translateX(-50%); bottom: 5%; width: 32%; }
+
+/* The filled naval examples use a short award statement rather than a
+   second narrative paragraph on the two landscape forms. */
+.sheet.navy_cross .ct-deed, .sheet.navy_commendation .ct-deed { display: none; }
+.sheet.navy_cross .ct-for, .sheet.navy_commendation .ct-for { text-align: center; }
+.sheet.navy_cross .ct-for-label, .sheet.navy_commendation .ct-for-label {
+    display: block; margin: 0 0 0.35em; text-align: center;
+}
+.sheet.navy_commendation .ct-name { font-size: 2.35em; }
 
 /* Republic of Korea Presidential Unit Citation: the form's sans faces; the
    text block runs 15-86% of the width, between the ribbons. */

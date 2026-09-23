@@ -116,6 +116,22 @@
    ""
   ]
  },
+ "naval": {
+  "air_force": "United States Air Force",
+  "air_command": "Far East Air Forces",
+  "air_force_short": "Air Force",
+  "602": {"service": "United States Navy", "service_short": "Navy", "command": "United States Naval Forces, Far East"},
+  "603": {"service": "United States Marine Corps", "service_short": "Marine Corps", "command": "Fleet Marine Force, Pacific"},
+  "awards": {
+   "dsc": "Distinguished Service Cross", "navy_cross": "Navy Cross",
+   "dsm": "Distinguished Service Medal", "navy_dsm": "Navy Distinguished Service Medal",
+   "commendation": "Commendation Ribbon with Metal Pendant", "navy_commendation": "Navy Commendation Medal"
+  },
+  "navy_unit_commendation": [
+   "The {unit} is commended for exceptionally meritorious conduct and outstanding performance during successful operations against enemy forces in Korea. {deed}",
+   "The professional skill, determination and devotion to duty displayed by the members of the squadron reflect great credit upon themselves and the {service}."
+  ]
+ },
  "sov": {
   "hero": [
    "By decree of the Presidium of the Supreme Soviet of the USSR of {date}, for the exemplary performance of combat missions and for the courage and heroism shown in them, {rank} {name} is awarded the title of Hero of the Soviet Union with the Order of Lenin and the Gold Star medal.",
@@ -506,6 +522,106 @@
     "signer": "un"
    }
   },
+  "naval_forms": {
+   "moh": {
+    "pre": [
+     "TO ALL WHO SHALL SEE THESE PRESENTS, GREETING;",
+     "THE PRESIDENT OF THE UNITED STATES OF AMERICA, IN THE NAME OF CONGRESS, HAS AWARDED TO"
+    ],
+    "name": "{RANK} {NAME}, {SERVICE}",
+    "reason": "CONSPICUOUS GALLANTRY AND INTREPIDITY AT THE RISK OF LIFE ABOVE AND BEYOND THE CALL OF DUTY IN ACTION WITH THE ENEMY",
+    "signer": ["president", "navy_secretary"]
+   },
+   "navy_cross": {
+    "header": "THE UNITED STATES OF AMERICA",
+    "pre": [
+     "THE PRESIDENT OF THE UNITED STATES OF AMERICA",
+     "HAS AWARDED THE"
+    ],
+    "title": "NAVY CROSS",
+    "to": "TO",
+    "name": "{RANK} {NAME}",
+    "service": "{SERVICE}",
+    "for": "FOR",
+    "reason": "EXTRAORDINARY HEROISM WHILE ENGAGED IN COMBAT OPERATIONS AGAINST HOSTILE ENEMY FORCES NEAR {PLACE}, KOREA, ON {DATE}, WHILE SERVING AS PILOT OF AN {AIRCRAFT} WITH THE {UNIT}.",
+    "signer": "navy_secretary"
+   },
+   "navy_dsm": {
+    "pre": [
+     "AUTHORIZED BY ACT OF CONGRESS APPROVED 4 FEBRUARY 1919",
+     "THE PRESIDENT OF THE UNITED STATES HAS AWARDED THE"
+    ],
+    "title": "NAVY DISTINGUISHED SERVICE MEDAL",
+    "name": "{RANK} {NAME}",
+    "service": "{SERVICE}",
+    "reason": "FOR EXCEPTIONALLY MERITORIOUS SERVICE TO THE GOVERNMENT OF THE UNITED STATES IN A DUTY OF GREAT RESPONSIBILITY WHILE COMMANDING THE {UNIT} IN KOREA.",
+    "signer": "navy_secretary"
+   },
+   "dfc": {
+    "pre": [
+     "ESTABLISHED BY ACT OF CONGRESS APPROVED 2 JULY 1926",
+     "AND AWARDED FOR HEROISM OR EXTRAORDINARY ACHIEVEMENT IN AERIAL FLIGHT"
+    ]
+   },
+   "navy_commendation": {
+    "header": "DEPARTMENT OF THE NAVY",
+    "pre": [
+     "TO ALL WHO SHALL SEE THESE PRESENTS, GREETINGS, THIS IS TO CERTIFY THAT",
+     "THE SECRETARY OF THE NAVY HAS ON THIS DAY AWARDED THE"
+    ],
+    "title": "COMMENDATION RIBBON WITH METAL PENDANT",
+    "to": "TO",
+    "name": "{RANK} {NAME}",
+    "service": "{SERVICE}",
+    "for": "FOR",
+    "reason": "DISTINGUISHED ACHIEVEMENT AND MERITORIOUS SERVICE WHILE SERVING AS PILOT OF AN {AIRCRAFT} WITH THE {UNIT} IN KOREA FROM {FROM} TO {TO}.",
+    "given": [
+     "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON, DC",
+     "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
+    ],
+    "signer": "navy_chief"
+   },
+   "navy_puc": {
+    "header": "DEPARTMENT OF THE NAVY",
+    "pre": [
+     "BY VIRTUE OF THE AUTHORITY VESTED IN ME AS PRESIDENT AND COMMANDER-IN-CHIEF",
+     "OF THE ARMED FORCES OF THE UNITED STATES OF AMERICA, I HAVE TODAY AWARDED THE"
+    ],
+    "title": "PRESIDENTIAL UNIT CITATION",
+    "to": "TO",
+    "name": "{RANK} {NAME}",
+    "unit_line": "{UNIT}",
+    "service": "{SERVICE}",
+    "for": "FOR",
+    "reason": "EXTRAORDINARY HEROISM",
+    "close": "AND OUTSTANDING PERFORMANCE OF DUTY IN COMBAT OPERATIONS AGAINST HOSTILE ENEMY FORCES IN KOREA FROM {FROM} TO {TO}.\nBY ORDER OF THE SECRETARY OF THE NAVY",
+    "given": [
+     "GIVEN IN THE CITY OF WASHINGTON",
+     "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
+    ],
+    "signer": "navy_secretary"
+   },
+   "navy_unit_commendation": {
+    "header": "DEPARTMENT OF THE NAVY",
+    "pre": [
+     "THE SECRETARY OF THE NAVY TAKES PLEASURE IN AWARDING",
+     "THE"
+    ],
+    "title": "NAVY UNIT COMMENDATION",
+    "to": "TO",
+    "name": "{RANK} {NAME}",
+    "unit_line": "{UNIT}",
+    "service": "{SERVICE}",
+    "for": "FOR",
+    "reason": "EXCEPTIONALLY MERITORIOUS CONDUCT AND OUTSTANDING PERFORMANCE",
+    "close": "DURING SUCCESSFUL MILITARY OPERATIONS AGAINST HOSTILE ENEMY FORCES IN KOREA FROM {FROM} TO {TO}.",
+    "given": [
+     "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
+     "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
+    ],
+    "signer": "navy_secretary"
+   }
+  },
   "ordinal": {
    "1": "1ST",
    "2": "2ND",
@@ -532,6 +648,19 @@
    "5": "A SILVER SERVICE STAR IN LIEU OF FIVE BRONZE",
    "6": "A SILVER AND A BRONZE SERVICE STAR",
    "7": "A SILVER AND TWO BRONZE SERVICE STARS"
+  },
+  "gold_star": {
+   "1": "A GOLD STAR",
+   "2": "A SECOND GOLD STAR",
+   "3": "A THIRD GOLD STAR",
+   "4": "A FOURTH GOLD STAR",
+   "5": "A SILVER STAR IN LIEU OF FIVE GOLD"
+  },
+  "naval_bronze_star": {
+   "1": "A BRONZE STAR",
+   "2": "A SECOND BRONZE STAR",
+   "3": "A THIRD BRONZE STAR",
+   "4": "A FOURTH BRONZE STAR"
   },
   "seal": "DEPARTMENT OF THE AIR FORCE",
   "signers": {
@@ -601,6 +730,60 @@
      "Nathan F. Twining",
      "GENERAL, USAF, CHIEF OF STAFF",
      "twining"
+    ]
+   ],
+   "navy_secretary": [
+    [
+     "1951.07.31",
+     "Francis P. Matthews",
+     "SECRETARY OF THE NAVY",
+     "matthews"
+    ],
+    [
+     "1953.01.20",
+     "Dan A. Kimball",
+     "SECRETARY OF THE NAVY",
+     "kimball"
+    ],
+    [
+     "9999.12.31",
+     "Robert B. Anderson",
+     "SECRETARY OF THE NAVY",
+     "robert_b_anderson"
+    ]
+   ],
+   "navy_chief": [
+    [
+     "1951.07.22",
+     "Forrest P. Sherman",
+     "ADMIRAL, USN, CHIEF OF NAVAL OPERATIONS",
+     "sherman"
+    ],
+    [
+     "1951.08.16",
+     "Lynde D. McCormick",
+     "ADMIRAL, USN, ACTING CHIEF OF NAVAL OPERATIONS",
+     "mccormick"
+    ],
+    [
+     "9999.12.31",
+     "William M. Fechteler",
+     "ADMIRAL, USN, CHIEF OF NAVAL OPERATIONS",
+     "fechteler"
+    ]
+   ],
+   "marine_commandant": [
+    [
+     "1951.12.31",
+     "Clifton B. Cates",
+     "GENERAL, USMC, COMMANDANT OF THE MARINE CORPS",
+     "cates"
+    ],
+    [
+     "9999.12.31",
+     "Lemuel C. Shepherd, Jr.",
+     "GENERAL, USMC, COMMANDANT OF THE MARINE CORPS",
+     "shepherd"
     ]
    ],
    "rok": [
@@ -736,7 +919,10 @@
    "freedom": "ордену Свободы и Независимости",
    "soldiers_honour": "ордену Солдатской Славы",
    "merit_k": "медали «За боевые заслуги»",
-   "flw": "медали «За Отечественную освободительную войну»"
+   "flw": "медали «За Отечественную освободительную войну»",
+   "merit_c": "медали «За боевые заслуги»",
+   "liberation_c": "медали «За освобождение Северного Китая»",
+   "oppose_c": "медали «За сопротивление США и помощь Корее»"
   },
   "worthy": {
    "hero": "присвоения звания Героя Советского Союза",
@@ -751,7 +937,10 @@
    "freedom": "орденом Свободы и Независимости",
    "soldiers_honour": "орденом Солдатской Славы",
    "merit_k": "медалью «За боевые заслуги»",
-   "flw": "медалью «За Отечественную освободительную войну»"
+   "flw": "медалью «За Отечественную освободительную войну»",
+   "merit_c": "медалью «За боевые заслуги»",
+   "liberation_c": "медалью «За освобождение Северного Китая»",
+   "oppose_c": "медалью «За сопротивление США и помощь Корее»"
   },
   "held": {
    "hero": "Герой Советского Союза",
@@ -766,7 +955,10 @@
    "freedom": "орден Свободы и Независимости",
    "soldiers_honour": "орден Солдатской Славы",
    "merit_k": "медаль «За боевые заслуги»",
-   "flw": "медаль «За Отечественную освободительную войну»"
+   "flw": "медаль «За Отечественную освободительную войну»",
+   "merit_c": "медаль «За боевые заслуги»",
+   "liberation_c": "медаль «За освобождение Северного Китая»",
+   "oppose_c": "медаль «За сопротивление США и помощь Корее»"
   },
   "repeat": " (повторно)",
   "post": "лётчик, {unit}",

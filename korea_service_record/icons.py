@@ -19,6 +19,7 @@ disk, so the cost is paid once per icon and never again — and because the
 asset layer prefers loose files, a modded install yields the modded medals.
 """
 
+import hashlib
 import io
 import logging
 import re
@@ -94,11 +95,26 @@ class IconLibrary:
         return self._sheets[kind]
 
     def _key(self, kind: str, ident: str) -> str:
+        # Preserve repeat-citation IDs in the record, but use the plain ROK
+        # emblem even with an older mod or previously cached cluster icons.
+        if kind == "award" and str(ident) in ("601047", "601048", "601049"):
+            ident = "601043"
         return f"{SHEETS[kind][1]}{ident}"
 
-    def _cache_path(self, kind: str, key: str, height: Optional[int]) -> Path:
+    def _cache_path(self, kind: str, key: str, height: Optional[int], crop) -> Path:
+        """
+        The cached slice, named after what it was cut from as well as what it
+        is: a short hash of the atlas file's fingerprint and the crop
+        rectangle. New art, a re-pointed rectangle or a game update all
+        change the name, so the cache can never serve yesterday's medal -
+        which it did, silently, for every user who upgraded while the
+        name was just <key>@<height>.png.
+        """
         suffix = f"@{height}" if height else ""
-        return self.resolver.cache_dir / "icons" / kind / f"{key}{suffix}.png"
+        stamp = hashlib.sha1(
+            f"{self.resolver.fingerprint(f'{IMAGE_ROOT}/{crop.atlas}')}|{crop.box}".encode()
+        ).hexdigest()[:8]
+        return self.resolver.cache_dir / "icons" / kind / f"{key}{suffix}.{stamp}.png"
 
     def _atlas(self, name: str):
         """Decode one atlas, keeping it in memory for the rest of the run."""
@@ -138,7 +154,7 @@ class IconLibrary:
         if crop is None:
             return None
 
-        cached = self._cache_path(kind, key, height)
+        cached = self._cache_path(kind, key, height, crop)
         if cached.is_file():
             try:
                 return cached.read_bytes()
@@ -166,6 +182,16 @@ class IconLibrary:
             tmp = cached.with_suffix(".part")
             tmp.write_bytes(data)
             tmp.replace(cached)
+            # Sweep this icon's earlier slices - other stamps, and the
+            # unstamped name older versions wrote - so the folder does not
+            # grow one orphan per art change.
+            stem = f"{key}@{height}" if height else key
+            for old in cached.parent.glob(f"{stem}.*png"):
+                if old != cached and (old.name == f"{stem}.png" or old.stem.rsplit(".", 1)[0] == stem):
+                    try:
+                        old.unlink()
+                    except OSError:
+                        pass
         except OSError as exc:
             logger.warning("Cannot cache icon %s: %s", cached, exc)
         return data

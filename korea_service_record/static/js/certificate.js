@@ -33,7 +33,11 @@
         // The certificate is an English document, the наградной лист a Russian
         // one: the record is read in that language for it.
         const country = String(awardId).slice(0, 3);
-        const lang = country === "601" ? "en" : (country === "501" || country === "503") ? "ru" : pageLang;
+        // The sheet keeps its own language: American forms in English, the
+        // наградной лист in Russian for every communist-bloc award that
+        // uses it - the USSR, the DPRK and the PRC alike.
+        const russianSheet = country === "501" || country === "502" || country === "503";
+        const lang = country === "601" ? "en" : russianSheet ? "ru" : pageLang;
         const r = await fetch("/api/citation/" + encodeURIComponent(careerId) + "/" + encodeURIComponent(pilotId) + "/" +
             encodeURIComponent(awardId) + "?earned=" + encodeURIComponent(earned) + "&lang=" + encodeURIComponent(lang) + "&tr=" + encodeURIComponent(pageLang));
         if (!r.ok) throw new Error(r.status);
@@ -48,7 +52,8 @@
 
     // A drawn sheet for this family, if the artist has made one.
     const family = data.family || "";
-    const template = "/static/images/certificates/" + family + ".png";
+    const templateFamily = c.template || family;
+    const template = "/static/images/certificates/" + templateFamily + ".png";
     const decreeTemplate = "/static/images/certificates/decree_" + ({"501": "sov", "503": "dprk", "502": "prc"}[String(awardId).slice(0, 3)] || "sov") + ".png";
     // A drawn sheet brings its own shape: the page takes the picture's aspect.
     const exists = (url) => new Promise((ok) => {
@@ -67,6 +72,7 @@
         el("ct-sheet").innerHTML =
             '<section class="sheet usaf ' + esc(family) + (drawn ? " drawn" : "") + (portrait ? " portrait" : "") + '"' + style + ">" +
                 (drawn ? "" : '<img class="ct-medal" src="' + esc(data.icon) + '" alt="">') +
+                (c.seal_overlay ? '<img class="ct-service-seal" src="' + esc(c.seal_overlay) + '" alt="">' : "") +
                 '<div class="ct-text">' +
                     line("ct-country", c.header) +
                     (c.pre || []).map((t) => line("ct-pre", t)).join("") +

@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 ART = Path(__file__).resolve().parent / "static" / "images" / "medals"
 # Bump whenever the composition or the art changes; it is part of the URLs.
-REVISION = 4
+REVISION = 20
 
 # --- US: drawn art -----------------------------------------------------------
 # Every base medal is drawn 224 px wide - the drape is 1 3/8 inch, the same
@@ -41,9 +41,21 @@ REVISION = 4
 DRAPE = (224, 474)
 DRAPE_LENGTH = 185
 DEVICE_SCALE = DRAPE[0] / ribbons.BAR[0]
+# A cluster on the suspension ribbon is the 13/32" one, not the bar's 5/16"
+# (DEVICE_RULES.md 2); stars are the same size on both. Four clusters go
+# three in a row with the fourth centred above them, never four across.
+OLC_MEDAL_SCALE = (13 / 32) / (5 / 16)
+DEVICE_GAP = round(0.02 * DRAPE[0])
+DEVICE_GAP_TIGHT = round(0.015 * DRAPE[0])
 
 # Worn around the neck, not on the bar.
-NECK = (601026, 601041)
+NECK = (601026, 601041, 602027, 602038)
+# A repeat award falls back to the base decoration's neck art unless it has
+# its own (neck_602038.png carries the Navy's gold star on the pad).
+NECK_ART = {601041: 601026, 602038: 602027}
+# neck_601041.png and neck_602038.png carry the repeat device on the pad -
+# a bronze cluster for the Air Force, a gold star for the naval services -
+# so those ids find their own art before this fallback applies.
 
 # Awards with drawn art: the base ids with a file in the folder.
 DRAWN = {int(p.stem) for p in ART.glob("[0-9]*.png") if p.stem.isdigit()}
@@ -129,19 +141,74 @@ def width_pct(icons, award_id: int, coat: str) -> Optional[float]:
     return round((crop.box[2] - crop.box[0]) * TILE_SCALE / COAT_PX[coat] * 100, 3)
 
 
-def neck_url(award_id: Optional[int]) -> Optional[str]:
+def neck_url(award_id: Optional[int], coat: Optional[str] = None) -> Optional[str]:
     """The neck decoration's picture: own art (neck_<id>.png, the ribbon as
     it goes round the collar) where drawn, else the game's atlas tile."""
     if award_id is None:
         return None
-    if (ART / f"neck_{award_id}.png").is_file():
-        return f"/static/images/medals/neck_{award_id}.png?v={REVISION}"
+    if coat == "usmc" and award_id in (602027, 602038):
+        # The neck decoration is only ever drawn in full dress, which for a
+        # Marine is Blue Dress "A"; the green coat's overlay stays for the
+        # case where no blue art exists.
+        blue = ART / f"neck_{award_id}_USMC_BD.png"
+        if blue.is_file():
+            return f"/static/images/medals/{blue.name}?v={REVISION}"
+        own = ART.parent / f"usmc_MoH_w_collar_overlay_{award_id}.png"
+        name = own.name if own.is_file() else "usmc_MoH_w_collar_overlay.png"
+        return f"/static/images/{name}?v={REVISION}"
+    for art_id in (award_id, NECK_ART.get(award_id, award_id)):
+        if (ART / f"neck_{art_id}.png").is_file():
+            return f"/static/images/medals/neck_{art_id}.png?v={REVISION}"
     return f"/api/icon/award/{award_id}"
 
 
 def rows(count: int, per_row: int = 4) -> List[int]:
     """Row sizes top to bottom: full rows, a short top row centred."""
     return ribbons.rows(count, per_row)
+
+
+# The Navy's own distribution of full-size medals over rows, top to bottom
+# (docs/NAVY_RACK.md 3). Not a formula: 13 is 3/5/5 where 14 is 4/5/5, and
+# 21 opens with a row of two. Beyond 25 the table runs out and rows of five
+# carry the rest.
+NAVY_ROWS = {
+    1: [1], 2: [2], 3: [3], 4: [4], 5: [5],
+    6: [3, 3], 7: [3, 4], 8: [4, 4], 9: [4, 5], 10: [5, 5],
+    11: [3, 4, 4], 12: [4, 4, 4], 13: [3, 5, 5], 14: [4, 5, 5], 15: [5, 5, 5],
+    16: [4, 4, 4, 4], 17: [3, 4, 5, 5], 18: [3, 5, 5, 5], 19: [4, 5, 5, 5],
+    20: [5, 5, 5, 5],
+    21: [2, 4, 5, 5, 5], 22: [3, 4, 5, 5, 5], 23: [3, 5, 5, 5, 5],
+    24: [4, 5, 5, 5, 5], 25: [5, 5, 5, 5, 5],
+}
+
+
+# The Air Force mounts three full-size medals to a row (its own rule, not
+# the Navy table), going to four - overlapped, as its regulation allows -
+# once three would stack higher than this. Three rows is the limit that
+# keeps the rack on the breast instead of climbing to the shoulder seam.
+# Soviet-pattern coats keep five.
+MAX_MEDAL_ROWS_AT_THREE = 3
+
+
+def rows_for(coat: Optional[str], count: int) -> List[int]:
+    """The row sizes for a breast rack of full-size medals, by service."""
+    if coat in ("usnavy", "usmc"):
+        return navy_rows(count)
+    if coat in ("sov", "dprk"):
+        return rows(count, 5)
+    per = 4 if -(-count // 3) > MAX_MEDAL_ROWS_AT_THREE else 3
+    return rows(count, per)
+
+
+def navy_rows(count: int) -> List[int]:
+    """Navy row distribution for a breast rack of `count` full-size medals.
+    The Medal of Honor (neck) and ribbon-only unit awards are not in it."""
+    if count <= 0:
+        return []
+    if count in NAVY_ROWS:
+        return NAVY_ROWS[count]
+    first = count % 5 or 5
+    return [first] + [5] * ((count - first) // 5)
 
 
 def _widest(img) -> int:
@@ -179,12 +246,12 @@ class MedalRenderer:
         self._art[base] = img
         return img
 
-    def png(self, award_id: int) -> Optional[bytes]:
+    def png(self, award_id: int, naval: bool = False) -> Optional[bytes]:
         # Badges and stripes have no ribbon and so no Ribbon spec.
         spec = ribbons.RIBBONS.get(award_id)
         if award_id not in ATLAS and (spec is None or spec.base not in DRAWN):
             return None
-        out = self.cache_dir / f"{award_id}.png"
+        out = self.cache_dir / ("navy" if naval else "") / f"{award_id}.png"
         if out.is_file():
             return out.read_bytes()
         own = ART / f"{award_id}.png"
@@ -193,7 +260,7 @@ class MedalRenderer:
         elif award_id in ATLAS:
             data = self.from_atlas(award_id)
         else:
-            data = self.compose(spec)
+            data = self.compose(spec, naval)
         if data is not None:
             try:
                 out.parent.mkdir(parents=True, exist_ok=True)
@@ -216,33 +283,41 @@ class MedalRenderer:
         tile.save(buf, "PNG", optimize=True)
         return buf.getvalue()
 
-    def compose(self, spec: ribbons.Ribbon) -> Optional[bytes]:
+    def compose(self, spec: ribbons.Ribbon, naval: bool = False) -> Optional[bytes]:
         from PIL import Image
         base = self._base(spec.base)
         if base is None:
             return None
         canvas = base.copy()
-        # The bar's devices, at the bar's regulation size, scaled with the
-        # drape; a full row is shrunk together to fit, as on the bar.
-        devices = [self.ribbons._device(n) for n in spec.devices]
-        devices = [d.resize((max(1, round(d.width * DEVICE_SCALE)),
-                             max(1, round(d.height * DEVICE_SCALE))), Image.LANCZOS)
-                   for d in devices if d is not None]
+        # The bar's devices scaled with the drape, clusters to their larger
+        # medal size (DEVICE_RULES.md 2); rows never shrunk (10).
+        names, devices = [], []
+        for n in ([ribbons.NAVAL_STAR.get(d, d) for d in spec.devices] if naval else spec.devices):
+            d = self.ribbons._device(n)
+            if d is None:
+                continue
+            k = DEVICE_SCALE * (OLC_MEDAL_SCALE if n.startswith("olc") else 1.0)
+            names.append(n)
+            devices.append(d.resize((max(1, round(d.width * k)), max(1, round(d.height * k))), Image.LANCZOS))
         if devices:
-            gap = max(2, round(ribbons.DEVICE_GAP * DEVICE_SCALE))
-            width = sum(d.width for d in devices) + gap * (len(devices) - 1)
-            usable = DRAPE[0] - 2 * round(ribbons.DEVICE_INSET * DEVICE_SCALE)
-            if width > usable:
-                scale = usable / width
-                devices = [d.resize((max(1, round(d.width * scale)),
-                                     max(1, round(d.height * scale))), Image.LANCZOS)
-                           for d in devices]
-                gap = max(2, round(gap * scale))
-                width = sum(d.width for d in devices) + gap * (len(devices) - 1)
-            x = (DRAPE[0] - width) // 2
-            for d in devices:
-                canvas.alpha_composite(d, (x, (DRAPE_LENGTH - d.height) // 2))
-                x += d.width + gap
+            # Four or more clusters, and nothing else: three across, the
+            # rest centred above. Everything else is one centred row.
+            if len(devices) >= 4 and all(n.startswith("olc") for n in names):
+                rows = [(names[-3:], devices[-3:]), (names[:-3], devices[:-3])]
+            else:
+                rows = [(names, devices)]
+            vgap = DEVICE_GAP
+            total_h = sum(max(d.height for d in r) for _, r in rows) + vgap * (len(rows) - 1)
+            y = (DRAPE_LENGTH - total_h) // 2
+            for row_names, row in reversed(rows):
+                # bottom row is the main one; each row placed on its own
+                rh = max(d.height for d in row)
+                gap, width = ribbons.fit_row([d.width for d in row], DRAPE[0], DEVICE_GAP, DEVICE_GAP_TIGHT)
+                x = ribbons.row_origin(row_names, [d.width for d in row], gap, DRAPE[0])
+                for d in row:
+                    canvas.alpha_composite(d, (x, y + (rh - d.height) // 2))
+                    x += d.width + gap
+                y += rh + vgap
         buf = io.BytesIO()
         canvas.save(buf, "PNG", optimize=True)
         return buf.getvalue()

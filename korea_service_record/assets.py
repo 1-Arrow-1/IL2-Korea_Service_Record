@@ -74,6 +74,22 @@ class AssetResolver:
             return "cache"
         return "archive" if self._archive_paths() else "missing"
 
+    def fingerprint(self, vpath: str) -> str:
+        """
+        Something that changes whenever the bytes behind a path would: the
+        size and mtime of the loose file, else of the cached extraction,
+        else of the first archive. Cheap (a stat, no read), so a derived
+        cache can be keyed on it without touching the asset itself.
+        """
+        for candidate in (self._loose_path(vpath), self._cache_path(vpath),
+                          *self._archive_paths()[:1]):
+            try:
+                st = candidate.stat()
+            except OSError:
+                continue
+            return f"{st.st_size}-{st.st_mtime_ns}"
+        return "missing"
+
     def read(self, vpath: str, use_cache: bool = True) -> Optional[bytes]:
         """
         Return the bytes for a virtual path, or None if it cannot be found.

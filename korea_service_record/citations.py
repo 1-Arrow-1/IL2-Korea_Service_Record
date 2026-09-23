@@ -31,6 +31,25 @@ _USAF_PERIOD = {"bsm": (601008, 601009, 601010), "air_medal": (601002, 601003, 6
                 "commendation": (601054, 601055, 601056, 601057), "lom": (601017,), "dsm": (601052,)}
 _USAF_SERVICE = {"ndsm": (601053,), "ksm": tuple(range(601031, 601039)), "un": (601039,)}
 _USAF_UNIT = {"duc": (601042, 601044, 601045, 601046), "rok_puc": (601043, 601047, 601048, 601049)}
+_NAVAL_SORTIE = {
+    "moh": (602027, 602038),
+    "navy_cross": (602021, 602022, 602023, 602024, 602025, 602026),
+    "silver_star": (602018, 602019, 602020, 602042, 602043),
+    "bsm_v": (602048, 602049, 602050, 602051, 602052),
+    "purple_heart": (602028, 602029, 602030),
+}
+_NAVAL_PERIOD = {
+    "bsm": (602008, 602009, 602010),
+    "air_medal": (602002, 602003, 602004, 602005, 602006, 602007),
+    "dfc": (602011, 602012, 602013, 602014, 602015, 602016),
+    "navy_commendation": (602032, 602035, 602036, 602037),
+    "lom": (602017,),
+    "navy_dsm": (602031,),
+}
+_NAVAL_UNIT = {
+    "navy_puc": (602033, 602039, 602040, 602041),
+    "navy_unit_commendation": (602034, 602044, 602045, 602046, 602047),
+}
 _SOV_SORTIE = {"courage": (501002,)}
 _SOV_PERIOD = {"hero": (501022,), "lenin": (501024,), "red_banner": (501016, 501018, 501020), "suvorov": (501014,),
                "nevsky": (501012,), "red_star": (501006,), "battle_merit": (501004,)}
@@ -43,6 +62,8 @@ _PRC_SERVICE = {"liberation_c": (502003,), "oppose_c": (502004,)}
 FAMILY: Dict[int, tuple] = {}
 for nation, table, kind in (("usaf", _USAF_SORTIE, "sortie"), ("usaf", _USAF_PERIOD, "period"), ("usaf", _USAF_UNIT, "unit"),
                             ("usaf", _USAF_SERVICE, "service"),
+                            ("naval", _NAVAL_SORTIE, "sortie"), ("naval", _NAVAL_PERIOD, "period"),
+                            ("naval", _NAVAL_UNIT, "unit"),
                             ("sov", _SOV_SORTIE, "sortie"), ("sov", _SOV_PERIOD, "period"),
                             ("dprk", _DPRK_PERIOD, "period"), ("dprk", _DPRK_SERVICE, "service"),
                             ("prc", _PRC_PERIOD, "period"), ("prc", _PRC_SERVICE, "service")):
@@ -108,10 +129,58 @@ def _fill(template: str, facts: Dict[str, Any]) -> str:
 
 
 _LADDERS = {}
-for _table in (_USAF_SORTIE, _USAF_PERIOD, _USAF_UNIT, _USAF_SERVICE):
+for _table in (_USAF_SORTIE, _USAF_PERIOD, _USAF_UNIT, _USAF_SERVICE,
+               _NAVAL_SORTIE, _NAVAL_PERIOD, _NAVAL_UNIT):
     _LADDERS.update(_table)
 # Twin ids for one rung (the Bronze Star V ladder): both count as that rung.
 _RUNG = {601058: 0, 601059: 1, 601061: 1, 601060: 2, 601062: 2}
+_RUNG.update({602048: 0, 602049: 1, 602051: 1, 602050: 2, 602052: 2})
+
+# Naval families whose citation prose follows an existing U.S. family. The
+# award and service names are changed below; the deed remains the pilot's.
+_NAVAL_CITATION_BASE = {
+    "navy_cross": "dsc",
+    "navy_dsm": "dsm",
+    "navy_commendation": "commendation",
+    "navy_puc": "duc",
+    "navy_unit_commendation": "duc",
+}
+
+# The supplied Navy-specific sheets. Other U.S. naval awards use the shared
+# Army/Air Force sheet with the Navy seal overlay.
+_NAVAL_TEMPLATE = {
+    "moh": "Navy_MoH",
+    "navy_cross": "Navy_Cross",
+    "navy_commendation": "Navy_commendation",
+    "navy_puc": "Navy_puc",
+    "navy_unit_commendation": "Navy_unit_commendation",
+}
+
+
+def _naval_text(text: str, texts: Dict[str, Any], country: int,
+                family: str = "") -> str:
+    """Change Air Force prose to Navy or Marine Corps prose in one locale."""
+    naval = texts.get("naval") or {}
+    branch = naval.get(str(country)) or naval.get("602") or {}
+    def replace_term(value: str, source: str, target: str) -> str:
+        return value.replace(source.upper(), target.upper()).replace(source, target)
+
+    # Both the Navy and Marine Corps are administered by the Department of
+    # the Navy. Handle those office names before replacing generic service
+    # references such as "Air Force" with the member's actual branch.
+    text = replace_term(text, "Department of the Air Force", "Department of the Navy")
+    text = replace_term(text, "Secretary of the Air Force", "Secretary of the Navy")
+    text = replace_term(text, naval.get("air_force", "United States Air Force"),
+                        branch.get("service", "United States Navy"))
+    text = replace_term(text, naval.get("air_command", "Far East Air Forces"),
+                        branch.get("command", "United States Naval Forces, Far East"))
+    if naval.get("air_force_short") and branch.get("service_short"):
+        text = replace_term(text, naval["air_force_short"], branch["service_short"])
+    awards = naval.get("awards") or {}
+    base = _NAVAL_CITATION_BASE.get(family)
+    if base and awards.get(base) and awards.get(family):
+        text = replace_term(text, awards[base], awards[family])
+    return text
 
 
 def _rung(award_id: int) -> int:
@@ -160,14 +229,34 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
     if fam is None:
         return None
     nation, family, kind = fam
-    if nation == "usaf":
+    country = int(facts.get("country") or 0)
+    is_naval = country in (602, 603) and nation in ("usaf", "naval")
+    if nation in ("usaf", "naval"):
         cert = strings("eng").get("certificate") or {}
-        form = cert.get("forms", {}).get(family)
-        if not form:
+        base_family = _NAVAL_CITATION_BASE.get(family, family)
+        base_form = cert.get("forms", {}).get(base_family)
+        if not base_form:
             return None
+        form = dict(base_form)
+        if is_naval:
+            def naval_value(value):
+                if isinstance(value, str):
+                    return _naval_text(value, strings("eng"), country, family)
+                if isinstance(value, list):
+                    return [naval_value(v) for v in value]
+                return value
+            form = {key: naval_value(value) for key, value in form.items()}
+            form.update((cert.get("naval_forms") or {}).get(family, {}))
         rung = _rung(award_id)
-        if family == "ksm":
+        if family == "rok_puc":
+            device = ""  # Further citations do not authorize a ribbon device.
+        elif family == "ksm":
             device = cert["star"].get(str(rung), "") if rung else ""
+        elif is_naval and rung and family in ("navy_commendation", "navy_puc",
+                                               "navy_unit_commendation"):
+            device = cert["naval_bronze_star"].get(str(rung), "")
+        elif is_naval and rung:
+            device = cert["gold_star"].get(str(rung), "")
         elif rung and (family, award_id) in (("dfc", 601016), ("air_medal", 601007)):
             device = cert["cluster_silver"]
         else:
@@ -183,6 +272,9 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             "Place": facts.get("place") or "", "Date": _title_date(facts.get("earned_raw", "")),
             "From": _title_date(facts.get("period_from_raw", "")), "To": _title_date(facts.get("earned_raw", "")),
         }
+        if is_naval:
+            branch = (strings("eng").get("naval") or {}).get(str(country), {})
+            fill["SERVICE"] = (branch.get("service") or "United States Navy").upper()
         given = []
         try:
             y, m, d = (int(n) for n in (received or facts.get("earned_raw") or "").split(".")[:3])
@@ -204,14 +296,25 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             offices = ["", offices]                      # right-hand signature only
         signers = []
         for office in offices:
+            if is_naval:
+                office = {"chief": "navy_chief", "secretary": "navy_secretary",
+                          "fifth": "navy_chief"}.get(office, office)
+                if office == "navy_chief" and country == 603:
+                    office = "marine_commandant"
             who = cert["signers"].get(office, []) if office else []
             s_ = next((s for s in who if received <= s[0]), who[-1] if who else ["", "", ""])
             signers.append({"name": s_[1], "title": s_[2] if len(s_) > 2 else "",
                             "image": f"/static/images/signatures/{s_[3]}.png" if len(s_) > 3 and
                             (Path(__file__).resolve().parent / "static" / "images" / "signatures" / f"{s_[3]}.png").is_file() else ""})
         signer = signers[-1]
+        template = _NAVAL_TEMPLATE.get(family, base_family) if is_naval else family
+        seal_overlay = (is_naval and family not in _NAVAL_TEMPLATE and
+                        base_family not in ("un", "rok_puc"))
         return {
             "form": "usaf",
+            "template": template,
+            "seal_overlay": ("/static/images/certificates/Navy_seal_overlay_landscape.png"
+                             if seal_overlay else ""),
             "header": form.get("header", ""),
             "pre": [_fill(line, fill) for line in form.get("pre", [])],
             "name_first": bool(form.get("name_first")),
@@ -220,13 +323,14 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
             "to": form.get("to", ""),
             "name": _fill(form.get("name", "{RANK} {NAME}"), fill),
             "unit_line": _fill(form.get("unit_line", ""), fill),
-            "service": form.get("service", ""),
+            "service": _fill(form.get("service", ""), fill),
             "for": form.get("for", ""),
             "reason": reason,
             "where": _fill(form.get("where", ""), fill),
             "deed": paragraphs[1] if len(paragraphs) > 2 else "",
             "close": [_fill(line, fill) for line in form.get("close", "").split(chr(10)) if line],
-            "given": given, "seal": cert.get("seal", ""),
+            "given": given,
+            "seal": "DEPARTMENT OF THE NAVY" if is_naval else cert.get("seal", ""),
             "signer": signer["name"], "signer_title": signer["title"],
             "signers": signers,                          # [left, right]
         }
@@ -314,11 +418,21 @@ def compose(lang: str, award_id: int, facts: Dict[str, Any]) -> Optional[Dict[st
     if not texts or fam is None:
         return None
     nation, family, kind = fam
-    template = texts.get(nation, {}).get(family)
+    country = int(facts.get("country") or 0)
+    is_naval = country in (602, 603) and nation in ("usaf", "naval")
+    if family == "navy_unit_commendation":
+        template = (texts.get("naval") or {}).get("navy_unit_commendation")
+    else:
+        template_family = _NAVAL_CITATION_BASE.get(family, family)
+        template_nation = "usaf" if nation == "naval" else nation
+        template = texts.get(template_nation, {}).get(template_family)
     if not template:
         return None
     facts = dict(facts)
     facts["order"] = ""
+    if is_naval:
+        facts["service"] = ((texts.get("naval") or {}).get(str(country), {})
+                            .get("service", "United States Navy"))
     if award_id in ORDER_NUMERAL:
         facts["order"] = f" ({ORDER_NUMERAL[award_id]})"
     lst = texts.get("list", {})
@@ -407,6 +521,9 @@ def compose(lang: str, award_id: int, facts: Dict[str, Any]) -> Optional[Dict[st
     facts["deed"] = " ".join(deed)
     opening = _fill(template[0], facts).strip()
     closing = _fill(template[1], facts).strip() if len(template) > 1 else ""
+    if is_naval:
+        opening = _naval_text(opening, texts, country, family)
+        closing = _naval_text(closing, texts, country, family)
     paragraphs = [opening]
     if kind != "unit" and facts["deed"]:
         paragraphs.append(facts["deed"])

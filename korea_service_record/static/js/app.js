@@ -54,11 +54,14 @@
 
     // Artwork sliced out of the game's own atlases. A missing icon 404s, and
     // onerror hides it so the text beside it simply stands alone.
+    // Reuse the plain ROK image URL too, bypassing cached repeat-device art.
+    const iconIdent = (kind, ident) => kind === "award" &&
+        ["601047", "601048", "601049"].includes(String(ident)) ? 601043 : ident;
     const icon = (kind, ident, height, cls, title, extra) =>
         (ident === null || ident === undefined || ident === "")
             ? ""
             : '<img class="' + cls + ' emblem" src="/api/icon/' + kind + "/" +
-              encodeURIComponent(ident) + "?h=" + height + '" alt="" title="' +
+              encodeURIComponent(iconIdent(kind, ident)) + "?h=" + height + '" alt="" title="' +
               esc(title || "") + '" data-kind="' + kind + '" data-id="' +
               esc(ident) + '" data-title="' + esc(title || "") + '" ' + (extra || "") +
               ' onerror="this.style.display=&quot;none&quot;">';
@@ -84,7 +87,7 @@
         el("lb-title").textContent = title || "";
         el("lb-sub").textContent = "";
         el("lb-desc").textContent = T("common.loading");
-        el("lb-image").src = "/api/icon/" + kind + "/" + encodeURIComponent(ident);
+        el("lb-image").src = "/api/icon/" + kind + "/" + encodeURIComponent(iconIdent(kind, ident));
         el("lb-image").alt = title || "";
         show(box);
         document.body.classList.add("lightbox-open");
@@ -267,12 +270,16 @@
     // The ribbon rack: rows of three, highest precedence top-left, a short
     // top row centred, exactly as the bars sit on a tunic. Each ribbon is one
     // image the server composes with its devices; the name is the tooltip.
+    // The wearer's service, when the current rack names one: shared awards
+    // wear different devices for a sailor than for an airman.
+    let rackSvc = "";
+    const svcArg = () => (rackSvc ? "&svc=" + esc(rackSvc) : "");
     function ribbonRows(list, rows, rev) {
         let i = 0;
         return rows.map((n) => {
             const row = list.slice(i, i + n); i += n;
             return '<div class="ribbon-row">' + row.map((r) =>
-                '<img class="ribbon' + (r.framed ? " framed" : "") + (r.geometry === "sov" ? " sov" : "") + '" src="/api/ribbon/' + esc(r.type) + "?v=" + esc(rev || 0) +
+                '<img class="ribbon' + (r.framed ? " framed" : "") + (r.geometry === "sov" ? " sov" : "") + '" src="/api/ribbon/' + esc(r.type) + "?v=" + esc(rev || 0) + svcArg() +
                 '" alt="' + esc(r.name) + '" title="' + esc(r.name) + '" width="168" height="56">').join("") +
                 "</div>";
         }).join("");
@@ -285,9 +292,13 @@
     // small rack beneath the decorations.
     function ribbonRack(rack) {
         if (!rack) { return ""; }
-        const own = rack.ribbons || [], unit = rack.citations || [];
+        rackSvc = rack.svc || "";
+        const own = rack.ribbons || [];
+        // Navy unit awards are already merged into the service-dress rack.
+        const unit = rack.unit_in_service ? [] : (rack.citations || []);
         if (!own.length && !unit.length) { return ""; }
-        return (own.length ? '<div class="ribbon-group">' + ribbonRows(own, rack.rows, rack.rev) + "</div>" : "") +
+        const four = rack.ribbon_per_row === 4 ? " four" : "";
+        return (own.length ? '<div class="ribbon-group' + four + '">' + ribbonRows(own, rack.rows, rack.rev) + "</div>" : "") +
             (unit.length ? '<div class="ribbon-group citations">' +
                 ribbonRows(unit, rack.citation_rows, rack.rev) + "</div>" : "");
     }
@@ -319,6 +330,49 @@
             }).join("") + "</div>";
         }).join("");
     }
+    // The rows a strip of unit ribbons takes: the payload's own count when
+    // it still matches, else three to a row like any other rack.
+    function ribbonRowsOf(count, rack) {
+        const rows = rack.citation_rows || [];
+        return rows.reduce((a, b) => a + b, 0) === count ? rows : rowsOf(count, 3);
+    }
+    // Blue Dress "A" hangs its medals from a line midway between the first
+    // and second coat buttons, not from the pocket: the middle row's
+    // holding bar sits on it (the one row, if there is one; halfway between
+    // the two middle bars for an even number). Measured after layout, so it
+    // holds for any number of rows without repeating the CSS geometry here.
+    const MARINE_BAR_LINE = 0.35;
+    function anchorRack(coat, full) {
+        const box = el("tunic-right");
+        box.style.bottom = "";
+        if (coat !== "usmc" || !full) { return; }
+        // The medals are <img>; until they have loaded the rows measure
+        // nothing, so wait for the last of them before placing the rack.
+        const loading = [...box.querySelectorAll("img")].filter((i) => !i.complete);
+        if (loading.length) {
+            let left = loading.length;
+            const done = () => { if (--left === 0) { place(); } };
+            loading.forEach((i) => {
+                i.addEventListener("load", done, { once: true });
+                i.addEventListener("error", done, { once: true });
+            });
+            return;
+        }
+        place();
+
+        function place() {
+            const rows = [...box.querySelectorAll(".medal-row")];
+            const tunic = el("tunic").getBoundingClientRect();
+            if (!rows.length || !tunic.height) { return; }
+            const tops = rows.map((r) => r.getBoundingClientRect().top);
+            const mid = (tops.length - 1) / 2;
+            const lo = tops[Math.floor(mid)], hi = tops[Math.ceil(mid)];
+            const bar = lo + (hi - lo) * (mid - Math.floor(mid));
+            const want = tunic.top + tunic.height * MARINE_BAR_LINE;
+            const now = parseFloat(getComputedStyle(box).bottom) || 0;
+            box.style.bottom = ((now + (bar - want)) / tunic.height * 100).toFixed(3) + "%";
+        }
+    }
     function rowsOf(count, per) {
         if (count <= 0) { return []; }
         const first = count % per || per, out = [first];
@@ -327,7 +381,7 @@
     }
     function medalImg(id, name, cls, rev, style) {
         return '<img class="' + cls + '"' + (style ? ' style="' + style + '"' : "") +
-            ' src="/api/medal/' + esc(id) + "?v=" + esc(rev || 0) +
+            ' src="/api/medal/' + esc(id) + "?v=" + esc(rev || 0) + svcArg() +
             '" alt="' + esc(name) + '" title="' + esc(name) + '">';
     }
     // The Soviet-pattern coats lay their awards out in percent of the coat,
@@ -344,6 +398,8 @@
     function openTunic(name) {
         const rack = currentRack;
         if (!rack || !rack.tunic) { return; }
+        // The coat may belong to another pilot than the panel behind it.
+        rackSvc = rack.svc || "";
         const coat = rack.tunic, full = dress === "full";
         const own = rack.ribbons || [], unit = rack.citations || [];
         el("tunic-title").textContent = name || "";
@@ -354,12 +410,33 @@
         const tunic = el("tunic");
         tunic.dataset.coat = coat;
         tunic.classList.toggle("full", full);
-        el("tunic-coat").src = "/static/images/tunic_" + coat + ".jpg";
-        // The lapel and collar cut-outs belong to the USAF coat's photograph.
-        show(el("tunic-lapel"), coat === "usaf");
-        show(el("tunic-collar"), coat === "usaf");
+        // Full-size medals belong to Blue Dress "A" on a Marine, so full
+        // dress swaps the photograph and the shoulder boards with it.
+        const dressCoat = full && rack.dress_coat;
+        el("tunic-coat").src = "/static/images/" +
+            (dressCoat || "tunic_" + coat + ".jpg") + "?v=" + (rack.medal_rev || 0);
+        const rankOverlay = el("tunic-rank");
+        const board = (full && rack.rank_overlay_full) || rack.rank_overlay;
+        if (board) {
+            rankOverlay.src = "/static/images/" + board;
+            show(rankOverlay, true);
+        } else {
+            rankOverlay.removeAttribute("src");
+            show(rankOverlay, false);
+        }
+        // The lapel cut-out belongs to its coat's photograph (USAF, USMC);
+        // the shirt collar only the USAF coat has.
+        // Blue Dress "A" has a standing collar and no lapel to cut out.
+        const lapel = el("tunic-lapel");
+        const wearsLapel = coat === "usaf" || (coat === "usmc" && !dressCoat);
+        if (wearsLapel) { lapel.src = "/static/images/lapel_" + coat + ".png"; }
+        show(lapel, wearsLapel);
         el("tunic-neck").innerHTML = full && rack.neck
-            ? '<img class="neck-medal" src="' + esc(rack.neck_src) + '" alt="' + esc(rack.neck_name) + '" title="' + esc(rack.neck_name) + '">' : "";
+            ? '<img class="neck-medal" src="' + esc(rack.neck_src) + '" alt="' + esc(rack.neck_name) + '" title="' + esc(rack.neck_name) + '">' +
+              // The Navy and Marine overlays span the whole coat, so their
+              // <img> would answer every hover; a hotspot the size of the
+              // decoration carries the title instead (CSS per coat).
+              '<span class="neck-hotspot" title="' + esc(rack.neck_name) + '"></span>' : "";
         let right = "", left = "", caption;
         if (coat === "sov" || coat === "dprk") {
             coatRow = COAT_ROW[coat];
@@ -414,22 +491,35 @@
             caption = T("awards.tunic_caption_" + coat + (full ? "_full" : ""));
         } else {
             const badge = rack.badge ? '<img class="tunic-badge" src="/api/icon/award/' + esc(rack.badge) + '" alt="' + esc(rack.badge_name) + '" title="' + esc(rack.badge_name) + '">' : "";
+            // Service dress mounts unit citations in the rack itself, so
+            // the strip is only drawn in full dress, on the breast opposite
+            // the medals: every one for a Marine, the senior alone for a
+            // sailor, none at all for an airman.
+            const lim = rack.unit_dress_limit;
+            const worn = (full && lim !== null && lim !== undefined) ? unit.slice(0, lim) : unit;
+            const unitStrip = worn.length
+                ? '<div class="ribbon-group unit-strip">' + ribbonRows(worn, ribbonRowsOf(worn.length, rack), rack.rev) + "</div>" : "";
+            let mine;
             if (full) {
                 const bar = rack.medals || [];
-                right = badge + (bar.length ? '<div class="medal-group">' + medalRows(bar, rack.medal_rows, rack.medal_rev) + "</div>" : "");
+                mine = bar.length ? '<div class="medal-group">' + medalRows(bar, rack.medal_rows, rack.medal_rev) + "</div>" : "";
             } else {
-                // Regulations allowed four ribbons per row; a man with four
-                // rows of three would push his wings into the collar, so on
-                // the coat a large rack goes four across (the panel keeps three).
-                const wide = own.length > 9;
-                const rows = wide ? rowsOf(own.length, 4) : rack.rows;
-                right = badge + (own.length ? '<div class="ribbon-group' + (wide ? " four" : "") + '">' + ribbonRows(own, rows, rack.rev) + "</div>" : "");
+                // Three to a row with the short row on top - the rack.rows
+                // the panel uses. Only a large Marine or Air Force rack goes
+                // to four, and then the bars come down to their true width.
+                const four = rack.ribbon_per_row === 4 ? " four" : "";
+                mine = own.length ? '<div class="ribbon-group' + four + '">' + ribbonRows(own, rack.rows, rack.rev) + "</div>" : "";
             }
-            left = unit.length ? '<div class="ribbon-group">' + ribbonRows(unit, rack.citation_rows, rack.rev) + "</div>" : "";
-            caption = T(full ? "awards.tunic_caption_full" : "awards.tunic_caption");
+            const strip = full ? unitStrip : (rack.unit_in_service ? "" : unitStrip);
+            right = badge + mine;
+            left = full ? strip : "";
+            caption = coat === "usnavy" || coat === "usmc"
+                ? T("awards.tunic_caption_" + coat + (full ? "_full" : ""))
+                : T(full ? "awards.tunic_caption_full" : "awards.tunic_caption");
         }
         el("tunic-right").innerHTML = right;
         el("tunic-left").innerHTML = left;
+        anchorRack(coat, full);
         el("tunic-caption").textContent = caption;
         show(el("tunicbox"), true);
         document.body.classList.add("lightbox-open");
@@ -1055,8 +1145,8 @@
             const citations = d.citations || [];
             const strip = el("d-squadron-citations");
             strip.hidden = citations.length === 0;
-            // One row per ladder (DUC and its clusters, then the ROK PUC and
-            // its clusters), every rung the unit has held, oldest first.
+            // One row per citation family, every award the unit has held,
+            // oldest first. Repeated ROK citations share the plain emblem.
             strip.innerHTML = citations.length === 0 ? "" :
                 '<span class="citation-label">' + T("roster.citations") + "</span>" +
                 citations.map((ladder) =>
@@ -1373,6 +1463,15 @@
                 "<h3>Promotions</h3><div class=\"pb-emblems\">" + promos + "</div>" +
                 "<h3>Awards</h3><div class=\"pb-emblems\">" + awards + "</div>" +
                 "<h3>Recent Sorties</h3><div class=\"pb-sorties\">" + recent + "</div>";
+            const pilotRack = el("pb-body").querySelector(".pb-rack");
+            if (pilotRack && p.ribbon_rack && p.ribbon_rack.tunic) {
+                pilotRack.classList.add("wearable");
+                pilotRack.title = T("awards.tunic_hint");
+                pilotRack.onclick = () => {
+                    currentRack = p.ribbon_rack;
+                    openTunic(p.name);
+                };
+            }
         } catch (err) {
             el("pb-body").innerHTML =
                 '<p class="state-message">Could not open that pilot: ' +
