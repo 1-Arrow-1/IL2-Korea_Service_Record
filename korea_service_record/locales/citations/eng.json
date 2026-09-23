@@ -107,6 +107,10 @@
    "The National Defense Service Medal is awarded to {rank} {name} for honorable active service in the armed forces of the United States during the Korean emergency.",
    ""
   ],
+  "soldiers_medal": [
+   "The President of the United States of America, authorized by Act of Congress of 2 July 1926, takes pleasure in presenting the Soldier's Medal to {rank} {name}, United States Air Force, for heroism at the voluntary risk of life, not involving actual conflict with an armed enemy, while serving with the {unit} in Korea.",
+   "By his prompt action and disregard for his own safety, {rank} {name} has upheld the highest traditions of the military service and reflected great credit upon himself and the United States Air Force."
+  ],
   "ksm": [
    "The Korean Service Medal is awarded to {rank} {name} for service in the Korean theatre with the {unit} during the period {period_from} to {period_to}.",
    ""
@@ -130,6 +134,10 @@
   "navy_unit_commendation": [
    "The {unit} is commended for exceptionally meritorious conduct and outstanding performance during successful operations against enemy forces in Korea. {deed}",
    "The professional skill, determination and devotion to duty displayed by the members of the squadron reflect great credit upon themselves and the {service}."
+  ],
+  "nmc_medal": [
+   "The Secretary of the Navy takes pleasure in presenting the Navy and Marine Corps Medal to {rank} {name}, {service}, for acts of heroism at great risk to his own life, not involving actual conflict with an armed enemy, while serving with the {unit} in Korea.",
+   "By his prompt action and disregard for his own safety, {rank} {name} has upheld the highest traditions of the naval service."
   ]
  },
  "sov": {
@@ -489,6 +497,24 @@
     ],
     "signer": "fifth"
    },
+   "soldiers_medal": {
+    "header": "THE UNITED STATES OF AMERICA",
+    "pre": [
+     "AUTHORIZED BY ACT OF CONGRESS AND APPROVED ON 2 JULY 1926, AND",
+     "AWARDED FOR DISTINGUISHED ACTS OF HEROISM NOT INVOLVING ACTUAL CONFLICT WITH AN ENEMY"
+    ],
+    "title": "SOLDIERS MEDAL",
+    "to": "TO",
+    "name": "{RANK} {NAME}",
+    "service": "UNITED STATES AIR FORCE",
+    "for": "FOR",
+    "reason": "HEROISM AT THE VOLUNTARY RISK OF LIFE WHILE SERVING WITH THE {UNIT} IN KOREA",
+    "given": [
+     "GIVEN UNDER MY HAND",
+     "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
+    ],
+    "signer": "fifth"
+   },
    "ksm": {
     "header": "THE UNITED STATES OF AMERICA",
     "pre": [],
@@ -617,6 +643,24 @@
     "close": "DURING SUCCESSFUL MILITARY OPERATIONS AGAINST HOSTILE ENEMY FORCES IN KOREA FROM {FROM} TO {TO}.",
     "given": [
      "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON",
+     "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
+    ],
+    "signer": "navy_secretary"
+   },
+   "nmc_medal": {
+    "header": "DEPARTMENT OF THE NAVY",
+    "pre": [
+     "TO ALL WHO SHALL SEE THESE PRESENTS, GREETINGS; THIS IS TO CERTIFY THAT",
+     "THE SECRETARY OF THE NAVY HAS ON THIS DAY AWARDED THE"
+    ],
+    "title": "NAVY AND MARINE CORPS MEDAL",
+    "to": "TO",
+    "name": "{RANK} {NAME}",
+    "service": "{SERVICE}",
+    "for": "FOR",
+    "reason": "ACTS OF HEROISM AT GREAT RISK TO HIS OWN LIFE",
+    "given": [
+     "GIVEN UNDER MY HAND IN THE CITY OF WASHINGTON, DC",
      "ON THIS {DAY} DAY OF {MONTH} {YEAR}"
     ],
     "signer": "navy_secretary"

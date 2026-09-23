@@ -107,6 +107,10 @@
    "Se concede al {rank} {name} la Medalla del Servicio de Defensa Nacional por servicio activo honorable en las fuerzas armadas de los Estados Unidos durante la emergencia de Corea.",
    ""
   ],
+  "soldiers_medal": [
+   "El Presidente de los Estados Unidos de América, autorizado por la ley del Congreso de 2 de julio de 1926, se complace en conceder la Soldier's Medal a {rank} {name}, Fuerza Aérea de los Estados Unidos, por heroísmo con riesgo voluntario de la vida, sin conflicto directo con un enemigo armado, sirviendo con el {unit} en Corea.",
+   "Por su pronta acción y su desprecio del peligro personal, {rank} {name} ha mantenido las más altas tradiciones del servicio militar y honrado grandemente a su persona y a la Fuerza Aérea de los Estados Unidos."
+  ],
   "ksm": [
    "Se concede al {rank} {name} la Medalla del Servicio en Corea por servicio en el teatro coreano con el {unit} durante el período del {period_from} al {period_to}.",
    ""
@@ -130,6 +134,10 @@
   "navy_unit_commendation": [
    "El {unit} recibe un encomio por conducta excepcionalmente meritoria y desempeño sobresaliente durante operaciones exitosas contra fuerzas enemigas en Corea. {deed}",
    "La pericia profesional, la determinación y la devoción al deber de los miembros del escuadrón constituyen un alto honor para ellos y para {service}."
+  ],
+  "nmc_medal": [
+   "El Secretario de la Armada se complace en conceder la Navy and Marine Corps Medal a {rank} {name}, {service}, por actos de heroísmo con grave riesgo de su propia vida, sin conflicto directo con un enemigo armado, sirviendo con el {unit} en Corea.",
+   "Por su pronta acción y su desprecio del peligro personal, {rank} {name} ha mantenido las más altas tradiciones del servicio naval."
   ]
  },
  "sov": {

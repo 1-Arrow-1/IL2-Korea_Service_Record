@@ -107,6 +107,10 @@
    "{rank} {name} wird die National Defense Service Medal für ehrenvollen aktiven Dienst in den Streitkräften der Vereinigten Staaten während des Korea-Notstands verliehen.",
    ""
   ],
+  "soldiers_medal": [
+   "Der Präsident der Vereinigten Staaten von Amerika verleiht, auf Grund des Gesetzes vom 2. Juli 1926, {rank} {name}, United States Air Force, die Soldier's Medal für Heldentum unter freiwilligem Einsatz des eigenen Lebens, ohne unmittelbaren Kampf gegen einen bewaffneten Feind, während seiner Dienstzeit bei der {unit} in Korea.",
+   "Durch sein entschlossenes Handeln und die Missachtung der eigenen Sicherheit hat {rank} {name} die besten Überlieferungen des Dienstes gewahrt und sich selbst und der United States Air Force große Ehre gemacht."
+  ],
   "ksm": [
    "{rank} {name} wird die Korean Service Medal für Dienst im koreanischen Kriegsgebiet bei der {unit} im Zeitraum vom {period_from} bis {period_to} verliehen.",
    ""
@@ -130,6 +134,10 @@
   "navy_unit_commendation": [
    "Die {unit} wird für außergewöhnlich verdienstvolles Verhalten und hervorragende Leistungen bei erfolgreichen Operationen gegen feindliche Streitkräfte in Korea ausgezeichnet. {deed}",
    "Fachliches Können, Entschlossenheit und Pflichttreue der Angehörigen der Staffel bringen ihnen große Ehre und würdigen zugleich {service}."
+  ],
+  "nmc_medal": [
+   "Der Marineminister verleiht {rank} {name}, {service}, die Navy and Marine Corps Medal für Heldentaten unter hoher eigener Lebensgefahr, ohne unmittelbaren Kampf gegen einen bewaffneten Feind, während seiner Dienstzeit bei der {unit} in Korea.",
+   "Durch sein entschlossenes Handeln und die Missachtung der eigenen Sicherheit hat {rank} {name} die besten Überlieferungen der Seestreitkräfte gewahrt."
   ]
  },
  "sov": {

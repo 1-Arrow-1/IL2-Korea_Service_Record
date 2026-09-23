@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 ART = Path(__file__).resolve().parent / "static" / "images" / "ribbons"
 # Bump whenever the composition or the art changes: it goes into the image
 # URLs, so browsers that were told to cache a ribbon for a year re-fetch it.
-REVISION = 20
+REVISION = 21
 # US bars are 1 3/8 x 3/8 inch (11:3); Soviet-pattern bars (USSR, DPRK) are
 # 24 x 8 mm (3:1). Each sits centred on a canvas 20 px bigger all round, so a
 # unit citation's frame can overhang without changing the grid.
@@ -201,6 +201,7 @@ RIBBONS.update(_ladder(601018, [601018, 601019, 601020, 601050, 601051]))       
 RIBBONS.update(_ladder(601017, [601017]))                                           # Legion of Merit
 RIBBONS.update(_ladder(601011, [601011, 601012, 601013, 601014, 601015, 601016],
                        silver_at=601016))                                           # DFC
+RIBBONS[601063] = Ribbon(601063)                                                    # Soldier's Medal
 RIBBONS.update({                                                                    # Bronze Star, valour
     601058: Ribbon(601008, valour=True),
     601059: Ribbon(601008, valour=True, olc_bronze=1),
@@ -224,6 +225,7 @@ RIBBONS.update(_navy_ladder(601018, [602018, 602019, 602020, 602042, 602043]))  
 RIBBONS[602017] = Ribbon(601017)                                                    # Legion of Merit
 RIBBONS.update(_navy_ladder(601011, [602011, 602012, 602013, 602014, 602015, 602016],
                             silver_at=602016))                                      # DFC
+RIBBONS[602053] = Ribbon(602053)                                                    # Navy and Marine Corps Medal
 RIBBONS.update({                                                                    # Bronze Star with V
     602048: Ribbon(601008, valour=True),
     602049: Ribbon(601008, valour=True, star_gold=1),

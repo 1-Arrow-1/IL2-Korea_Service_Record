@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 ART = Path(__file__).resolve().parent / "static" / "images" / "medals"
 # Bump whenever the composition or the art changes; it is part of the URLs.
-REVISION = 20
+REVISION = 21
 
 # --- US: drawn art -----------------------------------------------------------
 # Every base medal is drawn 224 px wide - the drape is 1 3/8 inch, the same

@@ -69,7 +69,10 @@ for award in ("601027", "601040", "601041", "601042", "601043", "601044",
               "602037", "602038", "602039", "602040", "602041", "602042",
               "602043", "602044", "602045", "602046", "602047",
               # Naval Bronze Star with Combat V: five logic ids share three tiles.
-              "602048", "602049", "602050", "602051", "602052"):
+              "602048", "602049", "602050", "602051", "602052",
+              # Heroism with no enemy in it: the Soldier's Medal and its
+              # naval counterpart.
+              "601063", "602053"):
     for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
         MOD_FILES[f"{award}.locale={lang}.txt"] = "nsdata/assets/awards/6xx"
 for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):

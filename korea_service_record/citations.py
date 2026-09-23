@@ -33,7 +33,8 @@ _USAF_PERIOD = {"bsm": (601008, 601009, 601010), "air_medal": (601002, 601003, 6
 # that did NOT involve participation in aerial flight, so its citation must
 # never narrate what the man did from the cockpit that day.
 _USAF_SERVICE = {"ndsm": (601053,), "ksm": tuple(range(601031, 601039)), "un": (601039,),
-                 "bsm_v": (601058, 601059, 601060, 601061, 601062)}
+                 "bsm_v": (601058, 601059, 601060, 601061, 601062),
+                 "soldiers_medal": (601063,)}
 _USAF_UNIT = {"duc": (601042, 601044, 601045, 601046), "rok_puc": (601043, 601047, 601048, 601049)}
 _NAVAL_SORTIE = {
     "moh": (602027, 602038),
@@ -49,7 +50,8 @@ _NAVAL_PERIOD = {
     "lom": (602017,),
     "navy_dsm": (602031,),
 }
-_NAVAL_SERVICE = {"bsm_v": (602048, 602049, 602050, 602051, 602052)}
+_NAVAL_SERVICE = {"bsm_v": (602048, 602049, 602050, 602051, 602052),
+                  "nmc_medal": (602053,)}
 _NAVAL_UNIT = {
     "navy_puc": (602033, 602039, 602040, 602041),
     "navy_unit_commendation": (602034, 602044, 602045, 602046, 602047),
@@ -143,6 +145,7 @@ _RUNG.update({602048: 0, 602049: 1, 602051: 1, 602050: 2, 602052: 2})
 # Naval families whose citation prose follows an existing U.S. family. The
 # award and service names are changed below; the deed remains the pilot's.
 _NAVAL_CITATION_BASE = {
+    "nmc_medal": "soldiers_medal",
     "navy_cross": "dsc",
     "navy_dsm": "dsm",
     "navy_commendation": "commendation",
@@ -150,9 +153,14 @@ _NAVAL_CITATION_BASE = {
     "navy_unit_commendation": "duc",
 }
 
+# Naval awards whose citation is written for them, not an Air Force text
+# with the service names changed.
+NAVAL_OWN_TEXT = ("navy_unit_commendation", "nmc_medal")
+
 # The supplied Navy-specific sheets. Other U.S. naval awards use the shared
 # Army/Air Force sheet with the Navy seal overlay.
 _NAVAL_TEMPLATE = {
+    "nmc_medal": "Navy_MC_medal",
     "moh": "Navy_MoH",
     "navy_cross": "Navy_Cross",
     "navy_commendation": "Navy_commendation",
@@ -424,8 +432,8 @@ def compose(lang: str, award_id: int, facts: Dict[str, Any]) -> Optional[Dict[st
     nation, family, kind = fam
     country = int(facts.get("country") or 0)
     is_naval = country in (602, 603) and nation in ("usaf", "naval")
-    if family == "navy_unit_commendation":
-        template = (texts.get("naval") or {}).get("navy_unit_commendation")
+    if family in NAVAL_OWN_TEXT:
+        template = (texts.get("naval") or {}).get(family)
     else:
         template_family = _NAVAL_CITATION_BASE.get(family, family)
         template_nation = "usaf" if nation == "naval" else nation

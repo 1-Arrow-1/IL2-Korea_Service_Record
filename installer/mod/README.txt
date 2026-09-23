@@ -167,6 +167,12 @@ Both carry the same medal fixes. Only the promotion block differs.
     601062.locale=ger.txt
     601062.locale=rus.txt
     601062.locale=spa.txt
+    601063.locale=chs.txt
+    601063.locale=eng.txt
+    601063.locale=fra.txt
+    601063.locale=ger.txt
+    601063.locale=rus.txt
+    601063.locale=spa.txt
     602031.locale=chs.txt
     602031.locale=eng.txt
     602031.locale=fra.txt
@@ -299,6 +305,12 @@ Both carry the same medal fixes. Only the promotion block differs.
     602052.locale=ger.txt
     602052.locale=rus.txt
     602052.locale=spa.txt
+    602053.locale=chs.txt
+    602053.locale=eng.txt
+    602053.locale=fra.txt
+    602053.locale=ger.txt
+    602053.locale=rus.txt
+    602053.locale=spa.txt
 
 <IL-2 Korea>\data\nsdata\assets\images\
     Ranks501.dds

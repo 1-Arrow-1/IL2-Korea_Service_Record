@@ -107,6 +107,10 @@
    "Le {rank} {name} reçoit la National Defense Service Medal pour service actif honorable dans les forces armées des États-Unis pendant l’urgence de Corée.",
    ""
   ],
+  "soldiers_medal": [
+   "Le Président des États-Unis d’Amérique, en vertu de la loi du Congrès du 2 juillet 1926, a l’honneur de remettre la Soldier's Medal à {rank} {name}, United States Air Force, pour un acte d’héroïsme accompli au péril volontaire de sa vie, sans combat direct contre un ennemi armé, alors qu’il servait au sein du {unit} en Corée.",
+   "Par sa promptitude et son mépris du danger, {rank} {name} a soutenu les plus hautes traditions du service et fait le plus grand honneur à lui-même et à l’United States Air Force."
+  ],
   "ksm": [
    "Le {rank} {name} reçoit la Korean Service Medal pour service sur le théâtre coréen au sein du {unit} du {period_from} au {period_to}.",
    ""
@@ -130,6 +134,10 @@
   "navy_unit_commendation": [
    "Le {unit} est cité pour une conduite exceptionnellement méritoire et des résultats remarquables au cours d’opérations victorieuses contre les forces ennemies en Corée. {deed}",
    "La compétence professionnelle, la détermination et le dévouement des membres de l’escadron font grand honneur à eux-mêmes et à {service}."
+  ],
+  "nmc_medal": [
+   "Le Secrétaire à la Marine a l’honneur de remettre la Navy and Marine Corps Medal à {rank} {name}, {service}, pour des actes d’héroïsme accomplis au grand péril de sa propre vie, sans combat direct contre un ennemi armé, alors qu’il servait au sein du {unit} en Corée.",
+   "Par sa promptitude et son mépris du danger, {rank} {name} a soutenu les plus hautes traditions du service naval."
   ]
  },
  "sov": {
