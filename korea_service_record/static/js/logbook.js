@@ -44,7 +44,10 @@
     }
 
     // The form's language: the document's own where it has one.
-    const formLang = {usaf: "en", sov: "ru"}[data.form] || pageLang;
+    // The form keeps its own language whatever the page speaks: English on
+    // the Form 5, Russian on the flight book - the Korean People's Army
+    // took its paperwork from its Soviet advisers, as its award sheets do.
+    const formLang = {usaf: "en", sov: "ru", dprk: "ru"}[data.form] || pageLang;
     if (formLang !== pageLang) await i18n.load(formLang);
     const bundle = i18n.loaded[formLang] || i18n.loaded[pageLang];
     const TF = (key, p) => {

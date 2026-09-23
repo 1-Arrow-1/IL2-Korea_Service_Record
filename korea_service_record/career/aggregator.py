@@ -2121,7 +2121,11 @@ class CareerAggregator:
                           "is_player": bool(pilot["isPlayer"])},
                 "organization": meta.squadron_name,
                 "aircraft": self.objects.describe(PurePath(planes[next(iter(planes))]["config"]).stem)["name"] if planes else "",
-                "form": {601: "usaf", 501: "sov", 503: "dprk"}.get(country, "usaf"),
+                # A Chinese pilot flew Soviet aeroplanes under Soviet
+                # advisers and keeps the Soviet book, as his award papers
+                # already use the Soviet sheet. Without 502 here he was
+                # handed an AF Form 5.
+                "form": {601: "usaf", 501: "sov", 502: "sov", 503: "dprk"}.get(country, "usaf"),
                 "months": [months[k] for k in sorted(months)],
                 "as_of": career["currentDate"],
                 "corrected": getattr(db, "_corr", None) is not None,
