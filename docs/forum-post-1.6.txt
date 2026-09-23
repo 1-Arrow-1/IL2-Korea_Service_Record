@@ -71,12 +71,14 @@ CAPTURED
 
 Swoose asked for this one, and he was right to.
 
-A man shot down over enemy territory who survives the crash is never really lost in this
-game. It marks him as evading, and after a day or two it walks him back to his own lines
-and returns him to the squadron — the tab will even tell you the date he is due back. That
-happened often enough in Korea, and it is a fine outcome. It is just not the only one, and
-until now it was the only one available: every man who went down behind the lines
-eventually strolled home.
+When one of your pilots is shot down over enemy territory and survives the crash, the game
+marks him as evading, and a day or two later it walks him back to his own lines and returns
+him to the squadron — the tab will tell you the date he is due back. Now and then it does
+something else and takes a man for good: missing, not killed, gone from the roll. I have
+seen that once in some five hundred sorties.
+
+The one man it never does it to is you. The commander always evades, always walks home,
+wherever he comes down, and there was no way to say otherwise.
 
 The Career Helper now has a Captured tab. It lists the men who went down over enemy ground
 and came through it — the evaders the game is walking back, and anyone who lost his
