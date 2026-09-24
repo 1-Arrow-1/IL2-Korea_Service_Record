@@ -42,7 +42,7 @@ import sys
 import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, ttk
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -93,6 +93,16 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "points_now": "The squadron's award points now: {points}",
         "points_add": "Add",
         "points_added": "Award points are now {points}. Backup: {backup}",
+        "pending_intro": "Awards your pilots have earned but not yet been given. Each costs one award point. Click a line to include or exclude it, then hand them over.",
+        "pend_col_who": "Pilot",
+        "pend_col_award": "Award",
+        "pend_col_earned": "Earned",
+        "pend_all": "All",
+        "pend_none": "None",
+        "pend_grant": "Present the ticked awards",
+        "pend_cost": "{n} ticked, {cost} points of {points}",
+        "pend_short": "That needs {need} award points and the squadron has {points}. Add some first.",
+        "pend_done": "{n} awards presented, {spent} points spent. Backup: {backup}",
         "locked": "The career file is in use - close IL-2 Korea and try again.",
         "failed": "That did not work: {error}",
         "player_note": "The player's own character is not listed: the game carries the career on with a successor, and this tool leaves that alone.",
@@ -158,6 +168,16 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "points_now": "Auszeichnungspunkte der Staffel: {points}",
         "points_add": "Hinzufügen",
         "points_added": "Die Auszeichnungspunkte betragen jetzt {points}. Sicherung: {backup}",
+        "pending_intro": "Auszeichnungen, die Ihre Piloten erhalten haben, aber noch nicht verliehen bekamen. Jede kostet einen Auszeichnungspunkt. Klicken Sie eine Zeile an, um sie ein- oder auszuschließen, und verleihen Sie sie dann.",
+        "pend_col_who": "Pilot",
+        "pend_col_award": "Auszeichnung",
+        "pend_col_earned": "Erworben",
+        "pend_all": "Alle",
+        "pend_none": "Keine",
+        "pend_grant": "Markierte verleihen",
+        "pend_cost": "{n} markiert, {cost} von {points} Punkten",
+        "pend_short": "Dafür sind {need} Auszeichnungspunkte nötig, die Staffel hat {points}. Bitte zuerst aufstocken.",
+        "pend_done": "{n} Auszeichnungen verliehen, {spent} Punkte verbraucht. Sicherung: {backup}",
         "locked": "Die Laufbahndatei ist in Benutzung - IL-2 Korea schließen und erneut versuchen.",
         "failed": "Das hat nicht geklappt: {error}",
         "player_note": "Der eigene Charakter des Spielers wird nicht aufgeführt: das Spiel führt die Laufbahn mit einem Nachfolger fort, und dieses Werkzeug lässt das unangetastet.",
@@ -223,6 +243,16 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "points_now": "Puntos de condecoración del escuadrón: {points}",
         "points_add": "Añadir",
         "points_added": "Los puntos de condecoración son ahora {points}. Copia de seguridad: {backup}",
+        "pending_intro": "Condecoraciones que sus pilotos han ganado pero aún no han recibido. Cada una cuesta un punto. Pulse una línea para incluirla o excluirla y después entréguelas.",
+        "pend_col_who": "Piloto",
+        "pend_col_award": "Condecoración",
+        "pend_col_earned": "Ganada",
+        "pend_all": "Todas",
+        "pend_none": "Ninguna",
+        "pend_grant": "Entregar las marcadas",
+        "pend_cost": "{n} marcadas, {cost} de {points} puntos",
+        "pend_short": "Hacen falta {need} puntos de condecoración y el escuadrón tiene {points}. Añada algunos primero.",
+        "pend_done": "{n} condecoraciones entregadas, {spent} puntos gastados. Copia de seguridad: {backup}",
         "locked": "El archivo de la carrera está en uso: cierre IL-2 Korea e inténtelo de nuevo.",
         "failed": "No ha funcionado: {error}",
         "player_note": "El personaje del jugador no aparece: el juego continúa la carrera con un sucesor y esta herramienta no lo toca.",
@@ -288,6 +318,16 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "points_now": "Points de décoration de l’escadron : {points}",
         "points_add": "Ajouter",
         "points_added": "Les points de décoration sont maintenant à {points}. Sauvegarde : {backup}",
+        "pending_intro": "Décorations que vos pilotes ont méritées mais pas encore reçues. Chacune coûte un point. Cliquez sur une ligne pour l’inclure ou l’exclure, puis remettez-les.",
+        "pend_col_who": "Pilote",
+        "pend_col_award": "Décoration",
+        "pend_col_earned": "Méritée",
+        "pend_all": "Toutes",
+        "pend_none": "Aucune",
+        "pend_grant": "Remettre les décorations cochées",
+        "pend_cost": "{n} cochées, {cost} points sur {points}",
+        "pend_short": "Il faut {need} points de décoration et l’escadron en a {points}. Ajoutez-en d’abord.",
+        "pend_done": "{n} décorations remises, {spent} points dépensés. Sauvegarde : {backup}",
         "locked": "Le fichier de carrière est en cours d’utilisation : fermez IL-2 Korea et réessayez.",
         "failed": "Cela n’a pas fonctionné : {error}",
         "player_note": "Le personnage du joueur n’est pas listé : le jeu poursuit la carrière avec un successeur, et cet outil n’y touche pas.",
@@ -353,6 +393,16 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "points_now": "Наградные очки эскадрильи: {points}",
         "points_add": "Добавить",
         "points_added": "Наградных очков теперь {points}. Резервная копия: {backup}",
+        "pending_intro": "Награды, заслуженные вашими лётчиками, но ещё не вручённые. Каждая стоит одно наградное очко. Щёлкните по строке, чтобы включить или исключить её, затем вручите.",
+        "pend_col_who": "Лётчик",
+        "pend_col_award": "Награда",
+        "pend_col_earned": "Заслужена",
+        "pend_all": "Все",
+        "pend_none": "Ни одной",
+        "pend_grant": "Вручить отмеченные",
+        "pend_cost": "отмечено {n}, {cost} очков из {points}",
+        "pend_short": "Нужно {need} наградных очков, у эскадрильи {points}. Сначала добавьте.",
+        "pend_done": "Вручено наград: {n}, потрачено очков: {spent}. Резервная копия: {backup}",
         "locked": "Файл карьеры занят — закройте IL-2 Korea и попробуйте снова.",
         "failed": "Не получилось: {error}",
         "player_note": "Персонаж игрока не показан: игра продолжает карьеру преемником, и этот инструмент этого не трогает.",
@@ -418,6 +468,16 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "points_now": "中队当前授勋点数：{points}",
         "points_add": "增加",
         "points_added": "授勋点数现为 {points}。备份：{backup}",
+        "pending_intro": "您的飞行员已获得但尚未授予的奖励。每项消耗一点授勋点数。点击某行以选中或取消，然后予以授予。",
+        "pend_col_who": "飞行员",
+        "pend_col_award": "奖励",
+        "pend_col_earned": "获得日期",
+        "pend_all": "全选",
+        "pend_none": "全不选",
+        "pend_grant": "授予已选奖励",
+        "pend_cost": "已选 {n} 项，{cost} / {points} 点",
+        "pend_short": "需要 {need} 点授勋点数，中队只有 {points} 点。请先补充。",
+        "pend_done": "已授予 {n} 项奖励，消耗 {spent} 点。备份：{backup}",
         "locked": "生涯文件正在使用中——请关闭 IL-2 Korea 后重试。",
         "failed": "操作失败：{error}",
         "player_note": "玩家自己的角色不在列表中：游戏会以继任者延续生涯，本工具不作改动。",
@@ -597,6 +657,95 @@ class Career:
     def award_points(self) -> int:
         with self._open() as con:
             return int(con.execute("SELECT awardPoints FROM squadron").fetchone()[0] or 0)
+
+    # -- pending awards -----------------------------------------------------
+    # An award earned but not yet handed over sits at isPending=1 with a
+    # receivedDate of '0000.00.00', and costs a point from the squadron's
+    # pool. The player's own are presented at the rollover; the ones that
+    # pile up are his pilots', and in game they are given one at a time.
+
+    # improvedQual records WHICH attribute the presentation improved, as a
+    # 1-based index in the PANEL's order - not the order of the persLevel
+    # nibbles, which is skills, courage, discipline low to high. 2 and 3
+    # cross over. Proven in game 2026-09-24: an award written 2 moved
+    # discipline, one written 3 moved courage.
+    QUAL = {1: ("skills", 0), 2: ("discipline", 2), 3: ("courage", 1)}
+    QUAL_CAP = 4                      # stored 4, drawn as 5
+
+    def pending_awards(self, game: Optional[Path] = None) -> List[Dict]:
+        """Every award earned and not yet presented, newest pilot-first."""
+        names = {}
+        if game is not None:
+            from korea_service_record.gamedata import AwardsConfig
+            path = game / "data" / "scg" / "2" / "awards.cfg"
+            if path.is_file():
+                names = {a.award_id: a.name for a in AwardsConfig(path).definitions.values()}
+        with self._open() as con:
+            rows = con.execute(
+                """SELECT a.id, a.type, a.cost, a.earnedDate, a.pilotId,
+                          p.name, p.lastName, p.persLevel
+                   FROM award a JOIN pilot p ON p.id=a.pilotId
+                   WHERE a.isPending=1 AND a.isDeleted=0 AND a.pilotId>0
+                   ORDER BY p.lastName, p.name, a.earnedDate, a.id""").fetchall()
+        return [{"id": r["id"], "type": r["type"], "cost": int(r["cost"] or 1),
+                 "earned": r["earnedDate"], "pilot": r["pilotId"],
+                 "who": f"{r['name']} {r['lastName']}".strip(),
+                 "award": names.get(r["type"], str(r["type"]))} for r in rows]
+
+    def present_awards(self, award_ids: List[int]) -> Dict[str, Any]:
+        """
+        Hand the chosen awards over, exactly as the game does it.
+
+        Per award: isPending 0, receivedDate today, a random attribute +1
+        unless the man is already at the cap, and one type-20 event with
+        ipar3=1 carrying the award ROW id. The squadron pays a point each.
+        """
+        import random
+        ids = [int(i) for i in award_ids]
+        if not ids:
+            return {"granted": 0, "spent": 0, "backup": None}
+        backup = self.backup()
+        marks = ",".join("?" * len(ids))
+        with self._open(write=True) as con:
+            con.execute("BEGIN IMMEDIATE")
+            career = con.execute("SELECT id, currentDate, currentTime FROM career").fetchone()
+            points = int(con.execute("SELECT awardPoints FROM squadron").fetchone()[0] or 0)
+            rows = con.execute(
+                f"""SELECT id, type, cost, pilotId, pilotRank, squadronId
+                    FROM award WHERE id IN ({marks}) AND isPending=1 AND isDeleted=0""",
+                ids).fetchall()
+            need = sum(int(r["cost"] or 1) for r in rows)
+            if need > points:
+                con.rollback()
+                raise ValueError(f"{need}/{points}")
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            levels = {}
+            for r in rows:
+                pid = r["pilotId"]
+                if pid not in levels:
+                    levels[pid] = int(con.execute(
+                        "SELECT persLevel FROM pilot WHERE id=?", (pid,)).fetchone()[0] or 0)
+                # a bump goes to an attribute that is not already at the cap;
+                # when all three are full the game writes 0 and moves nothing
+                free = [q for q, (_, nib) in self.QUAL.items()
+                        if (levels[pid] >> 4 * nib) & 15 < self.QUAL_CAP]
+                qual = random.choice(free) if free else 0
+                if qual:
+                    levels[pid] += 1 << (4 * self.QUAL[qual][1])
+                    con.execute("UPDATE pilot SET persLevel=? WHERE id=?", (levels[pid], pid))
+                con.execute(
+                    "UPDATE award SET isPending=0, receivedDate=?, improvedQual=? WHERE id=?",
+                    (career["currentDate"], qual, r["id"]))
+                con.execute(
+                    """INSERT INTO event (date, type, pilotId, rankId, missionId, squadronId,
+                                          careerId, planeId, ipar1, ipar2, ipar3, ipar4,
+                                          tpar1, tpar2, tpar3, tpar4, insdate, isDeleted)
+                       VALUES (?, 20, ?, ?, -1, ?, ?, -1, ?, ?, 1, -1, '', '', '', '', ?, 0)""",
+                    (career["currentTime"], pid, r["pilotRank"], r["squadronId"],
+                     career["id"], r["id"], r["type"], now))
+            con.execute("UPDATE squadron SET awardPoints = awardPoints - ?", (need,))
+            con.commit()
+        return {"granted": len(rows), "spent": need, "backup": backup}
 
     # -- writes ------------------------------------------------------------
 
@@ -809,6 +958,32 @@ class App(tk.Tk):
         ttk.Spinbox(row, from_=1, to=500, textvariable=self.amount, width=6).pack(side="left")
         ttk.Button(row, text=self.t["points_add"], command=self._add_points).pack(side="left", padx=8)
 
+        # -- pending awards, on the same tab: they are what the points buy
+        ttk.Separator(pts).pack(fill="x", padx=8, pady=(14, 8))
+        ttk.Label(pts, text=self.t["pending_intro"], wraplength=720,
+                  foreground="#444").pack(anchor="w", padx=8)
+        self.pend_tree = ttk.Treeview(pts, columns=("who", "award", "earned"),
+                                      show="headings", height=9, selectmode="none")
+        for col, w in (("who", 190), ("award", 330), ("earned", 110)):
+            self.pend_tree.heading(col, text=self.t["pend_col_" + col])
+            self.pend_tree.column(col, width=w, anchor="w")
+        self.pend_tree.pack(fill="both", expand=True, padx=8, pady=(6, 4))
+        # A checkbox per row would need a third-party widget; a tick in the
+        # first column and a click to toggle does the same job with ttk alone.
+        self.pend_tree.bind("<Button-1>", self._toggle_pending)
+        self.pend_checked = set()
+        self.pending = []          # filled on the first refresh
+        prow = ttk.Frame(pts)
+        prow.pack(anchor="w", padx=8, pady=(0, 10))
+        ttk.Button(prow, text=self.t["pend_all"],
+                   command=lambda: self._check_pending(True)).pack(side="left")
+        ttk.Button(prow, text=self.t["pend_none"],
+                   command=lambda: self._check_pending(False)).pack(side="left", padx=8)
+        self.pend_btn = ttk.Button(prow, text=self.t["pend_grant"], command=self._grant_pending)
+        self.pend_btn.pack(side="left", padx=8)
+        self.pend_var = tk.StringVar()
+        ttk.Label(prow, textvariable=self.pend_var).pack(side="left", padx=8)
+
         self.status = tk.StringVar()
         ttk.Label(self, textvariable=self.status, wraplength=740, foreground="#444").pack(
             fill="x", padx=10, pady=(0, 8))
@@ -867,6 +1042,7 @@ class App(tk.Tk):
         self.points_var.set(self.t["points_now"].format(points=points))
         self._update_buttons()
         self._fill_times()
+        self._fill_pending()
 
     def _selected(self) -> Optional[Dict]:
         sel = self.tree.selection()
@@ -1038,6 +1214,64 @@ class App(tk.Tk):
         self.status.set(self.t["withdrawn"].format(n=len(ids), backup=backup))
         self._fill_times()
 
+    # -- pending awards ----------------------------------------------------
+
+    def _fill_pending(self) -> None:
+        self.pend_tree.delete(*self.pend_tree.get_children())
+        self.pending = [] if self.career is None else self.career.pending_awards(find_game_dir())
+        self.pend_checked = {a["id"] for a in self.pending}     # all ticked to start
+        for a in self.pending:
+            self.pend_tree.insert("", "end", iid=str(a["id"]),
+                                  values=(a["who"], a["award"], a["earned"]))
+        self._mark_pending()
+
+    def _mark_pending(self) -> None:
+        """Redraw the ticks and the running cost."""
+        for a in self.pending:
+            on = a["id"] in self.pend_checked
+            self.pend_tree.item(str(a["id"]), values=(
+                ("✓  " if on else "   ") + a["who"], a["award"], a["earned"]))
+        cost = sum(a["cost"] for a in self.pending if a["id"] in self.pend_checked)
+        points = self.career.award_points() if self.career else 0
+        self.pend_var.set(self.t["pend_cost"].format(n=len(self.pend_checked),
+                                                     cost=cost, points=points))
+        self.pend_btn.state(["!disabled"] if self.pend_checked and cost <= points
+                            else ["disabled"])
+
+    def _toggle_pending(self, event) -> None:
+        row = self.pend_tree.identify_row(event.y)
+        if not row:
+            return
+        rid = int(row)
+        self.pend_checked.symmetric_difference_update({rid})
+        self._mark_pending()
+
+    def _check_pending(self, on: bool) -> None:
+        self.pend_checked = {a["id"] for a in self.pending} if on else set()
+        self._mark_pending()
+
+    def _grant_pending(self) -> None:
+        if self.career is None or not self.pend_checked:
+            return
+        try:
+            done = self.career.present_awards(sorted(self.pend_checked))
+        except ValueError as short:
+            need, have = str(short).split("/")
+            messagebox.showwarning(self.t["title"],
+                                   self.t["pend_short"].format(need=need, points=have))
+            return
+        except sqlite3.OperationalError:
+            messagebox.showerror(self.t["title"], self.t["locked"])
+            return
+        except Exception as exc:          # noqa: BLE001
+            messagebox.showerror(self.t["title"], self.t["failed"].format(error=exc))
+            return
+        points = self.career.award_points()
+        self.points_var.set(self.t["points_now"].format(points=points))
+        self.status.set(self.t["pend_done"].format(n=done["granted"], spent=done["spent"],
+                                                   backup=done["backup"]))
+        self._fill_pending()
+
     def _add_points(self) -> None:
         if self.career is None:
             return
@@ -1058,6 +1292,7 @@ class App(tk.Tk):
             return
         self.points_var.set(self.t["points_now"].format(points=points))
         self.status.set(self.t["points_added"].format(points=points, backup=backup))
+        self._mark_pending()          # the pool moved, so the button may open
 
 
 MOD_MARKER = b"[Award=601042]"     # the Distinguished Unit Citation: only the awards mod defines it
