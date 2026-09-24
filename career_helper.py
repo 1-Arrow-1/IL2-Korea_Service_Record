@@ -76,6 +76,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         'capture_confirm': 'Mark {name} as captured on {date}? The game will list him as missing in action.',
         'captured_done': '{name} is now missing in action - captured. Backup: {backup}',
         "title": "IL-2 Korea Career Helper",
+        "subtitle": "Squadron paperwork for IL-2 Sturmovik: Korea",
         "career": "Career",
         "no_game": "No IL-2 Korea installation found.",
         "no_careers": "No careers found.",
@@ -158,6 +159,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         'capture_confirm': '{name} am {date} als gefangen markieren? Das Spiel führt ihn dann als vermisst.',
         'captured_done': '{name} gilt jetzt als vermisst - in Gefangenschaft. Sicherung: {backup}',
         "title": "IL-2 Korea Laufbahn-Helfer",
+        "subtitle": "Schreibstube der Staffel für IL-2 Sturmovik: Korea",
         "career": "Laufbahn",
         "no_game": "Keine IL-2-Korea-Installation gefunden.",
         "no_careers": "Keine Laufbahnen gefunden.",
@@ -240,6 +242,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         'capture_confirm': '¿Marcar a {name} como capturado el {date}? El juego lo listará como desaparecido en combate.',
         'captured_done': '{name} figura ahora como desaparecido en combate: capturado. Copia de seguridad: {backup}',
         "title": "Asistente de carrera IL-2 Korea",
+        "subtitle": "La oficina del escuadrón para IL-2 Sturmovik: Korea",
         "career": "Carrera",
         "no_game": "No se encontró ninguna instalación de IL-2 Korea.",
         "no_careers": "No se encontraron carreras.",
@@ -322,6 +325,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         'capture_confirm': 'Marquer {name} comme capturé le {date} ? Le jeu le portera disparu au combat.',
         'captured_done': '{name} est désormais porté disparu - capturé. Sauvegarde : {backup}',
         "title": "Assistant de carrière IL-2 Korea",
+        "subtitle": "Le bureau de l’escadron pour IL-2 Sturmovik: Korea",
         "career": "Carrière",
         "no_game": "Aucune installation d’IL-2 Korea trouvée.",
         "no_careers": "Aucune carrière trouvée.",
@@ -404,6 +408,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         'capture_confirm': 'Отметить {name} пленённым {date}? Игра будет считать его пропавшим без вести.',
         'captured_done': '{name} теперь числится пропавшим без вести — в плену. Резервная копия: {backup}',
         "title": "Помощник карьеры IL-2 Korea",
+        "subtitle": "Канцелярия эскадрильи для IL-2 Sturmovik: Korea",
         "career": "Карьера",
         "no_game": "Установка IL-2 Korea не найдена.",
         "no_careers": "Карьеры не найдены.",
@@ -486,6 +491,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         'capture_confirm': '将 {name} 标记为于 {date} 被俘？游戏将把他列为作战失踪。',
         'captured_done': '{name} 现已列为作战失踪——被俘。备份：{backup}',
         "title": "IL-2 Korea 生涯助手",
+        "subtitle": "IL-2 Sturmovik: Korea 中队文书",
         "career": "生涯",
         "no_game": "未找到 IL-2 Korea 安装。",
         "no_careers": "未找到生涯。",
@@ -941,18 +947,85 @@ class App(tk.Tk):
         super().__init__()
         self.t = STRINGS[pick_language()]
         self.title(self.t["title"])
-        self.geometry("760x460")
-        self.minsize(640, 400)
+        self.geometry("860x560")
+        self.minsize(720, 460)
+        self._skin()
         self.careers: List[Career] = []
         self.career: Optional[Career] = None
         self.lost: List[Dict] = []
         self._build()
         self._load_careers()
 
+    # -- looks ---------------------------------------------------------------
+
+    # The Service Record's own palette, so the two windows read as one
+    # product rather than an application and its utility. ttk on Windows
+    # defaults to a theme that ignores most colour settings; clam honours
+    # them, which is the only reason it is chosen here.
+    PAPER, PANEL, DESK = "#fbf6e9", "#f8f2e0", "#ece1c8"
+    INK, INK_MUTED, ACCENT = "#2c2212", "#4a3a24", "#8b6f4a"
+    ACCENT_DARK, BORDER, BAD = "#5a4022", "#cbb999", "#8c3a2c"
+
+    def _skin(self) -> None:
+        st = ttk.Style(self)
+        try:
+            st.theme_use("clam")
+        except tk.TclError:              # a stripped Tk: leave it grey but working
+            return
+        self.configure(background=self.DESK)
+        head = ("Georgia", 10, "bold")
+        st.configure(".", background=self.PANEL, foreground=self.INK,
+                     fieldbackground=self.PAPER, bordercolor=self.BORDER,
+                     lightcolor=self.PANEL, darkcolor=self.PANEL, focuscolor=self.ACCENT)
+        st.configure("TFrame", background=self.PANEL)
+        st.configure("TLabel", background=self.PANEL, foreground=self.INK)
+        st.configure("TLabelframe", background=self.PANEL, bordercolor=self.BORDER)
+        st.configure("TLabelframe.Label", background=self.PANEL, foreground=self.ACCENT_DARK,
+                     font=head)
+        st.configure("TSeparator", background=self.BORDER)
+        st.configure("TNotebook", background=self.DESK, bordercolor=self.BORDER, tabmargins=(6, 4, 6, 0))
+        st.configure("TNotebook.Tab", background=self.DESK, foreground=self.INK_MUTED,
+                     padding=(14, 6), font=head)
+        st.map("TNotebook.Tab",
+               background=[("selected", self.PANEL)],
+               foreground=[("selected", self.ACCENT_DARK)],
+               expand=[("selected", (0, 0, 0, 2))])
+        st.configure("TButton", background=self.PAPER, foreground=self.INK,
+                     bordercolor=self.BORDER, padding=(10, 4), relief="flat")
+        st.map("TButton",
+               background=[("pressed", self.ACCENT), ("active", "#f0e6cf"), ("disabled", self.DESK)],
+               foreground=[("pressed", self.PAPER), ("disabled", "#9c8f79")],
+               bordercolor=[("active", self.ACCENT)])
+        for widget in ("TEntry", "TCombobox", "TSpinbox"):
+            st.configure(widget, fieldbackground=self.PAPER, background=self.PAPER,
+                         foreground=self.INK, bordercolor=self.BORDER, arrowcolor=self.ACCENT_DARK,
+                         insertcolor=self.INK)
+        st.map("TCombobox", fieldbackground=[("readonly", self.PAPER)],
+               selectbackground=[("readonly", self.PAPER)],
+               selectforeground=[("readonly", self.INK)])
+        st.configure("Treeview", background=self.PAPER, fieldbackground=self.PAPER,
+                     foreground=self.INK, bordercolor=self.BORDER, rowheight=23)
+        st.configure("Treeview.Heading", background=self.DESK, foreground=self.ACCENT_DARK,
+                     relief="flat", font=head, padding=(6, 4))
+        st.map("Treeview.Heading", background=[("active", "#e2d5b8")])
+        st.map("Treeview", background=[("selected", self.ACCENT)],
+               foreground=[("selected", self.PAPER)])
+        st.configure("TCheckbutton", background=self.PANEL)
+        st.configure("Horizontal.TProgressbar", background=self.ACCENT, troughcolor=self.PAPER)
+
     # -- layout --------------------------------------------------------------
 
     def _build(self) -> None:
         pad = {"padx": 10, "pady": 6}
+        band = tk.Frame(self, background=self.ACCENT_DARK, height=3)
+        band.pack(fill="x", side="top")
+        head = tk.Frame(self, background=self.PANEL)
+        head.pack(fill="x", side="top")
+        tk.Label(head, text=self.t["title"], background=self.PANEL, foreground=self.ACCENT_DARK,
+                 font=("Georgia", 15), anchor="w").pack(fill="x", padx=12, pady=(10, 2))
+        tk.Label(head, text=self.t["subtitle"], background=self.PANEL, foreground="#6b5a3f",
+                 font=("Georgia", 9), anchor="w").pack(fill="x", padx=12, pady=(0, 8))
+        ttk.Separator(self).pack(fill="x")
         top = ttk.Frame(self)
         top.pack(fill="x", **pad)
         ttk.Label(top, text=self.t["career"]).pack(side="left")
@@ -1041,7 +1114,8 @@ class App(tk.Tk):
                                       show="headings", height=9, selectmode="none")
         # The fallen are listed but stand out: a posthumous award is the
         # commander's decision, not something to tick past by accident.
-        self.pend_tree.tag_configure("gone", foreground="#a4262c")
+        self.pend_tree.tag_configure("gone", foreground=self.BAD)
+        self.pend_tree.tag_configure("odd", background="#f3ebd8")
         for col, w in (("who", 170), ("status", 100), ("award", 300), ("earned", 100)):
             self.pend_tree.heading(col, text=self.t["pend_col_" + col])
             self.pend_tree.column(col, width=w, anchor="w")
@@ -1063,7 +1137,8 @@ class App(tk.Tk):
         ttk.Label(prow, textvariable=self.pend_var).pack(side="left", padx=8)
 
         self.status = tk.StringVar()
-        ttk.Label(self, textvariable=self.status, wraplength=740, foreground="#444").pack(
+        ttk.Label(self, textvariable=self.status, wraplength=820,
+                  foreground=self.INK_MUTED).pack(
             fill="x", padx=10, pady=(0, 8))
 
     # -- data ------------------------------------------------------------------
@@ -1300,9 +1375,9 @@ class App(tk.Tk):
         # everyone ticked but the dead - those are opted in, not out
         self.pend_checked = {a["id"] for a in self.pending
                              if a["status"] not in ("kia", "mia")}
-        for a in self.pending:
-            self.pend_tree.insert("", "end", iid=str(a["id"]),
-                                  tags=("gone",) if a["status"] in ("kia", "mia") else (),
+        for n, a in enumerate(self.pending):
+            tags = (("gone",) if a["status"] in ("kia", "mia") else ()) + (("odd",) if n % 2 else ())
+            self.pend_tree.insert("", "end", iid=str(a["id"]), tags=tags,
                                   values=(a["who"], self.t["st_" + a["status"]],
                                           a["award"], a["earned"]))
         self._mark_pending()
