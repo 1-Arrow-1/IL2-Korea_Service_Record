@@ -106,6 +106,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_hurt": "hurt",
         "fl_none": "This career has no line-up to show.",
         "fl_moved": "{n} moved",
+        "fl_legend": "The three numbers are the pilot's own skills / discipline / courage, as his panel shows them. ↑ is his boosters. AI is how the generated mission rates him in the air: his skill, but capped at 4 - so a pilot at 5 flies no better than one at 4, and a wound costs him a level.",
         "col_name": "Pilot", "col_state": "Fate", "col_date": "Lost on", "col_can": "Revivable",
         "kia": "killed in action", "mia": "missing in action",
         "yes": "yes", "no": "no - the career has moved on",
@@ -212,6 +213,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_hurt": "verwundet",
         "fl_none": "Diese Laufbahn hat keine Staffelaufstellung.",
         "fl_moved": "{n} versetzt",
+        "fl_legend": "Die drei Zahlen sind die eigenen Werte des Piloten – Fähigkeiten / Disziplin / Mut – so wie sie sein Blatt zeigt. ↑ sind seine Boni. KI ist die Einstufung, die der erzeugte Einsatz ihm in der Luft gibt: seine Fähigkeiten, aber bei 4 gedeckelt – ein Pilot mit 5 fliegt also nicht besser als einer mit 4, und eine Verwundung kostet ihn eine Stufe.",
         "col_name": "Pilot", "col_state": "Schicksal", "col_date": "Verloren am", "col_can": "Zurückholbar",
         "kia": "gefallen", "mia": "vermisst",
         "yes": "ja", "no": "nein - die Laufbahn ist weitergegangen",
@@ -318,6 +320,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_hurt": "herido",
         "fl_none": "Esta carrera no tiene formación que mostrar.",
         "fl_moved": "{n} movidos",
+        "fl_legend": "Los tres números son las aptitudes propias del piloto: habilidad / disciplina / valor, tal como aparecen en su ficha. ↑ son sus bonificaciones. IA es la categoría que la misión generada le asigna en vuelo: su habilidad, pero limitada a 4, de modo que un piloto de 5 no vuela mejor que uno de 4, y una herida le cuesta un nivel.",
         "col_name": "Piloto", "col_state": "Suerte", "col_date": "Perdido el", "col_can": "Recuperable",
         "kia": "muerto en combate", "mia": "desaparecido en combate",
         "yes": "sí", "no": "no: la carrera ya ha avanzado",
@@ -424,6 +427,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_hurt": "blessé",
         "fl_none": "Cette carrière n’a aucune formation à afficher.",
         "fl_moved": "{n} déplacés",
+        "fl_legend": "Les trois nombres sont les qualités propres du pilote — compétence / discipline / courage — telles que sa fiche les affiche. ↑ ce sont ses bonus. IA est le niveau que la mission générée lui donne en vol : sa compétence, mais plafonnée à 4, si bien qu’un pilote à 5 ne vole pas mieux qu’un pilote à 4, et une blessure lui coûte un niveau.",
         "col_name": "Pilote", "col_state": "Sort", "col_date": "Perdu le", "col_can": "Récupérable",
         "kia": "mort au combat", "mia": "porté disparu",
         "yes": "oui", "no": "non - la carrière a continué",
@@ -530,6 +534,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_hurt": "ранен",
         "fl_none": "В этой карьере нет строевого состава.",
         "fl_moved": "переставлено: {n}",
+        "fl_legend": "Три числа — собственные качества лётчика: мастерство / дисциплина / смелость, в том же порядке, что и в его карточке. ↑ — его надбавки. ИИ — оценка, которую сгенерированный вылет даёт ему в воздухе: его мастерство, но не выше 4 — так что лётчик с 5 летает не лучше, чем с 4, а ранение стоит ему одной ступени.",
         "col_name": "Лётчик", "col_state": "Судьба", "col_date": "Потерян", "col_can": "Можно вернуть",
         "kia": "погиб", "mia": "пропал без вести",
         "yes": "да", "no": "нет — карьера ушла дальше",
@@ -636,6 +641,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_hurt": "负伤",
         "fl_none": "该生涯没有可显示的编队。",
         "fl_moved": "已移动 {n} 人",
+        "fl_legend": "三个数字是飞行员自身的技能 / 纪律 / 勇气，与他的面板显示一致。↑ 是他的加成。AI 是生成的任务对他空中表现的评级：取决于技能，但上限为 4 —— 所以技能 5 的飞行员并不比 4 的飞得好，而负伤会降一级。",
         "col_name": "飞行员", "col_state": "结局", "col_date": "损失日期", "col_can": "可复活",
         "kia": "阵亡", "mia": "失踪",
         "yes": "是", "no": "否——生涯已进入下一天",
@@ -1291,8 +1297,10 @@ class App(tk.Tk):
         super().__init__()
         self.t = STRINGS[pick_language()]
         self.title(self.t["title"])
-        self.geometry("860x560")
-        self.minsize(720, 460)
+        # wide enough for the Flights board - six columns of cards - without
+        # the reader having to stretch the window before it is any use
+        self.geometry("1140x820")
+        self.minsize(940, 640)
         self._skin()
         self.careers: List[Career] = []
         self.career: Optional[Career] = None
@@ -1488,7 +1496,7 @@ class App(tk.Tk):
         # -- flights tab
         fl = ttk.Frame(nb)
         nb.add(fl, text=self.t["tab_flights"])
-        ttk.Label(fl, text=self.t["fl_intro"], wraplength=810,
+        ttk.Label(fl, text=self.t["fl_intro"], wraplength=1080,
                   foreground="#444").pack(anchor="w", padx=8, pady=(8, 6))
         self.fl_men: Dict[int, Dict] = {}
         self.fl_plan: Dict[int, Optional[int]] = {}
@@ -1500,8 +1508,11 @@ class App(tk.Tk):
         board.pack(anchor="w", padx=8)
         self._build_board(board)
         tk.Label(fl, text="\u2605 " + self.t["fl_cmd"], background=self.PANEL,
-                 foreground=self.ACCENT, font=("", 8), anchor="w").pack(
-            anchor="w", padx=10, pady=(6, 0))
+                 foreground=self.ACCENT, font=("", 9), anchor="w").pack(
+            anchor="w", padx=10, pady=(8, 0))
+        tk.Label(fl, text=self.t["fl_legend"], background=self.PANEL,
+                 foreground=self.INK_MUTED, font=("", 9), anchor="w",
+                 justify="left", wraplength=1060).pack(anchor="w", padx=10, pady=(2, 0))
         frow = ttk.Frame(fl)
         frow.pack(anchor="w", padx=8, pady=(8, 10))
         ttk.Button(frow, text=self.t["fl_propose"],
@@ -1826,8 +1837,8 @@ class App(tk.Tk):
             col = tk.Frame(board, background=self.PANEL)
             col.grid(row=0, column=f, padx=2, sticky="n")
             head = tk.Label(col, text=self.t[f"fl_c{f + 1}"], background=self.DESK,
-                            foreground=self.ACCENT_DARK, font=("Georgia", 8, "bold"),
-                            width=18, pady=3)
+                            foreground=self.ACCENT_DARK, font=("Georgia", 10, "bold"),
+                            width=17, pady=4)
             head.pack(fill="x")
             self.fl_heads[f] = head
             for pos in range(4):
@@ -1837,16 +1848,18 @@ class App(tk.Tk):
                 card = tk.Frame(col, background=self.PAPER, padx=4, pady=2,
                                 highlightthickness=1, highlightbackground=self.BORDER)
                 card.pack(fill="x", pady=1)
-                who = tk.Label(card, background=self.PAPER, anchor="w", width=16,
-                               font=("Georgia", 9, "bold"))
+                who = tk.Label(card, background=self.PAPER, anchor="w", width=15,
+                               font=("Georgia", 11, "bold"))
                 line = tk.Label(card, background=self.PAPER, anchor="w",
-                                font=("", 7), foreground=self.INK_MUTED)
+                                font=("Georgia", 10), foreground=self.INK)
+                stat = tk.Label(card, background=self.PAPER, anchor="w",
+                                font=("", 9), foreground=self.INK_MUTED)
                 note = tk.Label(card, background=self.PAPER, anchor="w",
-                                font=("", 7), foreground=self.ACCENT)
-                for widget in (who, line, note):
+                                font=("", 9), foreground=self.ACCENT)
+                for widget in (who, line, stat, note):
                     widget.pack(fill="x")
-                self.fl_cards[slot] = (card, who, line, note)
-                for widget in (card, who, line, note):
+                self.fl_cards[slot] = (card, who, line, stat, note)
+                for widget in (card, who, line, stat, note):
                     widget.bind("<Button-1>", lambda _e, s=slot: self._pick_seat(s))
 
     def _fill_flights(self) -> None:
@@ -1882,7 +1895,7 @@ class App(tk.Tk):
             if seats and seats <= self.fl_alert:
                 title += "  " + self.t["fl_alert"]
             head.configure(text=title)
-        for slot, (card, who, line, note) in self.fl_cards.items():
+        for slot, (card, who, line, stat, note) in self.fl_cards.items():
             man = self.fl_men.get(self.fl_plan.get(slot))
             moved = man is not None and man["home"] != slot
             picked = slot == self.fl_pick
@@ -1894,25 +1907,34 @@ class App(tk.Tk):
                 edge = self.ACCENT
             card.configure(background=back, highlightthickness=2 if picked else 1,
                            highlightbackground=edge)
-            for widget in (who, line, note):
+            for widget in (who, line, stat, note):
                 widget.configure(background=back)
             if man is None:
                 who.configure(text=self.t["fl_empty"], foreground="#a3947c")
                 line.configure(text="")
+                stat.configure(text="")
                 note.configure(text="\u2605" if slot == 4 else "")
                 continue
             hurt = man["state"] == 4 or man["health"] < 100
             who.configure(text=man["short"], foreground=self.BAD if hurt else self.INK)
-            # the player has no simulated skill - the mission file gives him
-            # AILevel 0 because a human flies him - so the figure is left off
-            bits = [man["tail"]]
+            # the three attributes as the pilot's own panel prints them:
+            # skills, discipline, courage, each stored one lower than shown.
+            # The commander has none - the game simulates no skill for a man
+            # a human flies - so he gets his tail number alone.
+            if man["player"]:
+                line.configure(text=man["tail"])
+            else:
+                line.configure(text=f"{man['tail']}   "
+                                    f"{man['sk'] + 1}/{man['di'] + 1}/{man['co'] + 1}")
+            bits = []
             if not man["player"]:
                 bits.append(f"{self.t['fl_ai']} {man['ai']}")
             if man["fatigue"]:
                 bits.append(f"{self.t['fl_fat']} {man['fatigue']}")
             if hurt:
                 bits.append(self.t["fl_hurt"])
-            line.configure(text=" \u00b7 ".join(b for b in bits if b))
+            stat.configure(text=" \u00b7 ".join(bits),
+                           foreground=self.BAD if hurt else self.INK_MUTED)
             # the boosters in the panel's order, the way the mission screen
             # prints the commander's three chips
             tag = "\u2191" + "/".join(str(b) for b in man["boost"]) if any(man["boost"]) else ""
