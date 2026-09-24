@@ -105,6 +105,11 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_fat": "fatigue",
         "fl_hurt": "hurt",
         "fl_rest": "needs rest",
+        "fl_b_boost": "Boosters",
+        "fl_b_stats": "S/D/C",
+        "fl_use_pool": "let the proposal draw on the reserve",
+        "fl_bench_hint": "Pick a man here, then click a seat: he takes it and its aircraft, and the man he replaces goes down to the pool. One for one.",
+        "fl_bench": "Reserve pool",
         "fl_none": "This career has no line-up to show.",
         "fl_moved": "{n} moved",
         "fl_legend": "The three numbers are the pilot's own skills / discipline / courage, as his panel shows them. ↑ is his boosters. AI is how the generated mission rates him in the air: his skill, but capped at 4 - so a pilot at 5 flies no better than one at 4, and a wound costs him a level. Fatigue runs to 9: a sortie adds one, a day on the ground takes one back.",
@@ -213,6 +218,11 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_fat": "Ermüdung",
         "fl_hurt": "verwundet",
         "fl_rest": "braucht Ruhe",
+        "fl_b_boost": "Boni",
+        "fl_b_stats": "F/D/M",
+        "fl_use_pool": "Reserve in den Vorschlag einbeziehen",
+        "fl_bench_hint": "Hier einen Mann wählen, dann einen Platz anklicken: Er übernimmt Platz und Maschine, der Abgelöste geht in die Reserve. Einer für einen.",
+        "fl_bench": "Reserve",
         "fl_none": "Diese Laufbahn hat keine Staffelaufstellung.",
         "fl_moved": "{n} versetzt",
         "fl_legend": "Die drei Zahlen sind die eigenen Werte des Piloten – Fähigkeiten / Disziplin / Mut – so wie sie sein Blatt zeigt. ↑ sind seine Boni. KI ist die Einstufung, die der erzeugte Einsatz ihm in der Luft gibt: seine Fähigkeiten, aber bei 4 gedeckelt – ein Pilot mit 5 fliegt also nicht besser als einer mit 4, und eine Verwundung kostet ihn eine Stufe. Die Ermüdung reicht bis 9: ein Einsatz bringt einen Punkt, ein Tag am Boden nimmt einen zurück.",
@@ -321,6 +331,11 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_fat": "fatiga",
         "fl_hurt": "herido",
         "fl_rest": "necesita descanso",
+        "fl_b_boost": "Bonif.",
+        "fl_b_stats": "H/D/V",
+        "fl_use_pool": "que la propuesta recurra a la reserva",
+        "fl_bench_hint": "Elija aquí a un piloto y pulse un puesto: ocupa el puesto y su avión, y el sustituido pasa a la reserva. Uno por uno.",
+        "fl_bench": "Reserva",
         "fl_none": "Esta carrera no tiene formación que mostrar.",
         "fl_moved": "{n} movidos",
         "fl_legend": "Los tres números son las aptitudes propias del piloto: habilidad / disciplina / valor, tal como aparecen en su ficha. ↑ son sus bonificaciones. IA es la categoría que la misión generada le asigna en vuelo: su habilidad, pero limitada a 4, de modo que un piloto de 5 no vuela mejor que uno de 4, y una herida le cuesta un nivel. La fatiga llega a 9: una salida suma uno y un día en tierra descuenta uno.",
@@ -429,6 +444,11 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_fat": "fatigue",
         "fl_hurt": "blessé",
         "fl_rest": "doit se reposer",
+        "fl_b_boost": "Bonus",
+        "fl_b_stats": "C/D/C",
+        "fl_use_pool": "autoriser la proposition à puiser dans la réserve",
+        "fl_bench_hint": "Choisissez un pilote ici, puis cliquez sur une place : il la prend avec son appareil, et celui qu’il remplace passe en réserve. Un pour un.",
+        "fl_bench": "Réserve",
         "fl_none": "Cette carrière n’a aucune formation à afficher.",
         "fl_moved": "{n} déplacés",
         "fl_legend": "Les trois nombres sont les qualités propres du pilote — compétence / discipline / courage — telles que sa fiche les affiche. ↑ ce sont ses bonus. IA est le niveau que la mission générée lui donne en vol : sa compétence, mais plafonnée à 4, si bien qu’un pilote à 5 ne vole pas mieux qu’un pilote à 4, et une blessure lui coûte un niveau. La fatigue monte jusqu’à 9 : une sortie en ajoute un, une journée au sol en retire un.",
@@ -537,6 +557,11 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_fat": "усталость",
         "fl_hurt": "ранен",
         "fl_rest": "нужен отдых",
+        "fl_b_boost": "Надбавки",
+        "fl_b_stats": "М/Д/С",
+        "fl_use_pool": "разрешить брать людей из резерва",
+        "fl_bench_hint": "Выберите здесь лётчика, затем щёлкните по месту: он занимает его вместе с самолётом, а тот, кого он сменил, уходит в резерв. Один на одного.",
+        "fl_bench": "Резерв",
         "fl_none": "В этой карьере нет строевого состава.",
         "fl_moved": "переставлено: {n}",
         "fl_legend": "Три числа — собственные качества лётчика: мастерство / дисциплина / смелость, в том же порядке, что и в его карточке. ↑ — его надбавки. ИИ — оценка, которую сгенерированный вылет даёт ему в воздухе: его мастерство, но не выше 4 — так что лётчик с 5 летает не лучше, чем с 4, а ранение стоит ему одной ступени. Усталость доходит до 9: вылет добавляет единицу, день на земле снимает её.",
@@ -645,6 +670,11 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_fat": "疲劳",
         "fl_hurt": "负伤",
         "fl_rest": "需要休整",
+        "fl_b_boost": "加成",
+        "fl_b_stats": "技/律/勇",
+        "fl_use_pool": "允许建议编排动用预备队",
+        "fl_bench_hint": "在此选中一名飞行员，再点击一个位置：他接手该位置及其座机，被替下的人进入预备队。一换一。",
+        "fl_bench": "预备队",
         "fl_none": "该生涯没有可显示的编队。",
         "fl_moved": "已移动 {n} 人",
         "fl_legend": "三个数字是飞行员自身的技能 / 纪律 / 勇气，与他的面板显示一致。↑ 是他的加成。AI 是生成的任务对他空中表现的评级：取决于技能，但上限为 4 —— 所以技能 5 的飞行员并不比 4 的飞得好，而负伤会降一级。 疲劳最高为 9：每出击一次加一点，每在地面休整一天减一点。",
@@ -1046,16 +1076,65 @@ class Career:
             ai = max(0, ai - 1)
         return ai
 
-    def flight_seats(self) -> List[Dict]:
-        """All 24 seats in order, each with its pilot and aircraft or None."""
+    RESERVE_TOP = 5000                   # at or above this a man is dead, not benched
+
+    def _read_man(self, row, tail: str, slot: int) -> Dict:
+        """One pilot, with the numbers the board ranks him on."""
         def nib(value, index):
             return (int(value or 0) >> (4 * index)) & 15
 
+        pers, lead = row["persLevel"], row["leadLevel"]
+        first = (row["name"] or "").strip()
+        man = {
+            "id": row["id"],
+            "who": f"{first} {row['lastName']}".strip(),
+            "short": f"{first[:1]}. {row['lastName']}" if first else row["lastName"],
+            "sk": nib(pers, 0), "co": nib(pers, 1), "di": nib(pers, 2),
+            # boosters in the panel's own order, which is how the mission
+            # screen prints the commander's three chips
+            "boost": (nib(lead, 0), nib(lead, 2), nib(lead, 1)),
+            "fatigue": int(row["fatigue"] or 0),
+            "health": int(row["health"] or 100),
+            "state": int(row["state"] or 0),
+            "player": bool(row["isPlayer"]),
+            "sorties": int(row["sorties"] or 0),
+            "home": slot,
+            "tail": tail,
+        }
+        man["ai"] = self.ai_level(man["sk"], man["health"], man["state"])
+        man["hurt"] = man["state"] == 4 or man["health"] < 100
+        # the game counts the player's sorties like anyone else's, but how he
+        # flies on the day is his business and not the career file's - so he
+        # is never told to go and rest
+        man["tired"] = man["fatigue"] >= self.FATIGUE_REST and not man["player"]
+        return man
+
+    PILOT_COLS = """SELECT id, slot, name, lastName, persLevel, leadLevel, fatigue,
+                           health, state, isPlayer, sorties FROM pilot
+                    WHERE isDeleted=0"""
+
+    def pool_pilots(self) -> List[Dict]:
+        """
+        The bench: everyone not in the line-up and not dead.
+
+        Two bands sit here. 2000 and up is the replacement pool proper, a
+        queue that appends on the way in and closes up on the way out. 1000
+        and up is a man whose aircraft is in repair, which the Combat Units
+        screen calls "in reserve - NOT READY"; the game also walks a pilot
+        through that band as a staging step while a move commits. Neither has
+        an aircraft of his own, so no tail number is shown.
+        """
+        with self._open() as con:
+            rows = con.execute(
+                f"{self.PILOT_COLS} AND slot>=? AND slot<? ORDER BY slot",
+                (self.SEATS, self.RESERVE_TOP)).fetchall()
+        return [self._read_man(r, "", r["slot"]) for r in rows]
+
+    def flight_seats(self) -> List[Dict]:
+        """All 24 seats in order, each with its pilot and aircraft or None."""
         with self._open() as con:
             men = {r["slot"]: r for r in con.execute(
-                """SELECT id, slot, name, lastName, persLevel, leadLevel, fatigue,
-                          health, state, isPlayer, sorties
-                   FROM pilot WHERE isDeleted=0 AND slot<?""", (self.SEATS,))}
+                f"{self.PILOT_COLS} AND slot<?", (self.SEATS,))}
             planes = {r["slot"]: r for r in con.execute(
                 "SELECT id, slot, tcode, state FROM plane WHERE isDeleted=0 AND slot<?",
                 (self.SEATS,))}
@@ -1066,31 +1145,8 @@ class Career:
             row, air = men.get(slot), planes.get(slot)
             man = None
             if row is not None:
-                pers, lead = row["persLevel"], row["leadLevel"]
-                first = (row["name"] or "").strip()
-                man = {
-                    "id": row["id"],
-                    "who": f"{first} {row['lastName']}".strip(),
-                    "short": f"{first[:1]}. {row['lastName']}" if first else row["lastName"],
-                    "sk": nib(pers, 0), "co": nib(pers, 1), "di": nib(pers, 2),
-                    # boosters in the panel's own order, which is how the
-                    # mission screen prints the commander's three chips
-                    "boost": (nib(lead, 0), nib(lead, 2), nib(lead, 1)),
-                    "fatigue": int(row["fatigue"] or 0),
-                    "health": int(row["health"] or 100),
-                    "state": int(row["state"] or 0),
-                    "player": bool(row["isPlayer"]),
-                    "sorties": int(row["sorties"] or 0),
-                    "home": slot,
-                    "tail": decode_tcode(air["tcode"]) if air is not None else "",
-                }
-                man["ai"] = self.ai_level(man["sk"], man["health"], man["state"])
-                man["hurt"] = man["state"] == 4 or man["health"] < 100
-                # the game counts the player's sorties like anyone else's, but
-                # how he flies on the day is his business and not the career
-                # file's - so he is never told to go and rest
-                man["tired"] = (man["fatigue"] >= self.FATIGUE_REST
-                                and not man["player"])
+                man = self._read_man(
+                    row, decode_tcode(air["tcode"]) if air is not None else "", slot)
             seats.append({"slot": slot, "flight": slot // 4, "section": slot // 2,
                           "lead": slot % 4 == 0, "alert": slot in alert, "pilot": man,
                           "plane_state": air["state"] if air is not None else None})
@@ -1098,32 +1154,105 @@ class Career:
 
     def reseat(self, plan: Dict[int, int]) -> Path:
         """
-        Rewrite the line-up. ``plan`` maps seat -> pilot id and must be a
-        permutation of the men already seated: this moves people around, it
-        does not promote from the reserve, which the game does well enough on
-        its own. Each man's aircraft follows him. Returns the backup path.
+        Rewrite the line-up. ``plan`` maps seat -> pilot id, and a pilot may
+        come from the bench: anyone seated now but absent from the plan is
+        sent down to the pool.
+
+        The exchange must be **one for one** - as many men seated after as
+        before. That is what keeps the aircraft safe. Your own history shows a
+        promotion drawing a spare airframe from plane slot 2000 and a
+        demotion sending one back, but with the count held equal no aircraft
+        ever crosses that boundary: a man moving inside the line-up carries
+        his own, and a seat taken by someone off the bench keeps the aeroplane
+        the outgoing man left in it. Nothing can be stranded in a slot the
+        game does not read.
+
+        Men sent down are appended to the end of the pool, and the pool is
+        renumbered from 2000 with no gaps, which is what the game does.
+        Returns the backup path.
         """
         backup = self.backup()
         with self._open(write=True) as con:
             con.execute("BEGIN IMMEDIATE")
-            here = {r["slot"]: r["id"] for r in con.execute(
+            seated = {r["slot"]: r["id"] for r in con.execute(
                 "SELECT id, slot FROM pilot WHERE isDeleted=0 AND slot<?", (self.SEATS,))}
-            if sorted(plan.values()) != sorted(here.values()):
-                raise ValueError("the plan is not the same set of pilots")
+            benched = [r["id"] for r in con.execute(
+                """SELECT id FROM pilot WHERE isDeleted=0 AND slot>=? AND slot<?
+                   ORDER BY slot""", (self.SEATS, self.RESERVE_TOP))]
+            # the 2000 band is the queue that renumbers; the 1000 band means
+            # a man whose aircraft is in repair and is left exactly where it
+            # is, or a promotion would quietly change what his status says
+            pool_now = [r["id"] for r in con.execute(
+                """SELECT id FROM pilot WHERE isDeleted=0 AND slot>=? AND slot<?
+                   ORDER BY slot""", (RESERVE_BASE, self.RESERVE_TOP))]
+            known = set(seated.values()) | set(benched)
+            if len(set(plan.values())) != len(plan):
+                raise ValueError("two seats want the same pilot")
+            if not set(plan.values()) <= known:
+                raise ValueError("the plan names a pilot who is neither seated nor benched")
+            if len(plan) != len(seated):
+                raise ValueError("the exchange must be one for one")
+
             planes = {r["slot"]: r["id"] for r in con.execute(
                 "SELECT id, slot FROM plane WHERE isDeleted=0 AND slot<?", (self.SEATS,))}
-            home = {pid: slot for slot, pid in here.items()}
-            # park everyone out of range first: writing a seat that its new
+            home = {pid: slot for slot, pid in seated.items()}
+            promoted = [pid for pid in plan.values() if pid not in home]
+            demoted = [pid for pid in seated.values() if pid not in set(plan.values())]
+            pilot_home = {r["id"]: r["slot"] for r in con.execute(
+                """SELECT id, slot FROM pilot WHERE isDeleted=0
+                   AND slot>=? AND slot<?""", (self.SEATS, self.RESERVE_TOP))}
+
+            # park the line-up out of range: writing a seat that its new
             # occupant has not yet vacated would put two men in one aeroplane
-            for n, pid in enumerate(home):
+            for n, pid in enumerate(seated.values()):
                 con.execute("UPDATE pilot SET slot=? WHERE id=?", (self.PARK + n, pid))
             for n, aid in enumerate(planes.values()):
                 con.execute("UPDATE plane SET slot=? WHERE id=?", (self.PARK + n, aid))
+
+            # A man promoted out of the repair band leaves the aeroplane that
+            # was being mended for him. The game sends it to the plane pool -
+            # log 31 of this career did exactly that, Heinecke 1003 -> seat 14
+            # with his old airframe going to plane slot 2000 - so it is put on
+            # the end of that queue rather than left in a band nobody reads.
+            repair = {r["slot"]: r["id"] for r in con.execute(
+                """SELECT id, slot FROM plane WHERE isDeleted=0
+                   AND slot>=1000 AND slot<?""", (RESERVE_BASE,))}
+            plane_pool = [r["id"] for r in con.execute(
+                """SELECT id FROM plane WHERE isDeleted=0 AND slot>=? AND slot<?
+                   ORDER BY slot""", (RESERVE_BASE, self.RESERVE_TOP))]
+            grounded = [repair[s] for pid in promoted
+                        for s in (pilot_home.get(pid),) if s in repair]
+
+            # aircraft the demoted men leave behind, for the men coming up
+            spare = [planes[home[pid]] for pid in demoted if home[pid] in planes]
             for slot, pid in plan.items():
                 con.execute("UPDATE pilot SET slot=? WHERE id=?", (slot, pid))
-                aid = planes.get(home[pid])
+                if pid in home:
+                    aid = planes.get(home[pid])
+                elif spare:
+                    aid = spare.pop(0)
+                else:
+                    aid = None
                 if aid is not None:
                     con.execute("UPDATE plane SET slot=? WHERE id=?", (slot, aid))
+
+            # the pool: those who were in it, less anyone promoted, plus the
+            # men just sent down - then renumbered from 2000 without gaps
+            bench = [pid for pid in pool_now if pid not in promoted] + demoted
+            for n, pid in enumerate(bench):
+                con.execute("UPDATE pilot SET slot=? WHERE id=?", (self.PARK + 100 + n, pid))
+            for n, pid in enumerate(bench):
+                con.execute("UPDATE pilot SET slot=? WHERE id=?", (RESERVE_BASE + n, pid))
+
+            # and the airframes left mending behind a promoted man join the
+            # plane pool, renumbered from 2000 like the men's queue
+            if grounded:
+                for n, aid in enumerate(plane_pool + grounded):
+                    con.execute("UPDATE plane SET slot=? WHERE id=?",
+                                (self.PARK + 200 + n, aid))
+                for n, aid in enumerate(plane_pool + grounded):
+                    con.execute("UPDATE plane SET slot=? WHERE id=?",
+                                (RESERVE_BASE + n, aid))
             con.commit()
         return backup
 
@@ -1259,7 +1388,7 @@ def decode_tcode(code: str) -> str:
     return f"FF-{digits}" if digits else ""
 
 
-def propose_seating(seats: List[Dict]) -> Dict[int, int]:
+def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Dict[int, int]:
     """
     A seating to accept or argue with, built on what the game actually reads.
 
@@ -1277,6 +1406,10 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
     order within a tier, the best-boostered man lands in the lowest lead seat,
     which is the one most often in command.
 
+    Given a bench, men from the reserve compete for the seats on the same
+    terms, one for one: whoever is displaced goes down to the pool. The
+    wounded are never brought up.
+
     Wingmen are seated on what the game reads for them instead: AILevel, which
     comes from skill alone and saturates at 4, then discipline, then rest.
     Filling a tier at a time spreads strength across the flights rather than
@@ -1286,16 +1419,22 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
     seats those are is read from squadron.watchmen, because the player can
     move the D flight anywhere.
 
-    Two floors apply. Nobody below LEAD_MIN_AI leads a flight while a
-    qualified man is free, because boosters are so scarce - nought to three
-    across a whole squadron - that ranking on them alone otherwise hands a
-    flight to the worst flier in it. And a man at or past FATIGUE_REST is
+    Two floors apply. Nobody below LEAD_MIN_AI leads a flight or a section
+    while a qualified man is free, because boosters are so scarce - nought to
+    three across a whole squadron - that ranking on them alone otherwise hands
+    a flight to the worst flier in it, and, once the reserve is in play, hands
+    a section to a replacement who has never flown. And a man at or past FATIGUE_REST is
     treated as wanting a rest: he is kept off the alert seats and out of the
     lead seats, and his card says so, but he is still seated, because whether
     he actually flies is decided on the mission screen and not here.
     """
     taken = [s for s in seats if s["pilot"]]
-    pool = [s["pilot"] for s in taken]
+    # A benched man is only ever picked when he is strictly better, because
+    # the "is he already here" tiebreak can never fire for him - his home is a
+    # pool slot, never a seat. So the line-up is left alone unless the reserve
+    # genuinely improves it.
+    pool = [s["pilot"] for s in taken] + [
+        m for m in (bench or []) if not m["hurt"]]
     plan = {}
 
     player = next((m for m in pool if m["player"]), None)
@@ -1326,7 +1465,7 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
         if slot in alert:                        # scrambles without warning
             ready = [m for m in take if not m["hurt"] and not m["tired"]]
             take = ready or [m for m in take if not m["hurt"]] or pool
-        if slot % 4 == 0:                        # a flight lead
+        if slot % 2 == 0:                        # a flight or section lead
             able = [m for m in take if m["ai"] >= Career.LEAD_MIN_AI]
             rested = [m for m in able if not m["tired"]]
             take = rested or able or take
@@ -1344,8 +1483,8 @@ class App(tk.Tk):
         self.title(self.t["title"])
         # wide enough for the Flights board - six columns of cards - without
         # the reader having to stretch the window before it is any use
-        self.geometry("1140x820")
-        self.minsize(940, 640)
+        self.geometry("1140x960")
+        self.minsize(940, 700)
         self._skin()
         self.careers: List[Career] = []
         self.career: Optional[Career] = None
@@ -1558,6 +1697,31 @@ class App(tk.Tk):
         tk.Label(fl, text=self.t["fl_legend"], background=self.PANEL,
                  foreground=self.INK_MUTED, font=("", 9), anchor="w",
                  justify="left", wraplength=1060).pack(anchor="w", padx=10, pady=(2, 0))
+        ttk.Separator(fl).pack(fill="x", padx=8, pady=(10, 6))
+        tk.Label(fl, text=self.t["fl_bench"], background=self.PANEL,
+                 foreground=self.ACCENT_DARK, font=("Georgia", 10, "bold"),
+                 anchor="w").pack(anchor="w", padx=10)
+        tk.Label(fl, text=self.t["fl_bench_hint"], background=self.PANEL,
+                 foreground=self.INK_MUTED, font=("", 9), anchor="w").pack(
+            anchor="w", padx=10, pady=(0, 4))
+        bcols = ("who", "stats", "ai", "boost", "fat", "state")
+        self.bench_tree = ttk.Treeview(fl, columns=bcols, show="headings",
+                                       height=5, selectmode="browse")
+        self.bench_tree.tag_configure("odd", background=self.STRIPE)
+        self.bench_tree.tag_configure("gone", foreground=self.BAD)
+        for col, head, width in (
+                ("who", self.t["pend_col_who"], 180),
+                ("stats", self.t["fl_b_stats"], 90),
+                ("ai", self.t["fl_ai"], 60),
+                ("boost", self.t["fl_b_boost"], 90),
+                ("fat", self.t["fl_fat"], 90),
+                ("state", self.t["pend_col_status"], 120)):
+            self.bench_tree.heading(col, text=head, anchor="w")
+            self.bench_tree.column(col, width=width, anchor="w")
+        self.bench_tree.pack(fill="x", padx=10, pady=(0, 4))
+        self.bench_tree.bind("<<TreeviewSelect>>", self._pick_bench)
+        self.fl_up: Optional[int] = None
+
         frow = ttk.Frame(fl)
         frow.pack(anchor="w", padx=8, pady=(8, 10))
         ttk.Button(frow, text=self.t["fl_propose"],
@@ -1566,6 +1730,9 @@ class App(tk.Tk):
                    command=self._fill_flights).pack(side="left", padx=8)
         ttk.Button(frow, text=self.t["fl_apply"],
                    command=self._apply_seats).pack(side="left")
+        self.fl_pool_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(frow, text=self.t["fl_use_pool"],
+                        variable=self.fl_pool_var).pack(side="left", padx=12)
         self.fl_var = tk.StringVar(value=self.t["fl_hint"])
         ttk.Label(frow, textvariable=self.fl_var).pack(side="left", padx=10)
 
@@ -1908,14 +2075,16 @@ class App(tk.Tk):
                     widget.bind("<Button-1>", lambda _e, s=slot: self._pick_seat(s))
 
     def _fill_flights(self) -> None:
-        """Read the line-up back from the career and draw it as it stands."""
-        self.fl_pick = None
+        """Read the line-up and the bench back from the career and draw them."""
+        self.fl_pick = self.fl_up = None
         self.fl_men, self.fl_plan = {}, {s: None for s in range(Career.SEATS)}
         if self.career is None:
             self._draw_seats()
+            self._fill_bench()
             return
         try:
             seats = self.career.flight_seats()
+            bench = self.career.pool_pilots()
         except sqlite3.Error as exc:
             self.status.set(self.t["failed"].format(error=exc))
             return
@@ -1925,8 +2094,39 @@ class App(tk.Tk):
             self.fl_plan[seat["slot"]] = man["id"] if man else None
             if man:
                 self.fl_men[man["id"]] = man
+        for man in bench:
+            self.fl_men[man["id"]] = man
         self.fl_var.set(self.t["fl_hint"] if self.fl_men else self.t["fl_none"])
         self._draw_seats()
+        self._fill_bench()
+
+    def _fill_bench(self) -> None:
+        """Everyone the plan does not seat, which is the reserve as it would
+        stand if the plan were applied."""
+        self.bench_tree.delete(*self.bench_tree.get_children())
+        seated = {pid for pid in self.fl_plan.values() if pid is not None}
+        bench = sorted((m for i, m in self.fl_men.items() if i not in seated),
+                       key=lambda m: (-m["ai"], m["home"]))
+        for n, man in enumerate(bench):
+            tags = ["odd"] if n % 2 else []
+            if man["hurt"]:
+                tags.append("gone")
+            self.bench_tree.insert(
+                "", "end", iid=str(man["id"]), tags=tuple(tags), values=(
+                    man["who"],
+                    f"{man['sk'] + 1}/{man['di'] + 1}/{man['co'] + 1}",
+                    man["ai"],
+                    "/".join(str(b) for b in man["boost"]),
+                    f"{man['fatigue']}/{Career.FATIGUE_MAX}",
+                    self.t["st_" + Career._pilot_status(man["state"], man["home"])]))
+
+    def _pick_bench(self, _event=None) -> None:
+        """Take a man off the bench; the next seat clicked exchanges him."""
+        sel = self.bench_tree.selection()
+        self.fl_up = int(sel[0]) if sel else None
+        if self.fl_up is not None:
+            self.fl_pick = None
+            self._draw_seats()
 
     def _draw_seats(self) -> None:
         """
@@ -1997,6 +2197,19 @@ class App(tk.Tk):
         """First click takes a pilot, second click puts him in that seat."""
         if not self.fl_men:
             return
+        if self.fl_up is not None:
+            # a man off the bench takes the seat and its aeroplane, and the
+            # man he replaces goes down. An empty seat has no aircraft to
+            # inherit, so it cannot take him.
+            if self.fl_plan.get(slot) is None:
+                return
+            self.fl_plan[slot] = self.fl_up
+            self.fl_up = None
+            self.bench_tree.selection_remove(*self.bench_tree.selection())
+            self.fl_var.set(self.t["fl_moved"].format(n=self._moved_count()))
+            self._draw_seats()
+            self._fill_bench()
+            return
         if self.fl_pick is None:
             if self.fl_plan.get(slot) is None:
                 return                       # an empty seat cannot start a swap
@@ -2010,6 +2223,7 @@ class App(tk.Tk):
             self.fl_pick = None
             self.fl_var.set(self.t["fl_moved"].format(n=self._moved_count()))
         self._draw_seats()
+        self._fill_bench()
 
     def _moved_count(self) -> int:
         return sum(1 for slot, pid in self.fl_plan.items()
@@ -2028,15 +2242,20 @@ class App(tk.Tk):
         except sqlite3.Error as exc:
             self.status.set(self.t["failed"].format(error=exc))
             return
+        bench = self.career.pool_pilots()
         self.fl_men = {s["pilot"]["id"]: s["pilot"] for s in seats if s["pilot"]}
+        for man in bench:
+            self.fl_men[man["id"]] = man
         if not self.fl_men:
             self.fl_var.set(self.t["fl_none"])
             return
         self.fl_plan = {s: None for s in range(Career.SEATS)}
-        self.fl_plan.update(propose_seating(seats))
-        self.fl_pick = None
+        self.fl_plan.update(
+            propose_seating(seats, bench if self.fl_pool_var.get() else None))
+        self.fl_pick = self.fl_up = None
         self.fl_var.set(self.t["fl_moved"].format(n=self._moved_count()))
         self._draw_seats()
+        self._fill_bench()
 
     def _apply_seats(self) -> None:
         if self.career is None or not self.fl_men:
