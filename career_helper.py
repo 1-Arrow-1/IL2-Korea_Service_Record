@@ -1086,7 +1086,11 @@ class Career:
                 }
                 man["ai"] = self.ai_level(man["sk"], man["health"], man["state"])
                 man["hurt"] = man["state"] == 4 or man["health"] < 100
-                man["tired"] = man["fatigue"] >= self.FATIGUE_REST
+                # the game counts the player's sorties like anyone else's, but
+                # how he flies on the day is his business and not the career
+                # file's - so he is never told to go and rest
+                man["tired"] = (man["fatigue"] >= self.FATIGUE_REST
+                                and not man["player"])
             seats.append({"slot": slot, "flight": slot // 4, "section": slot // 2,
                           "lead": slot % 4 == 0, "alert": slot in alert, "pilot": man,
                           "plane_state": air["state"] if air is not None else None})
