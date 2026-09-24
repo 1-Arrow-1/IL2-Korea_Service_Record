@@ -30,6 +30,34 @@ from .locate import find_game_dir
 
 logger = logging.getLogger(__name__)
 
+# Career Helper processes this server has started. The helper is a separate
+# desktop window, so closing the Service Record would otherwise leave it
+# sitting there with no obvious parent - and a second Quit to find.
+HELPERS: list = []
+
+
+def close_helpers() -> int:
+    """
+    Shut the helpers this server started, and say how many were still up.
+
+    Called from both quit paths in run.py. Terminating is safe: the helper
+    keeps nothing unsaved, and every write it makes goes through a SQLite
+    transaction, which is atomic against the process being killed. A helper
+    the user has already closed is simply skipped.
+    """
+    closed = 0
+    for child in list(HELPERS):
+        HELPERS.remove(child)
+        if child.poll() is not None:            # already gone
+            continue
+        try:
+            child.terminate()
+            closed += 1
+        except OSError as exc:                  # never let this block a quit
+            logger.warning("could not close the Career Helper: %s", exc)
+    return closed
+
+
 def helper_command() -> Optional[list]:
     """How to start the Career Helper here, or None if there is none."""
     import sys
@@ -166,7 +194,9 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if cmd is None:
             return jsonify({"ok": False, "reason": "no helper"}), 404
         try:
-            subprocess.Popen(cmd + ["--from-tracker"], cwd=str(Path(cmd[0]).parent), close_fds=True)
+            HELPERS[:] = [c for c in HELPERS if c.poll() is None]
+            HELPERS.append(subprocess.Popen(
+                cmd + ["--from-tracker"], cwd=str(Path(cmd[0]).parent), close_fds=True))
         except OSError as exc:
             logger.warning("Career Helper failed to start: %s", exc)
             return jsonify({"ok": False, "reason": str(exc)}), 500

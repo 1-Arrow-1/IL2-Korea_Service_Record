@@ -37,7 +37,7 @@ import urllib.request
 import webbrowser
 from pathlib import Path
 
-from korea_service_record.app import create_app
+from korea_service_record.app import close_helpers, create_app
 
 DEFAULT_PORT = 5002
 LOG_NAME = "tracker.log"
@@ -98,6 +98,11 @@ def port_is_free(host: str, port: int) -> bool:
 TRAY: dict = {}
 
 
+def log_helpers(closed: int) -> None:
+    if closed:
+        log.info("closed %d Career Helper window%s", closed, "" if closed == 1 else "s")
+
+
 def request_quit(shutdown) -> None:
     """
     Shut down from a web request. The response must leave first, so the
@@ -107,6 +112,9 @@ def request_quit(shutdown) -> None:
     """
     def later():
         try:
+            # the helper goes first: os._exit below skips atexit, so anything
+            # left to clean up here is left for good
+            log_helpers(close_helpers())
             stop = TRAY.get("stop")
             if stop is not None:
                 stop()
@@ -142,6 +150,9 @@ def run_tray(url: str, shutdown) -> bool:
     icon = None
 
     def quit_now(*_):
+        # Quit from the tray menu comes straight here, without going through
+        # request_quit, so the helpers have to be closed on this path as well.
+        log_helpers(close_helpers())
         shutdown()
         if icon is not None:
             icon.stop()
