@@ -142,6 +142,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "st_wounded": "wounded",
         "st_mia": "MIA",
         "st_kia": "KIA",
+        "fl_unavailable": "{who} is not available - {state}. Only a pilot fit for duty can be brought up.",
+        "st_returning": "on his way back",
         "locked": "The career file is in use - close IL-2 Korea and try again.",
         "failed": "That did not work: {error}",
         "player_note": "The player's own character is not listed: the game carries the career on with a successor, and this tool leaves that alone.",
@@ -255,6 +257,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "st_wounded": "verwundet",
         "st_mia": "vermisst",
         "st_kia": "gefallen",
+        "fl_unavailable": "{who} steht nicht zur Verfügung - {state}. Nur ein einsatzbereiter Pilot kann aufrücken.",
+        "st_returning": "auf dem Rückweg",
         "locked": "Die Laufbahndatei ist in Benutzung - IL-2 Korea schließen und erneut versuchen.",
         "failed": "Das hat nicht geklappt: {error}",
         "player_note": "Der eigene Charakter des Spielers wird nicht aufgeführt: das Spiel führt die Laufbahn mit einem Nachfolger fort, und dieses Werkzeug lässt das unangetastet.",
@@ -368,6 +372,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "st_wounded": "herido",
         "st_mia": "desaparecido",
         "st_kia": "muerto",
+        "fl_unavailable": "{who} no está disponible: {state}. Solo puede ascender un piloto apto para el servicio.",
+        "st_returning": "regresando a pie",
         "locked": "El archivo de la carrera está en uso: cierre IL-2 Korea e inténtelo de nuevo.",
         "failed": "No ha funcionado: {error}",
         "player_note": "El personaje del jugador no aparece: el juego continúa la carrera con un sucesor y esta herramienta no lo toca.",
@@ -481,6 +487,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "st_wounded": "blessé",
         "st_mia": "disparu",
         "st_kia": "tué",
+        "fl_unavailable": "{who} n’est pas disponible : {state}. Seul un pilote apte au service peut être appelé.",
+        "st_returning": "sur le chemin du retour",
         "locked": "Le fichier de carrière est en cours d’utilisation : fermez IL-2 Korea et réessayez.",
         "failed": "Cela n’a pas fonctionné : {error}",
         "player_note": "Le personnage du joueur n’est pas listé : le jeu poursuit la carrière avec un successeur, et cet outil n’y touche pas.",
@@ -594,6 +602,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "st_wounded": "ранен",
         "st_mia": "пропал без вести",
         "st_kia": "погиб",
+        "fl_unavailable": "{who} недоступен — {state}. Поднять можно только годного к вылету лётчика.",
+        "st_returning": "возвращается",
         "locked": "Файл карьеры занят — закройте IL-2 Korea и попробуйте снова.",
         "failed": "Не получилось: {error}",
         "player_note": "Персонаж игрока не показан: игра продолжает карьеру преемником, и этот инструмент этого не трогает.",
@@ -707,6 +717,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "st_wounded": "负伤",
         "st_mia": "失踪",
         "st_kia": "阵亡",
+        "fl_unavailable": "{who} 无法出勤——{state}。只有可执行任务的飞行员才能调入现役。",
+        "st_returning": "正在返回途中",
         "locked": "生涯文件正在使用中——请关闭 IL-2 Korea 后重试。",
         "failed": "操作失败：{error}",
         "player_note": "玩家自己的角色不在列表中：游戏会以继任者延续生涯，本工具不作改动。",
@@ -935,13 +947,15 @@ class Career:
         """
         Where a man stands, in the terms the game's own screens use.
 
-        state first, because it outranks the slot: 2 killed, 3 missing,
-        4 in hospital, 1 walking home. Then the slot bands - 0..19 the
+        state first, because it outranks the slot: 1 walking home after going
+        down, 2 killed, 3 missing, 4 in hospital. Then the slot bands - the
         line-up, 1000..1999 parked with an aircraft under repair, which the
         Combat units screen calls "in reserve - NOT READY", and 2000..4999
         the replacement pool.
         """
         state, slot = int(state or 0), int(slot or 0)
+        if state == 1:
+            return "returning"
         if state == 2:
             return "kia"
         if state == 3:
@@ -1103,6 +1117,12 @@ class Career:
         }
         man["ai"] = self.ai_level(man["sk"], man["health"], man["state"])
         man["hurt"] = man["state"] == 4 or man["health"] < 100
+        # state 0 is the only one that means "can fly today". 1 is a man
+        # walking home after going down - unhurt, due back at stateEndDate,
+        # and the Combat Units screen greys him out with a clock. 2 and 3 are
+        # the dead and the missing, 4 is hospital. Anything but 0 is a man the
+        # squadron cannot count on, so none of them is ever brought up.
+        man["available"] = man["state"] == 0
         # the game counts the player's sorties like anyone else's, but how he
         # flies on the day is his business and not the career file's - so he
         # is never told to go and rest
@@ -1407,8 +1427,12 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
     which is the one most often in command.
 
     Given a bench, men from the reserve compete for the seats on the same
-    terms, one for one: whoever is displaced goes down to the pool. The
-    wounded are never brought up.
+    terms, one for one: whoever is displaced goes down to the pool. Only a man
+    in state 0 is ever brought up - not the wounded, and not one still walking
+    home from a sortie he did not come back from, however well he flies.
+    Someone already seated who has gone unavailable keeps his seat, since the
+    game keeps him there too and he is usually back within a day, but he is
+    passed over for the lead and alert seats.
 
     Wingmen are seated on what the game reads for them instead: AILevel, which
     comes from skill alone and saturates at 4, then discipline, then rest.
@@ -1434,7 +1458,7 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
     # pool slot, never a seat. So the line-up is left alone unless the reserve
     # genuinely improves it.
     pool = [s["pilot"] for s in taken] + [
-        m for m in (bench or []) if not m["hurt"]]
+        m for m in (bench or []) if m["available"]]
     plan = {}
 
     player = next((m for m in pool if m["player"]), None)
@@ -1463,12 +1487,14 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
             break
         take = pool
         if slot in alert:                        # scrambles without warning
-            ready = [m for m in take if not m["hurt"] and not m["tired"]]
-            take = ready or [m for m in take if not m["hurt"]] or pool
+            ready = [m for m in take
+                     if m["available"] and not m["hurt"] and not m["tired"]]
+            take = ready or [m for m in take if m["available"]] or pool
         if slot % 2 == 0:                        # a flight or section lead
-            able = [m for m in take if m["ai"] >= Career.LEAD_MIN_AI]
+            here = [m for m in take if m["available"]]
+            able = [m for m in (here or take) if m["ai"] >= Career.LEAD_MIN_AI]
             rested = [m for m in able if not m["tired"]]
-            take = rested or able or take
+            take = rested or able or here or take
         rank = as_lead if slot % 2 == 0 else as_wingman
         pick = max(take, key=lambda m: rank(m, slot))
         plan[slot] = pick["id"]
@@ -2109,7 +2135,7 @@ class App(tk.Tk):
                        key=lambda m: (-m["ai"], m["home"]))
         for n, man in enumerate(bench):
             tags = ["odd"] if n % 2 else []
-            if man["hurt"]:
+            if not man["available"]:
                 tags.append("gone")
             self.bench_tree.insert(
                 "", "end", iid=str(man["id"]), tags=tuple(tags), values=(
@@ -2161,9 +2187,9 @@ class App(tk.Tk):
                 stat.configure(text="")
                 note.configure(text="\u2605" if lead else "")
                 continue
-            hurt, tired = man["hurt"], man["tired"]
+            tired = man["tired"]
             who.configure(text=man["short"],
-                          foreground=self.BAD if hurt else self.INK)
+                          foreground=self.BAD if not man["available"] else self.INK)
             # the three attributes as the pilot's own panel prints them:
             # skills, discipline, courage, each stored one lower than shown.
             # The commander has none - the game simulates no skill for a man
@@ -2178,12 +2204,15 @@ class App(tk.Tk):
                 bits.append(f"{self.t['fl_ai']} {man['ai']}")
             if man["fatigue"]:
                 bits.append(f"{self.t['fl_fat']} {man['fatigue']}/{Career.FATIGUE_MAX}")
-            if hurt:
-                bits.append(self.t["fl_hurt"])
+            if not man["available"]:
+                bits.append(self.t["st_" + Career._pilot_status(
+                    man["state"], man["home"])])
             elif tired:
                 bits.append(self.t["fl_rest"])
-            stat.configure(text=" \u00b7 ".join(bits),
-                           foreground=self.BAD if (hurt or tired) else self.INK_MUTED)
+            stat.configure(
+                text=" \u00b7 ".join(bits),
+                foreground=self.BAD if (not man["available"] or tired)
+                else self.INK_MUTED)
             # the boosters in the panel's order, the way the mission screen
             # prints the commander's three chips
             tag = "\u2191" + "/".join(str(b) for b in man["boost"]) if any(man["boost"]) else ""
@@ -2201,6 +2230,13 @@ class App(tk.Tk):
             # a man off the bench takes the seat and its aeroplane, and the
             # man he replaces goes down. An empty seat has no aircraft to
             # inherit, so it cannot take him.
+            coming = self.fl_men.get(self.fl_up)
+            if coming is not None and not coming["available"]:
+                self.status.set(self.t["fl_unavailable"].format(
+                    who=coming["who"],
+                    state=self.t["st_" + Career._pilot_status(
+                        coming["state"], coming["home"])]))
+                return
             if self.fl_plan.get(slot) is None:
                 return
             self.fl_plan[slot] = self.fl_up
