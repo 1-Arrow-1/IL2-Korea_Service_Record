@@ -213,8 +213,20 @@ class AwardsConfig:
         self._load()
 
     def _field(self, body: str, key: str) -> str:
-        match = re.search(rf'{key}\s*=\s*"(.*?)"', body)
-        return match.group(1) if match else ""
+        """
+        One key's value, joining the pieces when a block assigns it twice.
+
+        The engine appends rather than overwrites - the cfg parser hands each
+        value to std::string::append - so a long condition may be written on
+        two lines and is reassembled on load. Six stock awards do exactly
+        that: the Order of the Red Banner in its three awardings, Hero of the
+        Soviet Union, Order of Lenin and the DPRK Hero's Medal, whose first
+        line ends on a dangling "|" and whose second closes the brackets.
+        Taking only the first match read half a condition and made those
+        awards look malformed.
+        """
+        parts = re.findall(rf'{key}\s*=\s*"(.*?)"', body)
+        return "".join(parts)
 
     def _load(self) -> None:
         text = None
