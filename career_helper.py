@@ -103,6 +103,13 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_cost": "{n} ticked, {cost} points of {points}",
         "pend_short": "That needs {need} award points and the squadron has {points}. Add some first.",
         "pend_done": "{n} awards presented, {spent} points spent. Backup: {backup}",
+        "pend_col_status": "Status",
+        "st_active": "active",
+        "st_reserve": "reserve",
+        "st_notready": "not ready",
+        "st_wounded": "wounded",
+        "st_mia": "MIA",
+        "st_kia": "KIA",
         "locked": "The career file is in use - close IL-2 Korea and try again.",
         "failed": "That did not work: {error}",
         "player_note": "The player's own character is not listed: the game carries the career on with a successor, and this tool leaves that alone.",
@@ -178,6 +185,13 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_cost": "{n} markiert, {cost} von {points} Punkten",
         "pend_short": "Dafür sind {need} Auszeichnungspunkte nötig, die Staffel hat {points}. Bitte zuerst aufstocken.",
         "pend_done": "{n} Auszeichnungen verliehen, {spent} Punkte verbraucht. Sicherung: {backup}",
+        "pend_col_status": "Status",
+        "st_active": "einsatzbereit",
+        "st_reserve": "Reserve",
+        "st_notready": "nicht bereit",
+        "st_wounded": "verwundet",
+        "st_mia": "vermisst",
+        "st_kia": "gefallen",
         "locked": "Die Laufbahndatei ist in Benutzung - IL-2 Korea schließen und erneut versuchen.",
         "failed": "Das hat nicht geklappt: {error}",
         "player_note": "Der eigene Charakter des Spielers wird nicht aufgeführt: das Spiel führt die Laufbahn mit einem Nachfolger fort, und dieses Werkzeug lässt das unangetastet.",
@@ -253,6 +267,13 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_cost": "{n} marcadas, {cost} de {points} puntos",
         "pend_short": "Hacen falta {need} puntos de condecoración y el escuadrón tiene {points}. Añada algunos primero.",
         "pend_done": "{n} condecoraciones entregadas, {spent} puntos gastados. Copia de seguridad: {backup}",
+        "pend_col_status": "Estado",
+        "st_active": "activo",
+        "st_reserve": "reserva",
+        "st_notready": "no listo",
+        "st_wounded": "herido",
+        "st_mia": "desaparecido",
+        "st_kia": "muerto",
         "locked": "El archivo de la carrera está en uso: cierre IL-2 Korea e inténtelo de nuevo.",
         "failed": "No ha funcionado: {error}",
         "player_note": "El personaje del jugador no aparece: el juego continúa la carrera con un sucesor y esta herramienta no lo toca.",
@@ -328,6 +349,13 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_cost": "{n} cochées, {cost} points sur {points}",
         "pend_short": "Il faut {need} points de décoration et l’escadron en a {points}. Ajoutez-en d’abord.",
         "pend_done": "{n} décorations remises, {spent} points dépensés. Sauvegarde : {backup}",
+        "pend_col_status": "Statut",
+        "st_active": "actif",
+        "st_reserve": "réserve",
+        "st_notready": "indisponible",
+        "st_wounded": "blessé",
+        "st_mia": "disparu",
+        "st_kia": "tué",
         "locked": "Le fichier de carrière est en cours d’utilisation : fermez IL-2 Korea et réessayez.",
         "failed": "Cela n’a pas fonctionné : {error}",
         "player_note": "Le personnage du joueur n’est pas listé : le jeu poursuit la carrière avec un successeur, et cet outil n’y touche pas.",
@@ -403,6 +431,13 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_cost": "отмечено {n}, {cost} очков из {points}",
         "pend_short": "Нужно {need} наградных очков, у эскадрильи {points}. Сначала добавьте.",
         "pend_done": "Вручено наград: {n}, потрачено очков: {spent}. Резервная копия: {backup}",
+        "pend_col_status": "Состояние",
+        "st_active": "в строю",
+        "st_reserve": "резерв",
+        "st_notready": "не готов",
+        "st_wounded": "ранен",
+        "st_mia": "пропал без вести",
+        "st_kia": "погиб",
         "locked": "Файл карьеры занят — закройте IL-2 Korea и попробуйте снова.",
         "failed": "Не получилось: {error}",
         "player_note": "Персонаж игрока не показан: игра продолжает карьеру преемником, и этот инструмент этого не трогает.",
@@ -478,6 +513,13 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_cost": "已选 {n} 项，{cost} / {points} 点",
         "pend_short": "需要 {need} 点授勋点数，中队只有 {points} 点。请先补充。",
         "pend_done": "已授予 {n} 项奖励，消耗 {spent} 点。备份：{backup}",
+        "pend_col_status": "状态",
+        "st_active": "可出击",
+        "st_reserve": "预备",
+        "st_notready": "未就绪",
+        "st_wounded": "负伤",
+        "st_mia": "失踪",
+        "st_kia": "阵亡",
         "locked": "生涯文件正在使用中——请关闭 IL-2 Korea 后重试。",
         "failed": "操作失败：{error}",
         "player_note": "玩家自己的角色不在列表中：游戏会以继任者延续生涯，本工具不作改动。",
@@ -673,7 +715,14 @@ class Career:
     QUAL_CAP = 4                      # stored 4, drawn as 5
 
     def pending_awards(self, game: Optional[Path] = None) -> List[Dict]:
-        """Every award earned and not yet presented, newest pilot-first."""
+        """
+        Every award earned and not yet presented, by pilot.
+
+        Everyone, including the dead: a posthumous award is a real thing
+        and the game offers them too. Each line carries the man's standing,
+        and the killed and the missing come in unticked and in red, so
+        presenting to them is a decision taken rather than one slipped past.
+        """
         names = {}
         if game is not None:
             from korea_service_record.gamedata import AwardsConfig
@@ -683,14 +732,40 @@ class Career:
         with self._open() as con:
             rows = con.execute(
                 """SELECT a.id, a.type, a.cost, a.earnedDate, a.pilotId,
-                          p.name, p.lastName, p.persLevel
+                          p.name, p.lastName, p.persLevel, p.state, p.slot
                    FROM award a JOIN pilot p ON p.id=a.pilotId
                    WHERE a.isPending=1 AND a.isDeleted=0 AND a.pilotId>0
+                     AND p.isDeleted=0
                    ORDER BY p.lastName, p.name, a.earnedDate, a.id""").fetchall()
         return [{"id": r["id"], "type": r["type"], "cost": int(r["cost"] or 1),
                  "earned": r["earnedDate"], "pilot": r["pilotId"],
                  "who": f"{r['name']} {r['lastName']}".strip(),
+                 "status": self._pilot_status(r["state"], r["slot"]),
                  "award": names.get(r["type"], str(r["type"]))} for r in rows]
+
+    @staticmethod
+    def _pilot_status(state: int, slot: int) -> str:
+        """
+        Where a man stands, in the terms the game's own screens use.
+
+        state first, because it outranks the slot: 2 killed, 3 missing,
+        4 in hospital, 1 walking home. Then the slot bands - 0..19 the
+        line-up, 1000..1999 parked with an aircraft under repair, which the
+        Combat units screen calls "in reserve - NOT READY", and 2000..4999
+        the replacement pool.
+        """
+        state, slot = int(state or 0), int(slot or 0)
+        if state == 2:
+            return "kia"
+        if state == 3:
+            return "mia"
+        if state == 4:
+            return "wounded"
+        if 1000 <= slot < 2000:
+            return "notready"
+        if 2000 <= slot < 5000:
+            return "reserve"
+        return "active"
 
     def present_awards(self, award_ids: List[int]) -> Dict[str, Any]:
         """
@@ -962,9 +1037,12 @@ class App(tk.Tk):
         ttk.Separator(pts).pack(fill="x", padx=8, pady=(14, 8))
         ttk.Label(pts, text=self.t["pending_intro"], wraplength=720,
                   foreground="#444").pack(anchor="w", padx=8)
-        self.pend_tree = ttk.Treeview(pts, columns=("who", "award", "earned"),
+        self.pend_tree = ttk.Treeview(pts, columns=("who", "status", "award", "earned"),
                                       show="headings", height=9, selectmode="none")
-        for col, w in (("who", 190), ("award", 330), ("earned", 110)):
+        # The fallen are listed but stand out: a posthumous award is the
+        # commander's decision, not something to tick past by accident.
+        self.pend_tree.tag_configure("gone", foreground="#a4262c")
+        for col, w in (("who", 170), ("status", 100), ("award", 300), ("earned", 100)):
             self.pend_tree.heading(col, text=self.t["pend_col_" + col])
             self.pend_tree.column(col, width=w, anchor="w")
         self.pend_tree.pack(fill="both", expand=True, padx=8, pady=(6, 4))
@@ -1219,10 +1297,14 @@ class App(tk.Tk):
     def _fill_pending(self) -> None:
         self.pend_tree.delete(*self.pend_tree.get_children())
         self.pending = [] if self.career is None else self.career.pending_awards(find_game_dir())
-        self.pend_checked = {a["id"] for a in self.pending}     # all ticked to start
+        # everyone ticked but the dead - those are opted in, not out
+        self.pend_checked = {a["id"] for a in self.pending
+                             if a["status"] not in ("kia", "mia")}
         for a in self.pending:
             self.pend_tree.insert("", "end", iid=str(a["id"]),
-                                  values=(a["who"], a["award"], a["earned"]))
+                                  tags=("gone",) if a["status"] in ("kia", "mia") else (),
+                                  values=(a["who"], self.t["st_" + a["status"]],
+                                          a["award"], a["earned"]))
         self._mark_pending()
 
     def _mark_pending(self) -> None:
@@ -1230,7 +1312,8 @@ class App(tk.Tk):
         for a in self.pending:
             on = a["id"] in self.pend_checked
             self.pend_tree.item(str(a["id"]), values=(
-                ("✓  " if on else "   ") + a["who"], a["award"], a["earned"]))
+                ("✓  " if on else "   ") + a["who"],
+                self.t["st_" + a["status"]], a["award"], a["earned"]))
         cost = sum(a["cost"] for a in self.pending if a["id"] in self.pend_checked)
         points = self.career.award_points() if self.career else 0
         self.pend_var.set(self.t["pend_cost"].format(n=len(self.pend_checked),
@@ -1247,7 +1330,9 @@ class App(tk.Tk):
         self._mark_pending()
 
     def _check_pending(self, on: bool) -> None:
-        self.pend_checked = {a["id"] for a in self.pending} if on else set()
+        # "All" means every man on strength; the dead stay a deliberate choice
+        self.pend_checked = ({a["id"] for a in self.pending
+                              if a["status"] not in ("kia", "mia")} if on else set())
         self._mark_pending()
 
     def _grant_pending(self) -> None:
