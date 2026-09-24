@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import locale
 import sqlite3
+import urllib.parse
 from datetime import datetime
 import sys
 import tkinter as tk
@@ -82,6 +83,29 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_careers": "No careers found.",
         "tab_revive": "Revive a pilot",
         "tab_points": "Award points",
+        "tab_flights": "Flights",
+        "fl_intro": "Who sits where. A flight is four aircraft, a section two. The man in the lead seat of the lowest-numbered flight you send commands the whole mission, and his three boosters cover every pilot in it - nobody else's count. Click a pilot, then click another, to swap them; each man's aircraft goes with him.",
+        "fl_c1": "1 · Red",
+        "fl_c2": "2 · Blue",
+        "fl_c3": "3 · Green",
+        "fl_c4": "4 · Yellow",
+        "fl_c5": "5 · White",
+        "fl_c6": "6 · Black",
+        "fl_alert": "alert",
+        "fl_empty": "— empty —",
+        "fl_propose": "Propose a seating",
+        "fl_apply": "Apply",
+        "fl_reset": "Start over",
+        "fl_hint": "Click a pilot, then another, to swap them.",
+        "fl_cmd": "commands when you stay behind",
+        "fl_you": "you",
+        "fl_applied": "{n} pilots reseated. Backup: {backup}",
+        "fl_nochange": "Nobody has moved, so there is nothing to apply.",
+        "fl_ai": "AI",
+        "fl_fat": "fatigue",
+        "fl_hurt": "hurt",
+        "fl_none": "This career has no line-up to show.",
+        "fl_moved": "{n} moved",
         "col_name": "Pilot", "col_state": "Fate", "col_date": "Lost on", "col_can": "Revivable",
         "kia": "killed in action", "mia": "missing in action",
         "yes": "yes", "no": "no - the career has moved on",
@@ -165,6 +189,29 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_careers": "Keine Laufbahnen gefunden.",
         "tab_revive": "Piloten zurückholen",
         "tab_points": "Auszeichnungspunkte",
+        "tab_flights": "Schwärme",
+        "fl_intro": "Wer wo sitzt. Ein Schwarm sind vier Maschinen, eine Rotte zwei. Wer den Führungsplatz des niedrigsten eingesetzten Schwarms hat, führt den gesamten Einsatz, und seine drei Boni gelten für jeden Piloten darin – die aller anderen zählen nicht. Einen Piloten anklicken, dann einen zweiten, um sie zu tauschen; die Maschine fliegt mit ihrem Piloten mit.",
+        "fl_c1": "1 · Rot",
+        "fl_c2": "2 · Blau",
+        "fl_c3": "3 · Grün",
+        "fl_c4": "4 · Gelb",
+        "fl_c5": "5 · Weiß",
+        "fl_c6": "6 · Schwarz",
+        "fl_alert": "Alarm",
+        "fl_empty": "— frei —",
+        "fl_propose": "Besetzung vorschlagen",
+        "fl_apply": "Übernehmen",
+        "fl_reset": "Zurücksetzen",
+        "fl_hint": "Einen Piloten anklicken, dann einen zweiten, um sie zu tauschen.",
+        "fl_cmd": "führt, wenn Sie am Boden bleiben",
+        "fl_you": "Sie",
+        "fl_applied": "{n} Piloten umgesetzt. Sicherung: {backup}",
+        "fl_nochange": "Niemand wurde versetzt, es gibt nichts zu übernehmen.",
+        "fl_ai": "KI",
+        "fl_fat": "Ermüdung",
+        "fl_hurt": "verwundet",
+        "fl_none": "Diese Laufbahn hat keine Staffelaufstellung.",
+        "fl_moved": "{n} versetzt",
         "col_name": "Pilot", "col_state": "Schicksal", "col_date": "Verloren am", "col_can": "Zurückholbar",
         "kia": "gefallen", "mia": "vermisst",
         "yes": "ja", "no": "nein - die Laufbahn ist weitergegangen",
@@ -248,6 +295,29 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_careers": "No se encontraron carreras.",
         "tab_revive": "Recuperar a un piloto",
         "tab_points": "Puntos de condecoración",
+        "tab_flights": "Patrullas",
+        "fl_intro": "Quién se sienta dónde. Una patrulla son cuatro aviones, una sección dos. El piloto que ocupa el puesto de mando de la patrulla de número más bajo que despega manda toda la misión, y sus tres bonificaciones cubren a todos los pilotos que van en ella; las de los demás no cuentan. Pulse un piloto y después otro para intercambiarlos; el avión acompaña a su piloto.",
+        "fl_c1": "1 · Rojo",
+        "fl_c2": "2 · Azul",
+        "fl_c3": "3 · Verde",
+        "fl_c4": "4 · Amarillo",
+        "fl_c5": "5 · Blanco",
+        "fl_c6": "6 · Negro",
+        "fl_alert": "alerta",
+        "fl_empty": "— libre —",
+        "fl_propose": "Proponer una formación",
+        "fl_apply": "Aplicar",
+        "fl_reset": "Empezar de nuevo",
+        "fl_hint": "Pulse un piloto y después otro para intercambiarlos.",
+        "fl_cmd": "manda cuando usted no vuela",
+        "fl_you": "usted",
+        "fl_applied": "{n} pilotos reubicados. Copia de seguridad: {backup}",
+        "fl_nochange": "Nadie se ha movido, no hay nada que aplicar.",
+        "fl_ai": "IA",
+        "fl_fat": "fatiga",
+        "fl_hurt": "herido",
+        "fl_none": "Esta carrera no tiene formación que mostrar.",
+        "fl_moved": "{n} movidos",
         "col_name": "Piloto", "col_state": "Suerte", "col_date": "Perdido el", "col_can": "Recuperable",
         "kia": "muerto en combate", "mia": "desaparecido en combate",
         "yes": "sí", "no": "no: la carrera ya ha avanzado",
@@ -331,6 +401,29 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_careers": "Aucune carrière trouvée.",
         "tab_revive": "Ramener un pilote",
         "tab_points": "Points de décoration",
+        "tab_flights": "Patrouilles",
+        "fl_intro": "Qui occupe quelle place. Une patrouille compte quatre appareils, une section deux. Le pilote en place de chef de la patrouille au numéro le plus bas qui décolle commande toute la mission, et ses trois bonus s’appliquent à chacun de ses pilotes — ceux des autres ne comptent pas. Cliquez sur un pilote, puis sur un autre, pour les échanger ; l’appareil suit son pilote.",
+        "fl_c1": "1 · Rouge",
+        "fl_c2": "2 · Bleu",
+        "fl_c3": "3 · Vert",
+        "fl_c4": "4 · Jaune",
+        "fl_c5": "5 · Blanc",
+        "fl_c6": "6 · Noir",
+        "fl_alert": "alerte",
+        "fl_empty": "— libre —",
+        "fl_propose": "Proposer une répartition",
+        "fl_apply": "Appliquer",
+        "fl_reset": "Recommencer",
+        "fl_hint": "Cliquez sur un pilote, puis sur un autre, pour les échanger.",
+        "fl_cmd": "commande quand vous restez au sol",
+        "fl_you": "vous",
+        "fl_applied": "{n} pilotes replacés. Sauvegarde : {backup}",
+        "fl_nochange": "Personne n’a bougé, il n’y a rien à appliquer.",
+        "fl_ai": "IA",
+        "fl_fat": "fatigue",
+        "fl_hurt": "blessé",
+        "fl_none": "Cette carrière n’a aucune formation à afficher.",
+        "fl_moved": "{n} déplacés",
         "col_name": "Pilote", "col_state": "Sort", "col_date": "Perdu le", "col_can": "Récupérable",
         "kia": "mort au combat", "mia": "porté disparu",
         "yes": "oui", "no": "non - la carrière a continué",
@@ -414,6 +507,29 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_careers": "Карьеры не найдены.",
         "tab_revive": "Вернуть лётчика",
         "tab_points": "Наградные очки",
+        "tab_flights": "Звенья",
+        "fl_intro": "Кто где сидит. Звено — четыре самолёта, пара — два. Лётчик на ведущем месте звена с наименьшим номером из вылетающих командует всем вылетом, и его три надбавки распространяются на каждого лётчика в группе — чужие не учитываются. Щёлкните по лётчику, затем по другому, чтобы поменять их местами; самолёт следует за своим лётчиком.",
+        "fl_c1": "1 · Красное",
+        "fl_c2": "2 · Синее",
+        "fl_c3": "3 · Зелёное",
+        "fl_c4": "4 · Жёлтое",
+        "fl_c5": "5 · Белое",
+        "fl_c6": "6 · Чёрное",
+        "fl_alert": "дежурное",
+        "fl_empty": "— свободно —",
+        "fl_propose": "Предложить расстановку",
+        "fl_apply": "Применить",
+        "fl_reset": "Начать заново",
+        "fl_hint": "Щёлкните по лётчику, затем по другому, чтобы поменять их местами.",
+        "fl_cmd": "командует, когда вы не летите",
+        "fl_you": "вы",
+        "fl_applied": "Переставлено лётчиков: {n}. Резервная копия: {backup}",
+        "fl_nochange": "Никто не переставлен, применять нечего.",
+        "fl_ai": "ИИ",
+        "fl_fat": "усталость",
+        "fl_hurt": "ранен",
+        "fl_none": "В этой карьере нет строевого состава.",
+        "fl_moved": "переставлено: {n}",
         "col_name": "Лётчик", "col_state": "Судьба", "col_date": "Потерян", "col_can": "Можно вернуть",
         "kia": "погиб", "mia": "пропал без вести",
         "yes": "да", "no": "нет — карьера ушла дальше",
@@ -497,6 +613,29 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "no_careers": "未找到生涯。",
         "tab_revive": "复活飞行员",
         "tab_points": "授勋点数",
+        "tab_flights": "编队",
+        "fl_intro": "谁坐哪个位置。一个小队四架飞机，一个分队两架。出击编号最小的小队的长机负责指挥整次任务，他的三项加成覆盖队中每一位飞行员——其他人的加成不计。点击一名飞行员，再点击另一名即可交换；座机随飞行员一同调动。",
+        "fl_c1": "1 · 红队",
+        "fl_c2": "2 · 蓝队",
+        "fl_c3": "3 · 绿队",
+        "fl_c4": "4 · 黄队",
+        "fl_c5": "5 · 白队",
+        "fl_c6": "6 · 黑队",
+        "fl_alert": "待命",
+        "fl_empty": "— 空缺 —",
+        "fl_propose": "生成建议编排",
+        "fl_apply": "应用",
+        "fl_reset": "重新开始",
+        "fl_hint": "点击一名飞行员，再点击另一名即可交换。",
+        "fl_cmd": "您不出击时由他指挥",
+        "fl_you": "您",
+        "fl_applied": "已调整 {n} 名飞行员。备份：{backup}",
+        "fl_nochange": "没有人被调动，无需应用。",
+        "fl_ai": "AI",
+        "fl_fat": "疲劳",
+        "fl_hurt": "负伤",
+        "fl_none": "该生涯没有可显示的编队。",
+        "fl_moved": "已移动 {n} 人",
         "col_name": "飞行员", "col_state": "结局", "col_date": "损失日期", "col_can": "可复活",
         "kia": "阵亡", "mia": "失踪",
         "yes": "是", "no": "否——生涯已进入下一天",
@@ -828,6 +967,112 @@ class Career:
             con.commit()
         return {"granted": len(rows), "spent": need, "backup": backup}
 
+    # -- flights -------------------------------------------------------------
+    # The line-up is 24 seats: six flights of four, each flight two sections
+    # of two. flight = slot // 4, section = slot // 2, and flight 6 (slots
+    # 20-23) is the alert flight the game scrambles for unplanned missions.
+    # Read off the Combat Units screen and confirmed against the database.
+    #
+    # A pilot's aircraft travels with him. Swapping two men in game moved
+    # both pilot.slot and plane.slot, so Galt kept FF-117 rather than
+    # inheriting the seat's aeroplane. A reseat here has to move the pair or
+    # somebody ends up in a wreck.
+
+    SEATS = 24
+    FLIGHTS = 6
+    ALERT_FLIGHT = 5                     # Black, the Alarmrotte
+    PARK = 9000                          # scratch slots while a permutation lands
+
+    @staticmethod
+    def ai_level(skills: int, health: int, state: int) -> int:
+        """
+        The AILevel the generated mission will give this pilot.
+
+        Fitted to every pilot in data/Missions/_gen.Mission: the displayed
+        skill - the raw nibble plus one - capped at 4, one lower for a man
+        who is hurt. Two things follow. Skills 4 and skills 5 fly
+        identically, so a fifth point buys nothing in the air; and a wound
+        costs a whole level. The wound penalty rests on a single observation
+        (a pilot in hospital on 60 health), so treat it as likely, not proven.
+        """
+        ai = min(4, skills + 1)
+        if state == 4 or health < 100:
+            ai = max(0, ai - 1)
+        return ai
+
+    def flight_seats(self) -> List[Dict]:
+        """All 24 seats in order, each with its pilot and aircraft or None."""
+        def nib(value, index):
+            return (int(value or 0) >> (4 * index)) & 15
+
+        with self._open() as con:
+            men = {r["slot"]: r for r in con.execute(
+                """SELECT id, slot, name, lastName, persLevel, leadLevel, fatigue,
+                          health, state, isPlayer, sorties
+                   FROM pilot WHERE isDeleted=0 AND slot<?""", (self.SEATS,))}
+            planes = {r["slot"]: r for r in con.execute(
+                "SELECT id, slot, tcode, state FROM plane WHERE isDeleted=0 AND slot<?",
+                (self.SEATS,))}
+        seats = []
+        for slot in range(self.SEATS):
+            row, air = men.get(slot), planes.get(slot)
+            man = None
+            if row is not None:
+                pers, lead = row["persLevel"], row["leadLevel"]
+                first = (row["name"] or "").strip()
+                man = {
+                    "id": row["id"],
+                    "who": f"{first} {row['lastName']}".strip(),
+                    "short": f"{first[:1]}. {row['lastName']}" if first else row["lastName"],
+                    "sk": nib(pers, 0), "co": nib(pers, 1), "di": nib(pers, 2),
+                    # boosters in the panel's own order, which is how the
+                    # mission screen prints the commander's three chips
+                    "boost": (nib(lead, 0), nib(lead, 2), nib(lead, 1)),
+                    "fatigue": int(row["fatigue"] or 0),
+                    "health": int(row["health"] or 100),
+                    "state": int(row["state"] or 0),
+                    "player": bool(row["isPlayer"]),
+                    "sorties": int(row["sorties"] or 0),
+                    "home": slot,
+                    "tail": decode_tcode(air["tcode"]) if air is not None else "",
+                }
+                man["ai"] = self.ai_level(man["sk"], man["health"], man["state"])
+            seats.append({"slot": slot, "flight": slot // 4, "section": slot // 2,
+                          "lead": slot % 4 == 0, "pilot": man,
+                          "plane_state": air["state"] if air is not None else None})
+        return seats
+
+    def reseat(self, plan: Dict[int, int]) -> Path:
+        """
+        Rewrite the line-up. ``plan`` maps seat -> pilot id and must be a
+        permutation of the men already seated: this moves people around, it
+        does not promote from the reserve, which the game does well enough on
+        its own. Each man's aircraft follows him. Returns the backup path.
+        """
+        backup = self.backup()
+        with self._open(write=True) as con:
+            con.execute("BEGIN IMMEDIATE")
+            here = {r["slot"]: r["id"] for r in con.execute(
+                "SELECT id, slot FROM pilot WHERE isDeleted=0 AND slot<?", (self.SEATS,))}
+            if sorted(plan.values()) != sorted(here.values()):
+                raise ValueError("the plan is not the same set of pilots")
+            planes = {r["slot"]: r["id"] for r in con.execute(
+                "SELECT id, slot FROM plane WHERE isDeleted=0 AND slot<?", (self.SEATS,))}
+            home = {pid: slot for slot, pid in here.items()}
+            # park everyone out of range first: writing a seat that its new
+            # occupant has not yet vacated would put two men in one aeroplane
+            for n, pid in enumerate(home):
+                con.execute("UPDATE pilot SET slot=? WHERE id=?", (self.PARK + n, pid))
+            for n, aid in enumerate(planes.values()):
+                con.execute("UPDATE plane SET slot=? WHERE id=?", (self.PARK + n, aid))
+            for slot, pid in plan.items():
+                con.execute("UPDATE pilot SET slot=? WHERE id=?", (slot, pid))
+                aid = planes.get(home[pid])
+                if aid is not None:
+                    con.execute("UPDATE plane SET slot=? WHERE id=?", (slot, aid))
+            con.commit()
+        return backup
+
     # -- writes ------------------------------------------------------------
 
     def backup(self) -> Path:
@@ -941,6 +1186,80 @@ def list_careers(game: Path) -> List[Career]:
 # ---------------------------------------------------------------------------
 # The window
 # ---------------------------------------------------------------------------
+
+def decode_tcode(code: str) -> str:
+    """
+    The tail number a ``plane.tcode`` stands for, e.g. FF-117.
+
+    The field is URL-encoded and then shifted: the character '!' is the digit
+    zero, so '%22%22%28' reads 1, 1, 7. The first three characters are the
+    unit prefix and are dropped.
+    """
+    if not code:
+        return ""
+    try:
+        raw = urllib.parse.unquote(code)
+    except Exception:
+        return ""
+    digits = "".join(str(ord(ch) - 0x21) for ch in raw[3:] if 0x21 <= ord(ch) <= 0x2A)
+    return f"FF-{digits}" if digits else ""
+
+
+def propose_seating(seats: List[Dict]) -> Dict[int, int]:
+    """
+    A seating to accept or argue with, built on what the game actually reads.
+
+    Only one man's boosters ever count. The mission commander is the pilot in
+    the lead seat of the lowest-numbered flight that flies, and his three
+    boosters cover every aircraft in the force; the other flight leads and all
+    the section leads contribute nothing. The player commands whenever he
+    flies, so the seat worth managing is the Blue lead - the man who takes the
+    mission every time the player sits one out. He is chosen on boosters.
+
+    Everyone else is seated on what the game reads for them: AILevel, which
+    comes from skill alone and saturates at 4, then discipline, then rest.
+    Seats fill a tier at a time - flight leads, then section leads, then
+    wingmen - so strength spreads across the flights instead of piling into
+    the first one, because missions are flown by whole flights. The alert
+    flight takes no wounded man while a fit one is left, since it is the
+    flight that scrambles without warning.
+    """
+    taken = [s for s in seats if s["pilot"]]
+    pool = [s["pilot"] for s in taken]
+    plan = {}
+
+    player = next((m for m in pool if m["player"]), None)
+    if player is not None:                       # the commander keeps his seat
+        plan[player["home"]] = player["id"]
+        pool.remove(player)
+
+    blue = 4                                     # the standing mission commander
+    if any(s["slot"] == blue for s in taken) and blue not in plan and pool:
+        pick = max(pool, key=lambda m: (sum(m["boost"]), m["ai"], -m["fatigue"],
+                                        m["home"] == blue))
+        plan[blue] = pick["id"]
+        pool.remove(pick)
+
+    open_seats = [s["slot"] for s in taken if s["slot"] not in plan]
+    tiers = {0: 0, 2: 1}                         # flight lead, section lead, the rest
+    open_seats.sort(key=lambda s: (tiers.get(s % 4, 2), s))
+
+    def strength(man, slot):
+        # the last term leaves a man where he is when nothing separates him
+        # from the alternative: a proposal you have to undo by hand is worse
+        # than no proposal at all
+        return (man["ai"], man["di"], -man["fatigue"], man["sk"], man["home"] == slot)
+
+    for slot in open_seats:
+        if not pool:
+            break
+        fit = [m for m in pool if m["state"] != 4 and m["health"] >= 100]
+        take = fit if (slot // 4 == Career.ALERT_FLIGHT and fit) else pool
+        pick = max(take, key=lambda m: strength(m, slot))
+        plan[slot] = pick["id"]
+        pool.remove(pick)
+    return plan
+
 
 class App(tk.Tk):
     def __init__(self):
@@ -1140,6 +1459,32 @@ class App(tk.Tk):
         self.pend_var = tk.StringVar()
         ttk.Label(prow, textvariable=self.pend_var).pack(side="left", padx=8)
 
+        # -- flights tab
+        fl = ttk.Frame(nb)
+        nb.add(fl, text=self.t["tab_flights"])
+        ttk.Label(fl, text=self.t["fl_intro"], wraplength=810,
+                  foreground="#444").pack(anchor="w", padx=8, pady=(8, 6))
+        self.fl_men: Dict[int, Dict] = {}
+        self.fl_plan: Dict[int, Optional[int]] = {}
+        self.fl_cards: Dict[int, tuple] = {}
+        self.fl_pick: Optional[int] = None
+        board = tk.Frame(fl, background=self.PANEL)
+        board.pack(anchor="w", padx=8)
+        self._build_board(board)
+        tk.Label(fl, text="\u2605 " + self.t["fl_cmd"], background=self.PANEL,
+                 foreground=self.ACCENT, font=("", 8), anchor="w").pack(
+            anchor="w", padx=10, pady=(6, 0))
+        frow = ttk.Frame(fl)
+        frow.pack(anchor="w", padx=8, pady=(8, 10))
+        ttk.Button(frow, text=self.t["fl_propose"],
+                   command=self._propose_seats).pack(side="left")
+        ttk.Button(frow, text=self.t["fl_reset"],
+                   command=self._fill_flights).pack(side="left", padx=8)
+        ttk.Button(frow, text=self.t["fl_apply"],
+                   command=self._apply_seats).pack(side="left")
+        self.fl_var = tk.StringVar(value=self.t["fl_hint"])
+        ttk.Label(frow, textvariable=self.fl_var).pack(side="left", padx=10)
+
         self.status = tk.StringVar()
         ttk.Label(self, textvariable=self.status, wraplength=820,
                   foreground=self.INK_MUTED).pack(
@@ -1202,6 +1547,7 @@ class App(tk.Tk):
         self._update_buttons()
         self._fill_times()
         self._fill_pending()
+        self._fill_flights()
 
     def _selected(self) -> Optional[Dict]:
         sel = self.tree.selection()
@@ -1439,6 +1785,162 @@ class App(tk.Tk):
         self.status.set(self.t["pend_done"].format(n=done["granted"], spent=done["spent"],
                                                    backup=done["backup"]))
         self._fill_pending()
+
+    # -- flights ---------------------------------------------------------------
+
+    def _build_board(self, board: tk.Frame) -> None:
+        """
+        The six flights as the Combat Units screen draws them: a column each,
+        four seats down it, a rule between the two sections. The structure
+        never changes, so it is built once and only repainted afterwards.
+        """
+        for f in range(Career.FLIGHTS):
+            col = tk.Frame(board, background=self.PANEL)
+            col.grid(row=0, column=f, padx=2, sticky="n")
+            title = self.t[f"fl_c{f + 1}"]
+            if f == Career.ALERT_FLIGHT:
+                title += "  " + self.t["fl_alert"]
+            tk.Label(col, text=title, background=self.DESK, foreground=self.ACCENT_DARK,
+                     font=("Georgia", 8, "bold"), width=18, pady=3).pack(fill="x")
+            for pos in range(4):
+                if pos == 2:                      # the section rule
+                    tk.Frame(col, background=self.BORDER, height=1).pack(fill="x", pady=2)
+                slot = f * 4 + pos
+                card = tk.Frame(col, background=self.PAPER, padx=4, pady=2,
+                                highlightthickness=1, highlightbackground=self.BORDER)
+                card.pack(fill="x", pady=1)
+                who = tk.Label(card, background=self.PAPER, anchor="w", width=16,
+                               font=("Georgia", 9, "bold"))
+                line = tk.Label(card, background=self.PAPER, anchor="w",
+                                font=("", 7), foreground=self.INK_MUTED)
+                note = tk.Label(card, background=self.PAPER, anchor="w",
+                                font=("", 7), foreground=self.ACCENT)
+                for widget in (who, line, note):
+                    widget.pack(fill="x")
+                self.fl_cards[slot] = (card, who, line, note)
+                for widget in (card, who, line, note):
+                    widget.bind("<Button-1>", lambda _e, s=slot: self._pick_seat(s))
+
+    def _fill_flights(self) -> None:
+        """Read the line-up back from the career and draw it as it stands."""
+        self.fl_pick = None
+        self.fl_men, self.fl_plan = {}, {s: None for s in range(Career.SEATS)}
+        if self.career is None:
+            self._draw_seats()
+            return
+        try:
+            seats = self.career.flight_seats()
+        except sqlite3.Error as exc:
+            self.status.set(self.t["failed"].format(error=exc))
+            return
+        for seat in seats:
+            man = seat["pilot"]
+            self.fl_plan[seat["slot"]] = man["id"] if man else None
+            if man:
+                self.fl_men[man["id"]] = man
+        self.fl_var.set(self.t["fl_hint"] if self.fl_men else self.t["fl_none"])
+        self._draw_seats()
+
+    def _draw_seats(self) -> None:
+        """Repaint every card from the plan. A moved man gets the stripe."""
+        for slot, (card, who, line, note) in self.fl_cards.items():
+            man = self.fl_men.get(self.fl_plan.get(slot))
+            moved = man is not None and man["home"] != slot
+            picked = slot == self.fl_pick
+            back = self.STRIPE if moved else self.PAPER
+            card.configure(background=back, highlightthickness=2 if picked else 1,
+                           highlightbackground=self.ACCENT if picked else self.BORDER)
+            for widget in (who, line, note):
+                widget.configure(background=back)
+            if man is None:
+                who.configure(text=self.t["fl_empty"], foreground="#a3947c")
+                line.configure(text="")
+                note.configure(text="\u2605" if slot == 4 else "")
+                continue
+            hurt = man["state"] == 4 or man["health"] < 100
+            who.configure(text=man["short"], foreground=self.BAD if hurt else self.INK)
+            # the player has no simulated skill - the mission file gives him
+            # AILevel 0 because a human flies him - so the figure is left off
+            bits = [man["tail"]]
+            if not man["player"]:
+                bits.append(f"{self.t['fl_ai']} {man['ai']}")
+            if man["fatigue"]:
+                bits.append(f"{self.t['fl_fat']} {man['fatigue']}")
+            if hurt:
+                bits.append(self.t["fl_hurt"])
+            line.configure(text=" \u00b7 ".join(b for b in bits if b))
+            # the boosters in the panel's order, the way the mission screen
+            # prints the commander's three chips
+            tag = "\u2191" + "/".join(str(b) for b in man["boost"]) if any(man["boost"]) else ""
+            if slot == 4:
+                tag = ("\u2605 " + tag).strip()
+            elif man["player"]:
+                tag = (tag + " " + self.t["fl_you"]).strip()
+            note.configure(text=tag)
+
+    def _pick_seat(self, slot: int) -> None:
+        """First click takes a pilot, second click puts him in that seat."""
+        if not self.fl_men:
+            return
+        if self.fl_pick is None:
+            if self.fl_plan.get(slot) is None:
+                return                       # an empty seat cannot start a swap
+            self.fl_pick = slot
+        elif self.fl_pick == slot:
+            self.fl_pick = None              # clicked again: put him back down
+        else:
+            first, second = self.fl_pick, slot
+            self.fl_plan[first], self.fl_plan[second] = (
+                self.fl_plan.get(second), self.fl_plan.get(first))
+            self.fl_pick = None
+            self.fl_var.set(self.t["fl_moved"].format(n=self._moved_count()))
+        self._draw_seats()
+
+    def _moved_count(self) -> int:
+        return sum(1 for slot, pid in self.fl_plan.items()
+                   if pid is not None and self.fl_men[pid]["home"] != slot)
+
+    def _propose_seats(self) -> None:
+        """
+        Lay out a fresh proposal from the career as it stands on disk, not
+        from whatever the board has been dragged into - otherwise a half-made
+        arrangement quietly steers the next suggestion.
+        """
+        if self.career is None:
+            return
+        try:
+            seats = self.career.flight_seats()
+        except sqlite3.Error as exc:
+            self.status.set(self.t["failed"].format(error=exc))
+            return
+        self.fl_men = {s["pilot"]["id"]: s["pilot"] for s in seats if s["pilot"]}
+        if not self.fl_men:
+            self.fl_var.set(self.t["fl_none"])
+            return
+        self.fl_plan = {s: None for s in range(Career.SEATS)}
+        self.fl_plan.update(propose_seating(seats))
+        self.fl_pick = None
+        self.fl_var.set(self.t["fl_moved"].format(n=self._moved_count()))
+        self._draw_seats()
+
+    def _apply_seats(self) -> None:
+        if self.career is None or not self.fl_men:
+            return
+        moved = self._moved_count()
+        if not moved:
+            self.status.set(self.t["fl_nochange"])
+            return
+        plan = {slot: pid for slot, pid in self.fl_plan.items() if pid is not None}
+        try:
+            backup = self.career.reseat(plan)
+        except sqlite3.OperationalError:
+            self.status.set(self.t["locked"])
+            return
+        except (sqlite3.Error, ValueError) as exc:
+            self.status.set(self.t["failed"].format(error=exc))
+            return
+        self.status.set(self.t["fl_applied"].format(n=moved, backup=backup.name))
+        self._fill_flights()
 
     def _add_points(self) -> None:
         if self.career is None:
