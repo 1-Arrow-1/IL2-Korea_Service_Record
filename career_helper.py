@@ -965,6 +965,7 @@ class App(tk.Tk):
     PAPER, PANEL, DESK = "#fbf6e9", "#f8f2e0", "#ece1c8"
     INK, INK_MUTED, ACCENT = "#2c2212", "#4a3a24", "#8b6f4a"
     ACCENT_DARK, BORDER, BAD = "#5a4022", "#cbb999", "#8c3a2c"
+    STRIPE = "#f3ebd8"                  # every other row, a shade off the paper
 
     def _skin(self) -> None:
         st = ttk.Style(self)
@@ -1047,8 +1048,9 @@ class App(tk.Tk):
                   foreground="#666").pack(anchor="w", padx=8, pady=(0, 6))
         cols = ("name", "state", "date", "can")
         self.tree = ttk.Treeview(rev, columns=cols, show="headings", height=8, selectmode="browse")
+        self.tree.tag_configure("odd", background=self.STRIPE)
         for key, width in (("name", 260), ("state", 160), ("date", 110), ("can", 200)):
-            self.tree.heading(key, text=self.t["col_" + key])
+            self.tree.heading(key, text=self.t["col_" + key], anchor="w")
             self.tree.column(key, width=width, anchor="w")
         self.tree.pack(fill="both", expand=True, padx=8)
         self.tree.bind("<<TreeviewSelect>>", lambda _e: self._update_buttons())
@@ -1065,8 +1067,9 @@ class App(tk.Tk):
         ttk.Label(cap, text=self.t["captured_intro"], wraplength=700).pack(anchor="w", padx=8, pady=(8, 6))
         cols = ("name", "sortie", "fate", "can2")
         self.cap_tree = ttk.Treeview(cap, columns=cols, show="headings", height=8, selectmode="browse")
+        self.cap_tree.tag_configure("odd", background=self.STRIPE)
         for key, width in (("name", 220), ("sortie", 110), ("fate", 240), ("can2", 170)):
-            self.cap_tree.heading(key, text=self.t["col_" + key])
+            self.cap_tree.heading(key, text=self.t["col_" + key], anchor="w")
             self.cap_tree.column(key, width=width, anchor="w")
         self.cap_tree.pack(fill="both", expand=True, padx=8)
         self.cap_tree.bind("<<TreeviewSelect>>", lambda _e: self._update_buttons())
@@ -1081,8 +1084,9 @@ class App(tk.Tk):
         ttk.Label(ft, text=self.t["times_intro"], wraplength=700).pack(anchor="w", padx=8, pady=(8, 6))
         cols = ("mission", "flown", "planned", "source", "applied")
         self.ft_tree = ttk.Treeview(ft, columns=cols, show="headings", height=7, selectmode="extended")
+        self.ft_tree.tag_configure("odd", background=self.STRIPE)
         for key, width in (("mission", 200), ("flown", 90), ("planned", 90), ("source", 130), ("applied", 130)):
-            self.ft_tree.heading(key, text=self.t["col_" + key])
+            self.ft_tree.heading(key, text=self.t["col_" + key], anchor="w")
             self.ft_tree.column(key, width=width, anchor="w")
         self.ft_tree.pack(fill="both", expand=True, padx=8)
         self.auto_label = ttk.Label(ft, text="", wraplength=700)
@@ -1115,9 +1119,9 @@ class App(tk.Tk):
         # The fallen are listed but stand out: a posthumous award is the
         # commander's decision, not something to tick past by accident.
         self.pend_tree.tag_configure("gone", foreground=self.BAD)
-        self.pend_tree.tag_configure("odd", background="#f3ebd8")
+        self.pend_tree.tag_configure("odd", background=self.STRIPE)
         for col, w in (("who", 170), ("status", 100), ("award", 300), ("earned", 100)):
-            self.pend_tree.heading(col, text=self.t["pend_col_" + col])
+            self.pend_tree.heading(col, text=self.t["pend_col_" + col], anchor="w")
             self.pend_tree.column(col, width=w, anchor="w")
         self.pend_tree.pack(fill="both", expand=True, padx=8, pady=(6, 4))
         # A checkbox per row would need a third-party widget; a tick in the
@@ -1178,8 +1182,8 @@ class App(tk.Tk):
             return
         self.rule_var.set(self.t["rule"].format(date=today))
         self.tree.delete(*self.tree.get_children())
-        for p in self.lost:
-            self.tree.insert("", "end", iid=str(p["id"]), values=(
+        for n, p in enumerate(self.lost):
+            self.tree.insert("", "end", iid=str(p["id"]), tags=("odd",) if n % 2 else (), values=(
                 p["name"], self.t[STATE_NAMES[p["state"]]], p["lost_on"],
                 self.t["yes"] if p["revivable"] else self.t["no"]))
         if not self.lost:
@@ -1190,7 +1194,9 @@ class App(tk.Tk):
         for d in self.downed:
             fate = (self.t["fate_evading"].format(date=d["back_on"]) if d["evading"]
                     else self.t["fate_lost_plane"])
-            self.cap_tree.insert("", "end", iid=str(d["id"]), values=(
+            self.cap_tree.insert("", "end", iid=str(d["id"]),
+                                 tags=("odd",) if len(self.cap_tree.get_children()) % 2 else (),
+                                 values=(
                 d["name"], d["date"], fate, self.t["yes"] if d["capturable"] else self.t["no_later"]))
         self.points_var.set(self.t["points_now"].format(points=points))
         self._update_buttons()
@@ -1264,7 +1270,9 @@ class App(tk.Tk):
         self.auto_label.configure(text=self.t["auto_on"] if (data or {}).get("auto") else self.t["auto_off"])
         for key in sorted(entries, key=int):
             e = entries[key]
-            self.ft_tree.insert("", "end", iid=key, values=(
+            self.ft_tree.insert("", "end", iid=key,
+                                tags=("odd",) if len(self.ft_tree.get_children()) % 2 else (),
+                                values=(
                 f"{key}  {e.get('date', '')}",
                 f"{e['flown_s'] / 60:.0f} min", f"{e['planned_s'] / 60:.0f} min",
                 self.t["src_log"] if e.get("source") == "log" else self.t["src_plan"],
