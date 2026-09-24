@@ -84,7 +84,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "tab_revive": "Revive a pilot",
         "tab_points": "Award points",
         "tab_flights": "Flights",
-        "fl_intro": "Who sits where. A flight is four aircraft, a section two. The man in the lead seat of the lowest-numbered flight you send commands the whole mission, and his three boosters cover every pilot in it - nobody else's count. Click a pilot, then click another, to swap them; each man's aircraft goes with him.",
+        "fl_intro": "Who sits where. A flight is four aircraft, a section two. Whoever holds the lowest-numbered seat you send commands the whole mission, and his three boosters cover every pilot in it - nobody else's count. Since any flight or section may be the one you send, the lead seats are the ones that carry boosters. Click a pilot, then click another, to swap them; each man's aircraft goes with him.",
         "fl_c1": "1 · Red",
         "fl_c2": "2 · Blue",
         "fl_c3": "3 · Green",
@@ -97,7 +97,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_apply": "Apply",
         "fl_reset": "Start over",
         "fl_hint": "Click a pilot, then another, to swap them.",
-        "fl_cmd": "commands when you stay behind",
+        "fl_cmd": "★ flight lead. Whichever flight or section you send, its senior seat takes command, so leads are chosen on their boosters.",
         "fl_you": "you",
         "fl_applied": "{n} pilots reseated. Backup: {backup}",
         "fl_nochange": "Nobody has moved, so there is nothing to apply.",
@@ -191,7 +191,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "tab_revive": "Piloten zurückholen",
         "tab_points": "Auszeichnungspunkte",
         "tab_flights": "Schwärme",
-        "fl_intro": "Wer wo sitzt. Ein Schwarm sind vier Maschinen, eine Rotte zwei. Wer den Führungsplatz des niedrigsten eingesetzten Schwarms hat, führt den gesamten Einsatz, und seine drei Boni gelten für jeden Piloten darin – die aller anderen zählen nicht. Einen Piloten anklicken, dann einen zweiten, um sie zu tauschen; die Maschine fliegt mit ihrem Piloten mit.",
+        "fl_intro": "Wer wo sitzt. Ein Schwarm sind vier Maschinen, eine Rotte zwei. Wer den niedrigsten eingesetzten Platz innehat, führt den gesamten Einsatz, und seine drei Boni gelten für jeden Piloten darin – die aller anderen zählen nicht. Da jeder Schwarm und jede Rotte der eingesetzte sein kann, sind es die Führungsplätze, auf die es bei den Boni ankommt. Einen Piloten anklicken, dann einen zweiten, um sie zu tauschen; die Maschine fliegt mit ihrem Piloten mit.",
         "fl_c1": "1 · Rot",
         "fl_c2": "2 · Blau",
         "fl_c3": "3 · Grün",
@@ -204,7 +204,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_apply": "Übernehmen",
         "fl_reset": "Zurücksetzen",
         "fl_hint": "Einen Piloten anklicken, dann einen zweiten, um sie zu tauschen.",
-        "fl_cmd": "führt, wenn Sie am Boden bleiben",
+        "fl_cmd": "★ Schwarmführer. Welchen Schwarm oder welche Rotte Sie auch schicken – der ranghöchste Platz führt, deshalb werden Führer nach ihren Boni ausgewählt.",
         "fl_you": "Sie",
         "fl_applied": "{n} Piloten umgesetzt. Sicherung: {backup}",
         "fl_nochange": "Niemand wurde versetzt, es gibt nichts zu übernehmen.",
@@ -298,7 +298,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "tab_revive": "Recuperar a un piloto",
         "tab_points": "Puntos de condecoración",
         "tab_flights": "Patrullas",
-        "fl_intro": "Quién se sienta dónde. Una patrulla son cuatro aviones, una sección dos. El piloto que ocupa el puesto de mando de la patrulla de número más bajo que despega manda toda la misión, y sus tres bonificaciones cubren a todos los pilotos que van en ella; las de los demás no cuentan. Pulse un piloto y después otro para intercambiarlos; el avión acompaña a su piloto.",
+        "fl_intro": "Quién se sienta dónde. Una patrulla son cuatro aviones, una sección dos. Quien ocupe el puesto de número más bajo de los que envíe manda toda la misión, y sus tres bonificaciones cubren a todos los pilotos que van en ella; las de los demás no cuentan. Como cualquier patrulla o sección puede ser la que envíe, son los puestos de mando los que deben llevar las bonificaciones. Pulse un piloto y después otro para intercambiarlos; el avión acompaña a su piloto.",
         "fl_c1": "1 · Rojo",
         "fl_c2": "2 · Azul",
         "fl_c3": "3 · Verde",
@@ -311,7 +311,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_apply": "Aplicar",
         "fl_reset": "Empezar de nuevo",
         "fl_hint": "Pulse un piloto y después otro para intercambiarlos.",
-        "fl_cmd": "manda cuando usted no vuela",
+        "fl_cmd": "★ jefe de patrulla. Sea cual sea la patrulla o sección que envíe, su puesto más antiguo toma el mando, por eso los jefes se eligen por sus bonificaciones.",
         "fl_you": "usted",
         "fl_applied": "{n} pilotos reubicados. Copia de seguridad: {backup}",
         "fl_nochange": "Nadie se ha movido, no hay nada que aplicar.",
@@ -405,7 +405,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "tab_revive": "Ramener un pilote",
         "tab_points": "Points de décoration",
         "tab_flights": "Patrouilles",
-        "fl_intro": "Qui occupe quelle place. Une patrouille compte quatre appareils, une section deux. Le pilote en place de chef de la patrouille au numéro le plus bas qui décolle commande toute la mission, et ses trois bonus s’appliquent à chacun de ses pilotes — ceux des autres ne comptent pas. Cliquez sur un pilote, puis sur un autre, pour les échanger ; l’appareil suit son pilote.",
+        "fl_intro": "Qui occupe quelle place. Une patrouille compte quatre appareils, une section deux. Celui qui occupe la place au numéro le plus bas parmi celles que vous envoyez commande toute la mission, et ses trois bonus s’appliquent à chacun de ses pilotes — ceux des autres ne comptent pas. Comme n’importe quelle patrouille ou section peut être celle que vous envoyez, ce sont les places de chef qui doivent porter les bonus. Cliquez sur un pilote, puis sur un autre, pour les échanger ; l’appareil suit son pilote.",
         "fl_c1": "1 · Rouge",
         "fl_c2": "2 · Bleu",
         "fl_c3": "3 · Vert",
@@ -418,7 +418,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_apply": "Appliquer",
         "fl_reset": "Recommencer",
         "fl_hint": "Cliquez sur un pilote, puis sur un autre, pour les échanger.",
-        "fl_cmd": "commande quand vous restez au sol",
+        "fl_cmd": "★ chef de patrouille. Quelle que soit la patrouille ou la section envoyée, sa place la plus ancienne prend le commandement : les chefs sont donc choisis sur leurs bonus.",
         "fl_you": "vous",
         "fl_applied": "{n} pilotes replacés. Sauvegarde : {backup}",
         "fl_nochange": "Personne n’a bougé, il n’y a rien à appliquer.",
@@ -512,7 +512,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "tab_revive": "Вернуть лётчика",
         "tab_points": "Наградные очки",
         "tab_flights": "Звенья",
-        "fl_intro": "Кто где сидит. Звено — четыре самолёта, пара — два. Лётчик на ведущем месте звена с наименьшим номером из вылетающих командует всем вылетом, и его три надбавки распространяются на каждого лётчика в группе — чужие не учитываются. Щёлкните по лётчику, затем по другому, чтобы поменять их местами; самолёт следует за своим лётчиком.",
+        "fl_intro": "Кто где сидит. Звено — четыре самолёта, пара — два. Тот, кто занимает место с наименьшим номером из вылетающих, командует всем вылетом, и его три надбавки распространяются на каждого лётчика в группе — чужие не учитываются. Поскольку вылететь может любое звено или любая пара, надбавки важны именно на ведущих местах. Щёлкните по лётчику, затем по другому, чтобы поменять их местами; самолёт следует за своим лётчиком.",
         "fl_c1": "1 · Красное",
         "fl_c2": "2 · Синее",
         "fl_c3": "3 · Зелёное",
@@ -525,7 +525,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_apply": "Применить",
         "fl_reset": "Начать заново",
         "fl_hint": "Щёлкните по лётчику, затем по другому, чтобы поменять их местами.",
-        "fl_cmd": "командует, когда вы не летите",
+        "fl_cmd": "★ ведущий звена. Какое бы звено или пару вы ни отправили, командует старшее место в ней, поэтому ведущих подбирают по надбавкам.",
         "fl_you": "вы",
         "fl_applied": "Переставлено лётчиков: {n}. Резервная копия: {backup}",
         "fl_nochange": "Никто не переставлен, применять нечего.",
@@ -619,7 +619,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "tab_revive": "复活飞行员",
         "tab_points": "授勋点数",
         "tab_flights": "编队",
-        "fl_intro": "谁坐哪个位置。一个小队四架飞机，一个分队两架。出击编号最小的小队的长机负责指挥整次任务，他的三项加成覆盖队中每一位飞行员——其他人的加成不计。点击一名飞行员，再点击另一名即可交换；座机随飞行员一同调动。",
+        "fl_intro": "谁坐哪个位置。一个小队四架飞机，一个分队两架。所派出的位置中编号最小的那一位指挥整次任务，他的三项加成覆盖队中每一位飞行员——其他人的加成不计。由于任何小队或分队都可能被派出，因此加成真正重要的是长机位置。点击一名飞行员，再点击另一名即可交换；座机随飞行员一同调动。",
         "fl_c1": "1 · 红队",
         "fl_c2": "2 · 蓝队",
         "fl_c3": "3 · 绿队",
@@ -632,7 +632,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_apply": "应用",
         "fl_reset": "重新开始",
         "fl_hint": "点击一名飞行员，再点击另一名即可交换。",
-        "fl_cmd": "您不出击时由他指挥",
+        "fl_cmd": "★ 长机。无论派出哪个小队或分队，都由其中位次最高者指挥，所以长机按加成挑选。",
         "fl_you": "您",
         "fl_applied": "已调整 {n} 名飞行员。备份：{backup}",
         "fl_nochange": "没有人被调动，无需应用。",
@@ -1238,21 +1238,27 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
     """
     A seating to accept or argue with, built on what the game actually reads.
 
-    Only one man's boosters ever count. The mission commander is the pilot in
-    the lead seat of the lowest-numbered flight that flies, and his three
-    boosters cover every aircraft in the force; the other flight leads and all
-    the section leads contribute nothing. The player commands whenever he
-    flies, so the seat worth managing is the Blue lead - the man who takes the
-    mission every time the player sits one out. He is chosen on boosters.
+    Exactly one man's boosters count for a mission: the commander's, and they
+    cover every aircraft in the force. The commander is whoever holds the
+    **lowest-numbered seat that flies** - which matches all four observed
+    cases (flights 2-4 gave Mull at 4, 1-4 gave the player at 0, 3-4 gave Galt
+    at 8, flight 4 alone gave Winicki at 12) and also covers sending a single
+    section, where the section lead takes it.
 
-    Everyone else is seated on what the game reads for them: AILevel, which
+    So there is no one seat to manage. Any flight may be the lowest one sent,
+    and so may any section, which means **every lead seat should carry
+    boosters**: flight leads first, section leads next, each ranked on the sum
+    of their three boosters and then on skill. Because seats fill in slot
+    order within a tier, the best-boostered man lands in the lowest lead seat,
+    which is the one most often in command.
+
+    Wingmen are seated on what the game reads for them instead: AILevel, which
     comes from skill alone and saturates at 4, then discipline, then rest.
-    Seats fill a tier at a time - flight leads, then section leads, then
-    wingmen - so strength spreads across the flights instead of piling into
-    the first one, because missions are flown by whole flights. The alert
-    seats take no wounded man while a fit one is left, since they are the ones
-    that scramble without warning - and which seats those are is read from
-    squadron.watchmen, because the player can move the D flight anywhere.
+    Filling a tier at a time spreads strength across the flights rather than
+    piling it into the first, because missions go out as whole flights. The
+    alert seats take no wounded man while a fit one is left, since they are
+    the ones that scramble without warning - and which seats those are is read
+    from squadron.watchmen, because the player can move the D flight anywhere.
     """
     taken = [s for s in seats if s["pilot"]]
     pool = [s["pilot"] for s in taken]
@@ -1263,22 +1269,20 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
         plan[player["home"]] = player["id"]
         pool.remove(player)
 
-    blue = 4                                     # the standing mission commander
-    if any(s["slot"] == blue for s in taken) and blue not in plan and pool:
-        pick = max(pool, key=lambda m: (sum(m["boost"]), m["ai"], -m["fatigue"],
-                                        m["home"] == blue))
-        plan[blue] = pick["id"]
-        pool.remove(pick)
-
     open_seats = [s["slot"] for s in taken if s["slot"] not in plan]
     tiers = {0: 0, 2: 1}                         # flight lead, section lead, the rest
     open_seats.sort(key=lambda s: (tiers.get(s % 4, 2), s))
 
-    def strength(man, slot):
-        # the last term leaves a man where he is when nothing separates him
-        # from the alternative: a proposal you have to undo by hand is worse
-        # than no proposal at all
-        return (man["ai"], man["di"], -man["fatigue"], man["sk"], man["home"] == slot)
+    # The trailing "is he already here" term leaves a man where he sits when
+    # nothing else separates him from the alternative: a proposal you have to
+    # undo by hand is worse than no proposal at all.
+    def as_lead(man, slot):
+        return (sum(man["boost"]), man["ai"], man["sk"], -man["fatigue"],
+                man["home"] == slot)
+
+    def as_wingman(man, slot):
+        return (man["ai"], man["di"], -man["fatigue"], man["sk"],
+                man["home"] == slot)
 
     alert = {s["slot"] for s in taken if s.get("alert")}
     for slot in open_seats:
@@ -1286,7 +1290,8 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
             break
         fit = [m for m in pool if m["state"] != 4 and m["health"] >= 100]
         take = fit if (slot in alert and fit) else pool
-        pick = max(take, key=lambda m: strength(m, slot))
+        rank = as_lead if slot % 2 == 0 else as_wingman
+        pick = max(take, key=lambda m: rank(m, slot))
         plan[slot] = pick["id"]
         pool.remove(pick)
     return plan
@@ -1909,11 +1914,12 @@ class App(tk.Tk):
                            highlightbackground=edge)
             for widget in (who, line, stat, note):
                 widget.configure(background=back)
+            lead = slot % 4 == 0             # a flight lead: he may command
             if man is None:
                 who.configure(text=self.t["fl_empty"], foreground="#a3947c")
                 line.configure(text="")
                 stat.configure(text="")
-                note.configure(text="\u2605" if slot == 4 else "")
+                note.configure(text="\u2605" if lead else "")
                 continue
             hurt = man["state"] == 4 or man["health"] < 100
             who.configure(text=man["short"], foreground=self.BAD if hurt else self.INK)
@@ -1938,9 +1944,9 @@ class App(tk.Tk):
             # the boosters in the panel's order, the way the mission screen
             # prints the commander's three chips
             tag = "\u2191" + "/".join(str(b) for b in man["boost"]) if any(man["boost"]) else ""
-            if slot == 4:
+            if lead:
                 tag = ("\u2605 " + tag).strip()
-            elif man["player"]:
+            if man["player"]:
                 tag = (tag + " " + self.t["fl_you"]).strip()
             note.configure(text=tag)
 
