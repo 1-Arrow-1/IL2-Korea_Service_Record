@@ -104,9 +104,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_ai": "AI",
         "fl_fat": "fatigue",
         "fl_hurt": "hurt",
+        "fl_rest": "needs rest",
         "fl_none": "This career has no line-up to show.",
         "fl_moved": "{n} moved",
-        "fl_legend": "The three numbers are the pilot's own skills / discipline / courage, as his panel shows them. ↑ is his boosters. AI is how the generated mission rates him in the air: his skill, but capped at 4 - so a pilot at 5 flies no better than one at 4, and a wound costs him a level.",
+        "fl_legend": "The three numbers are the pilot's own skills / discipline / courage, as his panel shows them. ↑ is his boosters. AI is how the generated mission rates him in the air: his skill, but capped at 4 - so a pilot at 5 flies no better than one at 4, and a wound costs him a level. Fatigue runs to 9: a sortie adds one, a day on the ground takes one back.",
         "col_name": "Pilot", "col_state": "Fate", "col_date": "Lost on", "col_can": "Revivable",
         "kia": "killed in action", "mia": "missing in action",
         "yes": "yes", "no": "no - the career has moved on",
@@ -211,9 +212,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_ai": "KI",
         "fl_fat": "Ermüdung",
         "fl_hurt": "verwundet",
+        "fl_rest": "braucht Ruhe",
         "fl_none": "Diese Laufbahn hat keine Staffelaufstellung.",
         "fl_moved": "{n} versetzt",
-        "fl_legend": "Die drei Zahlen sind die eigenen Werte des Piloten – Fähigkeiten / Disziplin / Mut – so wie sie sein Blatt zeigt. ↑ sind seine Boni. KI ist die Einstufung, die der erzeugte Einsatz ihm in der Luft gibt: seine Fähigkeiten, aber bei 4 gedeckelt – ein Pilot mit 5 fliegt also nicht besser als einer mit 4, und eine Verwundung kostet ihn eine Stufe.",
+        "fl_legend": "Die drei Zahlen sind die eigenen Werte des Piloten – Fähigkeiten / Disziplin / Mut – so wie sie sein Blatt zeigt. ↑ sind seine Boni. KI ist die Einstufung, die der erzeugte Einsatz ihm in der Luft gibt: seine Fähigkeiten, aber bei 4 gedeckelt – ein Pilot mit 5 fliegt also nicht besser als einer mit 4, und eine Verwundung kostet ihn eine Stufe. Die Ermüdung reicht bis 9: ein Einsatz bringt einen Punkt, ein Tag am Boden nimmt einen zurück.",
         "col_name": "Pilot", "col_state": "Schicksal", "col_date": "Verloren am", "col_can": "Zurückholbar",
         "kia": "gefallen", "mia": "vermisst",
         "yes": "ja", "no": "nein - die Laufbahn ist weitergegangen",
@@ -318,9 +320,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_ai": "IA",
         "fl_fat": "fatiga",
         "fl_hurt": "herido",
+        "fl_rest": "necesita descanso",
         "fl_none": "Esta carrera no tiene formación que mostrar.",
         "fl_moved": "{n} movidos",
-        "fl_legend": "Los tres números son las aptitudes propias del piloto: habilidad / disciplina / valor, tal como aparecen en su ficha. ↑ son sus bonificaciones. IA es la categoría que la misión generada le asigna en vuelo: su habilidad, pero limitada a 4, de modo que un piloto de 5 no vuela mejor que uno de 4, y una herida le cuesta un nivel.",
+        "fl_legend": "Los tres números son las aptitudes propias del piloto: habilidad / disciplina / valor, tal como aparecen en su ficha. ↑ son sus bonificaciones. IA es la categoría que la misión generada le asigna en vuelo: su habilidad, pero limitada a 4, de modo que un piloto de 5 no vuela mejor que uno de 4, y una herida le cuesta un nivel. La fatiga llega a 9: una salida suma uno y un día en tierra descuenta uno.",
         "col_name": "Piloto", "col_state": "Suerte", "col_date": "Perdido el", "col_can": "Recuperable",
         "kia": "muerto en combate", "mia": "desaparecido en combate",
         "yes": "sí", "no": "no: la carrera ya ha avanzado",
@@ -425,9 +428,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_ai": "IA",
         "fl_fat": "fatigue",
         "fl_hurt": "blessé",
+        "fl_rest": "doit se reposer",
         "fl_none": "Cette carrière n’a aucune formation à afficher.",
         "fl_moved": "{n} déplacés",
-        "fl_legend": "Les trois nombres sont les qualités propres du pilote — compétence / discipline / courage — telles que sa fiche les affiche. ↑ ce sont ses bonus. IA est le niveau que la mission générée lui donne en vol : sa compétence, mais plafonnée à 4, si bien qu’un pilote à 5 ne vole pas mieux qu’un pilote à 4, et une blessure lui coûte un niveau.",
+        "fl_legend": "Les trois nombres sont les qualités propres du pilote — compétence / discipline / courage — telles que sa fiche les affiche. ↑ ce sont ses bonus. IA est le niveau que la mission générée lui donne en vol : sa compétence, mais plafonnée à 4, si bien qu’un pilote à 5 ne vole pas mieux qu’un pilote à 4, et une blessure lui coûte un niveau. La fatigue monte jusqu’à 9 : une sortie en ajoute un, une journée au sol en retire un.",
         "col_name": "Pilote", "col_state": "Sort", "col_date": "Perdu le", "col_can": "Récupérable",
         "kia": "mort au combat", "mia": "porté disparu",
         "yes": "oui", "no": "non - la carrière a continué",
@@ -532,9 +536,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_ai": "ИИ",
         "fl_fat": "усталость",
         "fl_hurt": "ранен",
+        "fl_rest": "нужен отдых",
         "fl_none": "В этой карьере нет строевого состава.",
         "fl_moved": "переставлено: {n}",
-        "fl_legend": "Три числа — собственные качества лётчика: мастерство / дисциплина / смелость, в том же порядке, что и в его карточке. ↑ — его надбавки. ИИ — оценка, которую сгенерированный вылет даёт ему в воздухе: его мастерство, но не выше 4 — так что лётчик с 5 летает не лучше, чем с 4, а ранение стоит ему одной ступени.",
+        "fl_legend": "Три числа — собственные качества лётчика: мастерство / дисциплина / смелость, в том же порядке, что и в его карточке. ↑ — его надбавки. ИИ — оценка, которую сгенерированный вылет даёт ему в воздухе: его мастерство, но не выше 4 — так что лётчик с 5 летает не лучше, чем с 4, а ранение стоит ему одной ступени. Усталость доходит до 9: вылет добавляет единицу, день на земле снимает её.",
         "col_name": "Лётчик", "col_state": "Судьба", "col_date": "Потерян", "col_can": "Можно вернуть",
         "kia": "погиб", "mia": "пропал без вести",
         "yes": "да", "no": "нет — карьера ушла дальше",
@@ -639,9 +644,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_ai": "AI",
         "fl_fat": "疲劳",
         "fl_hurt": "负伤",
+        "fl_rest": "需要休整",
         "fl_none": "该生涯没有可显示的编队。",
         "fl_moved": "已移动 {n} 人",
-        "fl_legend": "三个数字是飞行员自身的技能 / 纪律 / 勇气，与他的面板显示一致。↑ 是他的加成。AI 是生成的任务对他空中表现的评级：取决于技能，但上限为 4 —— 所以技能 5 的飞行员并不比 4 的飞得好，而负伤会降一级。",
+        "fl_legend": "三个数字是飞行员自身的技能 / 纪律 / 勇气，与他的面板显示一致。↑ 是他的加成。AI 是生成的任务对他空中表现的评级：取决于技能，但上限为 4 —— 所以技能 5 的飞行员并不比 4 的飞得好，而负伤会降一级。 疲劳最高为 9：每出击一次加一点，每在地面休整一天减一点。",
         "col_name": "飞行员", "col_state": "结局", "col_date": "损失日期", "col_can": "可复活",
         "kia": "阵亡", "mia": "失踪",
         "yes": "是", "no": "否——生涯已进入下一天",
@@ -988,6 +994,19 @@ class Career:
     FLIGHTS = 6
     PARK = 9000                          # scratch slots while a permutation lands
 
+    # Fatigue runs 0 to 9. careerProcessor.dll adds one for every sortie a
+    # pilot flies, hard-clamped at 9 (FUN_18006b690), and takes one back for
+    # every mission day he sits out, floored at 0 - the rollover walks the
+    # squadron, looks each man up in the list of those who flew, and decrements
+    # everyone it does not find (FUN_18003d460). What a tired pilot actually
+    # does worse is not proven: nothing in the DLL reads the field for
+    # arithmetic, and it plainly does not reach AILevel, since men at 6 still
+    # generate as AI 4. REST is therefore a judgement - two thirds of the
+    # scale - and is meant to be argued with.
+    FATIGUE_MAX = 9
+    FATIGUE_REST = 6
+    LEAD_MIN_AI = 3                      # nobody duller leads a flight
+
     @staticmethod
     def parse_watchmen(value: str) -> set:
         """
@@ -1066,6 +1085,8 @@ class Career:
                     "tail": decode_tcode(air["tcode"]) if air is not None else "",
                 }
                 man["ai"] = self.ai_level(man["sk"], man["health"], man["state"])
+                man["hurt"] = man["state"] == 4 or man["health"] < 100
+                man["tired"] = man["fatigue"] >= self.FATIGUE_REST
             seats.append({"slot": slot, "flight": slot // 4, "section": slot // 2,
                           "lead": slot % 4 == 0, "alert": slot in alert, "pilot": man,
                           "plane_state": air["state"] if air is not None else None})
@@ -1256,9 +1277,18 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
     comes from skill alone and saturates at 4, then discipline, then rest.
     Filling a tier at a time spreads strength across the flights rather than
     piling it into the first, because missions go out as whole flights. The
-    alert seats take no wounded man while a fit one is left, since they are
-    the ones that scramble without warning - and which seats those are is read
-    from squadron.watchmen, because the player can move the D flight anywhere.
+    alert seats take neither a wounded nor a worn-out man while a fresh one is
+    left, since they are the ones that scramble without warning - and which
+    seats those are is read from squadron.watchmen, because the player can
+    move the D flight anywhere.
+
+    Two floors apply. Nobody below LEAD_MIN_AI leads a flight while a
+    qualified man is free, because boosters are so scarce - nought to three
+    across a whole squadron - that ranking on them alone otherwise hands a
+    flight to the worst flier in it. And a man at or past FATIGUE_REST is
+    treated as wanting a rest: he is kept off the alert seats and out of the
+    lead seats, and his card says so, but he is still seated, because whether
+    he actually flies is decided on the mission screen and not here.
     """
     taken = [s for s in seats if s["pilot"]]
     pool = [s["pilot"] for s in taken]
@@ -1288,8 +1318,14 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
     for slot in open_seats:
         if not pool:
             break
-        fit = [m for m in pool if m["state"] != 4 and m["health"] >= 100]
-        take = fit if (slot in alert and fit) else pool
+        take = pool
+        if slot in alert:                        # scrambles without warning
+            ready = [m for m in take if not m["hurt"] and not m["tired"]]
+            take = ready or [m for m in take if not m["hurt"]] or pool
+        if slot % 4 == 0:                        # a flight lead
+            able = [m for m in take if m["ai"] >= Career.LEAD_MIN_AI]
+            rested = [m for m in able if not m["tired"]]
+            take = rested or able or take
         rank = as_lead if slot % 2 == 0 else as_wingman
         pick = max(take, key=lambda m: rank(m, slot))
         plan[slot] = pick["id"]
@@ -1921,8 +1957,9 @@ class App(tk.Tk):
                 stat.configure(text="")
                 note.configure(text="\u2605" if lead else "")
                 continue
-            hurt = man["state"] == 4 or man["health"] < 100
-            who.configure(text=man["short"], foreground=self.BAD if hurt else self.INK)
+            hurt, tired = man["hurt"], man["tired"]
+            who.configure(text=man["short"],
+                          foreground=self.BAD if hurt else self.INK)
             # the three attributes as the pilot's own panel prints them:
             # skills, discipline, courage, each stored one lower than shown.
             # The commander has none - the game simulates no skill for a man
@@ -1936,11 +1973,13 @@ class App(tk.Tk):
             if not man["player"]:
                 bits.append(f"{self.t['fl_ai']} {man['ai']}")
             if man["fatigue"]:
-                bits.append(f"{self.t['fl_fat']} {man['fatigue']}")
+                bits.append(f"{self.t['fl_fat']} {man['fatigue']}/{Career.FATIGUE_MAX}")
             if hurt:
                 bits.append(self.t["fl_hurt"])
+            elif tired:
+                bits.append(self.t["fl_rest"])
             stat.configure(text=" \u00b7 ".join(bits),
-                           foreground=self.BAD if hurt else self.INK_MUTED)
+                           foreground=self.BAD if (hurt or tired) else self.INK_MUTED)
             # the boosters in the panel's order, the way the mission screen
             # prints the commander's three chips
             tag = "\u2191" + "/".join(str(b) for b in man["boost"]) if any(man["boost"]) else ""
