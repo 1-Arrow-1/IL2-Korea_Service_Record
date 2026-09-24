@@ -980,8 +980,29 @@ class Career:
 
     SEATS = 24
     FLIGHTS = 6
-    ALERT_FLIGHT = 5                     # Black, the Alarmrotte
     PARK = 9000                          # scratch slots while a permutation lands
+
+    @staticmethod
+    def parse_watchmen(value: str) -> set:
+        """
+        The seats standing alert, from ``squadron.watchmen``.
+
+        The game's D flight defaults to flight 6 but the player may put it on
+        any seats, so it must be read rather than assumed. The field is a list
+        like ``slot|20|21|22|23`` and ``slot`` is the only prefix the engine
+        writes - there is no section or flight form in the binary. Duty
+        belongs to the *seats*, not the men, so reseating changes who stands
+        alert without touching this field.
+        """
+        parts = (value or "").split("|")
+        if len(parts) < 2 or parts[0].strip() != "slot":
+            return set()
+        return {int(x) for x in parts[1:] if x.strip().isdigit()}
+
+    def alert_slots(self) -> set:
+        with self._open() as con:
+            row = con.execute("SELECT watchmen FROM squadron").fetchone()
+        return self.parse_watchmen(row[0] if row else "")
 
     @staticmethod
     def ai_level(skills: int, health: int, state: int) -> int:
@@ -1013,6 +1034,8 @@ class Career:
             planes = {r["slot"]: r for r in con.execute(
                 "SELECT id, slot, tcode, state FROM plane WHERE isDeleted=0 AND slot<?",
                 (self.SEATS,))}
+            row = con.execute("SELECT watchmen FROM squadron").fetchone()
+        alert = self.parse_watchmen(row[0] if row else "")
         seats = []
         for slot in range(self.SEATS):
             row, air = men.get(slot), planes.get(slot)
@@ -1038,7 +1061,7 @@ class Career:
                 }
                 man["ai"] = self.ai_level(man["sk"], man["health"], man["state"])
             seats.append({"slot": slot, "flight": slot // 4, "section": slot // 2,
-                          "lead": slot % 4 == 0, "pilot": man,
+                          "lead": slot % 4 == 0, "alert": slot in alert, "pilot": man,
                           "plane_state": air["state"] if air is not None else None})
         return seats
 
@@ -1221,8 +1244,9 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
     Seats fill a tier at a time - flight leads, then section leads, then
     wingmen - so strength spreads across the flights instead of piling into
     the first one, because missions are flown by whole flights. The alert
-    flight takes no wounded man while a fit one is left, since it is the
-    flight that scrambles without warning.
+    seats take no wounded man while a fit one is left, since they are the ones
+    that scramble without warning - and which seats those are is read from
+    squadron.watchmen, because the player can move the D flight anywhere.
     """
     taken = [s for s in seats if s["pilot"]]
     pool = [s["pilot"] for s in taken]
@@ -1250,11 +1274,12 @@ def propose_seating(seats: List[Dict]) -> Dict[int, int]:
         # than no proposal at all
         return (man["ai"], man["di"], -man["fatigue"], man["sk"], man["home"] == slot)
 
+    alert = {s["slot"] for s in taken if s.get("alert")}
     for slot in open_seats:
         if not pool:
             break
         fit = [m for m in pool if m["state"] != 4 and m["health"] >= 100]
-        take = fit if (slot // 4 == Career.ALERT_FLIGHT and fit) else pool
+        take = fit if (slot in alert and fit) else pool
         pick = max(take, key=lambda m: strength(m, slot))
         plan[slot] = pick["id"]
         pool.remove(pick)
@@ -1285,6 +1310,7 @@ class App(tk.Tk):
     INK, INK_MUTED, ACCENT = "#2c2212", "#4a3a24", "#8b6f4a"
     ACCENT_DARK, BORDER, BAD = "#5a4022", "#cbb999", "#8c3a2c"
     STRIPE = "#f3ebd8"                  # every other row, a shade off the paper
+    DUTY = "#4a6b8a"                    # the alert seats, as the game outlines them
 
     def _skin(self) -> None:
         st = ttk.Style(self)
@@ -1467,6 +1493,8 @@ class App(tk.Tk):
         self.fl_men: Dict[int, Dict] = {}
         self.fl_plan: Dict[int, Optional[int]] = {}
         self.fl_cards: Dict[int, tuple] = {}
+        self.fl_heads: Dict[int, tk.Label] = {}
+        self.fl_alert: set = set()
         self.fl_pick: Optional[int] = None
         board = tk.Frame(fl, background=self.PANEL)
         board.pack(anchor="w", padx=8)
@@ -1797,11 +1825,11 @@ class App(tk.Tk):
         for f in range(Career.FLIGHTS):
             col = tk.Frame(board, background=self.PANEL)
             col.grid(row=0, column=f, padx=2, sticky="n")
-            title = self.t[f"fl_c{f + 1}"]
-            if f == Career.ALERT_FLIGHT:
-                title += "  " + self.t["fl_alert"]
-            tk.Label(col, text=title, background=self.DESK, foreground=self.ACCENT_DARK,
-                     font=("Georgia", 8, "bold"), width=18, pady=3).pack(fill="x")
+            head = tk.Label(col, text=self.t[f"fl_c{f + 1}"], background=self.DESK,
+                            foreground=self.ACCENT_DARK, font=("Georgia", 8, "bold"),
+                            width=18, pady=3)
+            head.pack(fill="x")
+            self.fl_heads[f] = head
             for pos in range(4):
                 if pos == 2:                      # the section rule
                     tk.Frame(col, background=self.BORDER, height=1).pack(fill="x", pady=2)
@@ -1833,6 +1861,7 @@ class App(tk.Tk):
         except sqlite3.Error as exc:
             self.status.set(self.t["failed"].format(error=exc))
             return
+        self.fl_alert = {s["slot"] for s in seats if s["alert"]}
         for seat in seats:
             man = seat["pilot"]
             self.fl_plan[seat["slot"]] = man["id"] if man else None
@@ -1842,14 +1871,29 @@ class App(tk.Tk):
         self._draw_seats()
 
     def _draw_seats(self) -> None:
-        """Repaint every card from the plan. A moved man gets the stripe."""
+        """
+        Repaint every card from the plan. A moved man gets the stripe, and a
+        seat on alert gets the duty edge - which flight that is comes from
+        squadron.watchmen, since the player can put the D flight anywhere.
+        """
+        for flight, head in self.fl_heads.items():
+            seats = set(range(flight * 4, flight * 4 + 4))
+            title = self.t[f"fl_c{flight + 1}"]
+            if seats and seats <= self.fl_alert:
+                title += "  " + self.t["fl_alert"]
+            head.configure(text=title)
         for slot, (card, who, line, note) in self.fl_cards.items():
             man = self.fl_men.get(self.fl_plan.get(slot))
             moved = man is not None and man["home"] != slot
             picked = slot == self.fl_pick
             back = self.STRIPE if moved else self.PAPER
+            edge = self.BORDER
+            if slot in self.fl_alert:
+                edge = self.DUTY
+            if picked:
+                edge = self.ACCENT
             card.configure(background=back, highlightthickness=2 if picked else 1,
-                           highlightbackground=self.ACCENT if picked else self.BORDER)
+                           highlightbackground=edge)
             for widget in (who, line, note):
                 widget.configure(background=back)
             if man is None:
