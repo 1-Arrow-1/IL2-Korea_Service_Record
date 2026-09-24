@@ -337,6 +337,7 @@
     "arrival_equipment": "Поставка оборудования: {quantity}",
     "none_on_order": "Пополнения не ожидается.",
     "none_on_order_last": "Пополнения не ожидается. Последняя поставка: {quantity} × {type}, {date}.",
+    "materiel_heading": "Материальная часть",
     "stores_heading": "Запасы",
     "fuel": "Топливо",
     "ordnance": "Вооружение",

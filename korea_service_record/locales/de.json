@@ -337,6 +337,7 @@
     "arrival_equipment": "Ausrüstungslieferung: {quantity}",
     "none_on_order": "Nichts im Zulauf.",
     "none_on_order_last": "Nichts im Zulauf. Letzte Lieferung: {quantity} × {type} am {date}.",
+    "materiel_heading": "Material",
     "stores_heading": "Vorräte",
     "fuel": "Kraftstoff",
     "ordnance": "Waffen",

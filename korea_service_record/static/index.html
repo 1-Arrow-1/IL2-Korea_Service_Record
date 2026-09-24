@@ -197,23 +197,24 @@
                         <div id="d-map" class="map-view"></div>
                     </section>
 
+                    <!-- Two halves, as a reader asked for: what the squadron
+                         flies on the left, what it burns and shoots on the
+                         right, each with its own figures above its own list. -->
                     <section class="panel aircraft-panel" id="d-aircraft-panel">
-                        <h3><span data-i18n="aircraft.heading">Aircraft</span> <span id="d-aircraft-count" class="count"></span></h3>
-                        <div id="d-aircraft-strip" class="stat-strip"></div>
-                        <div class="aircraft-cols">
-                            <div class="aircraft-col">
-                                <h4 class="panel-subhead with-glyph"><span class="h-glyph" data-glyph="wrench"></span><span data-i18n="aircraft.repairs_heading">In repair</span></h4>
+                        <div class="supply-cols">
+                            <div class="supply-col">
+                                <h3><span data-i18n="aircraft.heading">Aircraft</span> <span id="d-aircraft-count" class="count"></span></h3>
+                                <div id="d-aircraft-strip" class="stat-strip"></div>
+                                <h4 class="panel-subhead with-glyph"><span class="h-glyph" data-glyph="ac_repair"></span><span data-i18n="aircraft.repairs_heading">In repair</span></h4>
                                 <ol class="service-list" id="d-aircraft-repairs"></ol>
                                 <p class="panel-note" id="d-aircraft-repairs-note"></p>
                             </div>
-                            <div class="aircraft-col">
-                                <h4 class="panel-subhead with-glyph"><span class="h-glyph" data-glyph="incoming"></span><span data-i18n="aircraft.arrivals_heading">Incoming</span></h4>
+                            <div class="supply-col">
+                                <h3 class="with-glyph"><span class="h-glyph" data-glyph="mat_stores"></span><span data-i18n="aircraft.materiel_heading">Materiel</span></h3>
+                                <div id="d-materiel-strip" class="stat-strip"></div>
+                                <h4 class="panel-subhead with-glyph"><span class="h-glyph" data-glyph="mat_deliveries"></span><span data-i18n="aircraft.arrivals_heading">Incoming</span></h4>
                                 <ol class="service-list" id="d-aircraft-arrivals"></ol>
                                 <p class="panel-note" id="d-aircraft-arrivals-note"></p>
-                            </div>
-                            <div class="aircraft-col">
-                                <h4 class="panel-subhead with-glyph"><span class="h-glyph" data-glyph="stores"></span><span data-i18n="aircraft.stores_heading">Stores</span></h4>
-                                <table class="mini-table" id="d-aircraft-stores"></table>
                             </div>
                         </div>
                         <details class="airframes" id="d-airframes">

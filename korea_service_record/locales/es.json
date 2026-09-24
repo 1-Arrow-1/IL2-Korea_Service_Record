@@ -337,6 +337,7 @@
     "arrival_equipment": "Entrega de equipamiento: {quantity}",
     "none_on_order": "Nada en camino.",
     "none_on_order_last": "Nada en camino. Última entrega: {quantity} × {type} el {date}.",
+    "materiel_heading": "Material",
     "stores_heading": "Almacén",
     "fuel": "Combustible",
     "ordnance": "Armamento",

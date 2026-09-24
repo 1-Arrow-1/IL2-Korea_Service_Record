@@ -589,23 +589,13 @@
         buildings: "icon_buildings", naval: "icon_marine"
     };
 
-    // Line glyphs in the style of the category pictograms (a ring, ink
-    // strokes), drawn inline so they take the page's own ink and stay crisp.
-    const RING = '<circle cx="32" cy="32" r="29"/>';
-    const PLANE = '<path class="fill" d="M32 11l2.4 14.5L51 33.5v4l-16-3.2-1.2 11.2 6.4 4v3L32 50.6l-8.2 1.9v-3l6.4-4L29 34.3l-16 3.2v-4l16.6-8z"/>';
-    const AIRCRAFT_ICON = {
-        serviceable: RING + PLANE,
-        repair: RING + '<path class="fill" d="M44.5 17.5a9 9 0 0 0-10.3 12L18 45.7a3.4 3.4 0 0 0 4.8 4.8l16.2-16.2a9 9 0 0 0 12-10.3l-5.6 5.6-5.2-1.2-1.2-5.2z"/>',
-        reserve: RING + '<path d="M14 47V32a18 18 0 0 1 36 0v15M22 47V37h20v10M14 47h36"/>',
-        received: RING + '<path d="M32 12v14m-6-5l6 6 6-6"/><path d="M17 30h30v18H17zM17 36h30"/>',
-        written_off: RING + '<g class="dim">' + PLANE + '</g><path class="bad" d="M17 47L47 17"/>',
-        incoming: '<path d="M12 22h24v14H12zM36 27h8l6 6v3h-14z"/><circle cx="19" cy="41" r="3"/><circle cx="43" cy="41" r="3"/>',
-        stores: '<path d="M20 16h24v32H20zM20 26h24M20 38h24"/>',
-        wrench: '<path class="fill" d="M44.5 17.5a9 9 0 0 0-10.3 12L18 45.7a3.4 3.4 0 0 0 4.8 4.8l16.2-16.2a9 9 0 0 0 12-10.3l-5.6 5.6-5.2-1.2-1.2-5.2z"/>'
-    };
-    const glyph = (name, cls) =>
-        '<svg class="' + (cls || "stat-icon") + ' glyph" viewBox="0 0 64 64" aria-hidden="true">' +
-        AIRCRAFT_ICON[name] + "</svg>";
+    // The owner's drawn set for the aircraft and materiel halves: eleven
+    // stencilled roundels, one artwork rather than eleven inline paths. They
+    // are ink on transparency, so they sit on the paper like the category
+    // pictograms above the combat numbers and need no colour of their own.
+    const pictogram = (name, cls) =>
+        '<img class="' + (cls || "stat-icon") + ' supply-icon" alt="" aria-hidden="true"' +
+        ' src="/static/images/icons/' + esc(name) + '.png">';
 
     function statStrip(items) {
         return items.map((item) => {
@@ -613,7 +603,7 @@
             const img = icon
                 ? '<img class="stat-icon" src="/static/images/icons/' + icon +
                   '.png" alt="">'
-                : item.glyph ? glyph(item.glyph) : "";
+                : item.glyph ? pictogram(item.glyph) : "";
             return '<div class="stat-cell">' + img +
                 '<span class="stat-value">' + esc(item.value) + "</span>" +
                 '<span class="stat-label">' +
@@ -756,16 +746,16 @@
         if (!a || !a.on_strength) { panel.hidden = true; return; }
         panel.hidden = false;
         panel.querySelectorAll(".h-glyph").forEach((span) => {
-            span.innerHTML = glyph(span.dataset.glyph, "h-icon");
+            span.innerHTML = pictogram(span.dataset.glyph, "h-icon");
         });
         el("d-aircraft-count").textContent =
             "(" + T("aircraft.on_strength", {count: a.on_strength, type: a.type}) + ")";
         el("d-aircraft-strip").innerHTML = statStrip([
-            {label: T("aircraft.serviceable"), value: a.serviceable, glyph: "serviceable"},
-            {label: T("aircraft.in_repair"), value: a.in_repair, glyph: "repair"},
-            {label: T("aircraft.reserve"), value: a.reserve, glyph: "reserve"},
-            {label: T("aircraft.received"), value: a.received, glyph: "received"},
-            {label: T("aircraft.written_off"), value: a.written_off, glyph: "written_off"}
+            {label: T("aircraft.serviceable"), value: a.serviceable, glyph: "ac_serviceable"},
+            {label: T("aircraft.in_repair"), value: a.in_repair, glyph: "ac_repair"},
+            {label: T("aircraft.reserve"), value: a.reserve, glyph: "ac_reserve"},
+            {label: T("aircraft.received"), value: a.received, glyph: "ac_received"},
+            {label: T("aircraft.written_off"), value: a.written_off, glyph: "ac_written_off"}
         ]);
 
         const when = (days) => days === 0 ? T("aircraft.today")
@@ -803,11 +793,14 @@
                 ? T("aircraft.none_on_order_last", a.last_delivery)
                 : T("aircraft.none_on_order");
 
-        el("d-aircraft-stores").innerHTML = rows([
-            [T("aircraft.fuel"), qty("fuel", a.stores.fuel)],
-            [T("aircraft.ordnance"), qty("ordnance", a.stores.ordnance)],
-            [T("aircraft.equipment"), qty("equipment", a.stores.equipment)],
-            [T("aircraft.requests"), a.stores.requests]
+        // What was a four-row table on the right is now the materiel half's
+        // own figures, read the same way as the aircraft half's: the number
+        // large, the unit under it, so the two strips scan as one line.
+        el("d-materiel-strip").innerHTML = statStrip([
+            {label: T("aircraft.fuel"), value: qty("fuel", a.stores.fuel), glyph: "mat_fuel"},
+            {label: T("aircraft.ordnance"), value: qty("ordnance", a.stores.ordnance), glyph: "mat_ordnance"},
+            {label: T("aircraft.equipment"), value: qty("equipment", a.stores.equipment), glyph: "mat_equipment"},
+            {label: T("aircraft.requests"), value: a.stores.requests, glyph: "mat_requests"}
         ]);
 
         // Every airframe the squadron has had, line-up first, write-offs

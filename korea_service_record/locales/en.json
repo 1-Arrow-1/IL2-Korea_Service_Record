@@ -337,6 +337,7 @@
     "arrival_equipment": "Equipment delivery: {quantity}",
     "none_on_order": "Nothing on its way.",
     "none_on_order_last": "Nothing on its way. Last delivery: {quantity} × {type} on {date}.",
+    "materiel_heading": "Materiel",
     "stores_heading": "Stores",
     "fuel": "Fuel",
     "ordnance": "Ordnance",

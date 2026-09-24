@@ -572,37 +572,56 @@ table.roster td.award-cell { white-space: normal; }
 
 /* ---------------------------------------------------------------- aircraft -- */
 
-/* The squadron's aircraft, above the roster: five figures in a row, then the
-   repair queue, the deliveries on their way, and the stores side by side. */
+/* The squadron's aircraft and its materiel, above the roster, as two halves
+   of one panel: on the left what it flies - the strength figures and the
+   repair queue - and on the right what it burns and shoots, the stores on
+   hand and the deliveries on their way. Split at a reader's suggestion; it
+   also stops the repair queue leaving half a panel empty on the days when
+   every aircraft is serviceable. */
 .aircraft-panel { margin-bottom: 1.25rem; }
-.aircraft-panel > h3 { font-size: 1.05rem; letter-spacing: 0.14em; }
-.aircraft-panel .stat-strip { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.aircraft-panel h3 { font-size: 1.05rem; letter-spacing: 0.14em; }
 .aircraft-panel .stat-value { font-size: 1.55rem; }
 .aircraft-panel .stat-label { font-size: 0.78rem; }
 .aircraft-panel .stat-icon { width: 52px; height: 52px; }
-.aircraft-cols {
+.supply-cols {
     display: grid;
-    grid-template-columns: 1.4fr 1.2fr 0.8fr;
+    /* Five figures against four, so the left half takes the wider share. */
+    grid-template-columns: 1.15fr 1fr;
     gap: 0 2.5rem;
 }
-.aircraft-col { min-width: 0; }
-.aircraft-col .panel-subhead { margin-top: 0; }
-.aircraft-col .service-list { margin-top: 0.4rem; }
-
-/* Inline line glyphs: ink strokes, a ring, in the weight of the category
-   pictograms. `.fill` shapes are solid silhouettes, `.bad` the write-off
-   stroke, `.dim` the retired airframe behind it. */
-.glyph { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.glyph .fill { fill: var(--ink); stroke: none; }
-.glyph .dim { opacity: 0.45; }
-.glyph .bad { stroke: var(--bad); stroke-width: 3.2; }
-.with-glyph { display: flex; align-items: center; gap: 0.45rem; }
-.h-glyph { display: inline-flex; }
-.h-icon { width: 24px; height: 24px; stroke-width: 3; }
+.supply-col { min-width: 0; --head-icon: 32px; }
+/* Each half's strip is as wide as its own figures, not the panel's. */
+#d-aircraft-strip { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+#d-materiel-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* A quantity carries its unit, so it cannot be as large as a bare count. */
+#d-materiel-strip .stat-value { font-size: 1.3rem; }
+/* "Available requests" is two words where the aircraft labels are one, and
+   the strip has a column fewer to spend, so these labels wrap instead of
+   running off the panel. */
+#d-materiel-strip .stat-label { white-space: normal; line-height: 1.25; }
+.supply-col .service-list { margin-top: 0.4rem; }
+/* The rule under a half's heading is its own, so the two do not join up. */
+.supply-col > h3 { border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
 /* Whatever sits under a glyph heading lines up with the heading's text,
    not with the glyph: the column is indented and the heading hangs out. */
-.aircraft-col { padding-left: calc(24px + 0.45rem); }
-.aircraft-col > .with-glyph { margin-left: calc(-24px - 0.45rem); }
+.supply-col .panel-subhead { margin-top: 1.1rem; padding-left: 0; }
+.supply-col .service-list,
+.supply-col .panel-note { padding-left: calc(var(--head-icon) + 0.45rem); }
+
+@media (max-width: 900px) {
+    .supply-cols { grid-template-columns: 1fr; gap: 1.5rem 0; }
+}
+
+.with-glyph { display: flex; align-items: center; gap: 0.45rem; }
+.h-glyph { display: inline-flex; }
+.h-icon { width: 24px; height: 24px; }
+/* The drawn roundels are artwork, not strokes, so they need no ink colour;
+   they are held a shade back from full black, as the category pictograms are. */
+.supply-icon { opacity: 0.88; }
+/* The roundels carry more detail than the strokes they replaced - a truck,
+   a warehouse, a plane under a spanner - so a heading wears one larger than
+   a line glyph needed to be. */
+.supply-col img.h-icon { width: var(--head-icon); height: var(--head-icon); }
 
 /* The repair queue is a service list like Incoming: due date on the left,
    then the airframe, a condition bar and the wait. */
@@ -643,10 +662,9 @@ table.airframe-table .pilot-link:hover { background: none; color: var(--accent-d
 /* Outcome and damage wrap rather than widening the table. */
 .mission-roster td:nth-child(7), .mission-roster td:nth-child(8) { white-space: normal; }
 .mission-roster .airframe-no { white-space: nowrap; color: var(--ink-strong); }
-@media (max-width: 1100px) { .aircraft-cols { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 700px) {
-    .aircraft-cols { grid-template-columns: 1fr; gap: 1.2rem 0; }
     .aircraft-panel .stat-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 0.8rem; }
+    #d-aircraft-strip, #d-materiel-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 .table-scroll { overflow-x: auto; }
 

@@ -337,6 +337,7 @@
     "arrival_equipment": "Livraison d'équipement : {quantity}",
     "none_on_order": "Rien en route.",
     "none_on_order_last": "Rien en route. Dernière livraison : {quantity} × {type} le {date}.",
+    "materiel_heading": "Matériel",
     "stores_heading": "Stocks",
     "fuel": "Carburant",
     "ordnance": "Armement",

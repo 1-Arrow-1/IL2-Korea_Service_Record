@@ -337,6 +337,7 @@
     "arrival_equipment": "装备运达：{quantity}",
     "none_on_order": "暂无补充。",
     "none_on_order_last": "暂无补充。上次交付：{date}，{quantity} 架 {type}。",
+    "materiel_heading": "物资",
     "stores_heading": "库存",
     "fuel": "燃油",
     "ordnance": "武器",
