@@ -102,9 +102,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_applied": "{n} pilots reseated. Backup: {backup}",
         "fl_nochange": "Nobody has moved, so there is nothing to apply.",
         "fl_ai": "AI",
-        "fl_fat": "fatigue",
         "fl_hurt": "hurt",
-        "fl_rest": "needs rest",
         "fl_b_boost": "Boosters",
         "fl_b_stats": "S/D/C",
         "fl_use_pool": "let the proposal draw on the reserve",
@@ -112,7 +110,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Reserve pool",
         "fl_none": "This career has no line-up to show.",
         "fl_moved": "{n} moved",
-        "fl_legend": "The three numbers are the pilot's own skills / discipline / courage, as his panel shows them. ↑ is his boosters. AI is how the generated mission rates him in the air: his skill, but capped at 4 - so a pilot at 5 flies no better than one at 4, and a wound costs him a level. Fatigue runs to 9: a sortie adds one, a day on the ground takes one back.",
+        "fl_legend": "The three numbers are the pilot's own skills / discipline / courage, as his panel shows them. ↑ is his boosters. AI is how the generated mission rates him in the air: his skill, but capped at 4 - so a pilot at 5 flies no better than one at 4, and a wound costs him a level.",
         "col_name": "Pilot", "col_state": "Fate", "col_date": "Lost on", "col_can": "Revivable",
         "kia": "killed in action", "mia": "missing in action",
         "yes": "yes", "no": "no - the career has moved on",
@@ -217,9 +215,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_applied": "{n} Piloten umgesetzt. Sicherung: {backup}",
         "fl_nochange": "Niemand wurde versetzt, es gibt nichts zu übernehmen.",
         "fl_ai": "KI",
-        "fl_fat": "Ermüdung",
         "fl_hurt": "verwundet",
-        "fl_rest": "braucht Ruhe",
         "fl_b_boost": "Boni",
         "fl_b_stats": "F/D/M",
         "fl_use_pool": "Reserve in den Vorschlag einbeziehen",
@@ -227,7 +223,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Reserve",
         "fl_none": "Diese Laufbahn hat keine Staffelaufstellung.",
         "fl_moved": "{n} versetzt",
-        "fl_legend": "Die drei Zahlen sind die eigenen Werte des Piloten – Fähigkeiten / Disziplin / Mut – so wie sie sein Blatt zeigt. ↑ sind seine Boni. KI ist die Einstufung, die der erzeugte Einsatz ihm in der Luft gibt: seine Fähigkeiten, aber bei 4 gedeckelt – ein Pilot mit 5 fliegt also nicht besser als einer mit 4, und eine Verwundung kostet ihn eine Stufe. Die Ermüdung reicht bis 9: ein Einsatz bringt einen Punkt, ein Tag am Boden nimmt einen zurück.",
+        "fl_legend": "Die drei Zahlen sind die eigenen Werte des Piloten – Fähigkeiten / Disziplin / Mut – so wie sie sein Blatt zeigt. ↑ sind seine Boni. KI ist die Einstufung, die der erzeugte Einsatz ihm in der Luft gibt: seine Fähigkeiten, aber bei 4 gedeckelt – ein Pilot mit 5 fliegt also nicht besser als einer mit 4, und eine Verwundung kostet ihn eine Stufe.",
         "col_name": "Pilot", "col_state": "Schicksal", "col_date": "Verloren am", "col_can": "Zurückholbar",
         "kia": "gefallen", "mia": "vermisst",
         "yes": "ja", "no": "nein - die Laufbahn ist weitergegangen",
@@ -332,9 +328,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_applied": "{n} pilotos reubicados. Copia de seguridad: {backup}",
         "fl_nochange": "Nadie se ha movido, no hay nada que aplicar.",
         "fl_ai": "IA",
-        "fl_fat": "fatiga",
         "fl_hurt": "herido",
-        "fl_rest": "necesita descanso",
         "fl_b_boost": "Bonif.",
         "fl_b_stats": "H/D/V",
         "fl_use_pool": "que la propuesta recurra a la reserva",
@@ -342,7 +336,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Reserva",
         "fl_none": "Esta carrera no tiene formación que mostrar.",
         "fl_moved": "{n} movidos",
-        "fl_legend": "Los tres números son las aptitudes propias del piloto: habilidad / disciplina / valor, tal como aparecen en su ficha. ↑ son sus bonificaciones. IA es la categoría que la misión generada le asigna en vuelo: su habilidad, pero limitada a 4, de modo que un piloto de 5 no vuela mejor que uno de 4, y una herida le cuesta un nivel. La fatiga llega a 9: una salida suma uno y un día en tierra descuenta uno.",
+        "fl_legend": "Los tres números son las aptitudes propias del piloto: habilidad / disciplina / valor, tal como aparecen en su ficha. ↑ son sus bonificaciones. IA es la categoría que la misión generada le asigna en vuelo: su habilidad, pero limitada a 4, de modo que un piloto de 5 no vuela mejor que uno de 4, y una herida le cuesta un nivel.",
         "col_name": "Piloto", "col_state": "Suerte", "col_date": "Perdido el", "col_can": "Recuperable",
         "kia": "muerto en combate", "mia": "desaparecido en combate",
         "yes": "sí", "no": "no: la carrera ya ha avanzado",
@@ -447,9 +441,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_applied": "{n} pilotes replacés. Sauvegarde : {backup}",
         "fl_nochange": "Personne n’a bougé, il n’y a rien à appliquer.",
         "fl_ai": "IA",
-        "fl_fat": "fatigue",
         "fl_hurt": "blessé",
-        "fl_rest": "doit se reposer",
         "fl_b_boost": "Bonus",
         "fl_b_stats": "C/D/C",
         "fl_use_pool": "autoriser la proposition à puiser dans la réserve",
@@ -457,7 +449,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Réserve",
         "fl_none": "Cette carrière n’a aucune formation à afficher.",
         "fl_moved": "{n} déplacés",
-        "fl_legend": "Les trois nombres sont les qualités propres du pilote — compétence / discipline / courage — telles que sa fiche les affiche. ↑ ce sont ses bonus. IA est le niveau que la mission générée lui donne en vol : sa compétence, mais plafonnée à 4, si bien qu’un pilote à 5 ne vole pas mieux qu’un pilote à 4, et une blessure lui coûte un niveau. La fatigue monte jusqu’à 9 : une sortie en ajoute un, une journée au sol en retire un.",
+        "fl_legend": "Les trois nombres sont les qualités propres du pilote — compétence / discipline / courage — telles que sa fiche les affiche. ↑ ce sont ses bonus. IA est le niveau que la mission générée lui donne en vol : sa compétence, mais plafonnée à 4, si bien qu’un pilote à 5 ne vole pas mieux qu’un pilote à 4, et une blessure lui coûte un niveau.",
         "col_name": "Pilote", "col_state": "Sort", "col_date": "Perdu le", "col_can": "Récupérable",
         "kia": "mort au combat", "mia": "porté disparu",
         "yes": "oui", "no": "non - la carrière a continué",
@@ -562,9 +554,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_applied": "Переставлено лётчиков: {n}. Резервная копия: {backup}",
         "fl_nochange": "Никто не переставлен, применять нечего.",
         "fl_ai": "ИИ",
-        "fl_fat": "усталость",
         "fl_hurt": "ранен",
-        "fl_rest": "нужен отдых",
         "fl_b_boost": "Надбавки",
         "fl_b_stats": "М/Д/С",
         "fl_use_pool": "разрешить брать людей из резерва",
@@ -572,7 +562,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Резерв",
         "fl_none": "В этой карьере нет строевого состава.",
         "fl_moved": "переставлено: {n}",
-        "fl_legend": "Три числа — собственные качества лётчика: мастерство / дисциплина / смелость, в том же порядке, что и в его карточке. ↑ — его надбавки. ИИ — оценка, которую сгенерированный вылет даёт ему в воздухе: его мастерство, но не выше 4 — так что лётчик с 5 летает не лучше, чем с 4, а ранение стоит ему одной ступени. Усталость доходит до 9: вылет добавляет единицу, день на земле снимает её.",
+        "fl_legend": "Три числа — собственные качества лётчика: мастерство / дисциплина / смелость, в том же порядке, что и в его карточке. ↑ — его надбавки. ИИ — оценка, которую сгенерированный вылет даёт ему в воздухе: его мастерство, но не выше 4 — так что лётчик с 5 летает не лучше, чем с 4, а ранение стоит ему одной ступени.",
         "col_name": "Лётчик", "col_state": "Судьба", "col_date": "Потерян", "col_can": "Можно вернуть",
         "kia": "погиб", "mia": "пропал без вести",
         "yes": "да", "no": "нет — карьера ушла дальше",
@@ -677,9 +667,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_applied": "已调整 {n} 名飞行员。备份：{backup}",
         "fl_nochange": "没有人被调动，无需应用。",
         "fl_ai": "AI",
-        "fl_fat": "疲劳",
         "fl_hurt": "负伤",
-        "fl_rest": "需要休整",
         "fl_b_boost": "加成",
         "fl_b_stats": "技/律/勇",
         "fl_use_pool": "允许建议编排动用预备队",
@@ -687,7 +675,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "预备队",
         "fl_none": "该生涯没有可显示的编队。",
         "fl_moved": "已移动 {n} 人",
-        "fl_legend": "三个数字是飞行员自身的技能 / 纪律 / 勇气，与他的面板显示一致。↑ 是他的加成。AI 是生成的任务对他空中表现的评级：取决于技能，但上限为 4 —— 所以技能 5 的飞行员并不比 4 的飞得好，而负伤会降一级。 疲劳最高为 9：每出击一次加一点，每在地面休整一天减一点。",
+        "fl_legend": "三个数字是飞行员自身的技能 / 纪律 / 勇气，与他的面板显示一致。↑ 是他的加成。AI 是生成的任务对他空中表现的评级：取决于技能，但上限为 4 —— 所以技能 5 的飞行员并不比 4 的飞得好，而负伤会降一级。",
         "col_name": "飞行员", "col_state": "结局", "col_date": "损失日期", "col_can": "可复活",
         "kia": "阵亡", "mia": "失踪",
         "yes": "是", "no": "否——生涯已进入下一天",
@@ -1038,17 +1026,14 @@ class Career:
     FLIGHTS = 6
     PARK = 9000                          # scratch slots while a permutation lands
 
-    # Fatigue runs 0 to 9. careerProcessor.dll adds one for every sortie a
-    # pilot flies, hard-clamped at 9 (FUN_18006b690), and takes one back for
-    # every mission day he sits out, floored at 0 - the rollover walks the
-    # squadron, looks each man up in the list of those who flew, and decrements
-    # everyone it does not find (FUN_18003d460). What a tired pilot actually
-    # does worse is not proven: nothing in the DLL reads the field for
-    # arithmetic, and it plainly does not reach AILevel, since men at 6 still
-    # generate as AI 4. REST is therefore a judgement - two thirds of the
-    # scale - and is meant to be argued with.
-    FATIGUE_MAX = 9
-    FATIGUE_REST = 6
+    # Fatigue is deliberately absent. It exists in the database and runs 0 to
+    # 9 - a sortie adds one, a day on the ground takes one back - but nothing
+    # reads it. Every reference to the key string is a write, every
+    # instruction touching pilot+0x244 is the increment, the decrement or the
+    # database, no other binary queries the pilot table, and nothing in the
+    # generated mission varies with it: men at 6 still fly as AILevel 4. The
+    # game does not even show it. Seating on a number with no consumer would
+    # be advice dressed up as arithmetic.
     LEAD_MIN_AI = 3                      # nobody duller leads a flight
 
     @staticmethod
@@ -1107,7 +1092,6 @@ class Career:
             # boosters in the panel's own order, which is how the mission
             # screen prints the commander's three chips
             "boost": (nib(lead, 0), nib(lead, 2), nib(lead, 1)),
-            "fatigue": int(row["fatigue"] or 0),
             "health": int(row["health"] or 100),
             "state": int(row["state"] or 0),
             "player": bool(row["isPlayer"]),
@@ -1123,13 +1107,9 @@ class Career:
         # the dead and the missing, 4 is hospital. Anything but 0 is a man the
         # squadron cannot count on, so none of them is ever brought up.
         man["available"] = man["state"] == 0
-        # the game counts the player's sorties like anyone else's, but how he
-        # flies on the day is his business and not the career file's - so he
-        # is never told to go and rest
-        man["tired"] = man["fatigue"] >= self.FATIGUE_REST and not man["player"]
         return man
 
-    PILOT_COLS = """SELECT id, slot, name, lastName, persLevel, leadLevel, fatigue,
+    PILOT_COLS = """SELECT id, slot, name, lastName, persLevel, leadLevel,
                            health, state, isPlayer, sorties FROM pilot
                     WHERE isDeleted=0"""
 
@@ -1438,19 +1418,16 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
     comes from skill alone and saturates at 4, then discipline, then rest.
     Filling a tier at a time spreads strength across the flights rather than
     piling it into the first, because missions go out as whole flights. The
-    alert seats take neither a wounded nor a worn-out man while a fresh one is
-    left, since they are the ones that scramble without warning - and which
-    seats those are is read from squadron.watchmen, because the player can
-    move the D flight anywhere.
+    alert seats take no wounded or absent man while a fit one is left, since
+    they are the ones that scramble without warning - and which seats those
+    are is read from squadron.watchmen, because the player can move the D
+    flight anywhere.
 
-    Two floors apply. Nobody below LEAD_MIN_AI leads a flight or a section
+    One floor applies. Nobody below LEAD_MIN_AI leads a flight or a section
     while a qualified man is free, because boosters are so scarce - nought to
     three across a whole squadron - that ranking on them alone otherwise hands
     a flight to the worst flier in it, and, once the reserve is in play, hands
-    a section to a replacement who has never flown. And a man at or past FATIGUE_REST is
-    treated as wanting a rest: he is kept off the alert seats and out of the
-    lead seats, and his card says so, but he is still seated, because whether
-    he actually flies is decided on the mission screen and not here.
+    a section to a replacement who has never flown.
     """
     taken = [s for s in seats if s["pilot"]]
     # A benched man is only ever picked when he is strictly better, because
@@ -1474,12 +1451,10 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
     # nothing else separates him from the alternative: a proposal you have to
     # undo by hand is worse than no proposal at all.
     def as_lead(man, slot):
-        return (sum(man["boost"]), man["ai"], man["sk"], -man["fatigue"],
-                man["home"] == slot)
+        return (sum(man["boost"]), man["ai"], man["sk"], man["home"] == slot)
 
     def as_wingman(man, slot):
-        return (man["ai"], man["di"], -man["fatigue"], man["sk"],
-                man["home"] == slot)
+        return (man["ai"], man["di"], man["sk"], man["home"] == slot)
 
     alert = {s["slot"] for s in taken if s.get("alert")}
     for slot in open_seats:
@@ -1487,14 +1462,11 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
             break
         take = pool
         if slot in alert:                        # scrambles without warning
-            ready = [m for m in take
-                     if m["available"] and not m["hurt"] and not m["tired"]]
-            take = ready or [m for m in take if m["available"]] or pool
+            take = [m for m in take if m["available"] and not m["hurt"]] or pool
         if slot % 2 == 0:                        # a flight or section lead
             here = [m for m in take if m["available"]]
-            able = [m for m in (here or take) if m["ai"] >= Career.LEAD_MIN_AI]
-            rested = [m for m in able if not m["tired"]]
-            take = rested or able or here or take
+            take = [m for m in (here or take)
+                    if m["ai"] >= Career.LEAD_MIN_AI] or here or take
         rank = as_lead if slot % 2 == 0 else as_wingman
         pick = max(take, key=lambda m: rank(m, slot))
         plan[slot] = pick["id"]
@@ -1730,7 +1702,7 @@ class App(tk.Tk):
         tk.Label(fl, text=self.t["fl_bench_hint"], background=self.PANEL,
                  foreground=self.INK_MUTED, font=("", 9), anchor="w").pack(
             anchor="w", padx=10, pady=(0, 4))
-        bcols = ("who", "stats", "ai", "boost", "fat", "state")
+        bcols = ("who", "stats", "ai", "boost", "state")
         self.bench_tree = ttk.Treeview(fl, columns=bcols, show="headings",
                                        height=5, selectmode="browse")
         self.bench_tree.tag_configure("odd", background=self.STRIPE)
@@ -1740,7 +1712,6 @@ class App(tk.Tk):
                 ("stats", self.t["fl_b_stats"], 90),
                 ("ai", self.t["fl_ai"], 60),
                 ("boost", self.t["fl_b_boost"], 90),
-                ("fat", self.t["fl_fat"], 90),
                 ("state", self.t["pend_col_status"], 120)):
             self.bench_tree.heading(col, text=head, anchor="w")
             self.bench_tree.column(col, width=width, anchor="w")
@@ -2143,7 +2114,6 @@ class App(tk.Tk):
                     f"{man['sk'] + 1}/{man['di'] + 1}/{man['co'] + 1}",
                     man["ai"],
                     "/".join(str(b) for b in man["boost"]),
-                    f"{man['fatigue']}/{Career.FATIGUE_MAX}",
                     self.t["st_" + Career._pilot_status(man["state"], man["home"])]))
 
     def _pick_bench(self, _event=None) -> None:
@@ -2187,7 +2157,6 @@ class App(tk.Tk):
                 stat.configure(text="")
                 note.configure(text="\u2605" if lead else "")
                 continue
-            tired = man["tired"]
             who.configure(text=man["short"],
                           foreground=self.BAD if not man["available"] else self.INK)
             # the three attributes as the pilot's own panel prints them:
@@ -2202,17 +2171,12 @@ class App(tk.Tk):
             bits = []
             if not man["player"]:
                 bits.append(f"{self.t['fl_ai']} {man['ai']}")
-            if man["fatigue"]:
-                bits.append(f"{self.t['fl_fat']} {man['fatigue']}/{Career.FATIGUE_MAX}")
             if not man["available"]:
                 bits.append(self.t["st_" + Career._pilot_status(
                     man["state"], man["home"])])
-            elif tired:
-                bits.append(self.t["fl_rest"])
             stat.configure(
                 text=" \u00b7 ".join(bits),
-                foreground=self.BAD if (not man["available"] or tired)
-                else self.INK_MUTED)
+                foreground=self.BAD if not man["available"] else self.INK_MUTED)
             # the boosters in the panel's order, the way the mission screen
             # prints the commander's three chips
             tag = "\u2191" + "/".join(str(b) for b in man["boost"]) if any(man["boost"]) else ""
