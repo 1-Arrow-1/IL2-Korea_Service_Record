@@ -19,6 +19,7 @@ from korea_service_record.career.events import (award_action, award_source,
                                                 describe, is_award_event)
 from korea_service_record.career.killstats import KillStats
 from korea_service_record.career.missionresult import MissionResult
+from korea_service_record import corrections
 import korea_service_record
 from korea_service_record.assets import AssetResolver
 from korea_service_record.career.aggregator import CareerAggregator
@@ -40,6 +41,13 @@ from korea_service_record.gamedata import (AwardsConfig, LocaleStrings,
                                            DEFAULT_TVD, resolve_game_dir)
 
 FAILURES = []
+SKIPPED = []
+
+# The career these facts were read off in game. Anything checked against a
+# pilot by id belongs to that file and nothing else: ids are reused, so on a
+# different career "pilot 17" is a different man and the check would fail on
+# a parser that is working perfectly. Those checks now skip out loud instead.
+FIXTURE_CAREER = "Manuel Rivera's career (deleted 2026-09)"
 
 
 def check(label, actual, expected):
@@ -48,6 +56,11 @@ def check(label, actual, expected):
           + ("" if ok else f"  (expected {expected!r})"))
     if not ok:
         FAILURES.append(label)
+
+
+def skip(label, why):
+    print(f"   [skip] {label}: {why}")
+    SKIPPED.append(label)
 
 
 def main(game_arg):
@@ -138,9 +151,60 @@ def main(game_arg):
             info = describe(code)
             print(f"   type {code:<3} n={counts[code]:<6} {info.confidence:<9} {info.label}")
 
-        # ---- regression checks against known-true facts -------------------
+        # ---- parser fixtures, independent of any career -------------------
+        # These were read off the game's own pilot panels. They used to be
+        # looked up by pilot id in whatever career happened to be installed,
+        # which meant they broke the moment that career was deleted - and
+        # worse, they then failed against a healthy parser. The raw packed
+        # values are recorded here instead, so the checks test the parsing
+        # and nothing else.
+        #
+        # persLevel and leadLevel pack three nibbles low to high as skills,
+        # courage, discipline; the panel prints skills, discipline, courage,
+        # so the middle two are crossed. Levels display one higher than they
+        # are stored, boosters display as stored. The player's own 0x220 is
+        # the case that fixes it: 0/2/2 on the panel.
+        print(f"\n=== parser fixtures ===")
+        for label, pers, lead, levels, points in (
+                ("panel 4/5/5 ups 13/2/2", 1091, 557, [4, 5, 5], [13, 2, 2]),
+                ("panel 4/5/4 ups 1/0/0", 1075, 1, [4, 5, 4], [1, 0, 0]),
+                ("panel 4/3/5 ups 1/1/0", 579, 257, [4, 3, 5], [1, 1, 0]),
+                ("panel 3/4/3 ups 0/1/1", 802, 272, [3, 4, 3], [0, 1, 1]),
+        ):
+            attrs = PilotAttributes(pers, lead)
+            check(f"{label} levels",
+                  [r["level"] for r in attrs.display_rows()], levels)
+            check(f"{label} points",
+                  [r["points"] for r in attrs.display_rows()], points)
+
+        # The commander has no simulated skill: the panel draws him no bars
+        # at all and shows boosters instead. leadLevel 0x220 is 0/2/2.
+        commander = PilotAttributes(0, 0x220)
+        check("commander has no levels", commander.has_levels, False)
+        check("commander levels are None",
+              [r["level"] for r in commander.display_rows()], [None, None, None])
+        check("commander points", [r["points"] for r in commander.display_rows()],
+              [0, 2, 2])
+
+        # A hand-totted killStats blob, using only keys this game actually
+        # writes. Five aircraft of which one was parked, so four airborne;
+        # ground targets are the truck, the two tanks, the three guns and the
+        # parked aircraft - a parked plane is a ground target - so 10 + 2 + 3
+        # + 1 = 16. The first draft of this used "MediumBomber", which the
+        # game never emits, and the parser quite rightly binned it as unknown
+        # ground clutter and returned 17.
+        ks = KillStats("Aircraft=5&LightFighter=3&MediumAttackPlane=1"
+                       "&StaticPlane=1&Truck=10&MediumTank=2&HeavyFlak=3")
+        check("fixture airborne", ks.airborne, 4)
+        check("fixture static air", ks.static_air, 1)
+        check("fixture ground targets", ks.ground_targets, 16)
+        check("empty killStats is zero, not negative", KillStats("").airborne, 0)
+        check("malformed killStats is zero", KillStats("rubbish").airborne, 0)
+
+        # ---- checks against this career -----------------------------------
         print(f"\n=== checks ===")
-        rivera = next((p for p in pilots if p["id"] == 17), None)
+        fixture_career = target.pilot_name == "Manuel Rivera"
+        rivera = next((p for p in pilots if p["id"] == 17), None) if fixture_career else None
         if rivera is not None:
             ra = PilotAttributes(rivera["persLevel"], rivera["leadLevel"])
             # From the in-game panel: SKILLS 4, DISCIPLINE 5, COURAGE 5, ups 13/2/2
@@ -154,7 +218,8 @@ def main(game_arg):
             check("player rank name",
                   locale.rank_name(player["country"], player["rankId"]), "Major")
 
-        funston = next((p for p in pilots if p["id"] == 8), None)
+        funston = (next((p for p in pilots if p["id"] == 8), None)
+                   if fixture_career else None)
         if funston is not None:
             fa = PilotAttributes(funston["persLevel"], funston["leadLevel"])
             # From the in-game panel: SKILLS 4, DISCIPLINE 5, COURAGE 4, ups 1/0/0.
@@ -178,15 +243,16 @@ def main(game_arg):
         # The player's own panel reports up-numbers 0 / 2 / 2 in display order,
         # from leadLevel 0x220. A third pilot confirming the packed order, and
         # the only one whose skills nibble is zero.
+        # Whatever career is installed, the player is the one man the game
+        # simulates no skill for. That is an invariant, not a fixture.
         pa = PilotAttributes(player["persLevel"], player["leadLevel"])
-        check("player up-points", [r["points"] for r in pa.display_rows()], [0, 2, 2])
-        # The commander's panel shows boosters and draws no bars at all.
         check("player has no skill levels", pa.has_levels, False)
         check("player levels are None",
               [r["level"] for r in pa.display_rows()], [None, None, None])
 
-        for pid, levels, points in ((4, [4, 3, 5], [1, 1, 0]),
-                                    (11, [3, 4, 3], [0, 1, 1])):
+        for pid, levels, points in (() if not fixture_career else
+                                    ((4, [4, 3, 5], [1, 1, 0]),
+                                     (11, [3, 4, 3], [0, 1, 1]))):
             row = next((p for p in pilots if p["id"] == pid), None)
             if row is None:
                 continue
@@ -196,8 +262,12 @@ def main(game_arg):
             check(f"pilot {pid} up-points",
                   [r["points"] for r in attrs.display_rows()], points)
 
-        m50 = db.query_one(
-            "SELECT * FROM sortie WHERE isPlayer=1 AND missionId=50")
+        m50 = (db.query_one("SELECT * FROM sortie WHERE isPlayer=1 AND missionId=50")
+               if fixture_career else None)
+        if not fixture_career:
+            skip("career fixtures (pilots 4/8/11/17, missions 31 and 50)",
+                 f"recorded against {FIXTURE_CAREER}; "
+                 f"installed is {target.pilot_name}, {target.squadron_name}")
         if m50 is not None:
             # The DSC sortie: 4 airborne Yak-9P + 1 La-11 destroyed on the ground.
             k = KillStats(m50["killStats"])
@@ -208,10 +278,23 @@ def main(game_arg):
         # the sortie rows positionally. Two unrelated fields have to agree for
         # every pair, or the attribution is guesswork: the flight time and the
         # air-kill count. Checked over every mission, not a sampled one.
-        pairs = flights = 0
+        # The flight-time half of this has to allow for the tracker's own
+        # corrections: applying them rewrites sortie.flightTime on purpose, so
+        # on a corrected mission the blob and the row are *meant* to differ.
+        # Checking them anyway made the validator fail on a working product -
+        # fifteen missions, every one of them in the sidecar. The kill half is
+        # untouched by corrections and stays strict everywhere.
+        corrected = set()
+        try:
+            sidecar = corrections.load(target.path.stem) or {}
+            corrected = {int(k) for k in (sidecar.get("missions") or {})
+                         if str(k).isdigit()}
+        except Exception:                      # no sidecar is not a failure
+            pass
+
+        total = kills_ok = times_ok = times_checked = flights = 0
         for row in db.query("SELECT id, result FROM mission"):
-            result = MissionResult(row["result"])
-            slots = result.flight_slots()
+            slots = MissionResult(row["result"]).flight_slots()
             sorties = db.query(
                 """SELECT killStats, flightTime FROM sortie
                    WHERE missionId=? AND isDeleted=0 AND isPlayer=0
@@ -220,19 +303,28 @@ def main(game_arg):
                 continue
             flights += 1
             for slot, sortie in zip(slots, sorties):
-                if (int(slot["totalFlightTime"]) == sortie["flightTime"]
-                        and _blob_air(slot) == KillStats(sortie["killStats"]).airborne):
-                    pairs += 1
+                total += 1
+                if _blob_air(slot) == KillStats(sortie["killStats"]).airborne:
+                    kills_ok += 1
+                if row["id"] in corrected:
+                    continue
+                times_checked += 1
+                if int(slot["totalFlightTime"]) == sortie["flightTime"]:
+                    times_ok += 1
+        every_ai_sortie = sum(len(db.query(
+            """SELECT id FROM sortie WHERE missionId=? AND isDeleted=0
+               AND isPlayer=0""", (r["id"],)))
+            for r in db.query("SELECT id FROM mission"))
         check("AI slot pairing covers every mission", flights > 0, True)
-        check("AI slots agree on time and air kills",
-              pairs, sum(len(db.query(
-                  """SELECT id FROM sortie WHERE missionId=? AND isDeleted=0
-                     AND isPlayer=0""", (r["id"],)))
-                  for r in db.query("SELECT id FROM mission")))
+        check("AI slot pairing reaches every AI sortie", total, every_ai_sortie)
+        check("AI slots agree on air kills", kills_ok, total)
+        check(f"AI slots agree on flight time ({len(corrected)} corrected "
+              f"mission(s) excluded)", times_ok, times_checked)
 
         aggregator = CareerAggregator(game_dir)
-        detail = aggregator.mission_detail(
+        detail = (aggregator.mission_detail(
             f"{target.pilot_name}, {target.squadron_name}", 34)
+            if fixture_career else None)
         if detail is not None:
             # The one AI air kill that mission belongs to Manuel Rivera, and
             # killStats says so independently of the blob.
@@ -289,6 +381,8 @@ def main(game_arg):
             check("601021 in_proc reachable", dsc.reachable_in_proc, True)
 
     print()
+    if SKIPPED:
+        print(f"skipped {len(SKIPPED)}: {SKIPPED}")
     if FAILURES:
         print(f"FAILED: {len(FAILURES)} check(s): {FAILURES}")
         return 1
