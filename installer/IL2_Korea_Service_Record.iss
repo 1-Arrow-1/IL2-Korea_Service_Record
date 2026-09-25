@@ -24,7 +24,7 @@
 
 #define MyAppName "IL-2 Korea Service Record"
 #define MyAppExeName "IL2_Korea_Service_Record.exe"
-#define MyAppVersion "1.6.1"
+#define MyAppVersion "1.7.0"
 #define MyAppPublisher "Arrow_1"
 
 [Setup]

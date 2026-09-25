@@ -23,7 +23,7 @@ import zipfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-VERSION = "1.6.1"
+VERSION = "1.7.0"
 SETUP = REPO / "installer" / "Output" / f"IL2_Korea_Service_Record_Setup_v{VERSION}.exe"
 OUT = REPO / "installer" / "Output" / f"IL-2 Korea Service Record v{VERSION}.zip"
 ROOT = f"IL-2 Korea Service Record v{VERSION}"
