@@ -314,6 +314,11 @@ def pilot_variables(pilot, career, squadron=None) -> Dict[str, float]:
     counts as a ground kill and appears in ``GrObj`` instead; and ``CDate`` is
     the campaign date as a bare YYYYMMDD integer.
 
+    ``CareerDays`` belongs to the career rather than the man, which matters
+    for replacements: a pilot who joins in week three is credited with the
+    whole campaign's length, so the long-service medals reach him on the same
+    day they reach everybody else.
+
     ``ComplSorties`` is read as the pilot's *good* sorties and ``Sorties`` as
     his total. On this career the two are equal so the choice is not yet
     settled by evidence - if an award ever fires a sortie early or late, this
@@ -324,9 +329,12 @@ def pilot_variables(pilot, career, squadron=None) -> Dict[str, float]:
     from .career.killstats import KillStats
 
     kills = KillStats(pilot["killStats"] if "killStats" in pilot.keys() else "")
-    start = pilot["careerStartDate"] if "careerStartDate" in pilot.keys() else None
     now = career["currentDate"] if career is not None else ""
-    days = _days(start or (career["startDate"] if career is not None else ""), now)
+    # CareerDays counts from the *career's* start, not the pilot's own.
+    # LeRoy Pound settles it: he joined on 1951.04.12 and received the UN
+    # Korean Service Medal - (CareerDays>=30) - on 1951.05.06. That is 24
+    # days of his own service and 34 of the career's, which began 04.02.
+    days = _days(career["startDate"] if career is not None else "", now)
     values = {
         "country": float(pilot["country"] or 0),
         "rankid": float(pilot["rankId"] or 0),
