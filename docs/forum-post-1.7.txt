@@ -16,9 +16,8 @@ Five findings, and none of them are guesses:
     in the force you send. Every other leader's are dead weight for that mission.
   * **Courage buys kills and costs lives**, by equal amounts, in the same table.
   * **Fatigue does nothing.** Nothing in the game reads it.
-  * **Seating is worth about four per cent**, so do not agonise over it — but the
-    arrangement that looks most obviously right is ten per cent *worse*, for a reason
-    below.
+  * **Your boosters are worth about forty per cent of a force's effectiveness** — small
+    per man, but you are boosting seven of them at once.
 
 The mod is unchanged from 1.6.1, byte for byte. If you do not use the Career Helper there
 is nothing here you need.
@@ -72,29 +71,38 @@ an ordinary decoration raises one of a man's own attributes, a promotion raises 
 boosters instead. The most-promoted men are the ones worth putting in charge.
 
 
-SO WHERE SHOULD PEOPLE SIT?
+WHAT THAT IS WORTH, AND WHERE PEOPLE SHOULD SIT
 
-I set out to build a clever optimiser and the arithmetic talked me out of it.
+One booster point is 0.05 against an attribute's full span of 0.20, so per man it is
+small. But the commander boosts seven other men at once, and mine are 0/2/2 — two
+attributes, seven pilots. Measured on my own squadron, that adds **+1.30 to an eight-ship
+force** whose unboosted value is about 3.25. Getting the right man in command is the
+largest single thing you control.
 
-A booster point is worth 0.05. The full span of an attribute is 0.20. Ability outweighs
-boosters four to one, and the booster is clamped, so **a pilot already at 4 gains nothing
-from one**. Six of my twenty are at skill 4 and two are at 4/4/4, for whom no commander
-does anything at all.
+It is clamped, though. A pilot already at 4 gains nothing. Six of my twenty are at skill 4
+and two are at 4/4/4, for whom no commander does anything whatsoever — so boosters land
+hardest on a force with room to grow, and are half wasted on a flight of veterans.
 
-Scoring my best eight-aircraft force and then searching for the best arrangement that
-exists:
+Seating itself matters less than that, and in a way that depends on how you play. Scoring
+the best eight-ship force I can put up:
 
-    as it stood         5.05
-    best possible       5.25      +4%, and losses rise by the same proportion
+                                  you flying     you on the ground
+    as it stands                     4.55              5.05
+    strongest man from slot 0 down   4.75 (+4%)        4.45 (-12%)
 
-Four per cent, cancelled by the extra losses. Whereas stacking your best men from slot 0
-downwards — the obvious arrangement — came out **ten per cent worse**, and the reason is
-the cap: it puts your strongest pilots under yourself, and if their courage and discipline
-are already at the ceiling your boosters are thrown away on them.
+If you fly every mission, stacking your best men in the first flights is slightly better,
+because you can send them as a unit and you are commanding regardless. If you often sit
+one out, it is considerably worse, because it leaves the later flights under men with no
+boosters to give — and one of them will be in command.
 
-So the board proposes one seating and offers no choice of doctrine, because I measured the
-choice and it is not worth having. The one thing worth doing by hand: put your
-best-boosted leader with men who still have room to grow, not with the 5/5/5s.
+Note what does *not* appear in that table: which flight a pilot sits in relative to you.
+Your boosters cover everyone in the force, wherever they are seated. Seating decides who
+can be sent together, and who commands when you stay behind. Nothing else.
+
+The board's proposal hedges — good fliers spread so any pair of flights is sendable, best
+boosters on the leads so whoever ends up commanding has something to give. Searching for
+the best arrangement that exists beats it by about four per cent, which is not worth a
+setting.
 
 
 FATIGUE, WHICH IS NOTHING
