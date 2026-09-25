@@ -10,17 +10,19 @@ reads, and what it does with them.
 
 Five findings, and none of them are guesses:
 
-  * **Skills 5 flies exactly like skills 4.** The value is capped at 4 before it reaches
-    the mission. The fifth point buys nothing in the air.
+  * **A pilot at skills 5 flies exactly like one at skills 4.** The mission's own AI
+    rating runs 0 to 4 and saturates there, so the fifth point buys nothing in the air.
   * **Only one man's boosters count on a sortie** — whoever holds the lowest-numbered seat
     in the force you send. Every other leader's are dead weight for that mission.
-  * **Courage buys kills and costs lives**, by equal amounts, in the same table.
-  * **Fatigue does nothing.** Nothing in the game reads it.
-  * **Your boosters are worth about forty per cent of a force's effectiveness** — small
-    per man, but you are boosting seven of them at once.
+  * **Courage buys kills and costs lives**, through equal-sized coefficients in the
+    same table.
+  * **Fatigue appears to do nothing.** I could find no read of it anywhere; every
+    reference I can identify is a write.
+  * **The commander's boosters add about forty per cent** to my own eight-ship force —
+    small per man, but he is boosting seven of them at once.
 
-The mod is unchanged from 1.6.1, byte for byte. If you do not use the Career Helper there
-is nothing here you need.
+The awards mod is unchanged from 1.6.1, byte for byte — 1.7 touches the Service Record
+and the Career Helper only, so there is nothing to merge or redo on the award side.
 
 
 WHAT THE ENGINE READS
@@ -28,13 +30,19 @@ WHAT THE ENGINE READS
 Two separate reckonings, using different numbers.
 
 **In the air: skill alone.** When a mission is built, each of your wingmen is given an AI
-level. It is his displayed skill, capped at 4, one lower if he is hurt. Courage and
-discipline never reach the mission file. That cap is why a 5 flies like a 4.
+rating on a scale of its own, 0 to 4. Fitting it against every pilot in one of my
+generated missions, it is his skill as the game shows it — 1 to 5 — capped at 4, and one
+lower if he is hurt. So skills 4 and skills 5 both come out as a 4, and the fifth point is
+spent for nothing. Courage and discipline never reach the mission file at all.
+
+One gap I should own: the commander in that mission had no skill booster, so I cannot say
+whether a booster can push a man up that scale the way it does in the reckoning below. It
+makes no difference to the point about the ceiling.
 
 **Off screen: all three, plus the commander's boosters.** The campaign resolves AI results
 through a table of coefficients:
 
-                     attribute 1 ....... 5
+                     attribute as the game shows it, 1 ....... 5
     FightKills   skill       0.10 → 0.30
                  courage     0.00 → 0.20
                  discipline  0.00 → 0.20
@@ -46,7 +54,7 @@ through a table of coefficients:
                  discipline  0.20 → 0.00     more discipline, fewer losses
 
 Read the Losses row twice. Courage is the only attribute that cuts both ways: the same
-0.20 that buys you victories buys you funerals. A bold squadron scores more and dies more,
+0.20 of coefficient that buys you victories buys you funerals. A bold squadron scores more and dies more,
 and nothing in the game mentions it.
 
 Before that lookup, the commander's boosters are added to each man's three attributes and
@@ -65,8 +73,8 @@ combinations, predicted a fifth before looking, and then found the code doing th
 thing.
 
 Two things the game does not tell you. The chips are printed **skills, discipline,
-courage**, which is not the order the values are stored in, so the middle two are crossed
-over against anything else you compare them to. And the boosters come from **promotions** —
+courage**, while the values are stored **skills, courage, discipline** — the middle two are
+crossed over, which will catch you out if you compare the screen against anything else. And the boosters come from **promotions** —
 an ordinary decoration raises one of a man's own attributes, a promotion raises one of his
 boosters instead. The most-promoted men are the ones worth putting in charge.
 
@@ -75,13 +83,15 @@ WHAT THAT IS WORTH, AND WHERE PEOPLE SHOULD SIT
 
 One booster point is 0.05 against an attribute's full span of 0.20, so per man it is
 small. But the commander boosts seven other men at once, and mine are 0/2/2 — two
-attributes, seven pilots. Measured on my own squadron, that adds **+1.30 to an eight-ship
-force** whose unboosted value is about 3.25. Getting the right man in command is the
-largest single thing you control.
+attributes, seven pilots. On my squadron that adds **+1.30 to an eight-ship force** whose
+unboosted score is about 3.25. Your own mileage depends entirely on your commander, your
+pilots and who you send, but it makes choosing him the largest single seating decision
+there is.
 
-It is clamped, though. A pilot already at 4 gains nothing. Six of my twenty are at skill 4
-and two are at 4/4/4, for whom no commander does anything whatsoever — so boosters land
-hardest on a force with room to grow, and are half wasted on a flight of veterans.
+It is clamped at 5, though — the top of the scale you see in game. A pilot already at 5
+gains nothing. Six of my twenty are at skill 5 and two are at 5/5/5, for whom no commander
+does anything whatsoever, so boosters land hardest on a force with room to grow and are
+half wasted on a flight of veterans.
 
 Seating itself matters less than that, and in a way that depends on how you play. Scoring
 the best eight-ship force I can put up, per AI pilot in it — you are not in the count,
@@ -156,7 +166,7 @@ DOWNLOAD
     IL-2 Korea Service Record v1.7.0
     setup SHA-256  ae2b743ecfaf4be3069481012e0bdb863a82e14017a8d3a7f0281f41e7ee2f67
 
-Install over 1.6.x; photographs, settings and corrections are kept. The mod is unchanged,
-so leave your awards as they are.
+Install over 1.6.x; photographs, settings and corrections are kept. The awards mod is
+unchanged, so leave your awards as they are.
 
 Corrections welcome, particularly on fatigue.
