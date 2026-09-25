@@ -1,0 +1,273 @@
+IL-2 Korea Service Record 1.7.0 — a seating board for the squadron, and what taking the
+career engine apart says about who should sit where
+
+
+Gentlemen,
+
+1.7 adds one screen and answers a question I have wanted answered since I started this:
+what does the game actually do with a pilot's numbers? The new screen is a seating board
+for the squadron. The answer turned out to be more interesting than the screen, so most of
+this post is the answer, and you can use it whether or not you ever open the tool.
+
+The short version, for anyone who reads no further:
+
+  * Skills 5 and skills 4 fly identically. The cap is 4.
+  * Only one man's "boosters" count on a mission — whoever holds the lowest-numbered
+    seat you send. Everybody else's are dead weight for that sortie.
+  * Courage buys kills and costs lives, in the same table, in opposite directions.
+  * Fatigue does nothing at all. Nothing in the game reads it.
+  * And seating barely matters. A perfect arrangement is about four per cent better
+    than a sensible one, so do not lose sleep over it.
+
+The mod is unchanged from 1.6.1 — same awards.cfg, byte for byte. If you are on 1.6.1 and
+do not use the Career Helper, there is nothing here you need.
+
+
+THE FLIGHTS BOARD
+
+The Career Helper has a new tab. It draws your squadron the way the Combat Units screen
+does — six flights of four, the two sections of each flight ruled apart, the alert flight
+outlined — and puts on every card the numbers you would otherwise have to open twenty
+pilot files to read: name, tail number, his own skills / discipline / courage in the order
+his panel prints them, what the game will rate him as in the air, his boosters, and
+whether he is fit to fly at all.
+
+Underneath sits the reserve, best first, with the same numbers. That is the part I wanted
+for myself: you can see at a glance whether somebody on the bench out-flies somebody in
+the line-up. On my squadron two men did.
+
+You rearrange it by clicking. Click a pilot, click another, they swap. Click a man on the
+bench and then a seat, and he takes the seat and its aeroplane while the man he replaces
+goes down to the pool. There is a button that proposes a whole seating, and a button that
+throws your changes away and reads the career back from disk. Apply writes it, after
+taking a backup, in one transaction, and refuses outright if IL-2 has the file open.
+
+It will not let you do a few things, all for the same reason: an exchange must be one for
+one. You cannot add a twenty-first man to a twenty-aircraft squadron, because the
+twenty-first would have nothing to fly. You cannot bring up a man who is in hospital or
+still walking home. Those are not fussiness — they are what keeps an airframe from being
+stranded in a slot the game never looks at.
+
+
+HOW A SQUADRON IS ACTUALLY ARRANGED
+
+There is no "flight" or "section" anywhere in a career file. There is one number per
+pilot, his slot, and everything else is arithmetic on it:
+
+    flight  = slot / 4          six of them: Red, Blue, Green, Yellow, White, Black
+    section = slot / 2          twelve of them, two per flight
+
+So slots 0-3 are Red, 4-7 Blue, and so on, and within each flight the first two seats are
+one section and the last two the other. Reserve pilots live at 2000 and up, the dead at
+5000 and up, and 1000 and up means a man who is off the strength for some reason.
+
+**The aircraft belongs to the man, not the seat.** I tested this by swapping two pilots in
+game and diffing the file: both the pilot slot and the aeroplane slot moved, so the man
+kept his own tail number rather than inheriting the seat's. Any tool that reseats pilots
+has to move the pair.
+
+**The alert flight is not fixed.** It defaults to flight 6 but you can put the D anywhere,
+and it is stored as a plain list of seats — `watchmen = slot|20|21|22|23`. Duty belongs to
+the seats, not the men, so moving people around changes who stands alert without changing
+the assignment.
+
+**The reserve is a queue.** A man sent down is appended to the end; when one is promoted,
+everybody above him shifts down to close the gap.
+
+One find I did not expect: your career file keeps a log of every rearrangement you have
+ever made. Every time you commit a change on that screen the game writes a row recording
+the complete pilot-to-slot and aeroplane-to-slot mapping, plus the alert list. Mine had
+forty-eight of them, and diffing consecutive rows reconstructs every promotion, demotion
+and loss of the campaign so far. That is where the rules above came from — the game's own
+record of what it did, rather than me guessing.
+
+
+WHAT THE GAME READS WHEN IT DECIDES
+
+Two different things happen with a pilot's numbers, and they use different ones.
+
+**In the air, only skill counts.** When the game builds a mission it writes an AI level
+for each of your wingmen. I fitted it against every pilot in my own generated mission:
+
+    AI level = his displayed skill, capped at 4, one lower if he is hurt
+
+Which means the thing worth saying plainly: **a pilot at skills 5 flies no better than one
+at skills 4.** The fifth point is wasted in the air. Courage and discipline do not appear
+in the mission file at all — they are for the campaign's own reckoning, below. And a
+wounded man measurably flies worse, which is the one bit of the model that rests on a
+single observation, so treat it as likely rather than certain.
+
+**Off screen, all three count, and so does the commander.** There is a file in the
+campaign data, ranks-effectiveness.cfg, holding three tables:
+
+                     attribute 1 ....... 5
+    FightKills   skill       0.10 → 0.30
+                 courage     0.00 → 0.20
+                 discipline  0.00 → 0.20
+    BombKills    skill       0.05 → 0.25
+                 courage     0.00 → 0.20
+                 discipline  0.00 → 0.20
+    Losses       skill       0.20 → 0.00      more skill, fewer losses
+                 courage     0.00 → 0.20      more courage, MORE losses
+                 discipline  0.20 → 0.00      more discipline, fewer losses
+
+I could not find anything that read that file, and for a while I assumed it was dead. It
+is not. The function that uses it gives itself away in its own error message —
+"Ranks-effectiveness.cfg: no %s koefs block" — and it is asked for three categories by
+name: fightkills, bombkills, losses. What it does is this:
+
+    if there is a commander, and he is not this pilot:
+        skill      = min(4, his skill      + the commander's skill booster)
+        courage    = min(4, his courage    + the commander's courage booster)
+        discipline = min(4, his discipline + the commander's discipline booster)
+    otherwise use his own three unchanged
+
+then it looks each one up in that category's table and adds the three numbers together.
+
+Read the Losses row again. **Courage is the only attribute that cuts both ways**: it buys
+kills and it costs lives, by the same amount, in the same table. A bold squadron scores
+more and buries more. That is a deliberate and rather good piece of design, and nothing in
+the game tells you about it.
+
+
+THE COMMANDER, AND THE PURPLE ARROWS
+
+Those little purple up-arrows on a pilot's card — the game calls them boosters — are what
+he gives the men flying with him. They are not part of his own ability; he never boosts
+himself.
+
+**Exactly one man's boosters apply to a mission: whoever holds the lowest-numbered seat in
+the force you send.** Not each flight's leader, not the section leaders. One man, covering
+every aircraft that goes.
+
+You can watch this happen without any tools. Send different combinations from the mission
+screen and the three purple chips at the top change to match whoever ends up in command —
+Blue's leader if Red stays home, Green's if Red and Blue both do. I checked four
+combinations, predicted the fifth before looking, and it came up right. Then the code said
+the same thing: the function above is handed the first pilot in the group list as the
+commander for every man in it.
+
+Two details worth knowing.
+
+The chips are printed in the panel's order — **skills, discipline, courage** — which is
+not the order the values are stored in. If you are comparing what the screen says against
+anything else, the middle two are crossed over.
+
+And the boosters come from **promotions**. An ordinary decoration raises one of a pilot's
+own three attributes; a promotion raises one of his boosters instead, capped at 4, picking
+the attribute the same way. So the men who have been promoted most are the men worth
+putting in charge — which is at least a pleasing bit of design.
+
+
+SO WHERE SHOULD PEOPLE SIT?
+
+Here is where I have to be honest, because I set out to build a clever optimiser and the
+arithmetic talked me out of it.
+
+Everything above is real, but the numbers are small. One booster point is worth 0.05. The
+full range of an attribute is 0.20. So raw ability outweighs a booster four to one, and
+the booster is clamped: **a pilot already at 4 gains nothing from it.** Six of my twenty
+are at skill 4 already and two are at 4/4/4, for whom no commander's boosters do anything
+whatsoever.
+
+I scored my squadron's best eight-aircraft force — eight being the cap on very nearly
+every mission type; the twelve-ship ones are relocations — and then hill-climbed to find
+the best arrangement that exists:
+
+    as it is now        5.05
+    the best possible   5.25      +4%, and losses rise by the same proportion
+
+Four per cent, cancelled out by the extra losses. Meanwhile the arrangement that looks
+most obviously right — strongest man in slot 0 and down from there — scored **ten per cent
+worse** than what I already had, for a reason that is only obvious once you know about the
+cap: it stacks your best pilots under yourself, and if their courage and discipline are
+already at the ceiling then your boosters are thrown away on them.
+
+So the tool proposes one seating and offers you no choice of philosophy, because I
+measured the choice and it is not worth making. The rules it uses:
+
+  * you keep your own seat;
+  * lead seats go to the best boosters, then the best fliers, and never to anyone the
+    game would rate below 3 in the air;
+  * wingman seats go on ability;
+  * nobody unfit is brought up from the reserve, and the alert seats get nobody hurt;
+  * and when two men are equally good for a seat, the one already sitting in it stays,
+    because a suggestion you have to undo by hand is worse than no suggestion.
+
+The one thing worth doing by hand, which no algorithm fixes: if you are choosing where to
+put your best-boosted leader, put him with men who still have room to grow. Not with the
+5/5/5s. They cannot use it.
+
+
+FATIGUE, WHICH TURNS OUT TO BE NOTHING
+
+I built a rest threshold into the board and then took it out again, and I think the reason
+is worth writing down.
+
+Fatigue is real and it moves: it runs 0 to 9, a sortie adds one, a day on the ground takes
+one back. I found both of those in the code and they are not in doubt.
+
+What I could not find was anything that reads it. Every reference to the field is a write.
+No other part of the game queries the pilot table at all. Nothing in the generated mission
+varies with it — two of my pilots flew at fatigue 6 and were rated exactly the same as men
+at 2. And the game does not display it.
+
+I want to be careful here, because I made exactly this claim about the boosters and was
+wrong: I had said no code read those either, and then found the function that does. The
+difference is that for the boosters I had missed something — the reading function sat
+right next to the database routines and I passed over it without opening it. For fatigue I
+have since gone back and enumerated every single instruction that touches the field, and
+they are all writes.
+
+So: it is recorded, it is never read, and the tool ignores it. If somebody can show me an
+effect, I will happily put it back.
+
+
+PILOT STATES, WHICH I ALSO GOT WRONG
+
+Worth a line because it bit me. A pilot's state is not just alive or dead. 0 means
+available; 1 means walking home after going down, unhurt, with the time he gets back
+recorded; 2 killed; 3 missing; 4 in hospital. A man at state 1 can still be sitting in a
+line-up seat — the game leaves him there and greys him out — so a seat number on its own
+never tells you a pilot can fly. My first version cheerfully promoted my best pilot into
+the line-up while he was still walking back across Korea.
+
+
+THE REST OF 1.7
+
+**Present every pending award at once.** The Award points tab now lists every decoration
+your pilots have earned and not been given, with their standing beside them, and hands
+them all over in one go — costing the award points it should, adding the attribute point
+the game adds, writing the same event the game writes. The killed and the missing are
+listed in red and not ticked: a posthumous award is a decision, not something to slip past
+by accident.
+
+**The Career Helper looks like the Service Record now** rather than a grey utility
+bolted to the side of it, and it closes when you close the Service Record, from the page
+or from the tray. That last one was embarrassing to have missed.
+
+**Aircraft and materiel on the squadron panel** are now laid out properly, aircraft on one
+side and stores on the other, with drawn icons rather than text glyphs.
+
+**A parsing fault of mine, fixed.** Six stock awards — the Order of the Red Banner in all
+three awardings, Hero of the Soviet Union, the Order of Lenin and the DPRK Hero's Medal —
+write their condition across two lines. The engine joins them back together; I was reading
+only the first half, which made the top Soviet and Korean decorations look malformed when
+they were nothing of the sort. My error, not the game's.
+
+
+DOWNLOAD
+
+    IL-2 Korea Service Record v1.7.0
+    setup SHA-256  ae2b743ecfaf4be3069481012e0bdb863a82e14017a8d3a7f0281f41e7ee2f67
+
+Install over the top of 1.6.x; your photographs, settings and corrections are kept. The
+mod is unchanged, so if you already have 1.6.1's awards installed you can leave them
+alone.
+
+As always: this reads your career files and, where you ask it to, writes them. Every write
+takes a backup first and none of them touch anything while the game has the file open. But
+they are your careers, and I would keep a copy of anything you would be sorry to lose.
+
+Corrections welcome, particularly on fatigue — I would rather be shown wrong than leave
+something out of the tool that matters.
