@@ -53,6 +53,12 @@ CONTEXT = {
     "opgood", "opsuccess", "battleend", "noawards",
 }
 
+# Context conditions a reader can do something about, or at least recognise
+# as a state he might one day be in. The rest - the wrong air force, a
+# campaign date that has not arrived, an operation flag - mean the award is
+# not his to chase and the row is better left out than explained away.
+PREREQUISITE = {"wia", "rankid", "iscommander"}
+
 
 class Gap(NamedTuple):
     """One unmet comparison, and how far off it is."""
@@ -276,6 +282,13 @@ def _distance(gaps: List[Gap]) -> float:
     worst = 1.0
     for gap in gaps:
         if gap.kind == "context":
+            # A prerequisite is distant but not impossible - a man may yet be
+            # wounded or promoted - so it sorts after everything measurable
+            # rather than dropping out of sight with the awards that belong
+            # to another air force.
+            if gap.variable.lower() in PREREQUISITE:
+                worst = 0.0
+                continue
             return 99.0
         if gap.kind == "dice":
             continue                        # never a barrier, only a chance
@@ -407,6 +420,18 @@ class Rung(NamedTuple):
         return [g for g in self.gaps if g.kind == "per_sortie"]
 
     @property
+    def prerequisites(self) -> List[Gap]:
+        """
+        States a man has to be in rather than numbers he has to reach.
+
+        The Purple Heart is the one that matters: its only real route is
+        ``WIA>=1``. Nobody is a percentage of the way to being wounded, and
+        nobody is waiting to be - so it is named as a condition of the award
+        and left at that.
+        """
+        return [g for g in self.gaps if g.kind == "context"]
+
+    @property
     def chance(self) -> Optional[float]:
         """
         The odds per evaluation, where the condition rests on a dice roll.
@@ -476,11 +501,62 @@ def next_rungs(awards, held: set, values: Dict[str, float],
         best = (ok, gaps)
 
         ok, gaps = best
-        if any(g.kind == "context" for g in gaps):
+        stoppers = [g for g in gaps if g.kind == "context"
+                    and g.variable.lower() not in PREREQUISITE]
+        if stoppers:
             continue                        # not this pilot's award at all
-        blocking = [g for g in gaps if g.kind in ("cumulative", "per_sortie")]
+        blocking = [g for g in gaps
+                    if g.kind in ("cumulative", "per_sortie", "context")]
         out.append(Rung(award.award_id, award.name, ok and not blocking, gaps,
                         0.0 if ok else _distance(gaps)))
 
     out.sort(key=lambda r: (not r.eligible, r.distance))
+    return out
+
+
+def alternatives(node, values: Dict[str, float], cap: int = 6) -> List[List[Gap]]:
+    """
+    Every distinct route through a condition, not just the nearest one.
+
+    ``evaluate`` answers "how close is he", which wants a single best path.
+    This answers "what are his options", which a standing requirement needs:
+    the Medal of Honor is six airborne kills in a sortie **or** five while
+    wounded, and the Distinguished Service Cross is exactly four at three in
+    five **or** exactly five at four in five. Showing one route hides the
+    better odds and, where the comparison is ``=`` rather than ``>=``, hides
+    that overshooting does not count.
+
+    The expansion is ordinary disjunctive normal form, capped because a
+    five-way OR inside an AND multiplies out fast and nobody reads six
+    alternatives anyway.
+    """
+    kind = node[0]
+    if kind == "or":
+        return (alternatives(node[1], values, cap)
+                + alternatives(node[2], values, cap))[:cap]
+    if kind == "and":
+        out: List[List[Gap]] = []
+        for left in alternatives(node[1], values, cap):
+            for right in alternatives(node[2], values, cap):
+                out.append(left + right)
+                if len(out) >= cap:
+                    return out
+        return out
+    _, gaps = evaluate(node, values)
+    return [gaps]
+
+
+def routes_for(expr: str, values: Dict[str, float]) -> List[List[Gap]]:
+    """The unsatisfied routes through a condition, nearest first, deduplicated."""
+    seen, out = set(), []
+    for gaps in alternatives(parse(expr), values):
+        blocking = [g for g in gaps if g.kind != "dice"]
+        if not blocking:
+            return []                       # one route is already open
+        key = tuple(sorted((g.variable, g.op, g.needed) for g in gaps))
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(gaps)
+    out.sort(key=_distance)
     return out

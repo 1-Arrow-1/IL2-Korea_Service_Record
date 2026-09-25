@@ -1226,7 +1226,10 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
    given. Anything louder would compete with them. */
 .progress-list { list-style: none; margin: .35rem 0 0; padding: 0; }
 .p-row {
-    display: grid; grid-template-columns: 1fr auto; gap: .35rem 1rem;
+    /* the name keeps at least two fifths of the row: a medal with two routes
+       and their odds will otherwise take the lot and crush "Silver Star"
+       down to "S.." */
+    display: grid; grid-template-columns: minmax(40%, 1fr) auto; gap: .35rem 1rem;
     align-items: baseline; padding: .28rem 0;
     border-bottom: 1px dotted var(--rule, #d8cbb0);
 }
@@ -1240,7 +1243,12 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .p-device { color: var(--ink-muted, #6b5a3f); font-size: .82rem; }
-.p-body { display: flex; align-items: center; gap: .45rem; white-space: nowrap; }
+.p-body {
+    display: flex; align-items: baseline; gap: .45rem;
+    flex-wrap: wrap; justify-content: flex-end; white-space: nowrap;
+}
+/* routes are the one thing long enough to need a second line */
+.p-routes { white-space: normal; text-align: right; }
 .p-bar {
     display: inline-block; width: 74px; height: 7px; border-radius: 3px;
     background: var(--rule, #d8cbb0); overflow: hidden; vertical-align: middle;
@@ -1248,6 +1256,14 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 .p-fill { display: block; height: 100%; background: var(--accent, #8b6f4a); }
 .p-num, .p-cond, .p-odds { font-size: .8rem; color: var(--ink-muted, #6b5a3f); }
 .p-cond { font-style: italic; }
+/* a prerequisite is a state, not a target: it is set in the same quiet ink
+   as the counters but upright, so it does not read as something pending */
+.p-prereq { font-size: .8rem; color: var(--ink-muted, #6b5a3f); }
+.p-routes { font-size: .8rem; font-style: italic; color: var(--ink-muted, #6b5a3f); }
+.p-or {
+    font-style: normal; text-transform: lowercase; padding: 0 .4rem;
+    color: var(--accent, #8b6f4a);
+}
 .p-odds:before { content: "· "; }
 .p-ready { font-size: .82rem; color: var(--accent-dark, #5a4022); font-weight: 600; }
 .p-promo .p-name { font-weight: 600; }

@@ -580,9 +580,24 @@
 
     function odds(chance) {
         if (!chance) return "";
-        const one = Math.round(1 / chance);
         return '<span class="p-odds">' +
-            esc(T("progress.odds", {n: one})) + "</span>";
+            esc(oddsText(chance).replace(" \u00b7 ", "")) + "</span>";
+    }
+
+    function prereqText(q) {
+        return q.kind === "rank" ? T("progress.req_rank", {rank: q.rank})
+            : q.kind === "command" ? T("progress.req_command")
+            : q.kind === "wia" ? T("progress.req_wia")
+            : q.what;
+    }
+
+    function oddsText(chance) {
+        if (!chance) return "";
+        // "about 1 in 1" is nonsense. Above a fifth a percentage reads
+        // properly; below it the one-in-N form is the clearer of the two.
+        return " \u00b7 " + (chance >= 0.2
+            ? T("progress.odds_pct", {n: Math.round(chance * 100)})
+            : T("progress.odds", {n: Math.round(1 / chance)}));
     }
 
     function progressItem(row) {
@@ -593,6 +608,26 @@
             body = '<span class="p-ready">' + esc(T("progress.eligible")) + "</span>";
         } else if (row.bars.length) {
             body = row.bars.map(progressBar).join("");
+        }
+        // more than one way in: list them, each with its own odds, joined
+        // by "or" - the reader is choosing between them, not progressing
+        // through them
+        if (!row.eligible && row.routes && row.routes.length > 1) {
+            body += '<span class="p-routes">' + row.routes.map((r) => {
+                const parts = r.conditions.map((cc) =>
+                    T(cc.exact ? "progress.exactly_in_one_sortie"
+                        : "progress.in_one_sortie", {n: fmtNum(cc.need)}))
+                    .concat(r.prereqs.map(prereqText));
+                return esc(parts.join(" + ")) + oddsText(r.chance);
+            }).join('<span class="p-or"> ' + esc(T("progress.or")) + " </span>") +
+                "</span>";
+            return '<li class="p-row" title="' + esc(row.name) +
+                '"><span class="p-name">' + title + "</span>" +
+                '<span class="p-body">' + body + "</span></li>";
+        }
+        if (row.prereqs && row.prereqs.length) {
+            body += row.prereqs.map((q) =>
+                '<span class="p-prereq">' + esc(prereqText(q)) + "</span>").join("");
         }
         if (row.conditions.length) {
             body += row.conditions.map((c) =>

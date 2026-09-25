@@ -159,7 +159,13 @@
     "odds": "etwa 1 zu {n} je Einsatz",
     "in_one_sortie": "{n} in einem einzigen Einsatz",
     "unit": "Für die Staffel",
-    "note": "Aus den Vergabekriterien der Kampagne selbst gelesen. Erfüllte Bedingungen machen eine Auszeichnung möglich, nicht sicher — über die meisten entscheidet ein Würfelwurf bei der Nachbesprechung."
+    "note": "Aus den Vergabekriterien der Kampagne selbst gelesen. Erfüllte Bedingungen machen eine Auszeichnung möglich, nicht sicher — über die meisten entscheidet ein Würfelwurf bei der Nachbesprechung.",
+    "req_wia": "Verwundung im Gefecht",
+    "req_rank": "erfordert {rank}",
+    "req_command": "erfordert Staffelführung",
+    "or": "oder",
+    "exactly_in_one_sortie": "genau {n} in einem einzigen Einsatz",
+    "odds_pct": "etwa {n}% je Einsatz"
   },
   "incidences": {
     "successor": "Übernahme der Laufbahn",

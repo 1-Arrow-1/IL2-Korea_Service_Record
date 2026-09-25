@@ -821,12 +821,30 @@ class CareerAggregator:
                               "fraction": round(g.fraction, 3)} for g in rung.bars],
                     "conditions": [{"what": g.variable, "need": g.needed}
                                    for g in rung.conditions],
+                    # A state the man has to be in rather than a number he
+                    # has to reach. Named plainly - "Wounded in Action" - and
+                    # not dressed up as something to work toward, because
+                    # nobody is a percentage of the way to being hit.
+                    "prereqs": [self._prereq(g, country)
+                                for g in rung.prerequisites],
+                    # Where nothing is measurable, a single "nearest" route
+                    # is a half-truth: the Medal of Honor is six kills in a
+                    # sortie *or* five while wounded, and the Distinguished
+                    # Service Cross is exactly four at three in five *or*
+                    # exactly five at four in five. Both are worth knowing,
+                    # so an award with no bar to draw lists its routes.
+                    "routes": self._routes(rung, values, country),
                 })
             return out
 
         country = int(subject["country"] or 0)
         values = prog.pilot_variables(subject, career, squad)
-        awards = rows(prog.next_rungs(self.awards_cfg, held, values, country), 8)
+        # "The next rung of each ladder" is self-limiting - a dozen or so for
+        # the USAF - so the cap is only a guard against a modded awards.cfg
+        # with far more ladders, not a shortlist. Cutting it tighter dropped
+        # the Medal of Honor and the Purple Heart, which are precisely the
+        # two a reader looks for.
+        awards = rows(prog.next_rungs(self.awards_cfg, held, values, country), 14)
 
         # The unit's citations are counted on the unit's totals, and the
         # squadron holds them, so they are asked for separately.
@@ -867,6 +885,47 @@ class CareerAggregator:
             break
 
         return {"awards": awards, "citations": citations, "promotion": promotion}
+
+    def _routes(self, rung, values, country: int) -> List[Dict[str, Any]]:
+        """The alternative ways in, for an award with nothing to measure."""
+        from .. import progress as prog
+
+        if rung.eligible or rung.bars:
+            return []
+        defn = self.awards_cfg.get(rung.award_id)
+        if defn is None or not defn.in_proc:
+            return []
+        out = []
+        for gaps in prog.routes_for(defn.in_proc, values)[:3]:
+            dice = [g for g in gaps if g.kind == "dice"]
+            out.append({
+                # WIASortie counts as a per-sortie variable in the engine,
+                # but to a reader it is a wound, not a tally - the Medal of
+                # Honor's second route is "wounded and five kills", not
+                # "one wound and five kills".
+                "conditions": [{"what": g.variable, "need": g.needed,
+                                "exact": g.op == "="}
+                               for g in gaps if g.kind == "per_sortie"
+                               and g.variable.lower() != "wiasortie"],
+                "prereqs": [self._prereq(g, country) for g in gaps
+                            if g.kind == "context"
+                            or g.variable.lower() == "wiasortie"],
+                "chance": min((g.needed for g in dice), default=0) / 1000.0
+                if dice else None,
+            })
+        return out if len(out) > 1 else []
+
+    def _prereq(self, gap, country: int) -> Dict[str, Any]:
+        """One context condition, in terms the page can put a name to."""
+        name = gap.variable.lower()
+        if name in ("wia", "wiasortie"):
+            return {"kind": "wia"}
+        if name == "rankid":
+            return {"kind": "rank",
+                    "rank": self.locale.rank_name(country, int(gap.needed))}
+        if name == "iscommander":
+            return {"kind": "command"}
+        return {"kind": "other", "what": gap.variable}
 
     def _citation_ladders(self, current, retired) -> List[Dict[str, Any]]:
         """

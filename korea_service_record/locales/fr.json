@@ -159,7 +159,13 @@
     "odds": "environ 1 sur {n} par mission",
     "in_one_sortie": "{n} en une seule sortie",
     "unit": "Pour l’escadron",
-    "note": "Lu dans les critères d’attribution de la campagne elle-même. Les remplir rend une décoration possible, non certaine : la plupart se décident sur un jet de dés au débriefing."
+    "note": "Lu dans les critères d’attribution de la campagne elle-même. Les remplir rend une décoration possible, non certaine : la plupart se décident sur un jet de dés au débriefing.",
+    "req_wia": "Blessé au combat",
+    "req_rank": "exige {rank}",
+    "req_command": "exige le commandement de l’escadron",
+    "or": "ou",
+    "exactly_in_one_sortie": "exactement {n} en une seule sortie",
+    "odds_pct": "environ {n}% par mission"
   },
   "incidences": {
     "successor": "A repris la carrière",

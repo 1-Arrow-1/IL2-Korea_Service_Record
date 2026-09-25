@@ -159,7 +159,13 @@
     "odds": "cerca de 1 entre {n} por misión",
     "in_one_sortie": "{n} en una sola salida",
     "unit": "Para el escuadrón",
-    "note": "Leído de los propios criterios de concesión de la campaña. Cumplirlos hace posible una condecoración, no segura: la mayoría se deciden con una tirada de dados en el informe posterior."
+    "note": "Leído de los propios criterios de concesión de la campaña. Cumplirlos hace posible una condecoración, no segura: la mayoría se deciden con una tirada de dados en el informe posterior.",
+    "req_wia": "Herido en combate",
+    "req_rank": "requiere {rank}",
+    "req_command": "requiere el mando del escuadrón",
+    "or": "o",
+    "exactly_in_one_sortie": "exactamente {n} en una sola salida",
+    "odds_pct": "cerca del {n}% por misión"
   },
   "incidences": {
     "successor": "Asumió la carrera",

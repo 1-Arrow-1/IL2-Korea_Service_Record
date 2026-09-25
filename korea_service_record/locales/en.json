@@ -159,7 +159,13 @@
     "odds": "about 1 in {n} a mission",
     "in_one_sortie": "{n} in a single sortie",
     "unit": "For the squadron",
-    "note": "Read from the campaign's own award criteria. Meeting them makes a decoration possible, not certain — most are settled by a dice roll at the debrief."
+    "note": "Read from the campaign's own award criteria. Meeting them makes a decoration possible, not certain — most are settled by a dice roll at the debrief.",
+    "req_wia": "Wounded in Action",
+    "req_rank": "requires {rank}",
+    "req_command": "requires squadron command",
+    "or": "or",
+    "exactly_in_one_sortie": "exactly {n} in a single sortie",
+    "odds_pct": "about {n}% a mission"
   },
   "incidences": {
     "successor": "Took over the career",
