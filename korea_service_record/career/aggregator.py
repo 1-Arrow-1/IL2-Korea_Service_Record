@@ -773,6 +773,95 @@ class CareerAggregator:
             seen.append(min(below))
         return seen[-1]
 
+    def _progress(self, db, subject, career, squad, held: set) -> Dict[str, Any]:
+        """
+        How close this pilot is to his next decoration, and the squadron to
+        its next citation.
+
+        Only the next rung of each ladder is offered. Every unearned award
+        would be forty-odd rows and would bury the two the man is actually
+        going to reach; the rung above the next one is unreachable anyway,
+        since it needs the one below it first.
+
+        A rung carries three different sorts of thing and the page must not
+        blur them. A cumulative counter can be drawn as a bar. A per-sortie
+        requirement cannot - "six airborne kills in one flight" is a standing
+        condition, not something a man is two thirds of the way through. And
+        a dice roll is neither: it is a chance per debrief, quoted so that a
+        Commendation Ribbon at one in five is not read as the same offer as a
+        Soldier's Medal at three in a thousand.
+        """
+        from .. import progress as prog
+
+        def rows(rungs, limit):
+            out = []
+            for rung in rungs[:limit]:
+                # Higher rungs are named for their device alone - "Bronze
+                # Oak Leaf Cluster in Lieu of 5th Award" - which says nothing
+                # about the medal it hangs on. The ladder's root carries the
+                # medal, so the row leads with that and keeps the device as
+                # the qualifier, the way the rack already reads.
+                root = self._ladder_root(rung.award_id)
+                device = self.award_name(rung.award_id)
+                headline = self.award_name(root)
+                out.append({
+                    "type": rung.award_id,
+                    "name": headline,
+                    "device": device if root != rung.award_id else "",
+                    "eligible": rung.eligible,
+                    "chance": rung.chance,
+                    "bars": [{"what": g.variable, "have": round(g.current, 1),
+                              "need": g.needed,
+                              "fraction": round(g.fraction, 3)} for g in rung.bars],
+                    "conditions": [{"what": g.variable, "need": g.needed}
+                                   for g in rung.conditions],
+                })
+            return out
+
+        country = int(subject["country"] or 0)
+        values = prog.pilot_variables(subject, career, squad)
+        awards = rows(prog.next_rungs(self.awards_cfg, held, values, country), 8)
+
+        # The unit's citations are counted on the unit's totals, and the
+        # squadron holds them, so they are asked for separately.
+        unit_held = {r["type"] for r in db.query(
+            "SELECT type FROM award WHERE pilotId<0 OR category=2")}
+        citations = rows(prog.next_rungs(
+            self.awards_cfg, unit_held,
+            prog.squadron_variables(squad, career, country), country,
+            squadron=True), 4)
+
+        # Promotions are pseudo-awards with no art and no name of their own,
+        # so they belong beside the rank rather than in the medal list.
+        promotion = None
+        for defn in sorted(self.awards_cfg.definitions.values(),
+                           key=lambda d: d.order):
+            if not defn.is_promotion or not defn.in_proc:
+                continue
+            node = prog.parse(defn.in_proc)
+            ok, gaps = prog.evaluate(node, values)
+            # the rung out of *this* rank, whether or not he is there yet
+            rank_gap = [g for g in gaps if g.variable.lower() == "rankid"]
+            if rank_gap or (not ok and not gaps):
+                continue
+            if ok:
+                promotion = {"rank": self.locale.rank_name(
+                    country, int(values.get("rankid", 0)) + 1), "ready": True,
+                    "bars": []}
+            else:
+                promotion = {
+                    "rank": self.locale.rank_name(
+                        country, int(values.get("rankid", 0)) + 1),
+                    "ready": False,
+                    "bars": [{"what": g.variable, "have": round(g.current, 1),
+                              "need": g.needed,
+                              "fraction": round(g.fraction, 3)}
+                             for g in gaps if g.kind == "cumulative"],
+                }
+            break
+
+        return {"awards": awards, "citations": citations, "promotion": promotion}
+
     def _citation_ladders(self, current, retired) -> List[Dict[str, Any]]:
         """
         Decorations to the unit itself, one row per ladder, every rung the
@@ -2349,6 +2438,9 @@ class CareerAggregator:
                 # IsSquadron=1: the engine files them under pilotId -1 with
                 # category 2, so they fall out of the same grouping the roster
                 # uses. Never pending — the engine grants them outright.
+                "progress": self._progress(
+                    db, player, career, squad,
+                    {r["type"] for r in player_awards}),
                 "citations": self._citation_ladders(
                     [r for r in awards_by_pilot.get(-1, []) if r["category"] == 2],
                     retired_citations),
