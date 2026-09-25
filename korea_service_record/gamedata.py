@@ -176,6 +176,7 @@ class AwardDefinition(NamedTuple):
     removes: str            # AwardRemove expression
     combo: Optional[str]
     is_promotion: bool
+    is_squadron: bool = False       # a unit citation: the squadron earns it
 
     @property
     def reachable_in_proc(self) -> bool:
@@ -259,6 +260,7 @@ class AwardsConfig:
                 removes=self._field(body, "AwardRemove"),
                 combo=self._field(body, "AwardCombo") or None,
                 is_promotion="IsPromotion=1" in body.replace(" ", ""),
+                is_squadron="IsSquadron=1" in body.replace(" ", ""),
             )
         logger.info("Loaded %d award definitions from %s",
                     len(self.definitions), self.path)

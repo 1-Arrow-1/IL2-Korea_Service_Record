@@ -232,10 +232,10 @@ def evaluate(node, values: Dict[str, float]) -> Tuple[bool, List[Gap]]:
     if kind == "or":
         ok_l, gap_l = evaluate(node[1], values)
         if ok_l:
-            return True, []
+            return True, [g for g in gap_l if g.kind == "dice"]
         ok_r, gap_r = evaluate(node[2], values)
         if ok_r:
-            return True, []
+            return True, [g for g in gap_r if g.kind == "dice"]
         return False, min((gap_l, gap_r), key=_distance)
 
     if kind == "truthy":
@@ -246,6 +246,13 @@ def evaluate(node, values: Dict[str, float]) -> Tuple[bool, List[Gap]]:
     if kind == "cmp":
         op, left, right = node[1], node[2], node[3]
         lv, rv = _value(left, values), _value(right, values)
+        # The dice are never a barrier and never a promise. RND is re-rolled
+        # on every read, so there is no "current value" to be short of - the
+        # branch stays live and the threshold is carried out as a chance, so
+        # a one-in-three-hundred roll is not reported in the same breath as a
+        # condition already met.
+        if _kind_of(left) == "dice":
+            return True, [Gap(_text(left), "dice", 0.0, rv, op)]
         ok = {">=": lv >= rv, "<=": lv <= rv, "<": lv < rv,
               ">": lv > rv, "=": lv == rv, "<>": lv != rv}[op]
         if ok:
@@ -274,3 +281,194 @@ def _distance(gaps: List[Gap]) -> float:
             continue                        # never a barrier, only a chance
         worst = min(worst, gap.fraction)
     return 1.0 - worst
+
+
+# --- what the career says the variables are ------------------------------
+
+def _days(start: str, now: str) -> int:
+    """Whole days between two of the game's ``YYYY.MM.DD`` stamps."""
+    from datetime import date
+    try:
+        a = date(*(int(x) for x in (start or "")[:10].split(".")))
+        b = date(*(int(x) for x in (now or "")[:10].split(".")))
+    except (ValueError, TypeError):
+        return 0
+    return max(0, (b - a).days)
+
+
+def _cdate(now: str) -> int:
+    """``CDate`` is the current date as a plain YYYYMMDD number."""
+    try:
+        return int((now or "")[:10].replace(".", ""))
+    except ValueError:
+        return 0
+
+
+def pilot_variables(pilot, career, squadron=None) -> Dict[str, float]:
+    """
+    Every variable an award condition can ask about this pilot.
+
+    The awkward ones, all established by experiment rather than guessed:
+    ``FlTime`` is in **hours** while the database stores seconds; ``AirObj``
+    is aircraft *minus* those destroyed on the ground, because a parked plane
+    counts as a ground kill and appears in ``GrObj`` instead; and ``CDate`` is
+    the campaign date as a bare YYYYMMDD integer.
+
+    ``ComplSorties`` is read as the pilot's *good* sorties and ``Sorties`` as
+    his total. On this career the two are equal so the choice is not yet
+    settled by evidence - if an award ever fires a sortie early or late, this
+    is the first line to suspect. ``TrnsObj`` is left at zero: the variable
+    exists in the engine but nothing in the shipped conditions uses it, and
+    the kill blob has no transport category to read it from.
+    """
+    from .career.killstats import KillStats
+
+    kills = KillStats(pilot["killStats"] if "killStats" in pilot.keys() else "")
+    start = pilot["careerStartDate"] if "careerStartDate" in pilot.keys() else None
+    now = career["currentDate"] if career is not None else ""
+    days = _days(start or (career["startDate"] if career is not None else ""), now)
+    values = {
+        "country": float(pilot["country"] or 0),
+        "rankid": float(pilot["rankId"] or 0),
+        "pcp": float(pilot["pcp"] or 0),
+        "sorties": float(pilot["sorties"] or 0),
+        "complsorties": float(pilot["goodSorties"] or 0),
+        "goodsorties": float(pilot["goodSorties"] or 0),
+        "fltime": float(pilot["flightTime"] or 0) / 3600.0,
+        "careerdays": float(days),
+        "servicedays": float(days),
+        "cdate": float(_cdate(now)),
+        "iscommander": 1.0 if pilot["isPlayer"] else 0.0,
+        "isplayer": 1.0 if pilot["isPlayer"] else 0.0,
+        "airobj": float(kills.airborne),
+        "grobj": float(kills.get("Materiel") + kills.static_air),
+        "bldobj": float(kills.get("Building")),
+        "seaobj": float(kills.category_totals().get("naval", 0)),
+        "trnsobj": 0.0,
+        "wia": float(pilot["wounded"] or 0) if "wounded" in pilot.keys() else 0.0,
+        "efficiency": float(squadron["efficiency"] or 0) if squadron is not None else 0.0,
+    }
+    return values
+
+
+def squadron_variables(squadron, career, country: int) -> Dict[str, float]:
+    """
+    The same vocabulary, but counted for the unit.
+
+    A unit citation asks about the squadron's totals, not the player's, and
+    ``Efficiency`` is defined only here - which is why the same condition
+    text means different things on a squadron award and a personal one.
+    """
+    from .career.killstats import KillStats
+
+    kills = KillStats(squadron["killStats"] if squadron is not None else "")
+    now = career["currentDate"] if career is not None else ""
+    days = _days(career["startDate"] if career is not None else "", now)
+    return {
+        "country": float(country),
+        "complsorties": float(squadron["goodSorties"] or 0) if squadron is not None else 0.0,
+        "sorties": float(squadron["sorties"] or 0) if squadron is not None else 0.0,
+        "goodsorties": float(squadron["goodSorties"] or 0) if squadron is not None else 0.0,
+        "efficiency": float(squadron["efficiency"] or 0) if squadron is not None else 0.0,
+        "airobj": float(kills.airborne),
+        "grobj": float(kills.get("Materiel") + kills.static_air),
+        "bldobj": float(kills.get("Building")),
+        "seaobj": float(kills.category_totals().get("naval", 0)),
+        "careerdays": float(days),
+        "servicedays": float(days),
+        "cdate": float(_cdate(now)),
+    }
+
+
+# --- which rung is next --------------------------------------------------
+
+class Rung(NamedTuple):
+    """One award the pilot could reasonably reach next."""
+    award_id: int
+    name: str
+    eligible: bool          # the condition holds; only the dice are left
+    gaps: List[Gap]
+    distance: float         # 0 is there, 1 is nowhere near, 99 is not for him
+
+    @property
+    def bars(self) -> List[Gap]:
+        return [g for g in self.gaps if g.kind == "cumulative"]
+
+    @property
+    def conditions(self) -> List[Gap]:
+        return [g for g in self.gaps if g.kind == "per_sortie"]
+
+    @property
+    def chance(self) -> Optional[float]:
+        """
+        The odds per evaluation, where the condition rests on a dice roll.
+
+        RND is an integer the engine re-rolls on every read and the shipped
+        conditions compare it against thresholds from 3 to 500, which only
+        makes sense on a scale of a thousand: the Navy work confirmed 199
+        passes ``RND<200`` and 200 does not. So the threshold is the chance
+        in a thousand, and a Soldier's Medal at ``RND<3`` is a different
+        proposition from a Commendation Ribbon at ``RND<200``.
+        """
+        dice = [g for g in self.gaps if g.kind == "dice"]
+        if not dice:
+            return None
+        return min(g.needed for g in dice) / 1000.0
+
+
+def next_rungs(awards, held: set, values: Dict[str, float],
+               country: int, squadron: bool = False) -> List[Rung]:
+    """
+    The next rung of every ladder this pilot is standing on.
+
+    A ladder is a chain of ``RequiredAward``, so the next rung finds itself:
+    an award whose requirement is held and which is not, and nothing further
+    up, because rung three needs rung two which he has not got. Ladders he
+    has not started contribute their first rung, which is how a man who has
+    never been decorated still sees where the Air Medal is.
+
+    Promotions are left out - they are pseudo-awards with no artwork and no
+    name, and they belong beside the rank rather than in the medal list.
+    Squadron citations are asked for separately, because they are counted on
+    the unit's totals and not the man's.
+
+    A requirement must be **held**, which in the engine means received rather
+    than merely earned: an award still sitting pending does not unlock the
+    rung above it.
+    """
+    prefix = str(country)
+    out: List[Rung] = []
+    for award in sorted(awards.definitions.values(), key=lambda a: a.order):
+        if award.is_promotion or bool(award.is_squadron) != squadron:
+            continue
+        if not str(award.award_id).startswith(prefix):
+            continue
+        if award.award_id in held:
+            continue
+        if any(req not in held for req in award.required):
+            continue
+        if not award.reachable_in_proc and not award.reachable_by_def:
+            continue
+
+        best = None
+        for expr in (award.in_proc, award.by_def):
+            if not expr or expr.replace(" ", "") == "(RND<0)":
+                continue
+            ok, gaps = evaluate(parse(expr), values)
+            if ok:
+                best = (True, gaps)         # gaps here are the dice, if any
+                break
+            if best is None or _distance(gaps) < _distance(best[1]):
+                best = (False, gaps)
+        if best is None:
+            continue
+
+        ok, gaps = best
+        if any(g.kind == "context" for g in gaps):
+            continue                        # not this pilot's award at all
+        blocking = [g for g in gaps if g.kind in ("cumulative", "per_sortie")]
+        out.append(Rung(award.award_id, award.name, ok and not blocking, gaps,
+                        0.0 if ok else _distance(gaps)))
+
+    out.sort(key=lambda r: (not r.eligible, r.distance))
+    return out
