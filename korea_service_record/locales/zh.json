@@ -165,7 +165,13 @@
     "req_command": "需要担任中队长",
     "or": "或",
     "exactly_in_one_sortie": "单次出击恰好 {n}",
-    "odds_pct": "每次任务约 {n}%"
+    "odds_pct": "每次任务约 {n}%",
+    "unit_sorties": "架次",
+    "unit_hours": "小时",
+    "unit_days": "天",
+    "unit_pcp": "点",
+    "unit_air": "空战战果",
+    "unit_targets": "目标"
   },
   "incidences": {
     "successor": "接替生涯",

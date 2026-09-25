@@ -165,7 +165,13 @@
     "req_command": "exige le commandement de l’escadron",
     "or": "ou",
     "exactly_in_one_sortie": "exactement {n} en une seule sortie",
-    "odds_pct": "environ {n}% par mission"
+    "odds_pct": "environ {n}% par mission",
+    "unit_sorties": "sorties",
+    "unit_hours": "heures",
+    "unit_days": "jours",
+    "unit_pcp": "points",
+    "unit_air": "victoires aériennes",
+    "unit_targets": "objectifs"
   },
   "incidences": {
     "successor": "A repris la carrière",

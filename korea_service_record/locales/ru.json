@@ -165,7 +165,13 @@
     "req_command": "требуется командование эскадрильей",
     "or": "или",
     "exactly_in_one_sortie": "ровно {n} за один вылет",
-    "odds_pct": "около {n}% за вылет"
+    "odds_pct": "около {n}% за вылет",
+    "unit_sorties": "вылетов",
+    "unit_hours": "часов",
+    "unit_days": "дней",
+    "unit_pcp": "очков",
+    "unit_air": "воздушных побед",
+    "unit_targets": "целей"
   },
   "incidences": {
     "successor": "Принял карьеру",

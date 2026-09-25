@@ -575,7 +575,7 @@
             esc(bar.have + " / " + bar.need) + '">' +
             '<span class="p-fill" style="width:' + pct + '%"></span></div>' +
             '<span class="p-num">' + esc(fmtNum(bar.have)) + " / " +
-            esc(fmtNum(bar.need)) + "</span>";
+            esc(fmtNum(bar.need)) + unitSuffix(bar.unit) + "</span>";
     }
 
     function odds(chance) {
@@ -589,6 +589,11 @@
             : q.kind === "command" ? T("progress.req_command")
             : q.kind === "wia" ? T("progress.req_wia")
             : q.what;
+    }
+
+    // "35 / 75" is meaningless without saying what of
+    function unitSuffix(unit) {
+        return unit ? " " + esc(T("progress.unit_" + unit)) : "";
     }
 
     function oddsText(chance) {
@@ -616,7 +621,9 @@
             body += '<span class="p-routes">' + row.routes.map((r) => {
                 const parts = r.conditions.map((cc) =>
                     T(cc.exact ? "progress.exactly_in_one_sortie"
-                        : "progress.in_one_sortie", {n: fmtNum(cc.need)}))
+                        : "progress.in_one_sortie",
+                        {n: fmtNum(cc.need) + (cc.unit
+                            ? " " + T("progress.unit_" + cc.unit) : "")}))
                     .concat(r.prereqs.map(prereqText));
                 return esc(parts.join(" + ")) + oddsText(r.chance);
             }).join('<span class="p-or"> ' + esc(T("progress.or")) + " </span>") +
@@ -632,7 +639,8 @@
         if (row.conditions.length) {
             body += row.conditions.map((c) =>
                 '<span class="p-cond">' +
-                esc(T("progress.in_one_sortie", {n: fmtNum(c.need)})) +
+                esc(T("progress.in_one_sortie", {n: fmtNum(c.need) +
+                    (c.unit ? " " + T("progress.unit_" + c.unit) : "")})) +
                 "</span>").join("");
         }
         const full = row.name + (row.device ? " — " + row.device : "");

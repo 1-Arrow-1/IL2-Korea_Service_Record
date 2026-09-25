@@ -817,9 +817,10 @@ class CareerAggregator:
                     "eligible": rung.eligible,
                     "chance": rung.chance,
                     "bars": [{"what": g.variable, "have": round(g.current, 1),
-                              "need": g.needed,
+                              "need": g.needed, "unit": prog.unit_for(g.variable),
                               "fraction": round(g.fraction, 3)} for g in rung.bars],
-                    "conditions": [{"what": g.variable, "need": g.needed}
+                    "conditions": [{"what": g.variable, "need": g.needed,
+                                    "unit": prog.unit_for(g.variable)}
                                    for g in rung.conditions],
                     # A state the man has to be in rather than a number he
                     # has to reach. Named plainly - "Wounded in Action" - and
@@ -878,7 +879,7 @@ class CareerAggregator:
                         country, int(values.get("rankid", 0)) + 1),
                     "ready": False,
                     "bars": [{"what": g.variable, "have": round(g.current, 1),
-                              "need": g.needed,
+                              "need": g.needed, "unit": prog.unit_for(g.variable),
                               "fraction": round(g.fraction, 3)}
                              for g in gaps if g.kind == "cumulative"],
                 }
@@ -904,6 +905,7 @@ class CareerAggregator:
                 # Honor's second route is "wounded and five kills", not
                 # "one wound and five kills".
                 "conditions": [{"what": g.variable, "need": g.needed,
+                                "unit": prog.unit_for(g.variable),
                                 "exact": g.op == "="}
                                for g in gaps if g.kind == "per_sortie"
                                and g.variable.lower() != "wiasortie"],

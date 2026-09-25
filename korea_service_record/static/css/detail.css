@@ -1234,14 +1234,11 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     border-bottom: 1px dotted var(--rule, #d8cbb0);
 }
 .p-row:last-child { border-bottom: 0; }
-/* one row, one line. A medal and its device together can run very long -
-   "Bronze Star Medal, Bronze Oak Leaf Cluster in Lieu of 2nd with V Device"
-   - and a wrapped row breaks the alignment with the bar beside it. The cell
-   clips and the full text lives in the row's title. */
-.p-name {
-    font-size: .92rem; min-width: 0;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
+/* Names wrap. Clipping them kept every row one line and the bars in a tidy
+   column, but in a narrow record column it turned "Promotion to Lieutenant
+   Colonel" into "Promotion to Lie...", which tells the reader nothing at
+   all. A second line is a far smaller price than a lost name. */
+.p-name { font-size: .92rem; min-width: 0; }
 .p-device { color: var(--ink-muted, #6b5a3f); font-size: .82rem; }
 .p-body {
     display: flex; align-items: baseline; gap: .45rem;
@@ -1264,7 +1261,7 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     font-style: normal; text-transform: lowercase; padding: 0 .4rem;
     color: var(--accent, #8b6f4a);
 }
-.p-odds:before { content: "· "; }
+
 .p-ready { font-size: .82rem; color: var(--accent-dark, #5a4022); font-weight: 600; }
 .p-promo .p-name { font-weight: 600; }
 .p-sub .p-name {

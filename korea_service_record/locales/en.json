@@ -165,7 +165,13 @@
     "req_command": "requires squadron command",
     "or": "or",
     "exactly_in_one_sortie": "exactly {n} in a single sortie",
-    "odds_pct": "about {n}% a mission"
+    "odds_pct": "about {n}% a mission",
+    "unit_sorties": "sorties",
+    "unit_hours": "hours",
+    "unit_days": "days",
+    "unit_pcp": "points",
+    "unit_air": "air victories",
+    "unit_targets": "targets"
   },
   "incidences": {
     "successor": "Took over the career",

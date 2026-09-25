@@ -165,7 +165,13 @@
     "req_command": "erfordert Staffelführung",
     "or": "oder",
     "exactly_in_one_sortie": "genau {n} in einem einzigen Einsatz",
-    "odds_pct": "etwa {n}% je Einsatz"
+    "odds_pct": "etwa {n}% je Einsatz",
+    "unit_sorties": "Einsätze",
+    "unit_hours": "Stunden",
+    "unit_days": "Tage",
+    "unit_pcp": "Punkte",
+    "unit_air": "Luftsiege",
+    "unit_targets": "Ziele"
   },
   "incidences": {
     "successor": "Übernahme der Laufbahn",

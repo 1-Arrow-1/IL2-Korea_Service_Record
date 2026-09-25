@@ -60,6 +60,40 @@ CONTEXT = {
 PREREQUISITE = {"wia", "rankid", "iscommander"}
 
 
+# What a figure is counted in. "35 / 75" says nothing on its own; the reader
+# has no way to know whether that is days, sorties, hours or victories, and
+# the variable name in the cfg is no help to anybody who has not read it.
+UNITS = {
+    "complsorties": "sorties", "sorties": "sorties", "goodsorties": "sorties",
+    "fltime": "hours",
+    "careerdays": "days", "servicedays": "days",
+    "pcp": "pcp",
+    "airobj": "air", "airobjsortie": "air",
+    "fghtobjsortie": "air", "bmbrobjsortie": "air", "trnsobjsortie": "air",
+    "grobj": "targets", "bldobj": "targets", "seaobj": "targets",
+    "trnsobj": "targets", "grobjsortie": "targets", "bldobjsortie": "targets",
+    "seaobjsortie": "targets",
+}
+
+
+def unit_for(variable: str) -> str:
+    """
+    The unit of a figure, or of a sum of figures.
+
+    A sum only has a unit if its parts agree - AirObj+SeaObj+GrObj+BldObj is
+    a count of things destroyed whatever their kind, so "targets" covers it,
+    but a sum mixing hours and sorties would have no honest label and gets
+    none.
+    """
+    parts = [p for p in variable.replace(" ", "").split("+") if p]
+    found = {UNITS.get(p.lower(), "") for p in parts}
+    if len(found) == 1:
+        return found.pop()
+    if found and "" not in found and found <= {"air", "targets"}:
+        return "targets"
+    return ""
+
+
 class Gap(NamedTuple):
     """One unmet comparison, and how far off it is."""
     variable: str           # as written in the cfg, e.g. "AirObj+SeaObj"

@@ -165,7 +165,13 @@
     "req_command": "requiere el mando del escuadrón",
     "or": "o",
     "exactly_in_one_sortie": "exactamente {n} en una sola salida",
-    "odds_pct": "cerca del {n}% por misión"
+    "odds_pct": "cerca del {n}% por misión",
+    "unit_sorties": "salidas",
+    "unit_hours": "horas",
+    "unit_days": "días",
+    "unit_pcp": "puntos",
+    "unit_air": "victorias aéreas",
+    "unit_targets": "objetivos"
   },
   "incidences": {
     "successor": "Asumió la carrera",
