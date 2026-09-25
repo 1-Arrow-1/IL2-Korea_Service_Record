@@ -152,6 +152,15 @@
     "dress_full": "Uniforme de gala",
     "pending_note": "{count} condecoraciones esperan puntos; usted tiene {points}."
   },
+  "progress": {
+    "heading": "Hacia la próxima condecoración",
+    "next_rank": "Ascenso a {rank}",
+    "eligible": "cumplido",
+    "odds": "cerca de 1 entre {n} por misión",
+    "in_one_sortie": "{n} en una sola salida",
+    "unit": "Para el escuadrón",
+    "note": "Leído de los propios criterios de concesión de la campaña. Cumplirlos hace posible una condecoración, no segura: la mayoría se deciden con una tirada de dados en el informe posterior."
+  },
   "incidences": {
     "successor": "Asumió la carrera",
     "pilot_missing": "Desaparecido en combate",

@@ -152,6 +152,15 @@
     "dress_full": "Grande tenue",
     "pending_note": "{count} décorations attendent des points ; vous en avez {points}."
   },
+  "progress": {
+    "heading": "Vers la prochaine décoration",
+    "next_rank": "Promotion au grade de {rank}",
+    "eligible": "rempli",
+    "odds": "environ 1 sur {n} par mission",
+    "in_one_sortie": "{n} en une seule sortie",
+    "unit": "Pour l’escadron",
+    "note": "Lu dans les critères d’attribution de la campagne elle-même. Les remplir rend une décoration possible, non certaine : la plupart se décident sur un jet de dés au débriefing."
+  },
   "incidences": {
     "successor": "A repris la carrière",
     "pilot_missing": "Porté disparu",

@@ -804,6 +804,12 @@ class CareerAggregator:
                 root = self._ladder_root(rung.award_id)
                 device = self.award_name(rung.award_id)
                 headline = self.award_name(root)
+                # The device string usually ends by repeating the medal -
+                # "Bronze Oak Leaf Cluster in Lieu of 2nd Bronze Star Medal"
+                # - which wraps the row onto a second line for no gain, since
+                # the headline has just said it. Drop the repetition.
+                if headline and headline in device:
+                    device = device.replace(headline, "").strip(" ,-—")
                 out.append({
                     "type": rung.award_id,
                     "name": headline,

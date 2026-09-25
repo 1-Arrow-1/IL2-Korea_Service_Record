@@ -152,6 +152,15 @@
     "dress_full": "Full dress",
     "pending_note": "{count} awards are waiting on award points; you have {points}."
   },
+  "progress": {
+    "heading": "Toward the next award",
+    "next_rank": "Promotion to {rank}",
+    "eligible": "eligible",
+    "odds": "about 1 in {n} a mission",
+    "in_one_sortie": "{n} in a single sortie",
+    "unit": "For the squadron",
+    "note": "Read from the campaign's own award criteria. Meeting them makes a decoration possible, not certain — most are settled by a dice roll at the debrief."
+  },
   "incidences": {
     "successor": "Took over the career",
     "pilot_missing": "Missing in action",

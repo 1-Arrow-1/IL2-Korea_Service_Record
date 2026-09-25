@@ -561,6 +561,86 @@
             " &middot; " + when + "</span></div>" + toggle + folded + "</li>";
     }
 
+    // --- toward the next award -------------------------------------------
+    //
+    // Three kinds of requirement, kept visually apart on purpose. A
+    // cumulative counter gets a bar because it really is a fraction of the
+    // way there. A per-sortie requirement gets a sentence, because nobody is
+    // sixty per cent of the way to six kills in one flight. And a dice roll
+    // gets odds, because "eligible" alone would read the same for a one in
+    // five and a one in three hundred.
+    function progressBar(bar) {
+        const pct = Math.round((bar.fraction || 0) * 100);
+        return '<div class="p-bar" role="img" aria-label="' +
+            esc(bar.have + " / " + bar.need) + '">' +
+            '<span class="p-fill" style="width:' + pct + '%"></span></div>' +
+            '<span class="p-num">' + esc(fmtNum(bar.have)) + " / " +
+            esc(fmtNum(bar.need)) + "</span>";
+    }
+
+    function odds(chance) {
+        if (!chance) return "";
+        const one = Math.round(1 / chance);
+        return '<span class="p-odds">' +
+            esc(T("progress.odds", {n: one})) + "</span>";
+    }
+
+    function progressItem(row) {
+        const title = esc(row.name) +
+            (row.device ? ' <span class="p-device">' + esc(row.device) + "</span>" : "");
+        let body = "";
+        if (row.eligible) {
+            body = '<span class="p-ready">' + esc(T("progress.eligible")) + "</span>";
+        } else if (row.bars.length) {
+            body = row.bars.map(progressBar).join("");
+        }
+        if (row.conditions.length) {
+            body += row.conditions.map((c) =>
+                '<span class="p-cond">' +
+                esc(T("progress.in_one_sortie", {n: fmtNum(c.need)})) +
+                "</span>").join("");
+        }
+        const full = row.name + (row.device ? " — " + row.device : "");
+        return '<li class="p-row" title="' + esc(full) + '"><span class="p-name">' +
+            title + "</span>" +
+            '<span class="p-body">' + body + odds(row.chance) + "</span></li>";
+    }
+
+    function fmtNum(v) {
+        // the page's language, not the browser's: a German reader looking at
+        // a German record should see 14.000, whatever Windows is set to
+        return (Math.round(v * 10) / 10).toLocaleString(i18n.locale || undefined);
+    }
+
+    function renderProgress(p) {
+        const head = el("d-progress-head");
+        const list = el("d-progress");
+        const note = el("d-progress-note");
+        const rows = (p && p.awards) || [];
+        const promo = p && p.promotion;
+        const cites = (p && p.citations) || [];
+        let html = "";
+        if (promo) {
+            html += '<li class="p-row p-promo"><span class="p-name">' +
+                esc(T("progress.next_rank", {rank: promo.rank})) +
+                "</span><span class=\"p-body\">" +
+                (promo.ready
+                    ? '<span class="p-ready">' + esc(T("progress.eligible")) + "</span>"
+                    : promo.bars.map(progressBar).join("")) + "</span></li>";
+        }
+        html += rows.map(progressItem).join("");
+        if (cites.length) {
+            html += '<li class="p-row p-sub"><span class="p-name">' +
+                esc(T("progress.unit")) + "</span><span></span></li>";
+            html += cites.map(progressItem).join("");
+        }
+        list.innerHTML = html;
+        const any = Boolean(html);
+        head.hidden = !any;
+        note.hidden = !any;
+        note.textContent = any ? T("progress.note") : "";
+    }
+
     function promotionItem(promotion) {
         const badge = promotion.pending ? '<span class="badge pending">pending</span>' : "";
         return '<li class="with-icon">' +
@@ -1104,6 +1184,8 @@
             el("d-awards").innerHTML = d.awards.length
                 ? d.awards.map((a) => awardItem(Object.assign({pilot_id: d.player ? d.player.id : null}, a))).join("")
                 : '<li class="muted">' + esc(T("awards.none_yet")) + "</li>";
+
+            renderProgress(d.progress);
 
             el("d-combat-strip").innerHTML = statStrip(d.combat.headline);
             el("d-combat-breakdown").innerHTML = breakdown(d.combat.breakdown);

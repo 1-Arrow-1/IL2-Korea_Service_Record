@@ -1218,3 +1218,44 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 #header-nav .switch input { accent-color: var(--accent-dark); margin: 0; }
 #header-nav .switch:hover { color: var(--ink-strong); }
 #header-nav .switch.locked { cursor: default; color: var(--accent-dark); }
+
+
+/* --- toward the next award ------------------------------------------- */
+/* The bar is deliberately quiet: this is an estimate of where a man stands,
+   not a score, and it sits directly under the medals he has actually been
+   given. Anything louder would compete with them. */
+.progress-list { list-style: none; margin: .35rem 0 0; padding: 0; }
+.p-row {
+    display: grid; grid-template-columns: 1fr auto; gap: .35rem 1rem;
+    align-items: baseline; padding: .28rem 0;
+    border-bottom: 1px dotted var(--rule, #d8cbb0);
+}
+.p-row:last-child { border-bottom: 0; }
+/* one row, one line. A medal and its device together can run very long -
+   "Bronze Star Medal, Bronze Oak Leaf Cluster in Lieu of 2nd with V Device"
+   - and a wrapped row breaks the alignment with the bar beside it. The cell
+   clips and the full text lives in the row's title. */
+.p-name {
+    font-size: .92rem; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.p-device { color: var(--ink-muted, #6b5a3f); font-size: .82rem; }
+.p-body { display: flex; align-items: center; gap: .45rem; white-space: nowrap; }
+.p-bar {
+    display: inline-block; width: 74px; height: 7px; border-radius: 3px;
+    background: var(--rule, #d8cbb0); overflow: hidden; vertical-align: middle;
+}
+.p-fill { display: block; height: 100%; background: var(--accent, #8b6f4a); }
+.p-num, .p-cond, .p-odds { font-size: .8rem; color: var(--ink-muted, #6b5a3f); }
+.p-cond { font-style: italic; }
+.p-odds:before { content: "· "; }
+.p-ready { font-size: .82rem; color: var(--accent-dark, #5a4022); font-weight: 600; }
+.p-promo .p-name { font-weight: 600; }
+.p-sub .p-name {
+    font-size: .78rem; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent-dark, #5a4022); padding-top: .5rem;
+}
+.progress-note {
+    margin: .5rem 0 0; font-size: .78rem; font-style: italic;
+    color: var(--ink-muted, #6b5a3f);
+}

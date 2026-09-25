@@ -152,6 +152,15 @@
     "dress_full": "礼服",
     "pending_note": "{count} 项勋章正在等待勋章点数；您当前有 {points} 点。"
   },
+  "progress": {
+    "heading": "距下一枚勋章",
+    "next_rank": "晉升为{rank}",
+    "eligible": "已达成",
+    "odds": "每次任务约 {n} 分之一",
+    "in_one_sortie": "单次出击达到 {n}",
+    "unit": "中队荣誉",
+    "note": "直接读取战役自身的授勋条件。满足条件只是使授勋成为可能，而非必然——大多数奖励还要在任务总结时由随机判定决定。"
+  },
   "incidences": {
     "successor": "接替生涯",
     "pilot_missing": "作战失踪",
