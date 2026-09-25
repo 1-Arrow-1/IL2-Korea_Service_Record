@@ -435,6 +435,9 @@ def next_rungs(awards, held: set, values: Dict[str, float],
     A requirement must be **held**, which in the engine means received rather
     than merely earned: an award still sitting pending does not unlock the
     rung above it.
+
+    Only ``AwardInProc`` is consulted - see the note in the body for why
+    ``AwardByDef`` is not a route a player can count on.
     """
     prefix = str(country)
     out: List[Rung] = []
@@ -450,18 +453,19 @@ def next_rungs(awards, held: set, values: Dict[str, float],
         if not award.reachable_in_proc and not award.reachable_by_def:
             continue
 
-        best = None
-        for expr in (award.in_proc, award.by_def):
-            if not expr or expr.replace(" ", "") == "(RND<0)":
-                continue
-            ok, gaps = evaluate(parse(expr), values)
-            if ok:
-                best = (True, gaps)         # gaps here are the dice, if any
-                break
-            if best is None or _distance(gaps) < _distance(best[1]):
-                best = (False, gaps)
-        if best is None:
+        # Only AwardInProc. AwardByDef looks like a second route and is not
+        # one: across a whole career of daily roster sweeps, no award whose
+        # only live path is a dice-gated AwardByDef has ever been granted to
+        # anybody. The Senior Pilot Wings sit behind (RankID>=2)&(RND<500) -
+        # a coin flip per sweep, some thirty sweeps - and have nought
+        # holders; so do the Command Pilot Wings. Every Purple Heart in this
+        # career went to a man who was actually wounded, through the debrief.
+        # Presenting AwardByDef as live would promise medals that never come.
+        expr = award.in_proc
+        if not expr or expr.replace(" ", "") == "(RND<0)":
             continue
+        ok, gaps = evaluate(parse(expr), values)
+        best = (ok, gaps)
 
         ok, gaps = best
         if any(g.kind == "context" for g in gaps):
