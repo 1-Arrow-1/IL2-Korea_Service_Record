@@ -84,16 +84,18 @@ and two are at 4/4/4, for whom no commander does anything whatsoever — so boos
 hardest on a force with room to grow, and are half wasted on a flight of veterans.
 
 Seating itself matters less than that, and in a way that depends on how you play. Scoring
-the best eight-ship force I can put up:
+the best eight-ship force I can put up, per AI pilot in it — you are not in the count,
+because the game keeps no simulated skill for a human and your results come from your own
+flying rather than from that table:
 
                                   you flying     you on the ground
-    as it stands                     4.55              5.05
-    strongest man from slot 0 down   4.75 (+4%)        4.45 (-12%)
+    as it stands                     0.636            0.631
+    strongest man from slot 0 down   0.664 (+4%)      0.556 (-12%)
 
-If you fly every mission, stacking your best men in the first flights is slightly better,
-because you can send them as a unit and you are commanding regardless. If you often sit
-one out, it is considerably worse, because it leaves the later flights under men with no
-boosters to give — and one of them will be in command.
+If you fly every mission, stacking your best men into the first flights is slightly
+better: you can send them as one force, and you are in command either way. If you often
+sit one out, it is considerably worse, because it leaves the later flights under men with
+no boosters to give — and on those missions one of them is in command.
 
 Note what does *not* appear in that table: which flight a pilot sits in relative to you.
 Your boosters cover everyone in the force, wherever they are seated. Seating decides who
