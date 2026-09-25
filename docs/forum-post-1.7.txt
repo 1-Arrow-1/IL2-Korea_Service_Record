@@ -45,15 +45,17 @@ into the file with an AI rating on a scale of its own, running 0 to 4. That is n
 same scale as his skill, which you see as 1 to 5, and the two do not line up one for one.
 Every pilot in one of my generated missions:
 
-        skill shown       1     2     3     4     5
-        AI rating in     (you)  2     3     4     4
-        the mission
+        skill shown      1     2     3     4     5
+        AI rating        ?     2     3     4     4
 
 It follows his skill exactly, and then runs out of room. Skill 5 has nowhere higher to go
 and lands on 4 beside skill 4, so the fifth point is spent for nothing in the air. A
-wounded man comes out one lower. The 0 at the bottom turned up only on my own aeroplane,
-which figures — the game simulates no skill for a human. I had no AI pilot at skill 1 to
-check that end of it.
+wounded man comes out one lower.
+
+The question mark is honest: I had no AI pilot at skill 1 to test. The only man in my
+squadron down there is me, and the player is written as 0 whatever his skill — the game
+simulates none for a human — so my own aircraft says nothing about what a skill-1 wingman
+would be given.
 
 Courage and discipline never reach the mission file at all.
 
