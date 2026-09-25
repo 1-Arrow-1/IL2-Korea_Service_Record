@@ -4,22 +4,32 @@ does with your pilots' numbers
 
 Gentlemen,
 
-1.7 adds a seating board to the Career Helper. More usefully, it comes with answers to
-something none of us can see from inside the game: which of a pilot's numbers the engine
-reads, and what it does with them.
+1.7 adds a seating board to the Career Helper. More usefully, it comes with what I
+believe are answers to something none of us can see from inside the game: which of a
+pilot's numbers the engine reads, and what it does with them.
 
-Five findings, and none of them are guesses:
+A word on how much weight to put on this. Some of it I read directly out of the career
+executable and can quote; some is a pattern fitted to my own squadron's numbers and could
+be a coincidence of one career. I have tried to say which is which as I go, and where I
+am guessing I have said so. I have already been wrong once in this investigation and
+corrected it below. If any of it does not match what you see, say so and I will go back
+and look again.
 
-  * **A pilot at skills 5 flies exactly like one at skills 4.** The mission's own AI
-    rating runs 0 to 4 and saturates there, so the fifth point buys nothing in the air.
+Five findings, then, with that caveat over all of them:
+
+  * **A pilot at skills 5 appears to fly exactly like one at skills 4.** The mission's
+    own AI rating runs 0 to 4 and saturates there. Fitted to one generated mission.
   * **Only one man's boosters count on a sortie** — whoever holds the lowest-numbered seat
-    in the force you send. Every other leader's are dead weight for that mission.
-  * **Courage buys kills and costs lives**, through equal-sized coefficients in the
-    same table.
+    in the force you send. Every other leader's are dead weight for that mission. This is
+    the one I am most confident of: the game shows it on the mission screen and the code
+    does the same thing.
+  * **Courage buys kills and costs lives**, through equal-sized coefficients in the same
+    table. That is the table's plain reading; I have not watched it happen.
   * **Fatigue appears to do nothing.** I could find no read of it anywhere; every
     reference I can identify is a write.
-  * **The commander's boosters add about forty per cent** to my own eight-ship force —
-    small per man, but he is boosting seven of them at once.
+  * **The commander's boosters look worth about forty per cent** on my own eight-ship
+    force — small per man, but he is boosting seven at once. See the caveat on that
+    number further down.
 
 The awards mod is unchanged from 1.6.1, byte for byte — 1.7 touches the Service Record
 and the Career Helper only, so there is nothing to merge or redo on the award side.
@@ -39,8 +49,11 @@ One gap I should own: the commander in that mission had no skill booster, so I c
 whether a booster can push a man up that scale the way it does in the reckoning below. It
 makes no difference to the point about the ceiling.
 
-**Off screen: all three, plus the commander's boosters.** The campaign resolves AI results
-through a table of coefficients:
+**Off screen: all three, plus the commander's boosters.** There is a function in the
+career executable that reads a table of coefficients out of the campaign data — it names
+the file in its own error messages, so there is no doubt which file — and it is asked for
+three categories by name: fightkills, bombkills, losses. I take that to be how AI results
+are reckoned, though I have not followed the numbers all the way to a result:
 
                      attribute as the game shows it, 1 ....... 5
     FightKills   skill       0.10 → 0.30
@@ -80,6 +93,12 @@ boosters instead. The most-promoted men are the ones worth putting in charge.
 
 
 WHAT THAT IS WORTH, AND WHERE PEOPLE SHOULD SIT
+
+Before the numbers: what I am adding up is each pilot's three coefficients. The engine
+sums those across the force and then multiplies the total by other things entirely —
+aircraft effectiveness, ammunition, and more I have not traced. So these figures are a
+proxy for the pilot part of the sum, good for comparing one seating against another, and
+not a prediction of anything that will happen to you.
 
 One booster point is 0.05 against an attribute's full span of 0.20, so per man it is
 small. But the commander boosts seven other men at once, and mine are 0/2/2 — two
@@ -169,4 +188,6 @@ DOWNLOAD
 Install over 1.6.x; photographs, settings and corrections are kept. The awards mod is
 unchanged, so leave your awards as they are.
 
-Corrections welcome, particularly on fatigue.
+Corrections very welcome — on fatigue especially, but on any of it. This is one man
+reading a disassembly against one career, and I would much rather be put right in the
+thread than leave something wrong standing.
