@@ -307,6 +307,8 @@
     // panel's, laid over the photograph at the pocket: ribbons and badge over
     // the wearer's left breast, unit citations over the right.
     let currentRack = null;
+    // The pilot the record is showing, for the panels that open over it.
+    let currentPlayer = null;
     // Service dress (ribbons) or full dress (the medals); remembered per
     // browser, as a convenience only.
     let dress = "service";
@@ -528,6 +530,97 @@
         show(el("tunicbox"), false);
         document.body.classList.remove("lightbox-open");
     }
+
+    // ---------------------------------------------------------- shadowbox
+    // The case is fetched rather than assembled here: where each medal hangs
+    // depends on measurements taken off the frame photograph, which live
+    // with the frame in shadowbox.py and not in two places.
+    let sboxFor = null;
+
+    function fitPlate() {
+        // The engraving is sized from the brass itself. The plate is a
+        // percentage of a box whose width is whatever the viewport gives,
+        // so this runs on open and on resize rather than being a fixed pt.
+        const holder = el("sbox-plate-text");
+        const span = holder.firstElementChild;
+        if (!span || !holder.offsetHeight) { return; }
+        // The engraving field is the brass between the two screws, which sit
+        // at about 7% and 93% inside the plate's raised border.
+        const room = holder.clientWidth * 0.77;
+        const want = holder.offsetHeight * 0.42;    // the size it is cut at
+        const least = holder.offsetHeight * 0.30;   // and the smallest worth reading
+
+        // Measure a candidate at the preferred size and say what size, if
+        // any, would make it fit the field.
+        const sizeFor = (text) => {
+            span.textContent = text;
+            span.style.fontSize = want + "px";
+            return span.scrollWidth <= room ? want : want * room / span.scrollWidth;
+        };
+
+        // A man's name goes on his plate in full wherever the brass can hold
+        // it, even if that means slightly smaller letters. Only when it will
+        // not go at a readable size is the first name cut to an initial,
+        // which is what an engraver would do.
+        const full = holder.dataset.full || "";
+        const short = holder.dataset.short || full;
+        let text = full, fit = sizeFor(full);
+        if (fit < least && short !== full) {
+            const shortFit = sizeFor(short);
+            if (shortFit > fit) { text = short; fit = shortFit; }
+        }
+        span.textContent = text;
+        span.style.fontSize = Math.max(7, fit) + "px";
+    }
+
+    async function openShadowbox() {
+        const who = currentPlayer;
+        if (!currentCareer || !who) { return; }
+        const url = "/api/shadowbox/" + encodeURIComponent(currentCareer) +
+            (who.id != null ? "?pilot=" + encodeURIComponent(who.id) : "");
+        let box;
+        try {
+            const res = await fetch(url);
+            if (!res.ok) { return; }
+            box = await res.json();
+        } catch (err) { return; }
+        sboxFor = who.id;
+        el("sbox-title").textContent = who.name || "";
+        el("sbox-frame").src = box.frame;
+        el("sbox-items").innerHTML = (box.items || []).map((it) =>
+            '<img class="' + esc(it.cls || "") + '" src="' + esc(it.src) + '"' +
+            ' alt="' + esc(it.name || "") + '"' +
+            (it.name ? ' title="' + esc(it.name) + '"' : ' aria-hidden="true"') +
+            ' style="left:' + it.left + "%;top:" + it.top + "%;width:" +
+            it.width + "%;height:" + it.height + '%">').join("");
+        const glass = el("sbox-glass");
+        glass.src = box.glass.src;
+        glass.style.left = box.glass.left + "%";
+        glass.style.top = box.glass.top + "%";
+        glass.style.width = box.glass.width + "%";
+        glass.style.height = box.glass.height + "%";
+        const plate = el("sbox-plate-text");
+        plate.style.left = box.plate.left + "%";
+        plate.style.top = box.plate.top + "%";
+        plate.style.width = box.plate.width + "%";
+        plate.style.height = box.plate.height + "%";
+        plate.dataset.full = (box.text && box.text.full) || "";
+        plate.dataset.short = (box.text && box.text.short) || "";
+        show(el("shadowbox"), true);
+        document.body.classList.add("lightbox-open");
+        // The plate cannot be measured until the frame has laid out.
+        const frame = el("sbox-frame");
+        if (frame.complete) { fitPlate(); } else { frame.onload = fitPlate; }
+        requestAnimationFrame(fitPlate);
+    }
+
+    function closeShadowbox() {
+        show(el("shadowbox"), false);
+        document.body.classList.remove("lightbox-open");
+    }
+    window.addEventListener("resize", () => {
+        if (!el("shadowbox").hidden) { fitPlate(); }
+    });
 
     function awardItem(award) {
         const badge = award.pending ? '<span class="badge pending">pending</span>' : "";
@@ -1211,6 +1304,7 @@
             rackEl.hidden = !rackEl.innerHTML;
             rackEl.setAttribute("aria-label", T("awards.ribbon_rack"));
             currentRack = d.ribbon_rack;
+            currentPlayer = d.player || null;
             // The flight record opens on its own page, ready to print.
             const logbook = el("d-logbook");
             logbook.href = "/logbook?career=" + encodeURIComponent(careerId) +
@@ -1220,6 +1314,10 @@
             rackEl.classList.toggle("wearable", Boolean(d.ribbon_rack && d.ribbon_rack.tunic));
             rackEl.title = d.ribbon_rack && d.ribbon_rack.tunic ? T("awards.tunic_hint") : "";
             rackEl.onclick = () => openTunic(d.player ? d.player.name : "");
+            // Only the Air Force has a case drawn for it so far.
+            const sboxBtn = el("d-shadowbox-btn");
+            sboxBtn.hidden = !(d.player && d.player.country === 601);
+            sboxBtn.onclick = openShadowbox;
 
             el("d-promotions").innerHTML = d.promotions.length
                 ? d.promotions.map(promotionItem).join("")
@@ -1920,6 +2018,9 @@
         if (event.target.closest && event.target.closest("[data-tunic-close]")) {
             closeTunic();
         }
+        if (event.target.closest && event.target.closest("[data-sbox-close]")) {
+            closeShadowbox();
+        }
         const dressBtn = event.target.closest && event.target.closest(".dress-btn");
         if (dressBtn && dressBtn.dataset.dress !== dress) {
             dress = dressBtn.dataset.dress;
@@ -1929,6 +2030,7 @@
     });
     document.addEventListener("keydown", (event) => {
         if (event.key !== "Escape") return;
+        if (!el("shadowbox").hidden) { closeShadowbox(); return; }
         if (!el("tunicbox").hidden) { closeTunic(); return; }
         if (!el("cropper").hidden) closeCropper();
         else if (!el("missionbox").hidden) closeMission();

@@ -463,5 +463,9 @@
     "machine_gun_squad_dprk": "Machine-gun squad (DPRK)",
     "submachine_gun_squad_dprk": "Submachine-gun squad (DPRK)",
     "cargocart_m5": "Ammunition cart"
+  },
+  "shadowbox": {
+    "open": "Shadowbox",
+    "caption": "Decorations, badge and unit insignia in a display case."
   }
 }

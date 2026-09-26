@@ -1272,3 +1272,65 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     margin: .5rem 0 0; font-size: .78rem; font-style: italic;
     color: var(--ink-muted, #6b5a3f);
 }
+
+
+/* ---------------------------------------------------------------- shadowbox
+
+   A photographed case with the pilot's decorations dropped onto it. The
+   frame img is the only thing in flow: it carries the aspect ratio, and
+   every other piece is absolutely positioned in percentages worked out
+   server-side, so the whole box scales as one picture at any width. */
+.shadowbox-btn { margin-top: .9rem; }
+
+/* Trimmed padding, like the tunic: the case is the content, and a 2.2rem
+   margin on a landscape picture costs it height it cannot spare. */
+.sbox-panel {
+    max-width: min(96vw, 1200px); padding: 1rem 1.2rem .9rem;
+    display: flex; flex-direction: column; align-items: center; gap: .55rem;
+}
+.sbox-title { margin: 0; font-size: 1.15rem; align-self: flex-start; }
+
+/* The case is sized by the frame photograph and shrink-wrapped, never
+   stretched: every other piece is positioned in percentages of this box, so
+   it has to match the picture exactly. Bounding the frame by height as well
+   as width is what keeps a landscape case inside a short window - a box
+   whose plate is below the fold is not a display case. */
+.sbox { position: relative; line-height: 0; align-self: center; max-width: 100%; }
+.sbox-frame {
+    display: block; width: auto; height: auto;
+    /* The panel is capped at 86vh and spends about 5rem of it on its own
+       padding, the title and the caption; the frame gets the rest. */
+    max-width: min(92vw, 1150px); max-height: calc(86vh - 8rem);
+}
+.sbox-items { position: absolute; inset: 0; }
+/* Each piece carries its own left/top/width/height inline, in percentages
+   of the case. They are the art's true proportions scaled to the frame, so
+   the image fills its slot exactly and nothing here may resize it - an
+   object-fit or a max-width would break the ribbon line the rows hang from. */
+.sbox-items img { position: absolute; }
+
+/* The glass goes over everything, including the plate engraving: it is a
+   photograph of the pane, so anything it does not cover reads as if it were
+   sitting outside the case. */
+.sbox-glass { position: absolute; pointer-events: none; }
+
+/* The engraving. Centred on the brass, in small caps, and clipped to the
+   plate so a long name cannot run off the metal. The size is set from the
+   plate's own height in script, because the plate is a percentage of a box
+   whose width is whatever the viewport allows. */
+.sbox-plate-text {
+    position: absolute; display: flex;
+    align-items: center; justify-content: center;
+    overflow: hidden; line-height: 1;
+    font-family: "Times New Roman", Georgia, serif;
+    font-weight: 600; letter-spacing: .06em;
+    color: #4a3410; text-shadow: 0 1px 0 rgba(255, 244, 214, .45);
+    white-space: nowrap;
+}
+
+.sbox-caption { margin: 0; font-size: .82rem; color: var(--ink-muted, #6b5a3f); }
+
+@media (max-width: 720px) {
+    .sbox-panel { max-width: 98vw; }
+    .sbox-title { font-size: 1rem; }
+}

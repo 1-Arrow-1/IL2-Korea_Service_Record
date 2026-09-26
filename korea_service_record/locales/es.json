@@ -463,5 +463,9 @@
     "machine_gun_squad_dprk": "Pelotón de ametralladoras (RPDC)",
     "submachine_gun_squad_dprk": "Pelotón de subfusiles (RPDC)",
     "cargocart_m5": "Carro de munición"
+  },
+  "shadowbox": {
+    "open": "Vitrina",
+    "caption": "Condecoraciones, distintivo e insignias de unidad en una vitrina."
   }
 }

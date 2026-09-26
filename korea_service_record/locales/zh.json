@@ -463,5 +463,9 @@
     "machine_gun_squad_dprk": "机枪班（朝鲜）",
     "submachine_gun_squad_dprk": "冲锋枪班（朝鲜）",
     "cargocart_m5": "弹药车"
+  },
+  "shadowbox": {
+    "open": "奖章展示框",
+    "caption": "奖章、飞行徽与部队标志的展示框。"
   }
 }

@@ -24,6 +24,7 @@ from .gamedata import loads_lenient
 from .i18n import (apply_game_strings, available as available_languages,
                    game_code, normalise, ui_strings)
 from .photos import PhotoStore
+from . import shadowbox as shadowbox_art
 from .settings import Settings
 from .assets import default_cache_dir
 from .locate import find_game_dir
@@ -400,6 +401,39 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         detail["language"] = settings.resolve(career_id)
         detail["language_override"] = settings.career_language(career_id) or ""
         return jsonify(detail)
+
+    @app.route("/api/shadowbox/<path:career_id>")
+    def api_shadowbox(career_id: str):
+        """
+        The display case for one pilot: where every piece hangs, in percent.
+
+        Built from the same tunic payload the detail page already has, so the
+        box cannot claim an award the uniform does not wear. The engraving is
+        taken from the English aggregator whatever the page language is - the
+        plate is a brass object, not a caption.
+        """
+        agg = aggregator(career_id)
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        try:
+            pilot_id = int(request.args["pilot"]) if "pilot" in request.args else None
+        except ValueError:
+            pilot_id = None
+        detail = agg.career_detail(career_id, pilot_id)
+        if detail is None:
+            return jsonify({"error": "career_not_found"}), 404
+        player = detail.get("player") or {}
+        country = player.get("country")
+        if not shadowbox_art.available(country):
+            return jsonify({"error": "no_case"}), 404
+        rank_id = player.get("rank_id")
+        english = aggregator_for("en")
+        rank = english.locale.rank_name(country, rank_id) if rank_id is not None else ""
+        data = shadowbox_art.layout(detail["ribbon_rack"], rank_id,
+                                    detail.get("squadron_key"), rev=asset_version())
+        data["text"] = shadowbox_art.plate_text(rank, player.get("name") or "")
+        data["squadron"] = detail.get("squadron") or ""
+        return jsonify(data)
 
     @app.route("/api/mission/<path:career_id>/<int:mission_id>")
     def api_mission(career_id: str, mission_id: int):

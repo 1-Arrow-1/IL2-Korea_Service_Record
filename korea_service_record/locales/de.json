@@ -463,5 +463,9 @@
     "machine_gun_squad_dprk": "MG-Gruppe (DVRK)",
     "submachine_gun_squad_dprk": "MPi-Gruppe (DVRK)",
     "cargocart_m5": "Munitionskarren"
+  },
+  "shadowbox": {
+    "open": "Schaukasten",
+    "caption": "Orden, Abzeichen und Verbandsabzeichen in einem Schaukasten."
   }
 }

@@ -463,5 +463,9 @@
     "machine_gun_squad_dprk": "Groupe de mitrailleuses (RPDC)",
     "submachine_gun_squad_dprk": "Groupe de pistolets-mitrailleurs (RPDC)",
     "cargocart_m5": "Chariot à munitions"
+  },
+  "shadowbox": {
+    "open": "Vitrine",
+    "caption": "Décorations, brevet et insignes d’unité dans une vitrine."
   }
 }

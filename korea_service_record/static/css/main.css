@@ -182,7 +182,10 @@ body {
 img.emblem { cursor: zoom-in; }
 body.lightbox-open { overflow: hidden; }
 
-.lightbox { position: fixed; inset: 0; z-index: 50; display: flex;
+/* Above Leaflet. The operations map puts its tile and marker panes at 400
+   and its controls at 1000, so at 50 any lightbox tall enough to reach the
+   map was painted over by it from the map's top edge down. */
+.lightbox { position: fixed; inset: 0; z-index: 1100; display: flex;
             align-items: center; justify-content: center; padding: 2rem; }
 .lightbox-backdrop { position: absolute; inset: 0; background: rgba(31, 20, 10, 0.72); }
 

@@ -136,6 +136,11 @@
                                 <h4 class="list-head" id="d-progress-head" data-i18n="progress.heading" hidden>Toward the next award</h4>
                                 <ul id="d-progress" class="progress-list"></ul>
                                 <p id="d-progress-note" class="progress-note" data-i18n="progress.note" hidden></p>
+                                <!-- The display case. Only the Air Force has
+                                     a frame, cloth and rank devices drawn for
+                                     it, so the button appears for 601 alone. -->
+                                <button type="button" id="d-shadowbox-btn" class="nav-btn small shadowbox-btn"
+                                        data-i18n="shadowbox.open" hidden>Shadowbox</button>
                             </section>
                         </div>
 
@@ -356,6 +361,24 @@
                 <img id="tunic-lapel" class="tunic-lapel" src="/static/images/lapel_usaf.png" alt="" aria-hidden="true">
             </div>
             <p id="tunic-caption" class="tunic-caption"></p>
+        </div>
+    </div>
+
+    <div id="shadowbox" class="lightbox" hidden>
+        <div class="lightbox-backdrop" data-sbox-close></div>
+        <div class="lightbox-panel sbox-panel" role="dialog" aria-modal="true" aria-labelledby="sbox-title">
+            <button class="lightbox-close" data-sbox-close aria-label="Close" data-i18n-title="common.close">&times;</button>
+            <h2 id="sbox-title" class="sbox-title"></h2>
+            <!-- The case itself. The frame is the only element in normal
+                 flow; it sets the size and everything else is placed on it
+                 in percentages, so the box scales as one picture. -->
+            <div id="sbox" class="sbox">
+                <img id="sbox-frame" class="sbox-frame" src="" alt="">
+                <div id="sbox-items" class="sbox-items"></div>
+                <div id="sbox-plate-text" class="sbox-plate-text"><span></span></div>
+                <img id="sbox-glass" class="sbox-glass" src="" alt="" aria-hidden="true">
+            </div>
+            <p id="sbox-caption" class="sbox-caption" data-i18n="shadowbox.caption"></p>
         </div>
     </div>
 
