@@ -76,6 +76,13 @@ NAVY_RANK_OVERLAYS = {
     7: "navy_rear_adm_UH.png",
 }
 
+# Service dress for the Navy is the khaki coat, not the white one: the white
+# is Service Dress White and carries the full-size medals. The boards are the
+# same eight files on both coats, but khaki is worn with a shirt collar, so
+# the rank is shown twice - gold on the boards and a device on each collar
+# point. Those are the same eight names with _khaki before the extension.
+NAVY_SERVICE_COAT = "tunic_navy_khaki_template.jpg"
+
 USMC_RANK_OVERLAYS = {
     0: "usmc_2nd_Lt.png",
     1: "usmc_1st_Lt.png",
@@ -90,6 +97,8 @@ USMC_RANK_OVERLAYS = {
 # the Marine full-dress view swaps coat, shoulder ranks and neck art. The
 # blue boards are the same eight files with _BD before the extension.
 USMC_BD_RANK_OVERLAYS = {r: n.replace(".png", "_BD.png") for r, n in USMC_RANK_OVERLAYS.items()}
+NAVY_COLLAR_OVERLAYS = {r: n.replace(".png", "_khaki.png")
+                        for r, n in NAVY_RANK_OVERLAYS.items()}
 USMC_DRESS_COAT = "tunic_dress_blue_usmc.jpg"
 from ..loadouts import AmmoSchemes, parse_pilots_list
 from ..worldobjects import WorldObjectIndex, normalise as normalise_object
@@ -1054,6 +1063,14 @@ class CareerAggregator:
                              USAF_RANK_OVERLAYS.get(rank_id) if coat == "usaf" else None),
             "rank_overlay_full": USMC_BD_RANK_OVERLAYS.get(rank_id) if coat == "usmc" else None,
             "dress_coat": USMC_DRESS_COAT if coat == "usmc" else None,
+            # The coat worn in service dress, where that is not simply
+            # tunic_<coat>.jpg. The Navy's is khaki; its white coat is the
+            # full-dress one and stays the default.
+            "service_coat": NAVY_SERVICE_COAT if coat == "usnavy" else None,
+            # Worn on the shirt collar with the khaki coat, alongside the
+            # boards rather than instead of them.
+            "collar_overlay": (NAVY_COLLAR_OVERLAYS.get(rank_id)
+                               if coat == "usnavy" else None),
             "unit_in_service": unit_in_service,
             "unit_dress_limit": unit_dress_limit,
             "rev": ribbons.REVISION,

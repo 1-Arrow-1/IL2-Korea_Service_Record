@@ -234,6 +234,10 @@ table.roster td.award-cell { white-space: normal; }
 .tunic-title { margin: 0 0 0.6rem; font-size: 1.15rem; }
 .tunic { position: relative; width: 100%; aspect-ratio: 1122 / 930; overflow: hidden; border-radius: 3px; }
 .tunic-coat { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+/* Full-canvas like the boards, and above them: the collar points sit in
+   front of the shoulders in the photograph. */
+.tunic-collar { position: absolute; inset: 0; width: 100%; height: 100%;
+    display: block; object-fit: cover; pointer-events: none; z-index: 2; }
 .tunic-rank { position: absolute; inset: 0; width: 100%; height: 100%; display: block;
     object-fit: cover; pointer-events: none; }
 .tunic-right, .tunic-left { position: absolute; bottom: 53.6%; width: 34.8%; display: flex; flex-direction: column;

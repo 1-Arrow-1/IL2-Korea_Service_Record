@@ -421,8 +421,13 @@
         // Full-size medals belong to Blue Dress "A" on a Marine, so full
         // dress swaps the photograph and the shoulder boards with it.
         const dressCoat = full && rack.dress_coat;
+        // Some services wear a different coat off the full-dress occasion -
+        // the Navy's khaki against its white - so service dress gets its own
+        // picture where one is given.
+        const serviceCoat = !full && rack.service_coat;
         el("tunic-coat").src = "/static/images/" +
-            (dressCoat || "tunic_" + coat + ".jpg") + "?v=" + (rack.medal_rev || 0);
+            (dressCoat || serviceCoat || "tunic_" + coat + ".jpg") +
+            "?v=" + (rack.medal_rev || 0);
         const rankOverlay = el("tunic-rank");
         const board = (full && rack.rank_overlay_full) || rack.rank_overlay;
         if (board) {
@@ -431,6 +436,16 @@
         } else {
             rankOverlay.removeAttribute("src");
             show(rankOverlay, false);
+        }
+        // Collar devices ride the shirt collar of the khaki coat, as well as
+        // the boards - the rank is shown in both places, not one or the other.
+        const collar = el("tunic-collar");
+        if (serviceCoat && rack.collar_overlay) {
+            collar.src = "/static/images/" + rack.collar_overlay;
+            show(collar, true);
+        } else {
+            collar.removeAttribute("src");
+            show(collar, false);
         }
         // The lapel cut-out belongs to its coat's photograph (USAF, USMC);
         // the shirt collar only the USAF coat has.
