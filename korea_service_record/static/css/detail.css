@@ -339,10 +339,11 @@ table.roster td.award-cell { white-space: normal; }
    its lapel cut-out measures 336x475 against the blue one's 367x518, the
    two dimensions agreeing to a thousandth - so a rack sized as a share of
    the frame came out too large on it. The whole right-breast group is
-   scaled down, which takes the aviator badge with it, and hung lower: the
-   bottom row belongs just above the pocket flap, whose top edge is 59% of
-   the way down this photograph. */
-.tunic[data-coat="usaf"]:not(.full) .tunic-right { width: 29.3%; bottom: 43%; }
+   scaled down, which takes the aviator badge with it, and hung so the
+   bottom row clears the pocket. The flap's top edge is 48% of the way down
+   this photograph - measured with the rack hidden, because with it drawn
+   the flap's own top is the one thing the rack covers. */
+.tunic[data-coat="usaf"]:not(.full) .tunic-right { width: 29.3%; bottom: 53.9%; }
 /* The larger medals make the rack about 13% of its own width taller, and it
    hangs from its bottom edge, so it grew up into the aviator badge. Hung
    that much lower - 5.4% of the coat's height - to clear it again. */
