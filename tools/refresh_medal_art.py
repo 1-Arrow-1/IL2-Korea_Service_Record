@@ -22,6 +22,17 @@ suspension ring or the clasp. It is found in both pictures, the tile's
 pendant is scaled to the width the old one had (or to the height left in
 the canvas, whichever is the tighter fit), and it is hung centred with its
 top on the old waist.
+
+DO NOT run this over the set. The atlas is not a general source for these
+bases: they were painted for the dress coat and the atlas tiles are a
+different rendering, systematically brighter and not always the same
+design. The Legion of Merit is the plain case - the drawn one has the green
+laurel wreath and no atlas tile has a single green pixel in it. Reach for
+this only when a particular medal has been remodelled in the mod and the
+tile is the wanted picture, and look at --sheet before writing.
+
+Used so far for 601008 and 601018, whose drawn bases were a brass Bronze
+Star and the old Silver Star.
 """
 
 import argparse

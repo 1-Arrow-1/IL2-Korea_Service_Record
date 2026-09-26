@@ -277,7 +277,7 @@ table.roster td.award-cell { white-space: normal; }
 .tunic.full .tunic-right { bottom: 31.4%; }
 .medal-group { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .medal-row { position: relative; display: flex; justify-content: center; width: 100%; }
-.medal-row + .medal-row { margin-top: -25.6%; }
+.medal-row + .medal-row { margin-top: -22.36%; }
 .medal { position: relative; width: 25%; height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
 /* Naval mounting (docs/NAVY_RACK.md 5-7, 10-11, 16). Every medal keeps its
    size; a row of four or five is fitted by moving the medals closer, not by
@@ -303,12 +303,23 @@ table.roster td.award-cell { white-space: normal; }
 /* The Air Force mounts three medals to a row like the Navy, but with its
    own overlap once a row runs wider: a third of a medal at four, a half at
    five, which is the 50% the regulation calls the limit. */
-.tunic[data-coat="usaf"] .medal-row.n4 .medal + .medal { margin-left: -8.333%; }
-.tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -12.5%; }
-.tunic[data-coat="usmc"] .medal-row + .medal-row { margin-top: -27.35%; }
+/* The drape is 224x414 - the ribbon was shortened at the bar so the medal
+   is a larger share of it - which makes a medal 1.848 times its width tall
+   rather than 2.116. Every row pull above is that same fraction of the new
+   height, so the rows show as much of each other as they always did.
+
+   Against the shortened drape the Air Force rack still read small, so its
+   medals are drawn at 29% of the container rather than 25%. The spacing is
+   the same geometry put through the larger medal: a third of one at four to
+   a row, a half at five, and a row pull of 0.484 of the new 53.6% height. */
+.tunic[data-coat="usaf"].full .medal { width: 29%; }
+.tunic[data-coat="usaf"] .medal-row.n4 .medal + .medal { margin-left: -9.667%; }
+.tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -14.5%; }
+.tunic[data-coat="usaf"].full .medal-row + .medal-row { margin-top: -25.94%; }
+.tunic[data-coat="usmc"] .medal-row + .medal-row { margin-top: -23.89%; }
 /* 58.19% of the container tall at the larger size, less the 48.3% of it the
    next row shows. */
-.tunic[data-coat="usnavy"] .medal-row + .medal-row { margin-top: -30.09%; }
+.tunic[data-coat="usnavy"] .medal-row + .medal-row { margin-top: -26.28%; }
 /* On the tie below the knot, the bow largely behind the collar points. */
 .tunic-neck { position: absolute; left: 46.5%; top: 0; width: 23%; transform: translateX(-50%); }
 .tunic-neck:empty { display: none; }

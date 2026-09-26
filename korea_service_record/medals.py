@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 ART = Path(__file__).resolve().parent / "static" / "images" / "medals"
 # Bump whenever the composition or the art changes; it is part of the URLs.
-REVISION = 23
+REVISION = 24
 
 # --- US: drawn art -----------------------------------------------------------
 # Every base medal is drawn 224 px wide - the drape is 1 3/8 inch, the same
@@ -38,8 +38,8 @@ REVISION = 23
 # and 474 px tall, the top of the drape at the top edge. The straight part of
 # the drape runs 185 px before it tapers to the suspension ring; devices are
 # centred on that.
-DRAPE = (224, 474)
-DRAPE_LENGTH = 185
+DRAPE = (224, 414)
+DRAPE_LENGTH = 125
 DEVICE_SCALE = DRAPE[0] / ribbons.BAR[0]
 # A cluster on the suspension ribbon is the 13/32" one, not the bar's 5/16"
 # (DEVICE_RULES.md 2); stars are the same size on both. Four clusters go
