@@ -398,6 +398,9 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if detail is None:
             return jsonify({"error": "career_not_found"}), 404
         settings = app.config["SETTINGS"]
+        # Moves when the mod's atlases do, so a remodelled medal is not
+        # hidden behind a year-long browser cache on an unchanged URL.
+        detail["art_rev"] = agg.icons.art_version()
         detail["language"] = settings.resolve(career_id)
         detail["language_override"] = settings.career_language(career_id) or ""
         return jsonify(detail)

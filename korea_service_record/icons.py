@@ -86,6 +86,30 @@ class IconLibrary:
         self.resolver = resolver
         self._sheets: Dict[str, IconSheet] = {}
         self._atlas_cache: Dict[str, object] = {}
+        self._art_version: Optional[str] = None
+
+    def art_version(self) -> str:
+        """
+        A short token that changes whenever any atlas behind these sheets
+        does.
+
+        The slices themselves are cached on disk under the atlas fingerprint,
+        so the server can never serve yesterday's medal - but the browser was
+        told to keep ``/api/icon/award/601008?h=88`` for a year, and that URL
+        does not move when the art under it is remodelled. The token goes in
+        the URL so a re-cut atlas reaches people who already have the old
+        picture, which a cache header alone cannot do.
+        """
+        if self._art_version is None:
+            marks = []
+            for kind in SHEETS:
+                sheet = self.sheet(kind)
+                if sheet is None:
+                    continue
+                for atlas in sorted({c.atlas for c in sheet.crops.values()}):
+                    marks.append(self.resolver.fingerprint(f"{IMAGE_ROOT}/{atlas}"))
+            self._art_version = hashlib.sha1("|".join(marks).encode()).hexdigest()[:8]
+        return self._art_version
 
     def sheet(self, kind: str) -> Optional[IconSheet]:
         if kind not in SHEETS:

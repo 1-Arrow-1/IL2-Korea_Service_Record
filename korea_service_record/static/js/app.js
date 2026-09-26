@@ -57,11 +57,16 @@
     // Reuse the plain ROK image URL too, bypassing cached repeat-device art.
     const iconIdent = (kind, ident) => kind === "award" &&
         ["601047", "601048", "601049"].includes(String(ident)) ? 601043 : ident;
+    // The atlases are the mod's, and the mod gets re-cut. Icons are cached
+    // hard, so their URL carries a token that moves with the art.
+    let artRev = "";
+    const artArg = () => (artRev ? "&r=" + encodeURIComponent(artRev) : "");
     const icon = (kind, ident, height, cls, title, extra) =>
         (ident === null || ident === undefined || ident === "")
             ? ""
             : '<img class="' + cls + ' emblem" src="/api/icon/' + kind + "/" +
-              encodeURIComponent(iconIdent(kind, ident)) + "?h=" + height + '" alt="" title="' +
+              encodeURIComponent(iconIdent(kind, ident)) + "?h=" + height + artArg() +
+              '" alt="" title="' +
               esc(title || "") + '" data-kind="' + kind + '" data-id="' +
               esc(ident) + '" data-title="' + esc(title || "") + '" ' + (extra || "") +
               ' onerror="this.style.display=&quot;none&quot;">';
@@ -87,7 +92,8 @@
         el("lb-title").textContent = title || "";
         el("lb-sub").textContent = "";
         el("lb-desc").textContent = T("common.loading");
-        el("lb-image").src = "/api/icon/" + kind + "/" + encodeURIComponent(iconIdent(kind, ident));
+        el("lb-image").src = "/api/icon/" + kind + "/" +
+            encodeURIComponent(iconIdent(kind, ident)) + (artRev ? "?r=" + encodeURIComponent(artRev) : "");
         el("lb-image").alt = title || "";
         show(box);
         document.body.classList.add("lightbox-open");
@@ -492,7 +498,7 @@
             left = stack ? '<div class="sov-right">' + stack + "</div>" : "";
             caption = T("awards.tunic_caption_" + coat + (full ? "_full" : ""));
         } else {
-            const badge = rack.badge ? '<img class="tunic-badge" src="/api/icon/award/' + esc(rack.badge) + '" alt="' + esc(rack.badge_name) + '" title="' + esc(rack.badge_name) + '">' : "";
+            const badge = rack.badge ? '<img class="tunic-badge" src="/api/icon/award/' + esc(rack.badge) + (artRev ? "?r=" + esc(artRev) : "") + '" alt="' + esc(rack.badge_name) + '" title="' + esc(rack.badge_name) + '">' : "";
             // Service dress mounts unit citations in the rack itself, so
             // the strip is only drawn in full dress, on the breast opposite
             // the medals: every one for a Marine, the senior alone for a
@@ -1258,6 +1264,7 @@
             const p = d.player;
 
             currentCareer = d.id;
+            artRev = d.art_rev || "";
             currentPilot = d.subject_id;
             currentAvatar = p.avatar;
             showPortrait(currentCareer, currentPilot, p.avatar);
