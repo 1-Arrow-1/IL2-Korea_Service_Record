@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 # Bumped whenever a constant below moves, so a cached layout is not drawn
 # against a frame it was not measured for.
-REVISION = 3
+REVISION = 4
 
 # The frame photograph. Every number below is in its pixel space.
 FRAME = (2050, 1860)
@@ -45,9 +45,13 @@ FRAME = (2050, 1860)
 # the reflection is cropped tighter on the left than the frame is.
 GLASS_AT = (53, 0)
 
-# The velvet's horizontal middle. Not FRAME[0] / 2: the moulding is a shade
-# wider on the right, and rows centred on the true centre of the picture sit
-# visibly off-centre inside the box.
+# The velvet's horizontal middle, and the one axis everything in the case is
+# hung on. Not FRAME[0] / 2: the moulding is a shade wider on the right, and
+# rows centred on the true centre of the picture sit visibly off-centre
+# inside the box. Every centred piece derives from this rather than carrying
+# its own measured x - the reference box was laid out by hand and its badge
+# and citation bars ended up 24px right of its seal, patch and plate, which
+# is invisible on their own and obvious once they are stacked.
 CENTRE_X = 1022
 
 # Medals hang in rows of up to seven. A pilot of the 601st can reach
@@ -66,7 +70,7 @@ MEDAL_ROW_TOP = (132, 655)
 # patch. Each is centred on its own point rather than sharing a baseline -
 # the badge rides higher because the citation bars are pinned beneath it.
 SEAL_AT = (443, 1313)
-BADGE_AT = (1046, 1226)
+BADGE_AT = (CENTRE_X, 1226)
 PATCH_AT = (1602, 1325)
 
 # The aviator badge is mounted slightly over its atlas size. It is a small
@@ -88,7 +92,7 @@ CITATION_Y = 1427
 # The brass plate, given as the ink itself rather than the canvas - the art
 # carries a wide transparent margin and placing the canvas would put the
 # plate somewhere else entirely.
-PLATE = (656, 1547, 739, 142)
+PLATE = (CENTRE_X - 739 / 2.0, 1547, 739, 142)
 
 # Rank devices butt against the plate at this distance, at their own size,
 # centred on the plate. The widest device in the set is the Major General
