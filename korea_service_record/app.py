@@ -430,7 +430,8 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         english = aggregator_for("en")
         rank = english.locale.rank_name(country, rank_id) if rank_id is not None else ""
         data = shadowbox_art.layout(detail["ribbon_rack"], rank_id,
-                                    detail.get("squadron_key"), rev=asset_version())
+                                    detail.get("squadron_key"), agg.icons,
+                                    rev=asset_version())
         data["text"] = shadowbox_art.plate_text(rank, player.get("name") or "")
         data["squadron"] = detail.get("squadron") or ""
         return jsonify(data)

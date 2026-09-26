@@ -24,14 +24,18 @@ game's English strings, not the reader's.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Sequence
+import io
+import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from . import medals as medal_art
-from . import ribbons
+
+logger = logging.getLogger(__name__)
 
 # Bumped whenever a constant below moves, so a cached layout is not drawn
 # against a frame it was not measured for.
-REVISION = 2
+REVISION = 3
 
 # The frame photograph. Every number below is in its pixel space.
 FRAME = (2050, 1860)
@@ -69,14 +73,15 @@ PATCH_AT = (1602, 1325)
 # piece of art beside two 290px discs and reads as an afterthought at 1:1.
 BADGE_SCALE = 1.05
 
-# The squadron emblem is a 320px tile in the game's atlas, mounted a little
-# under size so it does not outweigh the seal facing it.
-PATCH_WIDTH = 285
+# The squadron emblem goes in at its atlas size. The tile is 320 square with
+# a 14px clear border, so the emblem itself comes out 289 across - within
+# four pixels of the Air Force seal facing it, which is what pairs them.
+# Scaling the tile to the seal's canvas instead would shrink the emblem.
 
-# Unit citations, pinned in a line beneath the badge. The width is measured;
-# the height follows the ribbon's own aspect rather than the reference box,
-# which stretched them.
-CITATION_WIDTH = 228
+# Unit citations, pinned in a line beneath the badge. Their atlas tiles are
+# 456 wide and go in at half size, which is exactly the 228 measured off the
+# reference box.
+CITATION_SCALE = 0.5
 CITATION_GAP = 64
 CITATION_Y = 1427
 
@@ -90,11 +95,26 @@ PLATE = (656, 1547, 739, 142)
 # star cluster at 394px, which still clears the moulding on both sides.
 RANK_GAP = 68
 
-# Art whose size cannot be asked of the atlas.
+# The Air Force seal is furniture, not an award, and has no atlas tile.
 SEAL_SIZE = (295, 294)
-NECK_SIZE = (348, 496)
-MEDAL_SIZE = medal_art.DRAPE               # (224, 474)
-BADGE_SIZE = {601001: (448, 133), 601027: (456, 208), 601040: (456, 208)}
+
+# The neck orders are the one set drawn by hand. Their atlas tiles show the
+# Medal of Honor on a short drape like any other medal; in a case it hangs
+# from its full neck ribbon, which is a different piece of art.
+DRAWN_NECK = (601026, 601041)
+
+# A row is scaled down if it will not fit between the mouldings. It only
+# bites on a full row of unusually wide tiles, but a medal drawn over the
+# frame is worse than one drawn a few per cent small.
+INTERIOR = (140, 1905)
+
+# How the ribbon top is found in a piece of art: the band is the widest the
+# art gets in its top quarter, and the ribbon starts at the first row that
+# reaches most of it. Neither the canvas nor the ink bounding box will do -
+# the tiles carry different amounts of clear space above the ribbon, and
+# some have a suspension ring or a clasp poking up above it.
+BAND_REGION = 0.25
+BAND_REACH = 0.80
 
 # The rank devices on disk, by the game's own rank id with 601 dropped. A
 # general's star is symmetrical and ships as one file; everything below it is
@@ -112,6 +132,74 @@ RANK_SIZE = {0: (64, 166), 1: (65, 165), 2: (168, 167), 3: (173, 188),
 # Korean air forces want their own frame, cloth and devices, and a box built
 # out of USAF furniture would be wrong rather than merely plain.
 COUNTRIES = (601,)
+
+
+# Measured art, by award id. The atlas does not change while the tracker is
+# running and the answer is three small integers, so it is worked out once.
+_GEOMETRY: Dict[int, Tuple[int, int, int]] = {}
+_TILES: Dict[str, Tuple[int, int, int]] = {}
+
+
+def _measure(data: bytes) -> Tuple[int, int, int]:
+    """Width, height and ribbon top of one piece of art."""
+    import numpy as np
+    from PIL import Image
+
+    im = Image.open(io.BytesIO(data)).convert("RGBA")
+    opaque = np.asarray(im)[..., 3] > 128
+    widths = opaque.sum(axis=1)
+    head = widths[:max(4, int(len(widths) * BAND_REGION))]
+    band = int(head.max()) if len(head) else 0
+    top = int(np.argmax(widths >= BAND_REACH * band)) if band else 0
+    return im.width, im.height, top
+
+
+def _tile(icons, kind: str, ident: str) -> Optional[Tuple[str, int, int, int]]:
+    """Source and measurements for one tile of any of the game's sheets."""
+    key = f"{kind}:{ident}"
+    if key not in _TILES:
+        data = icons.png(kind, ident)
+        if data is None:
+            logger.warning("No %s tile for %s", kind, ident)
+            return None
+        try:
+            _TILES[key] = _measure(data)
+        except Exception as exc:                  # pragma: no cover - art only
+            logger.warning("Cannot measure %s %s: %s", kind, ident, exc)
+            return None
+    return (f"/api/icon/{kind}/{ident}",) + _TILES[key]
+
+
+def _art(icons, award_id: int) -> Optional[Tuple[str, int, int, int]]:
+    """
+    The source and measurements for one award's full-size art.
+
+    Everything comes from the game's own atlas, at the size the atlas draws
+    it, so the case shows the same medals the game does. The neck orders are
+    the exception and are read from the files drawn for them.
+    """
+    if award_id in _GEOMETRY:
+        src, = (f"/static/images/shadowbox/601/{award_id}.png",) if award_id in DRAWN_NECK \
+            else (f"/api/icon/award/{award_id}",)
+        return (src,) + _GEOMETRY[award_id]
+    if award_id in DRAWN_NECK:
+        path = (Path(__file__).resolve().parent / "static" / "images" /
+                "shadowbox" / "601" / f"{award_id}.png")
+        if not path.is_file():
+            return None
+        data, src = path.read_bytes(), f"/static/images/shadowbox/601/{award_id}.png"
+    else:
+        data = icons.png("award", str(award_id))
+        if data is None:
+            logger.warning("No atlas tile for award %s", award_id)
+            return None
+        src = f"/api/icon/award/{award_id}"
+    try:
+        _GEOMETRY[award_id] = _measure(data)
+    except Exception as exc:                      # pragma: no cover - art only
+        logger.warning("Cannot measure award %s: %s", award_id, exc)
+        return None
+    return (src,) + _GEOMETRY[award_id]
 
 
 def available(country: Optional[int]) -> bool:
@@ -151,20 +239,26 @@ def _row_sizes(count: int) -> List[int]:
     return medal_art.rows(count, MEDAL_PER_ROW) if count else []
 
 
-def _place_row(widths: Sequence[int], top: float, heights: Sequence[int]) -> List[tuple]:
+def _place_row(art: Sequence[Tuple[int, int, int]], line: float) -> List[tuple]:
     """
-    Lay a row of art out around ``CENTRE_X``, hung from a common top edge.
+    Lay a row of medals out around ``CENTRE_X``, hung from a common ribbon.
 
-    Widths vary - the Medal of Honor's neck ribbon is half again as wide as
-    a drape - so the row is measured before it is placed rather than being
-    dropped onto a fixed pitch.
+    Every tile is a different size and carries a different amount of clear
+    space above its ribbon, so neither a fixed pitch nor a shared top edge
+    will do. Each piece is placed by its own ribbon top, which puts all the
+    ribbons on ``line`` - the way a case is actually mounted, and the only
+    line in a row of medals that reads as straight.
     """
+    widths = [w for w, _, _ in art]
     total = sum(widths) + MEDAL_GAP * (len(widths) - 1)
-    x = CENTRE_X - total / 2.0
+    room = INTERIOR[1] - INTERIOR[0]
+    scale = min(1.0, room / total) if total else 1.0
+    gap = MEDAL_GAP * scale
+    x = CENTRE_X - total * scale / 2.0
     out = []
-    for w, h in zip(widths, heights):
-        out.append((x, top, w, h))
-        x += w + MEDAL_GAP
+    for w, h, ribbon in art:
+        out.append((x, line - ribbon * scale, w * scale, h * scale))
+        x += w * scale + gap
     return out
 
 
@@ -188,13 +282,14 @@ def plate_text(rank: str, name: str) -> Dict[str, str]:
 
 
 def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[str],
-           rev: int = 0) -> Dict[str, Any]:
+           icons, rev: int = 0) -> Dict[str, Any]:
     """
     Every piece in the box, in the order it should be drawn.
 
     ``rack`` is the tunic payload the detail page already builds - the same
     medals, citations and badge the pilot wears - so the box and the uniform
-    can never disagree about what he has been given.
+    can never disagree about what he has been given. ``icons`` is the sheet
+    reader the medals and badges are sliced from.
     """
     items: List[Dict[str, Any]] = []
 
@@ -202,22 +297,19 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
         x, y, w, h = box
         items.append({"src": src, "name": name, "cls": cls, **_pct(x, y, w, h)})
 
-    svc = f"&svc={rack['svc']}" if rack.get("svc") else ""
-    mrev = rack.get("medal_rev", 0)
-
     # --- the medals ----------------------------------------------------
     # The neck order is worn at the throat and leads the line; the rest
     # follow in precedence, which is the order the rack already holds them.
+    wanted = ([(rack["neck"], rack.get("neck_name") or "")] if rack.get("neck") else [])
+    wanted += [(m["type"], m.get("name") or "") for m in rack.get("medals") or []]
+
     worn: List[Dict[str, Any]] = []
-    neck = rack.get("neck")
-    if neck:
-        worn.append({"type": neck, "name": rack.get("neck_name") or "",
-                     "size": NECK_SIZE,
-                     "src": f"/static/images/shadowbox/601/{neck}.png?v={rev}"})
-    for piece in rack.get("medals") or []:
-        worn.append({"type": piece["type"], "name": piece.get("name") or "",
-                     "size": MEDAL_SIZE,
-                     "src": f"/api/medal/{piece['type']}?v={mrev}{svc}"})
+    for award_id, name in wanted:
+        art = _art(icons, award_id)
+        if art is None:
+            continue
+        src, w, h, ribbon = art
+        worn.append({"name": name, "src": f"{src}?v={rev}", "art": (w, h, ribbon)})
 
     # A pilot cannot hold more than two rows' worth, but a preview rack can
     # ask for anything; anything past the second row is dropped rather than
@@ -228,9 +320,7 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
     for row_index, count in enumerate(sizes):
         row = worn[placed:placed + count]
         placed += count
-        boxes = _place_row([m["size"][0] for m in row],
-                           tops[row_index],
-                           [m["size"][1] for m in row])
+        boxes = _place_row([m["art"] for m in row], tops[row_index])
         for medal, box in zip(row, boxes):
             add(medal["src"], box, medal["name"], "sbox-medal")
 
@@ -238,28 +328,33 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
     add(f"/static/images/shadowbox/601/seal.png?v={rev}",
         _centred(*SEAL_AT, *SEAL_SIZE), "United States Air Force", "sbox-seal")
 
-    badge = rack.get("badge")
+    badge = _art(icons, rack["badge"]) if rack.get("badge") else None
     if badge:
-        bw, bh = BADGE_SIZE.get(badge, (456, 208))
-        add(f"/api/icon/award/{badge}?v={rev}",
+        src, bw, bh, _ = badge
+        add(f"{src}?v={rev}",
             _centred(*BADGE_AT, bw * BADGE_SCALE, bh * BADGE_SCALE),
             rack.get("badge_name") or "", "sbox-badge")
 
-    if squadron_key:
-        add(f"/api/icon/squadron/{squadron_key}?v={rev}",
-            _centred(*PATCH_AT, PATCH_WIDTH, PATCH_WIDTH), "", "sbox-patch")
+    patch = _tile(icons, "squadron", squadron_key) if squadron_key else None
+    if patch:
+        src, pw, ph, _ = patch
+        add(f"{src}?v={rev}", _centred(*PATCH_AT, pw, ph), "", "sbox-patch")
 
     # --- the unit citations ---------------------------------------------
-    cites = rack.get("citations") or []
-    if cites:
-        ch = CITATION_WIDTH * ribbons.CANVAS[1] / ribbons.CANVAS[0]
-        total = len(cites) * CITATION_WIDTH + CITATION_GAP * (len(cites) - 1)
+    bars = []
+    for c in rack.get("citations") or []:
+        art = _art(icons, c["type"])
+        if art is not None:
+            bars.append((art, c.get("name") or ""))
+    if bars:
+        widths = [a[1] * CITATION_SCALE for a, _ in bars]
+        total = sum(widths) + CITATION_GAP * (len(bars) - 1)
         x = CENTRE_X - total / 2.0
-        for c in cites:
-            add(f"/api/ribbon/{c['type']}?v={rack.get('rev', 0)}{svc}",
-                (x, CITATION_Y - ch / 2.0, CITATION_WIDTH, ch),
-                c.get("name") or "", "sbox-citation")
-            x += CITATION_WIDTH + CITATION_GAP
+        for (src, w, h, _), name in bars:
+            cw, ch = w * CITATION_SCALE, h * CITATION_SCALE
+            add(f"{src}?v={rev}", (x, CITATION_Y - ch / 2.0, cw, ch),
+                name, "sbox-citation")
+            x += cw + CITATION_GAP
 
     # --- the plate and its rank devices ----------------------------------
     px, py, pw, ph = PLATE
