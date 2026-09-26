@@ -317,8 +317,8 @@ table.roster td.award-cell { white-space: normal; }
 .tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -14.5%; }
 .tunic[data-coat="usaf"].full .medal-row + .medal-row { margin-top: -25.94%; }
 .tunic[data-coat="usmc"] .medal-row + .medal-row { margin-top: -23.89%; }
-/* 58.19% of the container tall at the larger size, less the 48.3% of it the
-   next row shows. */
+/* 50.83% of the container tall at the larger size on the shortened drape,
+   less the 48.3% of it the next row shows. */
 .tunic[data-coat="usnavy"] .medal-row + .medal-row { margin-top: -26.28%; }
 /* On the tie below the knot, the bow largely behind the collar points. */
 .tunic-neck { position: absolute; left: 46.5%; top: 0; width: 23%; transform: translateX(-50%); }

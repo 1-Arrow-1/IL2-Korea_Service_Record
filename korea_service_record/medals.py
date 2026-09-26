@@ -35,9 +35,10 @@ REVISION = 24
 # --- US: drawn art -----------------------------------------------------------
 # Every base medal is drawn 224 px wide - the drape is 1 3/8 inch, the same
 # width as a ribbon bar, so a device is simply the bar's device at 224/440 -
-# and 474 px tall, the top of the drape at the top edge. The straight part of
-# the drape runs 185 px before it tapers to the suspension ring; devices are
-# centred on that.
+# and 414 px tall, the top of the drape at the top edge. The straight part of
+# the drape runs 125 px before it tapers to the suspension ring; devices are
+# centred on that. Both were 60 px longer until the ribbon was shortened at
+# the bar so the medal would read larger on the coat.
 DRAPE = (224, 414)
 DRAPE_LENGTH = 125
 DEVICE_SCALE = DRAPE[0] / ribbons.BAR[0]
