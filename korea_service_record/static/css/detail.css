@@ -335,6 +335,12 @@ table.roster td.award-cell { white-space: normal; }
    medals end at 72.69%. Rank rides the shoulder loops and the Medal of
    Honor's art is a full-canvas overlay, as on the naval coats. */
 .tunic[data-coat="usaf"] .tunic-right { left: 76.65%; bottom: 49.51%; }
+/* The silver-tan coat was photographed at 91.6% of the blue one's scale -
+   its lapel cut-out measures 336x475 against the blue one's 367x518, the
+   two dimensions agreeing to a thousandth - so a rack sized as a share of
+   the frame came out about a tenth too large on it. The whole right-breast
+   group is scaled to match, which takes the aviator badge with it. */
+.tunic[data-coat="usaf"]:not(.full) .tunic-right { width: 31.9%; }
 /* The larger medals make the rack about 13% of its own width taller, and it
    hangs from its bottom edge, so it grew up into the aviator badge. Hung
    that much lower - 5.4% of the coat's height - to clear it again. */
