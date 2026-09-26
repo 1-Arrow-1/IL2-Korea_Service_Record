@@ -175,6 +175,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Please open the Career Helper from the Service Record - the button in its header.",
         "needs_mod": "The Career Helper is part of the awards mod. Install the mod component of the Service Record setup and enable modifications in IL-2 Korea.",
         "withdrawn": "{n} awards withdrawn. Backup: {backup}",
+        "the_squadron": "The squadron",
     },
     "de": {
         'tab_captured': 'Gefangen',
@@ -288,6 +289,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Bitte öffnen Sie den Laufbahn-Helfer aus der Dienstakte - über die Schaltfläche in ihrer Kopfzeile.",
         "needs_mod": "Der Laufbahn-Helfer gehört zum Auszeichnungs-Mod. Installieren Sie die Mod-Komponente des Dienstakte-Setups und aktivieren Sie Modifikationen in IL-2 Korea.",
         "withdrawn": "{n} Auszeichnungen entzogen. Sicherung: {backup}",
+        "the_squadron": "Die Staffel",
     },
     "es": {
         'tab_captured': 'Capturado',
@@ -401,6 +403,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Abra el Asistente de carrera desde la Hoja de Servicios: el botón de su cabecera.",
         "needs_mod": "El Asistente de carrera forma parte del mod de condecoraciones. Instale el componente del mod en el instalador de la Hoja de Servicios y active las modificaciones en IL-2 Korea.",
         "withdrawn": "{n} condecoraciones retiradas. Copia de seguridad: {backup}",
+        "the_squadron": "El escuadrón",
     },
     "fr": {
         'tab_captured': 'Capturé',
@@ -514,6 +517,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Ouvrez l’assistant de carrière depuis l’état de service : le bouton de son en-tête.",
         "needs_mod": "L’assistant de carrière fait partie du mod de décorations. Installez le composant mod de l’installateur de l’état de service et activez les modifications dans IL-2 Korea.",
         "withdrawn": "{n} décorations retirées. Sauvegarde : {backup}",
+        "the_squadron": "L’escadron",
     },
     "ru": {
         'tab_captured': 'В плену',
@@ -627,6 +631,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Откройте помощник карьеры из послужного списка — кнопкой в его шапке.",
         "needs_mod": "Помощник карьеры — часть мода наград. Установите компонент мода в установщике послужного списка и включите модификации в IL-2 Korea.",
         "withdrawn": "Отозвано наград: {n}. Резервная копия: {backup}",
+        "the_squadron": "Эскадрилья",
     },
     "zh": {
         'tab_captured': '被俘',
@@ -740,6 +745,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "请从服役记录中打开生涯助手——其页眉中的按钮。",
         "needs_mod": "生涯助手是奖励模组的一部分。请在服役记录安装程序中安装模组组件，并在 IL-2 Korea 中启用修改。",
         "withdrawn": "已撤销 {n} 项奖励。备份：{backup}",
+        "the_squadron": "中队",
     },
 }
 
@@ -1873,7 +1879,8 @@ class App(tk.Tk):
                 self.t["applied"] if e.get("applied") else self.t["not_applied"]))
         # Awards granted since an apply, offered for withdrawal.
         try:
-            since = corrections.awards_since_apply(self.career.path, data) if data else []
+            since = (corrections.awards_since_apply(self.career.path, data, find_game_dir())
+                     if data else [])
         except sqlite3.Error:
             since = []
         if since:
@@ -1881,8 +1888,11 @@ class App(tk.Tk):
             self.aw_vars = []
             for a in since:
                 v = tk.BooleanVar(value=False)
-                ttk.Checkbutton(self.aw_frame, variable=v,
-                                text=f"#{a['id']}  pilot {a['pilotId']}  award {a['type']}  {a['earnedDate']}").pack(anchor="w")
+                ttk.Checkbutton(
+                    self.aw_frame, variable=v,
+                    text=f"{a['who'] or self.t['the_squadron']}  ·  "
+                         f"{a['award']}  ·  {a['earnedDate']}"
+                ).pack(anchor="w")
                 self.aw_vars.append((a["id"], v))
             ttk.Button(self.aw_frame, text=self.t["withdraw"], command=self._withdraw).pack(anchor="e", pady=4)
 

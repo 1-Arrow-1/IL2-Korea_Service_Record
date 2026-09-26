@@ -477,8 +477,16 @@ def auto_sync(db_path: Path, game_dir: Path) -> Optional[Dict[str, Any]]:
     return {"computed": len(new_keys), "applied": len(applied)}
 
 
-def awards_since_apply(db_path: Path, data: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Award rows granted after the earliest apply still in force."""
+def awards_since_apply(db_path: Path, data: Dict[str, Any],
+                       game: Optional[Path] = None) -> List[Dict[str, Any]]:
+    """
+    Award rows granted after the earliest apply still in force.
+
+    The man and the decoration come back named. Withdrawing an award is
+    destructive and the reader has to judge each line on whether it was
+    really the added hours that earned it - "pilot 20 award 601014" cannot
+    be judged at all, and the ids are the database's business, not his.
+    """
     import sqlite3
     before: Optional[set] = None
     for entry in data.get("missions", {}).values():
@@ -487,12 +495,28 @@ def awards_since_apply(db_path: Path, data: Dict[str, Any]) -> List[Dict[str, An
             before = ids if before is None else (before & ids)
     if before is None:
         return []
+    names: Dict[int, str] = {}
+    if game is not None:
+        from .gamedata import AwardsConfig
+        cfg = Path(game) / "data" / "scg" / "2" / "awards.cfg"
+        if cfg.is_file():
+            names = {a.award_id: a.name for a in AwardsConfig(cfg).definitions.values()}
     con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
     con.row_factory = sqlite3.Row
     rows = [dict(r) for r in con.execute(
-        "SELECT id, pilotId, type, earnedDate FROM award WHERE isDeleted=0 ORDER BY id")
+        """SELECT a.id, a.pilotId, a.type, a.earnedDate, p.name, p.lastName
+           FROM award a LEFT JOIN pilot p ON p.id = a.pilotId
+           WHERE a.isDeleted=0 ORDER BY a.id""")
         if r["id"] not in before]
     con.close()
+    for r in rows:
+        who = f"{r.pop('name', None) or ''} {r.pop('lastName', None) or ''}".strip()
+        # A unit citation is the squadron's and carries pilotId -1, so there
+        # is no man to name. The caller supplies the word for it: this is a
+        # database reader and has no business holding UI strings.
+        r["unit"] = r["pilotId"] is None or r["pilotId"] <= 0
+        r["who"] = who
+        r["award"] = names.get(r["type"], str(r["type"]))
     return rows
 
 
