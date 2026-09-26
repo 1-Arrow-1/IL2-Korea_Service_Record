@@ -31,7 +31,7 @@ from . import ribbons
 
 # Bumped whenever a constant below moves, so a cached layout is not drawn
 # against a frame it was not measured for.
-REVISION = 1
+REVISION = 2
 
 # The frame photograph. Every number below is in its pixel space.
 FRAME = (2050, 1860)
@@ -127,6 +127,20 @@ def _pct(x: float, y: float, w: float, h: float) -> Dict[str, float]:
             "height": round(100.0 * h / FRAME[1], 4)}
 
 
+def _row_tops(rows: int) -> List[float]:
+    """
+    The ribbon line each row of medals hangs from.
+
+    Two rows take the measured positions. A single row is hung midway
+    between them instead of at the top one: the case was laid out around a
+    full rack, and a lone row left up at the first line leaves the middle
+    of the velvet bare with the shelf stranded far below it.
+    """
+    if rows <= 1:
+        return [(MEDAL_ROW_TOP[0] + MEDAL_ROW_TOP[1]) / 2.0]
+    return [float(y) for y in MEDAL_ROW_TOP[:rows]]
+
+
 def _row_sizes(count: int) -> List[int]:
     """
     How many medals hang in each row, top to bottom.
@@ -137,7 +151,7 @@ def _row_sizes(count: int) -> List[int]:
     return medal_art.rows(count, MEDAL_PER_ROW) if count else []
 
 
-def _place_row(widths: Sequence[int], top: int, heights: Sequence[int]) -> List[tuple]:
+def _place_row(widths: Sequence[int], top: float, heights: Sequence[int]) -> List[tuple]:
     """
     Lay a row of art out around ``CENTRE_X``, hung from a common top edge.
 
@@ -205,17 +219,17 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
                      "size": MEDAL_SIZE,
                      "src": f"/api/medal/{piece['type']}?v={mrev}{svc}"})
 
+    # A pilot cannot hold more than two rows' worth, but a preview rack can
+    # ask for anything; anything past the second row is dropped rather than
+    # drawn over the seal.
+    sizes = _row_sizes(len(worn))[:len(MEDAL_ROW_TOP)]
+    tops = _row_tops(len(sizes))
     placed = 0
-    for row_index, count in enumerate(_row_sizes(len(worn))):
+    for row_index, count in enumerate(sizes):
         row = worn[placed:placed + count]
         placed += count
-        # A pilot cannot hold more than two rows' worth, but a preview rack
-        # can ask for anything; anything past the second row is dropped
-        # rather than drawn over the seal.
-        if row_index >= len(MEDAL_ROW_TOP):
-            break
         boxes = _place_row([m["size"][0] for m in row],
-                           MEDAL_ROW_TOP[row_index],
+                           tops[row_index],
                            [m["size"][1] for m in row])
         for medal, box in zip(row, boxes):
             add(medal["src"], box, medal["name"], "sbox-medal")
