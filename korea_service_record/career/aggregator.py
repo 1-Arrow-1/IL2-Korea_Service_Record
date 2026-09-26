@@ -65,6 +65,31 @@ USAF_RANK_OVERLAYS = {
     7: "usaf_maj_gen.png",
 }
 
+# Service dress for the Air Force is the silver-tan coat; the blue one is
+# what carries the full-size medals. The shoulder loops take their own
+# insignia on it - the same eight files with _ST before the extension -
+# because the tan loop wants a different rendering from the blue.
+USAF_SERVICE_COAT = "tunic_usaf_silver_tan.jpg"
+# The lapel cut-out is a piece of its own coat's photograph, drawn back over
+# the ribbons so they tuck under it as on a real coat. It therefore belongs
+# to the coat, not to the service: the blue one would paint a blue lapel on
+# the silver-tan. Named only when the art is actually there, so the view
+# falls back to no lapel rather than a broken picture.
+LAPELS = {"tunic_usaf.jpg": "lapel_usaf.png",
+          "tunic_usaf_silver_tan.jpg": "lapel_usaf_ST.png",
+          "tunic_usmc.jpg": "lapel_usmc.png"}
+
+
+def _lapel(coat_file: Optional[str]) -> Optional[str]:
+    """The lapel art for a coat, if that coat wears one and we have it."""
+    name = LAPELS.get(coat_file or "")
+    if name is None:
+        return None
+    art = Path(__file__).resolve().parent.parent / "static" / "images" / name
+    return name if art.is_file() else None
+USAF_ST_RANK_OVERLAYS = {r: n.replace(".png", "_ST.png")
+                         for r, n in USAF_RANK_OVERLAYS.items()}
+
 NAVY_RANK_OVERLAYS = {
     0: "navy_ensign.png",
     1: "navy_lieutenant_jr_grade.png",
@@ -1060,13 +1085,20 @@ class CareerAggregator:
             "tunic": coat,
             "rank_overlay": (NAVY_RANK_OVERLAYS.get(rank_id) if coat == "usnavy" else
                              USMC_RANK_OVERLAYS.get(rank_id) if coat == "usmc" else
-                             USAF_RANK_OVERLAYS.get(rank_id) if coat == "usaf" else None),
-            "rank_overlay_full": USMC_BD_RANK_OVERLAYS.get(rank_id) if coat == "usmc" else None,
+                             USAF_ST_RANK_OVERLAYS.get(rank_id) if coat == "usaf" else None),
+            "rank_overlay_full": (USMC_BD_RANK_OVERLAYS.get(rank_id) if coat == "usmc" else
+                                  USAF_RANK_OVERLAYS.get(rank_id) if coat == "usaf" else None),
             "dress_coat": USMC_DRESS_COAT if coat == "usmc" else None,
             # The coat worn in service dress, where that is not simply
             # tunic_<coat>.jpg. The Navy's is khaki; its white coat is the
             # full-dress one and stays the default.
-            "service_coat": NAVY_SERVICE_COAT if coat == "usnavy" else None,
+            "service_coat": (NAVY_SERVICE_COAT if coat == "usnavy" else
+                             USAF_SERVICE_COAT if coat == "usaf" else None),
+            "lapel": _lapel(NAVY_SERVICE_COAT if coat == "usnavy" else
+                            USAF_SERVICE_COAT if coat == "usaf" else
+                            f"tunic_{coat}.jpg" if coat else None),
+            "lapel_full": _lapel(USMC_DRESS_COAT if coat == "usmc" else
+                                 f"tunic_{coat}.jpg" if coat else None),
             # Worn on the shirt collar with the khaki coat, alongside the
             # boards rather than instead of them.
             "collar_overlay": (NAVY_COLLAR_OVERLAYS.get(rank_id)

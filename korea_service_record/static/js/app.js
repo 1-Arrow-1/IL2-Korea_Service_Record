@@ -451,9 +451,12 @@
         // the shirt collar only the USAF coat has.
         // Blue Dress "A" has a standing collar and no lapel to cut out.
         const lapel = el("tunic-lapel");
-        const wearsLapel = coat === "usaf" || (coat === "usmc" && !dressCoat);
-        if (wearsLapel) { lapel.src = "/static/images/lapel_" + coat + ".png"; }
-        show(lapel, wearsLapel);
+        // The lapel cut-out is a piece of its own coat's photograph, so the
+        // coat names it: the Air Force's blue lapel would be painted over
+        // the silver-tan service coat if the service simply chose it.
+        const lapelArt = full ? rack.lapel_full : rack.lapel;
+        if (lapelArt) { lapel.src = "/static/images/" + lapelArt; }
+        show(lapel, Boolean(lapelArt));
         el("tunic-neck").innerHTML = full && rack.neck
             ? '<img class="neck-medal" src="' + esc(rack.neck_src) + '" alt="' + esc(rack.neck_name) + '" title="' + esc(rack.neck_name) + '">' +
               // The Navy and Marine overlays span the whole coat, so their
