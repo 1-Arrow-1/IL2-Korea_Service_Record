@@ -277,7 +277,7 @@ table.roster td.award-cell { white-space: normal; }
 .tunic.full .tunic-right { bottom: 31.4%; }
 .medal-group { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .medal-row { position: relative; display: flex; justify-content: center; width: 100%; }
-.medal-row + .medal-row { margin-top: -22.36%; }
+.medal-row + .medal-row { margin-top: -25.6%; }
 .medal { position: relative; width: 25%; height: auto; display: block; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)); }
 /* Naval mounting (docs/NAVY_RACK.md 5-7, 10-11, 16). Every medal keeps its
    size; a row of four or five is fitted by moving the medals closer, not by
@@ -303,23 +303,20 @@ table.roster td.award-cell { white-space: normal; }
 /* The Air Force mounts three medals to a row like the Navy, but with its
    own overlap once a row runs wider: a third of a medal at four, a half at
    five, which is the 50% the regulation calls the limit. */
-/* The drape is 224x414 - the ribbon was shortened at the bar so the medal
-   is a larger share of it - which makes a medal 1.848 times its width tall
-   rather than 2.116. Every row pull above is that same fraction of the new
-   height, so the rows show as much of each other as they always did.
-
-   Against the shortened drape the Air Force rack still read small, so its
-   medals are drawn at 29% of the container rather than 25%. The spacing is
-   the same geometry put through the larger medal: a third of one at four to
-   a row, a half at five, and a row pull of 0.484 of the new 53.6% height. */
+/* The Air Force rack read small, so in full dress its medals are drawn at
+   29% of the container rather than 25%. Shortening the ribbon instead does
+   nothing for this: the coat sizes a medal by its width, so a shorter drape
+   only makes the rack more compact. The spacing is the same geometry put
+   through the larger medal - a third of one at four to a row, a half at
+   five - and the row pull is the base 0.484 of its 61.37% height. */
 .tunic[data-coat="usaf"].full .medal { width: 29%; }
 .tunic[data-coat="usaf"] .medal-row.n4 .medal + .medal { margin-left: -9.667%; }
 .tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -14.5%; }
-.tunic[data-coat="usaf"].full .medal-row + .medal-row { margin-top: -25.94%; }
-.tunic[data-coat="usmc"] .medal-row + .medal-row { margin-top: -23.89%; }
-/* 50.83% of the container tall at the larger size on the shortened drape,
-   less the 48.3% of it the next row shows. */
-.tunic[data-coat="usnavy"] .medal-row + .medal-row { margin-top: -26.28%; }
+.tunic[data-coat="usaf"].full .medal-row + .medal-row { margin-top: -29.7%; }
+.tunic[data-coat="usmc"] .medal-row + .medal-row { margin-top: -27.35%; }
+/* 58.19% of the container tall at the larger size, less the 48.3% of it the
+   next row shows. */
+.tunic[data-coat="usnavy"] .medal-row + .medal-row { margin-top: -30.09%; }
 /* On the tie below the knot, the bow largely behind the collar points. */
 .tunic-neck { position: absolute; left: 46.5%; top: 0; width: 23%; transform: translateX(-50%); }
 .tunic-neck:empty { display: none; }
@@ -334,7 +331,10 @@ table.roster td.award-cell { white-space: normal; }
    medals end at 72.69%. Rank rides the shoulder loops and the Medal of
    Honor's art is a full-canvas overlay, as on the naval coats. */
 .tunic[data-coat="usaf"] .tunic-right { left: 76.65%; bottom: 49.51%; }
-.tunic[data-coat="usaf"].full .tunic-right { bottom: 27.31%; }
+/* The larger medals make the rack about 13% of its own width taller, and it
+   hangs from its bottom edge, so it grew up into the aviator badge. Hung
+   that much lower - 5.4% of the coat's height - to clear it again. */
+.tunic[data-coat="usaf"].full .tunic-right { bottom: 21.9%; }
 .tunic[data-coat="usaf"] .tunic-neck { inset: 0; width: 100%; transform: none; }
 .tunic[data-coat="usaf"] .tunic-neck, .tunic[data-coat="usaf"] .neck-medal { pointer-events: none; }
 .tunic[data-coat="usaf"] .neck-hotspot { display: block; position: absolute; pointer-events: auto;
