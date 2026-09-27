@@ -437,8 +437,17 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if not shadowbox_art.available(country):
             return jsonify({"error": "no_case"}), 404
         rank_id = player.get("rank_id")
-        english = aggregator_for("en")
-        rank = english.locale.rank_name(country, rank_id) if rank_id is not None else ""
+        # The plate is engraved in the air force's own language, not the
+        # reader's. A Soviet case says Mayor to anyone who has not asked for
+        # Russian - transliterated, not translated.
+        rank = ""
+        if rank_id is not None:
+            if country == 501:
+                rank = aggregator_for("ru").locale.rank_name(country, rank_id)
+                if app.config["SETTINGS"].resolve(career_id) != "ru":
+                    rank = shadowbox_art.transliterate(rank)
+            else:
+                rank = aggregator_for("en").locale.rank_name(country, rank_id)
         data = shadowbox_art.layout(detail["ribbon_rack"], rank_id,
                                     detail.get("squadron_key"), agg.icons,
                                     country=country, rev=asset_version())

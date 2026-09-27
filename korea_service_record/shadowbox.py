@@ -17,10 +17,12 @@ That reference is kept as a JPEG because the original is a 6MB PNG, so it
 shows the intended arrangement but is no longer exact to the pixel. The
 constants below, not the picture, are what the layout is built from.
 
-Nothing here is localised. A shadowbox is an object hanging on a wall, and
-the engraving on its plate reads the same whatever language the tracker is
-set to - so the plate is always English and the rank name comes from the
-game's English strings, not the reader's.
+The engraving does not follow the reader's language. A shadowbox is an
+object hanging on a wall, and its plate is engraved once, in the language
+of the air force that issued the awards: English for the Americans, Russian
+for the Soviets. For a reader who has not asked for Russian the rank is
+transliterated rather than translated - Mayor, not Major - because that is
+what the man was called. The name is never touched.
 """
 from __future__ import annotations
 
@@ -35,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 # Bumped whenever a constant below moves, so a cached layout is not drawn
 # against a frame it was not measured for.
-REVISION = 5
+REVISION = 6
 
 # The frame photograph. Every number below is in its pixel space.
 FRAME = (2050, 1860)
@@ -141,10 +143,13 @@ RANK_SIZE = {0: (64, 166), 1: (65, 165), 2: (168, 167), 3: (173, 188),
 # orders and medals suspended on a pentagonal mount, screw-back orders with
 # no ribbon at all, and the Gold Star above them. So the case has a row for
 # each instead of the Air Force's single descending line.
-SOV_ROW1_LINE = 150          # where every suspended ribbon's top edge lands
+# Where every suspended ribbon's ink begins. The reference box had it at
+# 150, thirty pixels under the moulding, which read as squeezed; the row and
+# the one below it both come down so the case can breathe.
+SOV_ROW1_LINE = 195
 SOV_STAR_GAP = 92            # the air either side of the Gold Star
 SOV_GAP = 9                  # between neighbours, measured ink to ink
-SOV_ROW2_Y = 753             # the screw-back orders' middle
+SOV_ROW2_Y = 798             # the screw-back orders' middle
 SOV_ROW2_GAP = 160
 SOV_ARMS_AT = (452, 1196)
 SOV_BADGE_AT = (1019, 1100)
@@ -186,16 +191,24 @@ def _measure(data: bytes) -> Tuple[int, int, int]:
     return im.width, im.height, top
 
 
-_SPANS: Dict[str, Tuple[int, int]] = {}
+_SPANS: Dict[str, Tuple[int, int, int]] = {}
 
 
-def _span(src: str, data: bytes) -> Tuple[int, int]:
+def _span(src: str, data: bytes) -> Tuple[int, int, int]:
     """
-    The art's left and right ink edges within its canvas.
+    The art's left and right ink edges, and where its ink begins.
 
-    Rows are packed by this, not by the canvas: the Soviet tiles carry a
-    transparent margin, and spacing three Red Banners by their canvases put
-    the outermost one through the moulding.
+    Rows are packed by the edges, not by the canvas: the Soviet tiles carry
+    a transparent margin, and spacing three Red Banners by their canvases
+    put the outermost one through the moulding.
+
+    The ink top is what the Soviet row hangs from. ``_measure``'s rule -
+    the first row reaching most of the band's width - suits a US ribbon,
+    which is rectangular and full width at once. A Soviet pentagon ribbon
+    widens all the way down, so that rule lands wherever the taper happens
+    to cross the threshold: row 44 on a Red Banner against row 34 on the
+    Order of Lenin, which set them ten pixels apart on a row that should
+    have been level.
     """
     if src not in _SPANS:
         import io
@@ -204,7 +217,9 @@ def _span(src: str, data: bytes) -> Tuple[int, int]:
 
         opaque = np.asarray(Image.open(io.BytesIO(data)).convert("RGBA"))[..., 3] > 40
         cols = np.where(opaque.any(axis=0))[0]
-        _SPANS[src] = (int(cols.min()), int(cols.max())) if len(cols) else (0, 0)
+        rows = np.where(opaque.any(axis=1))[0]
+        _SPANS[src] = ((int(cols.min()), int(cols.max()), int(rows.min()))
+                       if len(cols) and len(rows) else (0, 0, 0))
     return _SPANS[src]
 
 
@@ -322,6 +337,38 @@ def _centred(cx: float, cy: float, w: float, h: float) -> tuple:
     return (cx - w / 2.0, cy - h / 2.0, w, h)
 
 
+# BGN/PCGN, enough for a rank name. A table rather than the eight ranks
+# spelled out, so it still holds if the game's strings are edited.
+CYRILLIC = {
+    "\u0430": "a", "\u0431": "b", "\u0432": "v", "\u0433": "g", "\u0434": "d",
+    "\u0435": "e", "\u0451": "ye", "\u0436": "zh", "\u0437": "z", "\u0438": "i",
+    "\u0439": "y", "\u043a": "k", "\u043b": "l", "\u043c": "m", "\u043d": "n",
+    "\u043e": "o", "\u043f": "p", "\u0440": "r", "\u0441": "s", "\u0442": "t",
+    "\u0443": "u", "\u0444": "f", "\u0445": "kh", "\u0446": "ts", "\u0447": "ch",
+    "\u0448": "sh", "\u0449": "shch", "\u044a": "", "\u044b": "y", "\u044c": "",
+    "\u044d": "e", "\u044e": "yu", "\u044f": "ya",
+}
+
+
+def transliterate(text: str) -> str:
+    """
+    A Cyrillic rank in Latin letters - Mayor, Podpolkovnik, General-leytenant.
+
+    Not a translation: the plate on a Soviet case says what the man was
+    called, and "Major" is a different word that happens to look similar.
+    """
+    out = []
+    for ch in text:
+        low = CYRILLIC.get(ch.lower())
+        if low is None:
+            out.append(ch)
+        elif ch.isupper() and low:
+            out.append(low[0].upper() + low[1:])
+        else:
+            out.append(low)
+    return "".join(out)
+
+
 def plate_text(rank: str, name: str) -> Dict[str, str]:
     """
     The engraving, in full and abbreviated.
@@ -397,19 +444,18 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
     star = art_of(hero, (rack.get("hero") or {}).get("name", "")) if hero else None
     if star:
         (src, w, h, ribbon), nm = star
-        sl, sr = _SPANS.get(src, (0, w - 1))
+        sl, sr, st = _SPANS.get(src, (0, w - 1, 0))
         add(f"{src}?v={rev}",
-            (CENTRE_X - (sl + sr) / 2.0, SOV_ROW1_LINE - ribbon, w, h),
+            (CENTRE_X - (sl + sr) / 2.0, SOV_ROW1_LINE - st, w, h),
             nm, "sbox-medal")
-        sl, sr = _SPANS.get(src, (0, w - 1))
         x = CENTRE_X - (sr - sl + 1) / 2.0 - SOV_STAR_GAP
         for a in left:
             got = art_of(a, names.get(a, ""))
             if not got:
                 continue
             (s, aw, ah, rb), nm = got
-            il, ir = _SPANS.get(s, (0, aw - 1))
-            add(f"{s}?v={rev}", (x - ir - 1, SOV_ROW1_LINE - rb, aw, ah), nm, "sbox-medal")
+            il, ir, it = _SPANS.get(s, (0, aw - 1, 0))
+            add(f"{s}?v={rev}", (x - ir - 1, SOV_ROW1_LINE - it, aw, ah), nm, "sbox-medal")
             x -= (ir - il + 1) + SOV_GAP
         x = CENTRE_X + (sr - sl + 1) / 2.0 + SOV_STAR_GAP
         for a in right:
@@ -417,8 +463,8 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
             if not got:
                 continue
             (s, aw, ah, rb), nm = got
-            il, ir = _SPANS.get(s, (0, aw - 1))
-            add(f"{s}?v={rev}", (x - il, SOV_ROW1_LINE - rb, aw, ah), nm, "sbox-medal")
+            il, ir, it = _SPANS.get(s, (0, aw - 1, 0))
+            add(f"{s}?v={rev}", (x - il, SOV_ROW1_LINE - it, aw, ah), nm, "sbox-medal")
             x += (ir - il + 1) + SOV_GAP
     else:
         row = [art_of(a, names.get(a, "")) for a in bar]
@@ -450,7 +496,11 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
         (s, w, h, _), nm = badge
         add(f"{s}?v={rev}", _centred(*SOV_BADGE_AT, w, h), nm, "sbox-badge")
 
-    patch = _tile(icons, "squadron", squadron_key) if squadron_key else None
+    # A squadron belongs to one air force, so a key from another is not
+    # drawn at all rather than put a foreign patch in the case. Real careers
+    # always agree; the preview switch is what can disagree.
+    patch = (_tile(icons, "squadron", squadron_key)
+             if squadron_key and str(squadron_key).startswith("501") else None)
     if patch:
         s, w, h, _ = patch
         add(f"{s}?v={rev}", _centred(*SOV_PATCH_AT, w, h), "", "sbox-patch")
@@ -463,10 +513,21 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
     board = _tile(icons, "rank", f"501{rank_id}") if rank_id is not None else None
     if board:
         s, w, h, _ = board
-        for side, x in (("left", px - SOV_BOARD_GAP - w),
-                        ("right", px + pw + SOV_BOARD_GAP)):
-            add(f"{s}?v={rev}", (x, SOV_BOARD_Y - h / 2.0, w, h), "",
-                f"sbox-board sbox-board-{side}")
+        il, ir, _ = _SPANS.get(s, (0, w - 1, 0))
+        ink = ir - il + 1
+        # A general's board is 504 wide against 461 for every other rank, and
+        # at the standard gap it would run through the moulding. The gap
+        # closes instead, the same amount on both sides, so the pair stays
+        # symmetrical and inside the cloth whatever the rank.
+        room = min(px - INTERIOR[0], INTERIOR[1] - (px + pw))
+        gap = max(0.0, min(float(SOV_BOARD_GAP), room - ink))
+        y = SOV_BOARD_Y - h / 2.0
+        add(f"{s}?v={rev}", (px - gap - ink - il, y, w, h), "",
+            "sbox-board sbox-board-left")
+        # The right board is this tile mirrored in the stylesheet, so its ink
+        # ends up (w - 1 - ir) in from the element's left edge.
+        add(f"{s}?v={rev}", (px + pw + gap - (w - 1 - ir), y, w, h), "",
+            "sbox-board sbox-board-right")
 
     return items, SOV_PLATE
 

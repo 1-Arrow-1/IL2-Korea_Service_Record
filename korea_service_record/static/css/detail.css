@@ -1339,6 +1339,10 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 /* Soviet shoulder boards are handed. The atlas holds one tile, so the
    right-hand board is that tile mirrored, which puts its button inboard. */
 .sbox-board-right { transform: scaleX(-1); }
+/* The arms and the propeller are flat drawings, unlike the atlas pieces,
+   which carry their own shadow. Without one they sit on the cloth rather
+   than above it. */
+.sbox-emblem { filter: drop-shadow(0 6px 7px rgba(0, 0, 0, .55)); }
 
 /* The glass goes over everything, including the plate engraving: it is a
    photograph of the pane, so anything it does not cover reads as if it were
