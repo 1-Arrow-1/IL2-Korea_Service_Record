@@ -528,6 +528,7 @@
     "transfer_done": "中队现驻 {field}",
     "and_others": {
       "other": "等 {n} 人"
-    }
+    },
+    "written_up_to": "记载至此日期"
   }
 }

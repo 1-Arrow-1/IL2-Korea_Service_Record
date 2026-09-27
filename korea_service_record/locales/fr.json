@@ -537,6 +537,7 @@
     "and_others": {
       "one": "et {n} autre",
       "other": "et {n} autres"
-    }
+    },
+    "written_up_to": "Tenu à jour jusqu’à cette date"
   }
 }

@@ -210,6 +210,16 @@
         el("wd-plane").src = "/static/images/planes/" + data.plane + ".png";
         el("wd-plane").hidden = false;
     }
+    // A date stamp is struck short - "7 MAY 1951", not "7 May 1951" in
+    // full - so it uses the medium form rather than the diary's long one.
+    if (data.today) {
+        const [y, m, d] = data.today.split(".").map(Number);
+        el("wd-date").textContent = new Intl.DateTimeFormat(lang, {
+            day: "numeric", month: "short", year: "numeric"
+        }).format(new Date(y, m - 1, d));
+        el("wd-datestamp").hidden = false;
+        el("wd-datestamp").title = T("written_up_to");
+    }
     fitTitle();
     addEventListener("resize", fitTitle);
     if (!data.days.length) { fail("diary.empty"); return; }

@@ -537,6 +537,7 @@
     "and_others": {
       "one": "y {n} más",
       "other": "y {n} más"
-    }
+    },
+    "written_up_to": "Redactado hasta esta fecha"
   }
 }

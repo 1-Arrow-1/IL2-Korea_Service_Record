@@ -537,6 +537,7 @@
     "and_others": {
       "one": "and {n} other",
       "other": "and {n} others"
-    }
+    },
+    "written_up_to": "Written up to this date"
   }
 }

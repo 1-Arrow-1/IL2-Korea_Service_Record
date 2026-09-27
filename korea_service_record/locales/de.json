@@ -537,6 +537,7 @@
     "and_others": {
       "one": "und {n} weiterer",
       "other": "und {n} weitere"
-    }
+    },
+    "written_up_to": "Geführt bis zu diesem Tag"
   }
 }

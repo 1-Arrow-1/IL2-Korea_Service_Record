@@ -64,7 +64,24 @@
     display: grid; grid-template-columns: auto 1fr auto; align-items: center;
     gap: 0 1.1rem; margin-bottom: .5rem;
 }
+.wd-ident { display: flex; align-items: center; gap: .9rem; }
 .wd-emblem { height: 64px; width: auto; }
+
+/* The date stamp. The frame is the drawn impression; the date is set into
+   the clear band the artwork leaves - measured off the file at 9.6% to
+   90.3% across and 28.2% to 71.4% down - so the type never touches the
+   rules or the stars. Tilted, because nobody ever struck one straight. */
+.wd-datestamp {
+    position: relative; width: 9.5rem; aspect-ratio: 450 / 220;
+    background: url("../images/stamps/date.png") no-repeat center / 100% 100%;
+    transform: rotate(-2.5deg);
+}
+.wd-datestamp span {
+    position: absolute; left: 9.6%; right: 9.7%; top: 28.2%; height: 43.2%;
+    display: grid; place-items: center;
+    font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
+    color: #504070; opacity: .85; white-space: nowrap; line-height: 1;
+}
 .wd-sub {
     margin: 0; font-size: .95rem; color: var(--ink-muted); text-align: center;
     letter-spacing: .04em;
@@ -194,7 +211,7 @@
     }
     .wd-edge { height: 2rem; }
     .wd-head-top { grid-template-columns: auto 1fr; }
-    .wd-plane { display: none; }
+    .wd-plane, .wd-datestamp { display: none; }
     .wd-m-head { min-width: 0; }
 }
 
