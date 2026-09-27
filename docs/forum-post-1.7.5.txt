@@ -22,8 +22,14 @@ Most rungs are a number, and the bar says which number:
 
 Some are not a number at all. The Purple Heart wants a wound, so it says "Wounded in
 Action" rather than pretending you are a percentage of the way there. Others want a
-rank, or squadron command, and say so. The Distinguished Service Cross and the Medal of
-Honor each have more than one route in, so both are listed with their odds.
+rank, or squadron command, and say so.
+
+Plenty can be earned more than one way, and that is the rule rather than the exception
+outside the American set — of the Soviet and Korean decorations, five routes to the same
+medal is ordinary. The nearest one is the bar; the others fold away under a chevron,
+each showing its own progress. So the Order of the Red Star may head with nine sorties
+of the fifteen it wants, and open to show that thirty ground targets or three air
+victories would have done as well.
 
 Three things to know about it before you rely on it:
 
@@ -54,9 +60,15 @@ than by seniority alone — the orders that hang from a ribbon in one row, the s
 orders that have no ribbon at all in another, the Gold Star above them — so those cases
 are built that way.
 
-Their plates are engraved in their own language. A Soviet case reads Майор for a reader
-who has asked for Russian, and Mayor for everyone else: transliterated, not translated,
-because that is what the man was called. The name is never touched, whatever it is.
+Each plate is engraved in the language of the air force that issued the awards, not in
+yours. A Soviet case reads Майор whatever language you have the page set to; hover the
+brass and it tells you the rank in your own. The name is never touched, whatever it is.
+
+The one air force this cannot serve properly is the North Korean. The game ships no
+Korean strings at all — its Chinese for the 503rd is 少校, which is the Chinese rank and
+wrong on a Korean plate — but its English is not "Major" either, it is "Sojwa", the
+Korean rank romanised. So that is what a North Korean plate carries: the right word in
+the wrong alphabet, which is the best the game has to offer.
 
 Nothing for the Navy or the Marines yet. The artwork is drawn and sitting in the
 release, but the game has no career for either service, so there is nothing to put in a
@@ -106,10 +118,10 @@ DOWNLOAD
     https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v1.7.5
 
 Installer  IL2_Korea_Service_Record_Setup_v1.7.5.exe
-           SHA-256  fcd948a0920c58a630218181530e8a59e6dbccf34794980d86c5242cb4c0a2cc
+           SHA-256  2302e36f9a3de5ae8a6ea7856f45fd2a9e00ca6253466eb219c10c11f5095eaa
 
 Zip        IL-2.Korea.Service.Record.v1.7.5.zip
-           SHA-256  5c1f6303a20306959df929a09fcf498b7517347b851315c593c7220a296b963f
+           SHA-256  b4f893d4beec671cb16fc0a965cec45730558d1774201ae48e32484555cda762
 
 (GitHub writes the zip's name with dots where I put spaces. The file is the same one.)
 
