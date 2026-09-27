@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 # Bumped whenever a constant below moves, so a cached layout is not drawn
 # against a frame it was not measured for.
-REVISION = 6
+REVISION = 7
 
 # The frame photograph. Every number below is in its pixel space.
 FRAME = (2050, 1860)
@@ -150,11 +150,20 @@ SOV_ROW1_LINE = 195
 SOV_STAR_GAP = 92            # the air either side of the Gold Star
 SOV_GAP = 9                  # between neighbours, measured ink to ink
 SOV_ROW2_Y = 798             # the screw-back orders' middle
-SOV_ROW2_GAP = 160
-SOV_ARMS_AT = (452, 1196)
-SOV_BADGE_AT = (1019, 1100)
-SOV_PROP_AT = (1019, 1290)
-SOV_PATCH_AT = (1615, 1193)
+# The screw-backs are spaced centre to centre, not packed edge to edge.
+# Packing three unequal orders - 290, 269 and 271 wide - centres the row but
+# leaves the middle one ten pixels off the axis, which shows against the
+# Gold Star and the badge sitting on it.
+SOV_ROW2_PITCH = 421
+# The middle of this row is on the case's axis, not on where the reference
+# box happened to put it: that was laid out by hand and sat three pixels
+# left, which shows the moment two pieces are stacked. The arms and the
+# squadron sit the same distance out on either side.
+SOV_SIDE = 581
+SOV_ARMS_AT = (CENTRE_X - SOV_SIDE, 1196)
+SOV_BADGE_AT = (CENTRE_X, 1100)
+SOV_PROP_AT = (CENTRE_X, 1290)
+SOV_PATCH_AT = (CENTRE_X + SOV_SIDE, 1193)
 # The plate sits higher than the Air Force's: the shoulder boards are 194
 # tall against a rank device's 166, and at the Air Force's height they would
 # come within twenty pixels of the moulding.
@@ -333,6 +342,18 @@ def _place_row(art: Sequence[Tuple[int, int, int]], line: float) -> List[tuple]:
     return out
 
 
+def _centred_ink(src: str, cx: float, cy: float, w: float, h: float) -> tuple:
+    """
+    Centre a piece on its own ink rather than on its canvas.
+
+    The pilot's badge is 465 wide with its ink from 2 to 454, so its middle
+    is four pixels left of the canvas middle; centring the canvas hangs it
+    visibly off the line it shares with the propeller beneath it.
+    """
+    il, ir, _ = _SPANS.get(src, (0, int(w) - 1, 0))
+    return (cx - (il + ir) / 2.0, cy - h / 2.0, w, h)
+
+
 def _centred(cx: float, cy: float, w: float, h: float) -> tuple:
     return (cx - w / 2.0, cy - h / 2.0, w, h)
 
@@ -477,24 +498,28 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
     pinned = [art_of(m["type"], m.get("name") or "") for m in rack.get("pinned") or []]
     pinned = [p for p in pinned if p]
     if pinned:
-        widths = [w for (_, w, _, _), _ in pinned]
-        total = sum(widths) + SOV_ROW2_GAP * (len(pinned) - 1)
-        x = CENTRE_X - total / 2.0
-        for (s, w, h, _), nm in pinned:
-            add(f"{s}?v={rev}", (x, SOV_ROW2_Y - h / 2.0, w, h), nm, "sbox-pinned")
-            x += w + SOV_ROW2_GAP
+        first = CENTRE_X - SOV_ROW2_PITCH * (len(pinned) - 1) / 2.0
+        for i, ((s, w, h, _), nm) in enumerate(pinned):
+            add(f"{s}?v={rev}",
+                _centred_ink(s, first + i * SOV_ROW2_PITCH, SOV_ROW2_Y, w, h),
+                nm, "sbox-pinned")
 
     # --- row three: arms, badge and squadron -----------------------------
     for name, at, size in (("USSR_coat_of_arms.png", SOV_ARMS_AT, (301, 315)),
                            ("VVS_winged_propeller.png", SOV_PROP_AT, (264, 167))):
-        add(f"/static/images/shadowbox/501/{name}?v={rev}",
-            _centred(*at, *size), "", "sbox-emblem")
+        src = f"/static/images/shadowbox/501/{name}"
+        if src not in _SPANS:
+            art = (Path(__file__).resolve().parent / "static" / "images" /
+                   "shadowbox" / "501" / name)
+            if art.is_file():
+                _span(src, art.read_bytes())
+        add(f"{src}?v={rev}", _centred_ink(src, *at, *size), "", "sbox-emblem")
 
     wings = rack.get("wings")
     badge = art_of(wings["type"], wings.get("name") or "") if wings else None
     if badge:
         (s, w, h, _), nm = badge
-        add(f"{s}?v={rev}", _centred(*SOV_BADGE_AT, w, h), nm, "sbox-badge")
+        add(f"{s}?v={rev}", _centred_ink(s, *SOV_BADGE_AT, w, h), nm, "sbox-badge")
 
     # A squadron belongs to one air force, so a key from another is not
     # drawn at all rather than put a foreign patch in the case. Real careers
@@ -503,7 +528,7 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
              if squadron_key and str(squadron_key).startswith("501") else None)
     if patch:
         s, w, h, _ = patch
-        add(f"{s}?v={rev}", _centred(*SOV_PATCH_AT, w, h), "", "sbox-patch")
+        add(f"{s}?v={rev}", _centred_ink(s, *SOV_PATCH_AT, w, h), "", "sbox-patch")
 
     # --- the plate and the shoulder boards -------------------------------
     px, py, pw, ph = SOV_PLATE
