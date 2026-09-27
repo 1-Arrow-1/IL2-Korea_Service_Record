@@ -485,7 +485,6 @@
     "no_career": "Aucune carrière n’a été indiquée.",
     "mission_num": "Mission {n}",
     "unscheduled": "Non programmée",
-    "against": "contre {place}",
     "targets": {
       "one": "{n} objectif détruit",
       "other": "{n} objectifs détruits"

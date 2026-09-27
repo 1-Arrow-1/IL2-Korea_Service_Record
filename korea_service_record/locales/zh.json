@@ -484,7 +484,6 @@
     "no_career": "未指定生涯。",
     "mission_num": "第 {n} 次任务",
     "unscheduled": "临时任务",
-    "against": "目标 {place}",
     "targets": {
       "other": "摧毁 {n} 个目标"
     },

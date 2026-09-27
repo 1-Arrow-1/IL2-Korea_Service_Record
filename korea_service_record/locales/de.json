@@ -485,7 +485,6 @@
     "no_career": "Es wurde keine Laufbahn angegeben.",
     "mission_num": "Einsatz {n}",
     "unscheduled": "Außerplanmäßig",
-    "against": "gegen {place}",
     "targets": {
       "one": "{n} Ziel zerstört",
       "other": "{n} Ziele zerstört"

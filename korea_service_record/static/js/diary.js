@@ -94,7 +94,14 @@
     function missionLine(m) {
         const head = m.num ? T("mission_num", {n: num(m.num)}) : T("unscheduled");
         const bits = [];
-        if (m.place) { bits.push(T("against", {place: m.place})); }
+        // The place, with no preposition in front of it. "against Sinnam"
+        // was right for an attack and wrong for everything else - an
+        // airfield defence is not flown against the field it protects, nor
+        // an escort against the place it passes. The mission types run from
+        // interception to cargo delivery to a squadron transfer, and no one
+        // preposition fits them all in English, let alone in six languages.
+        // A log entry does not need one.
+        if (m.place) { bits.push(m.place); }
         if (m.targets) { bits.push(T("targets", {n: m.targets})); }
         return '<li class="wd-mission' + (m.player ? " flown" : "") + '">' +
             '<span class="wd-m-head">' + esc(head) + "</span>" +
