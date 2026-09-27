@@ -1,0 +1,122 @@
+IL-2 Korea Service Record 1.7.5 — what you are working towards, and a case to put it in
+
+
+Gentlemen,
+
+1.7.5 is mostly artwork. One new thing: the record now tells you what your pilot is
+working towards, and how far off it is.
+
+
+WHAT COMES NEXT
+
+Under the awards on a pilot's page there is now a short list: for every ladder he is
+already on, the next rung and the distance to it. Not a catalogue of everything in the
+game — only the things actually in front of him.
+
+Most rungs are a number, and the bar says which number:
+
+    Bronze Star Medal                     16 / 35 sorties
+    Legion of Merit                     15.8 / 200 hours
+    Distinguished Unit Citation        1,551 / 14,000 targets
+    Promotion to Lieutenant Colonel       35 / 75 days · 229.8 / 500 points
+
+Some are not a number at all. The Purple Heart wants a wound, so it says "Wounded in
+Action" rather than pretending you are a percentage of the way there. Others want a
+rank, or squadron command, and say so. The Distinguished Service Cross and the Medal of
+Honor each have more than one route in, so both are listed with their odds.
+
+Three things to know about it before you rely on it:
+
+  * It reads the same conditions the game does, out of awards.cfg. If you run the awards
+    mod, it reads your modded file, so the figures are yours and not mine.
+  * Where a condition rolls dice, it says the odds per mission rather than a date. That
+    is the honest answer, not a hedge.
+  * It only shows the ladders a pilot is already on. A decoration he has never touched
+    does not appear, because the engine will not consider him for it either.
+
+One finding while building it, which may save someone else the puzzling. Some awards in
+the file have a second route written as AwardByDef. Reading it, that route looks live —
+a coin-flip on every sortie. It is not. Across a full career I could find no pilot who
+had ever received an award by it, for any of the decorations that offer it. Something
+gates it that I have not identified, so the list ignores that route entirely. If it
+ever fires for you, I would like to know.
+
+
+THE DISPLAY CASE
+
+There is a new button under the awards: a glazed case with the pilot's decorations
+mounted in it — medals, his badge, unit citations and squadron insignia, with his rank
+and name engraved on the brass.
+
+Three of them, for the Air Force, the Soviets and the North Koreans. The eastern cases
+are not the American one recoloured. Soviet awards divide by how they are worn rather
+than by seniority alone — the orders that hang from a ribbon in one row, the screw-back
+orders that have no ribbon at all in another, the Gold Star above them — so those cases
+are built that way.
+
+Their plates are engraved in their own language. A Soviet case reads Майор for a reader
+who has asked for Russian, and Mayor for everyone else: transliterated, not translated,
+because that is what the man was called. The name is never touched, whatever it is.
+
+Nothing for the Navy or the Marines yet. The artwork is drawn and sitting in the
+release, but the game has no career for either service, so there is nothing to put in a
+case and no way for me to check one.
+
+
+SERVICE DRESS
+
+The uniform view now shows the right coat for the occasion. Service dress for the Air
+Force is the silver-tan; for the Navy, khaki. Blue and white are full dress, which is
+what carries the full-size medals.
+
+Each wears its own rank. The Navy's khaki shows it twice, on the shoulder boards and
+again on the shirt collar, as it was worn.
+
+
+MEDALS AND RIBBONS
+
+All seventeen full-size medals are redrawn. They are also no longer wearing two shadows
+each: thirteen of them had one painted into the picture on top of the one the coat
+casts, which is a good part of why the rack used to look uneven from medal to medal.
+
+Ribbons and drapes are lit now rather than flat. The cloth bows over its mount the way
+it does in life, brightest a little above centre and falling away to the edges. The
+weave is untouched — it is only the light that is new.
+
+
+TWO FIXES WORTH KNOWING
+
+If you have been looking at a medal in the tracker and thinking it did not match the one
+in the game, that was real and it was mine. Award pictures were being cached in your
+browser for a year against an address that never changed, so a decoration you remodelled
+never reached the page. Fixed properly: the address now moves when the atlas does. If
+you have modded award art, it should finally show what you drew.
+
+And the Career Helper no longer offers awards for withdrawal as "#188 pilot 20 award
+601014". It names the man and the decoration.
+
+
+THE MOD
+
+The awards mod is unchanged from 1.7.0, byte for byte. Nothing to merge or redo.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v1.7.5
+
+Installer  IL2_Korea_Service_Record_Setup_v1.7.5.exe
+           SHA-256  fcd948a0920c58a630218181530e8a59e6dbccf34794980d86c5242cb4c0a2cc
+
+Zip        IL-2.Korea.Service.Record.v1.7.5.zip
+           SHA-256  5c1f6303a20306959df929a09fcf498b7517347b851315c593c7220a296b963f
+
+(GitHub writes the zip's name with dots where I put spaces. The file is the same one.)
+
+It is a bigger download than 1.7.0 — 76 MB against 51. The lighting on the ribbons and
+every measurement the cases take of a piece of art go through a numerical library that
+now has to ship inside the exe. I would rather hand you 25 MB than a release whose
+medals do not draw.
+
+As ever: if something does not match what you see in your own career, say so and I will
+go and look.
