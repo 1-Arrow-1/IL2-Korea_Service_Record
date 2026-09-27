@@ -171,7 +171,9 @@
     "unit_days": "天",
     "unit_pcp": "点",
     "unit_air": "空战战果",
-    "unit_targets": "目标"
+    "unit_targets": "目标",
+    "other_routes": "其他获得方式",
+    "req_date": "不早于 {date}"
   },
   "incidences": {
     "successor": "接替生涯",

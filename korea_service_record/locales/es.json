@@ -171,7 +171,9 @@
     "unit_days": "días",
     "unit_pcp": "puntos",
     "unit_air": "victorias aéreas",
-    "unit_targets": "objetivos"
+    "unit_targets": "objetivos",
+    "other_routes": "Otras formas de obtenerla",
+    "req_date": "no antes del {date}"
   },
   "incidences": {
     "successor": "Asumió la carrera",

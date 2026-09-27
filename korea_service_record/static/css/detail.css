@@ -1285,6 +1285,31 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
    as the counters but upright, so it does not read as something pending */
 .p-prereq { font-size: .8rem; color: var(--ink-muted, #6b5a3f); }
 .p-routes { font-size: .8rem; font-style: italic; color: var(--ink-muted, #6b5a3f); }
+/* The other ways in, folded under the bar. The award history's chevron,
+   reused, so the page has one gesture for "there is more under this". */
+.progress-list .route-toggle {
+    width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%;
+    margin-left: .3rem; vertical-align: -.22rem;
+    background: transparent; color: var(--ink-muted, #6b5a3f); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.progress-list .route-toggle:hover,
+.progress-list .route-toggle:focus-visible { background: var(--paper); color: var(--ink-strong); }
+.progress-list .route-toggle svg {
+    width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.9;
+    stroke-linecap: round; stroke-linejoin: round; transition: transform 120ms ease-in;
+}
+.progress-list .route-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+/* Its own line, always. Inside the body span it is an inline box, so on a
+   row with a short bar it sat alongside the bar instead of under it. */
+.progress-list ul.p-alts {
+    display: block; width: 100%;
+    list-style: none; margin: .25rem 0 0; padding: 0 0 0 .6rem;
+    border-left: 2px solid var(--border-soft); font-size: .8rem;
+    color: var(--ink-muted, #6b5a3f); text-align: left;
+}
+.progress-list ul.p-alts li { margin: .12rem 0; }
+@media (prefers-reduced-motion: reduce) { .progress-list .route-toggle svg { transition: none; } }
 .p-or {
     font-style: normal; text-transform: lowercase; padding: 0 .4rem;
     color: var(--accent, #8b6f4a);

@@ -171,7 +171,9 @@
     "unit_days": "days",
     "unit_pcp": "points",
     "unit_air": "air victories",
-    "unit_targets": "targets"
+    "unit_targets": "targets",
+    "other_routes": "Other ways to earn this",
+    "req_date": "not before {date}"
   },
   "incidences": {
     "successor": "Took over the career",

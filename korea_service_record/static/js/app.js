@@ -701,7 +701,34 @@
             esc(oddsText(chance).replace(" \u00b7 ", "")) + "</span>";
     }
 
+    // The unit without escaping, for text that is escaped as a whole.
+    function unitPlain(unit) {
+        return unit ? " " + T("progress.unit_" + unit) : "";
+    }
+    // One route put into words: its own counts, then any deed wanted in a
+    // single sortie, then whatever state it also asks for.
+    function routeText(r) {
+        return ((r.bars || []).map((b) =>
+                fmtNum(b.have) + " / " + fmtNum(b.need) + unitPlain(b.unit))
+            .concat((r.conditions || []).map((c) =>
+                T(c.exact ? "progress.exactly_in_one_sortie"
+                    : "progress.in_one_sortie",
+                    {n: fmtNum(c.need) + unitPlain(c.unit)})))
+            .concat((r.prereqs || []).map(prereqText))).join(" + ");
+    }
+
+    // The tail of a progress row, when nothing is folded under it.
+    function plainRow(row, title, body) {
+        if (row.prereqs && row.prereqs.length) {
+            body += row.prereqs.map((q) =>
+                '<span class="p-prereq">' + esc(prereqText(q)) + "</span>").join("");
+        }
+        return '<li class="p-row" title="' + esc(row.name) + '"><span class="p-name">' +
+            title + '</span><span class="p-body">' + body + odds(row.chance) + "</span></li>";
+    }
+
     function prereqText(q) {
+        if (q.kind === "date") { return T("progress.req_date", {date: q.date}); }
         return q.kind === "rank" ? T("progress.req_rank", {rank: q.rank})
             : q.kind === "command" ? T("progress.req_command")
             : q.kind === "wia" ? T("progress.req_wia")
@@ -731,10 +758,36 @@
         } else if (row.bars.length) {
             body = row.bars.map(progressBar).join("");
         }
-        // more than one way in: list them, each with its own odds, joined
-        // by "or" - the reader is choosing between them, not progressing
-        // through them
-        if (!row.eligible && row.routes && row.routes.length > 1) {
+        // Where the headline is a bar, the other ways in fold away under a
+        // chevron rather than being dropped. evaluate() reports only an OR's
+        // nearest branch, which is the right headline; but the Soviet and
+        // Korean awards are built almost entirely of ORs, so one bar is a
+        // small part of the answer and seems to jump about as the nearest
+        // branch changes. Same chevron as the award history, so the page has
+        // one gesture for "there is more under this".
+        if (!row.eligible && row.bars.length && row.routes && row.routes.length > 1) {
+            // Drop whichever route the bar is already showing, by matching
+            // it rather than by assuming it comes first: evaluate() and
+            // routes_for() need not agree on order, and taking route one on
+            // trust listed the headline again with a different figure.
+            const key = (bs) => (bs || []).map((b) => b.what + "|" + b.need).join(",");
+            const head = key(row.bars);
+            const rest = row.routes.filter((r) => key(r.bars) !== head);
+            if (!rest.length) { return plainRow(row, title, body); }
+            // No count in the label: the i18n has no plural rules, and "1 other
+            // ways" was wrong in English and German alike.
+            const label = T("progress.other_routes");
+            body += '<button type="button" class="route-toggle" aria-expanded="false"' +
+                ' title="' + esc(label) + '"><span class="sr-only">' + esc(label) +
+                '</span><svg viewBox="0 0 16 16" aria-hidden="true">' +
+                '<path d="M4 6l4 4 4-4"/></svg></button>' +
+                '<ul class="p-alts" hidden>' +
+                rest.map((r) => "<li>" + esc(routeText(r)) +
+                                oddsText(r.chance) + "</li>").join("") + "</ul>";
+        }
+        // No bar to head it with - the Distinguished Service Cross and the
+        // Medal of Honor - so the routes are the row, joined by "or".
+        if (!row.eligible && !row.bars.length && row.routes && row.routes.length > 1) {
             body += '<span class="p-routes">' + row.routes.map((r) => {
                 const parts = r.conditions.map((cc) =>
                     T(cc.exact ? "progress.exactly_in_one_sortie"
@@ -2021,6 +2074,14 @@
                     event.target.closest("tr[data-pilot], button[data-pilot]");
         if (row && !(event.target.closest && event.target.closest("img.emblem"))) {
             openPilot(currentCareer, Number(row.dataset.pilot));
+            return;
+        }
+        const alt = event.target.closest && event.target.closest("button.route-toggle");
+        if (alt) {
+            const open = alt.getAttribute("aria-expanded") !== "true";
+            alt.setAttribute("aria-expanded", open ? "true" : "false");
+            const list = alt.parentElement.querySelector("ul.p-alts");
+            if (list) { list.hidden = !open; }
             return;
         }
         const toggle = event.target.closest && event.target.closest("button.history-toggle");

@@ -171,7 +171,9 @@
     "unit_days": "Tage",
     "unit_pcp": "Punkte",
     "unit_air": "Luftsiege",
-    "unit_targets": "Ziele"
+    "unit_targets": "Ziele",
+    "other_routes": "Weitere Wege zu dieser Auszeichnung",
+    "req_date": "nicht vor {date}"
   },
   "incidences": {
     "successor": "Übernahme der Laufbahn",

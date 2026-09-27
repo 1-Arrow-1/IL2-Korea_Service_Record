@@ -171,7 +171,9 @@
     "unit_days": "дней",
     "unit_pcp": "очков",
     "unit_air": "воздушных побед",
-    "unit_targets": "целей"
+    "unit_targets": "целей",
+    "other_routes": "Другие способы её получить",
+    "req_date": "не ранее {date}"
   },
   "incidences": {
     "successor": "Принял карьеру",

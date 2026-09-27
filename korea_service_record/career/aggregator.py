@@ -827,7 +827,13 @@ class CareerAggregator:
         """
         from .. import progress as prog
 
-        def rows(rungs, limit):
+        # The value set is a parameter because a citation's rungs are
+        # counted on the squadron's numbers while everything else is
+        # counted on the pilot's. Reading the closure's `values` gave the
+        # Distinguished Unit Citation a headline of 1,551 targets and an
+        # alternative route of 575 - the same sum, read off two different
+        # sets.
+        def rows(rungs, limit, vals):
             out = []
             for rung in rungs[:limit]:
                 # Higher rungs are named for their device alone - "Bronze
@@ -868,7 +874,7 @@ class CareerAggregator:
                     # Service Cross is exactly four at three in five *or*
                     # exactly five at four in five. Both are worth knowing,
                     # so an award with no bar to draw lists its routes.
-                    "routes": self._routes(rung, values, country),
+                    "routes": self._routes(rung, vals, country),
                 })
             return out
 
@@ -879,16 +885,16 @@ class CareerAggregator:
         # with far more ladders, not a shortlist. Cutting it tighter dropped
         # the Medal of Honor and the Purple Heart, which are precisely the
         # two a reader looks for.
-        awards = rows(prog.next_rungs(self.awards_cfg, held, values, country), 14)
+        awards = rows(prog.next_rungs(self.awards_cfg, held, values, country), 14, values)
 
         # The unit's citations are counted on the unit's totals, and the
         # squadron holds them, so they are asked for separately.
         unit_held = {r["type"] for r in db.query(
             "SELECT type FROM award WHERE pilotId<0 OR category=2")}
+        unit_values = prog.squadron_variables(squad, career, country)
         citations = rows(prog.next_rungs(
-            self.awards_cfg, unit_held,
-            prog.squadron_variables(squad, career, country), country,
-            squadron=True), 4)
+            self.awards_cfg, unit_held, unit_values, country,
+            squadron=True), 4, unit_values)
 
         # Promotions are pseudo-awards with no art and no name of their own,
         # so they belong beside the rank rather than in the medal list.
@@ -922,18 +928,49 @@ class CareerAggregator:
         return {"awards": awards, "citations": citations, "promotion": promotion}
 
     def _routes(self, rung, values, country: int) -> List[Dict[str, Any]]:
-        """The alternative ways in, for an award with nothing to measure."""
+        """
+        Every unsatisfied way in, nearest first.
+
+        ``evaluate`` reports only an OR's most promising branch, which is the
+        right headline - it is the one the pilot will actually reach. But the
+        eastern decorations are built almost entirely of ORs, five routes
+        being ordinary rather than exceptional, so one bar is a small part of
+        the truth and appears to jump about as the nearest branch changes
+        under him. The rest go to the page to be folded away.
+        """
         from .. import progress as prog
 
-        if rung.eligible or rung.bars:
+        if rung.eligible:
             return []
         defn = self.awards_cfg.get(rung.award_id)
         if defn is None or not defn.in_proc:
             return []
         out = []
-        for gaps in prog.routes_for(defn.in_proc, values)[:3]:
+        seen = set()
+        for gaps in prog.routes_for(defn.in_proc, values):
+            # A branch that wants another nationality is not a route this
+            # man can take. The file shares one award between services by
+            # an OR over Country, and enumerating those gave the Republic
+            # of Korea citation three routes that read identically.
+            if any(g.kind == "context" and g.variable.lower() == "country"
+                   for g in gaps):
+                continue
+            key = tuple(sorted((g.variable.lower(), g.op, g.needed) for g in gaps))
+            if key in seen:
+                continue
+            seen.add(key)
+            if len(out) >= 5:
+                break
             dice = [g for g in gaps if g.kind == "dice"]
             out.append({
+                # A route can be a count in its own right, not only a deed
+                # in one sortie: "thirty targets" is as much a way in as
+                # "six in a single sortie", and the eastern awards are
+                # almost entirely the former.
+                "bars": [{"what": g.variable, "have": round(g.current, 1),
+                          "need": g.needed, "unit": prog.unit_for(g.variable),
+                          "fraction": round(g.fraction, 3)}
+                         for g in gaps if g.kind == "cumulative"],
                 # WIASortie counts as a per-sortie variable in the engine,
                 # but to a reader it is a wound, not a tally - the Medal of
                 # Honor's second route is "wounded and five kills", not
@@ -961,6 +998,13 @@ class CareerAggregator:
                     "rank": self.locale.rank_name(country, int(gap.needed))}
         if name == "iscommander":
             return {"kind": "command"}
+        if name == "cdate":
+            # The engine holds a date as 19510601. Rendered raw it said
+            # "CDate" in the middle of a route, which tells a reader
+            # nothing about what he is waiting for.
+            d = int(gap.needed)
+            return {"kind": "date",
+                    "date": f"{d // 10000}.{d // 100 % 100:02d}.{d % 100:02d}"}
         return {"kind": "other", "what": gap.variable}
 
     def _citation_ladders(self, current, retired) -> List[Dict[str, Any]]:
