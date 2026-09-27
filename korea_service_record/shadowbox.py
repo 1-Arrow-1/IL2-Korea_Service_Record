@@ -29,7 +29,7 @@ from __future__ import annotations
 import io
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
 from . import medals as medal_art
 
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 # Bumped whenever a constant below moves, so a cached layout is not drawn
 # against a frame it was not measured for.
-REVISION = 7
+REVISION = 8
 
 # The frame photograph. Every number below is in its pixel space.
 FRAME = (2050, 1860)
@@ -171,13 +171,57 @@ SOV_PLATE = (655, 1497, 738, 141)
 SOV_BOARD_Y = 1570
 SOV_BOARD_GAP = 46
 
-# Furniture is shared. Both cases are the same photographed box.
+# North Korea, measured the same way off its own reference box. The same
+# shape as the Soviet case - the hero centred in the top row, the pinned
+# orders below, then emblems and the boards - so the two are built from one
+# routine and differ only in these numbers.
+DPRK_ROW1_LINE = 195
+DPRK_ROW1_PITCH = 406
+DPRK_ROW2_Y = 770
+DPRK_ROW2_PITCH = 412
+DPRK_SIDE = 500
+DPRK_BADGE_AT = (CENTRE_X, 1087)
+DPRK_ROUNDEL_AT = (CENTRE_X, 1263)
+DPRK_ARMS_Y = 1157
+DPRK_PATCH_Y = 1161
+
+
+class Case(NamedTuple):
+    """What differs between one eastern case and the next."""
+    folder: str              # its own drawn emblems live here
+    row1_line: int           # where the suspended row's ink begins
+    row1_pitch: Optional[int]  # centre to centre, or None to pack by ink
+    star_gap: int            # the air either side of the hero, when packing
+    row2_y: int
+    row2_pitch: int
+    side: int                # how far out the arms and the squadron sit
+    badge_at: Tuple[int, int]
+    arms: Tuple[str, Tuple[int, int]]        # file, centre
+    extra: Tuple[str, Tuple[int, int]]       # the second drawn emblem
+    patch_y: int
+    rank_prefix: str
+
+
+CASES = {
+    501: Case("501", SOV_ROW1_LINE, None, SOV_STAR_GAP, SOV_ROW2_Y, SOV_ROW2_PITCH,
+              SOV_SIDE, SOV_BADGE_AT,
+              ("USSR_coat_of_arms.png", SOV_ARMS_AT),
+              ("VVS_winged_propeller.png", SOV_PROP_AT),
+              SOV_PATCH_AT[1], "501"),
+    503: Case("503", DPRK_ROW1_LINE, DPRK_ROW1_PITCH, 0, DPRK_ROW2_Y, DPRK_ROW2_PITCH,
+              DPRK_SIDE, DPRK_BADGE_AT,
+              ("North_Korea_coat_of_arms.png", (CENTRE_X - DPRK_SIDE, DPRK_ARMS_Y)),
+              ("North_Korea_roundel.png", DPRK_ROUNDEL_AT),
+              DPRK_PATCH_Y, "503"),
+}
+
+# Furniture is shared. Every case is the same photographed box.
 FURNITURE = "601"
 
 # Only these two air forces are furnished. The Navy, the Marines and the
 # Koreans want their own frame, cloth and devices, and a box built out of
 # USAF furniture would be wrong rather than merely plain.
-COUNTRIES = (601, 501)
+COUNTRIES = (601, 501, 503)
 
 
 # Measured art, by award id. The atlas does not change while the tracker is
@@ -415,8 +459,9 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
     can never disagree about what he has been given. ``icons`` is the sheet
     reader the medals and badges are sliced from.
     """
-    build = _soviet if country == 501 else _usaf
-    items, plate = build(rack, rank_id, squadron_key, icons, rev)
+    case = CASES.get(country)
+    items, plate = (_eastern(rack, rank_id, squadron_key, icons, rev, case)
+                    if case else _usaf(rack, rank_id, squadron_key, icons, rev))
     return {
         "rev": REVISION,
         "frame": f"/static/images/shadowbox/{FURNITURE}/frame.png?v={rev}",
@@ -428,11 +473,19 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
     }
 
 
-def _soviet(rack, rank_id, squadron_key, icons, rev):
+def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
     """
-    The Soviet case: suspended awards, then the screw-back orders, then the
-    arms, the pilot's badge and his squadron, over the boards and the plate.
+    A Soviet-pattern case: suspended awards, then the orders worn without a
+    ribbon, then the arms, the pilot's badge and his squadron, over the
+    boards and the plate.
+
+    The Soviet and North Korean boxes are the same arrangement with
+    different numbers, so ``case`` carries what differs.
     """
+    SOV_ROW1_LINE, SOV_ROW2_Y = case.row1_line, case.row2_y
+    SOV_ROW2_PITCH, SOV_STAR_GAP = case.row2_pitch, case.star_gap
+    SOV_BADGE_AT = case.badge_at
+    SOV_PATCH_AT = (CENTRE_X + case.side, case.patch_y)
     items: List[Dict[str, Any]] = []
 
     def add(src, box, name="", cls=""):
@@ -469,24 +522,31 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
         add(f"{src}?v={rev}",
             (CENTRE_X - (sl + sr) / 2.0, SOV_ROW1_LINE - st, w, h),
             nm, "sbox-medal")
-        x = CENTRE_X - (sr - sl + 1) / 2.0 - SOV_STAR_GAP
+        # Either a fixed centre-to-centre pitch, or packed outward from the
+        # hero by the art's own edges where the case gives no pitch.
+        step = case.row1_pitch
+        x = (CENTRE_X - step if step
+             else CENTRE_X - (sr - sl + 1) / 2.0 - SOV_STAR_GAP)
         for a in left:
             got = art_of(a, names.get(a, ""))
             if not got:
                 continue
             (s, aw, ah, rb), nm = got
             il, ir, it = _SPANS.get(s, (0, aw - 1, 0))
-            add(f"{s}?v={rev}", (x - ir - 1, SOV_ROW1_LINE - it, aw, ah), nm, "sbox-medal")
-            x -= (ir - il + 1) + SOV_GAP
-        x = CENTRE_X + (sr - sl + 1) / 2.0 + SOV_STAR_GAP
+            place = x - (il + ir) / 2.0 if step else x - ir - 1
+            add(f"{s}?v={rev}", (place, SOV_ROW1_LINE - it, aw, ah), nm, "sbox-medal")
+            x -= step if step else (ir - il + 1) + SOV_GAP
+        x = (CENTRE_X + step if step
+             else CENTRE_X + (sr - sl + 1) / 2.0 + SOV_STAR_GAP)
         for a in right:
             got = art_of(a, names.get(a, ""))
             if not got:
                 continue
             (s, aw, ah, rb), nm = got
             il, ir, it = _SPANS.get(s, (0, aw - 1, 0))
-            add(f"{s}?v={rev}", (x - il, SOV_ROW1_LINE - it, aw, ah), nm, "sbox-medal")
-            x += (ir - il + 1) + SOV_GAP
+            place = x - (il + ir) / 2.0 if step else x - il
+            add(f"{s}?v={rev}", (place, SOV_ROW1_LINE - it, aw, ah), nm, "sbox-medal")
+            x += step if step else (ir - il + 1) + SOV_GAP
     else:
         row = [art_of(a, names.get(a, "")) for a in bar]
         row = [r for r in row if r]
@@ -505,15 +565,17 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
                 nm, "sbox-pinned")
 
     # --- row three: arms, badge and squadron -----------------------------
-    for name, at, size in (("USSR_coat_of_arms.png", SOV_ARMS_AT, (301, 315)),
-                           ("VVS_winged_propeller.png", SOV_PROP_AT, (264, 167))):
-        src = f"/static/images/shadowbox/501/{name}"
+    for name, at in (case.arms, case.extra):
+        art = (Path(__file__).resolve().parent / "static" / "images" /
+               "shadowbox" / case.folder / name)
+        if not art.is_file():
+            logger.warning("Case emblem missing: %s", art.name)
+            continue
+        src = f"/static/images/shadowbox/{case.folder}/{name}"
         if src not in _SPANS:
-            art = (Path(__file__).resolve().parent / "static" / "images" /
-                   "shadowbox" / "501" / name)
-            if art.is_file():
-                _span(src, art.read_bytes())
-        add(f"{src}?v={rev}", _centred_ink(src, *at, *size), "", "sbox-emblem")
+            _span(src, art.read_bytes())
+        w, h = _measure(art.read_bytes())[:2]
+        add(f"{src}?v={rev}", _centred_ink(src, *at, w, h), "", "sbox-emblem")
 
     wings = rack.get("wings")
     badge = art_of(wings["type"], wings.get("name") or "") if wings else None
@@ -525,7 +587,7 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
     # drawn at all rather than put a foreign patch in the case. Real careers
     # always agree; the preview switch is what can disagree.
     patch = (_tile(icons, "squadron", squadron_key)
-             if squadron_key and str(squadron_key).startswith("501") else None)
+             if squadron_key and str(squadron_key).startswith(case.folder) else None)
     if patch:
         s, w, h, _ = patch
         add(f"{s}?v={rev}", _centred_ink(s, *SOV_PATCH_AT, w, h), "", "sbox-patch")
@@ -535,7 +597,8 @@ def _soviet(rack, rank_id, squadron_key, icons, rev):
     add(f"/static/images/shadowbox/{FURNITURE}/nameplate.png?v={rev}",
         _plate_box(SOV_PLATE), "", "sbox-plate")
 
-    board = _tile(icons, "rank", f"501{rank_id}") if rank_id is not None else None
+    board = (_tile(icons, "rank", f"{case.rank_prefix}{rank_id}")
+             if rank_id is not None else None)
     if board:
         s, w, h, _ = board
         il, ir, _ = _SPANS.get(s, (0, w - 1, 0))
