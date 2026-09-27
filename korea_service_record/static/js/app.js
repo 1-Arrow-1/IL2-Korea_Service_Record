@@ -630,6 +630,15 @@
         plate.style.height = box.plate.height + "%";
         plate.dataset.full = (box.text && box.text.full) || "";
         plate.dataset.short = (box.text && box.text.short) || "";
+        // The brass is engraved in the air force's own language. A reader
+        // who wants the rank in his hovers it.
+        const native = (box.text && box.text.rank) || "";
+        const mine = (box.text && box.text.rank_reader) || "";
+        if (mine && mine !== native) {
+            plate.setAttribute("title", T("shadowbox.rank_is", {rank: mine}));
+        } else {
+            plate.removeAttribute("title");
+        }
         show(el("shadowbox"), true);
         document.body.classList.add("lightbox-open");
         // The plate cannot be measured until the frame has laid out.

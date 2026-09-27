@@ -468,6 +468,7 @@
   },
   "shadowbox": {
     "open": "Vitrina",
-    "caption": "Condecoraciones, distintivo e insignias de unidad en una vitrina."
+    "caption": "Condecoraciones, distintivo e insignias de unidad en una vitrina.",
+    "rank_is": "{rank}"
   }
 }

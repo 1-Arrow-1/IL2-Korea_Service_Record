@@ -468,6 +468,7 @@
   },
   "shadowbox": {
     "open": "Shadowbox",
-    "caption": "Decorations, badge and unit insignia in a display case."
+    "caption": "Decorations, badge and unit insignia in a display case.",
+    "rank_is": "{rank}"
   }
 }

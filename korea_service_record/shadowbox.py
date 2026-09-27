@@ -19,10 +19,9 @@ constants below, not the picture, are what the layout is built from.
 
 The engraving does not follow the reader's language. A shadowbox is an
 object hanging on a wall, and its plate is engraved once, in the language
-of the air force that issued the awards: English for the Americans, Russian
-for the Soviets. For a reader who has not asked for Russian the rank is
-transliterated rather than translated - Mayor, not Major - because that is
-what the man was called. The name is never touched.
+of the air force that issued the awards: English for the Americans,
+Russian for the Soviets, Chinese for the Chinese. The reader who wants it
+in his own language hovers the plate. The name is never touched.
 """
 from __future__ import annotations
 
@@ -400,38 +399,6 @@ def _centred_ink(src: str, cx: float, cy: float, w: float, h: float) -> tuple:
 
 def _centred(cx: float, cy: float, w: float, h: float) -> tuple:
     return (cx - w / 2.0, cy - h / 2.0, w, h)
-
-
-# BGN/PCGN, enough for a rank name. A table rather than the eight ranks
-# spelled out, so it still holds if the game's strings are edited.
-CYRILLIC = {
-    "\u0430": "a", "\u0431": "b", "\u0432": "v", "\u0433": "g", "\u0434": "d",
-    "\u0435": "e", "\u0451": "ye", "\u0436": "zh", "\u0437": "z", "\u0438": "i",
-    "\u0439": "y", "\u043a": "k", "\u043b": "l", "\u043c": "m", "\u043d": "n",
-    "\u043e": "o", "\u043f": "p", "\u0440": "r", "\u0441": "s", "\u0442": "t",
-    "\u0443": "u", "\u0444": "f", "\u0445": "kh", "\u0446": "ts", "\u0447": "ch",
-    "\u0448": "sh", "\u0449": "shch", "\u044a": "", "\u044b": "y", "\u044c": "",
-    "\u044d": "e", "\u044e": "yu", "\u044f": "ya",
-}
-
-
-def transliterate(text: str) -> str:
-    """
-    A Cyrillic rank in Latin letters - Mayor, Podpolkovnik, General-leytenant.
-
-    Not a translation: the plate on a Soviet case says what the man was
-    called, and "Major" is a different word that happens to look similar.
-    """
-    out = []
-    for ch in text:
-        low = CYRILLIC.get(ch.lower())
-        if low is None:
-            out.append(ch)
-        elif ch.isupper() and low:
-            out.append(low[0].upper() + low[1:])
-        else:
-            out.append(low)
-    return "".join(out)
 
 
 def plate_text(rank: str, name: str) -> Dict[str, str]:

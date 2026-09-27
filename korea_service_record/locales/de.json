@@ -468,6 +468,7 @@
   },
   "shadowbox": {
     "open": "Schaukasten",
-    "caption": "Orden, Abzeichen und Verbandsabzeichen in einem Schaukasten."
+    "caption": "Orden, Abzeichen und Verbandsabzeichen in einem Schaukasten.",
+    "rank_is": "{rank}"
   }
 }

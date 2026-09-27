@@ -468,6 +468,7 @@
   },
   "shadowbox": {
     "open": "Vitrine",
-    "caption": "Décorations, brevet et insignes d’unité dans une vitrine."
+    "caption": "Décorations, brevet et insignes d’unité dans une vitrine.",
+    "rank_is": "{rank}"
   }
 }

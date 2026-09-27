@@ -437,21 +437,27 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if not shadowbox_art.available(country):
             return jsonify({"error": "no_case"}), 404
         rank_id = player.get("rank_id")
-        # The plate is engraved in the air force's own language, not the
-        # reader's. A Soviet case says Mayor to anyone who has not asked for
-        # Russian - transliterated, not translated.
-        rank = ""
+        # The plate is engraved once, in the language of the air force that
+        # issued the awards - never the reader's, and never transliterated.
+        # The game carries each country's own rank names, so they come from
+        # it rather than from a table here: Russian for the Soviets, Chinese
+        # for the Chinese. It ships no Korean, and its English strings for
+        # the 503rd are the Korean ranks romanised - Sojwa, not Major - so
+        # that is what a North Korean plate gets.
+        rank = reader_rank = ""
         if rank_id is not None:
-            if country == 501:
-                rank = aggregator_for("ru").locale.rank_name(country, rank_id)
-                if app.config["SETTINGS"].resolve(career_id) != "ru":
-                    rank = shadowbox_art.transliterate(rank)
-            else:
-                rank = aggregator_for("en").locale.rank_name(country, rank_id)
+            native = {501: "ru", 502: "zh"}.get(country, "en")
+            rank = aggregator_for(native).locale.rank_name(country, rank_id)
+            # ...and the page offers a translation on hover, in whatever
+            # language the reader has chosen.
+            reader = app.config["SETTINGS"].resolve(career_id)
+            reader_rank = aggregator_for(reader).locale.rank_name(country, rank_id)
         data = shadowbox_art.layout(detail["ribbon_rack"], rank_id,
                                     detail.get("squadron_key"), agg.icons,
                                     country=country, rev=asset_version())
         data["text"] = shadowbox_art.plate_text(rank, player.get("name") or "")
+        data["text"]["rank_reader"] = reader_rank
+        data["text"]["rank"] = rank
         data["squadron"] = detail.get("squadron") or ""
         return jsonify(data)
 
