@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 ART = Path(__file__).resolve().parent / "static" / "images" / "ribbons"
 # Bump whenever the composition or the art changes: it goes into the image
 # URLs, so browsers that were told to cache a ribbon for a year re-fetch it.
-REVISION = 21
+REVISION = 22
 # US bars are 1 3/8 x 3/8 inch (11:3); Soviet-pattern bars (USSR, DPRK) are
 # 24 x 8 mm (3:1). Each sits centred on a canvas 20 px bigger all round, so a
 # unit citation's frame can overhang without changing the grid.
@@ -330,6 +330,41 @@ def per_row_for(coat: Optional[str], count: int) -> int:
     return 3
 
 
+# --- the roll of the cloth -------------------------------------------------
+# The bar art is woven but flat: measured down its height it is the same
+# brightness at top, middle and bottom. Real ribbon is pulled over a mount
+# and bows, so it is brightest a little above centre and falls away to both
+# edges. These put that curve back. All three are multiplied over the art,
+# so the weave stays exactly as drawn.
+ROLL_CREST = 0.38      # where the bar is brightest, as a fraction of height
+ROLL_AMP = 0.26        # how far it falls to the edges
+ROLL_RIM = 0.20        # extra darkening in the last few rows: the edge
+ROLL_SHEEN = 0.10      # a soft highlight along the crest
+ROLL_SIDES = 0.18      # a touch down each side, so butted bars stay apart
+
+
+def roll(img):
+    """Shade a flat ribbon bar as cloth over a mount."""
+    import numpy as np
+    from PIL import Image
+
+    a = np.asarray(img.convert("RGBA")).astype(float)
+    h, w = a.shape[:2]
+    y = np.linspace(0.0, 1.0, h)
+    u = np.where(y < ROLL_CREST, (ROLL_CREST - y) / ROLL_CREST,
+                 (y - ROLL_CREST) / (1.0 - ROLL_CREST))
+    shade = 1.0 - ROLL_AMP * u ** 2
+    shade *= 1.0 - ROLL_RIM * (1.0 - np.clip(np.minimum(y, 1 - y) / 0.06, 0, 1))
+    shade *= 1.0 + ROLL_SHEEN * np.exp(-((y - 0.30) / 0.10) ** 2)
+    out = a.copy()
+    out[..., :3] *= shade[:, None, None]
+    if ROLL_SIDES:
+        x = np.linspace(0.0, 1.0, w)
+        out[..., :3] *= (1.0 - ROLL_SIDES *
+                         (1.0 - np.clip(np.minimum(x, 1 - x) / 0.02, 0, 1)))[None, :, None]
+    return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGBA")
+
+
 class RibbonRenderer:
     """Composes one ribbon per award id and caches the PNG on disk."""
 
@@ -411,6 +446,9 @@ class RibbonRenderer:
         size = GEOMETRY[geometry(spec.base)]
         if bar.size != size:
             bar = bar.resize(size, Image.LANCZOS)
+        # Shaded after any resize so the edge darkening is a fixed share of
+        # the bar rather than of whatever the art happened to be drawn at.
+        bar = roll(bar)
         canvas = Image.new("RGBA", (size[0] + 2 * MARGIN, size[1] + 2 * MARGIN), (0, 0, 0, 0))
         canvas.alpha_composite(bar, (MARGIN, MARGIN))
         wanted = [NAVAL_STAR.get(n, n) for n in spec.devices] if naval else list(spec.devices)
