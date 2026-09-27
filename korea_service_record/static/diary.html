@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Diary</title>
+    <link rel="icon" href="/static/images/icon.png?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/main.css?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/diary.css?v=__ASSET_VERSION__">
+</head>
+<body class="diary-page">
+    <!-- The squadron's war diary: the career day by day, assembled out of
+         the events the game recorded and nothing else. Its own page rather
+         than another panel, because the service record already carries
+         fifteen of them. -->
+    <div class="diary-bar no-print">
+        <a id="wd-back" class="nav-btn" href="/">&larr; <span data-i18n="diary.back">Service Record</span></a>
+        <span id="wd-note" class="wd-note"></span>
+        <button id="wd-print" class="nav-btn" data-i18n="diary.print">Print</button>
+    </div>
+    <main id="wd-sheet">
+        <header class="wd-head">
+            <h1 id="wd-title" data-i18n="diary.title">War Diary</h1>
+            <p id="wd-sub" class="wd-sub"></p>
+        </header>
+        <ol id="wd-days" class="wd-days"></ol>
+    </main>
+    <p id="wd-state" class="state-message" hidden></p>
+<script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/diary.js?v=__ASSET_VERSION__"></script>
+</body>
+</html>

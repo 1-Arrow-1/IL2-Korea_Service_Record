@@ -349,17 +349,45 @@ def main(game_arg):
                            else {prefix + k: v})
             return out
 
+        # A countable string is an object of CLDR plural forms rather than
+        # one string, and the languages do not agree on which forms exist:
+        # English and German need one/other, Russian one/few/many/other,
+        # Chinese other alone. So a plural key is compared by its stem -
+        # every language must carry the stem and an "other" - and never by
+        # the set of forms, which would demand Russian's "few" of Chinese.
+        CATEGORIES = {"zero", "one", "two", "few", "many", "other"}
+
+        def _stem(key):
+            head, _, last = key.rpartition(".")
+            return head if head and last in CATEGORIES else key
+
+        def _plural_stems(flat):
+            return {_stem(k) for k in flat if _stem(k) != k}
+
         english = _flat(_json.loads((loc_dir / "en.json").read_text(encoding="utf-8")))
+        en_plural = _plural_stems(english)
+        en_keys = {_stem(k) for k in english}
         for other in sorted(loc_dir.glob("*.json")):
             if other.stem == "en":
                 continue
             strings = _flat(_json.loads(other.read_text(encoding="utf-8")))
-            check(f"{other.stem}.json has every key", set(english) - set(strings), set())
-            check(f"{other.stem}.json has no stray key", set(strings) - set(english), set())
-            holes = [k for k in set(english) & set(strings)
-                     if set(_re.findall(r"\{(\w+)\}", english[k]))
+            keys = {_stem(k) for k in strings}
+            check(f"{other.stem}.json has every key", en_keys - keys, set())
+            check(f"{other.stem}.json has no stray key", keys - en_keys, set())
+            # Whatever forms a language chose, "other" must be among them:
+            # it is the one the front end falls back to.
+            check(f"{other.stem}.json plurals have an \"other\" form",
+                  sorted(s for s in en_plural if f"{s}.other" not in strings), [])
+            # A plural form is checked against English's "other", since
+            # that is the only form English is certain to have.
+            def _english_for(key):
+                stem = _stem(key)
+                return english.get(key, english.get(f"{stem}.other"))
+            holes = [k for k in strings
+                     if _english_for(k) is not None
+                     and set(_re.findall(r"\{(\w+)\}", _english_for(k)))
                      != set(_re.findall(r"\{(\w+)\}", strings[k]))]
-            check(f"{other.stem}.json keeps its placeholders", holes, [])
+            check(f"{other.stem}.json keeps its placeholders", sorted(holes), [])
 
         # Every key the payload asks the front end to translate must exist, or
         # the reader sees "incidences.plane_lost" on the page.

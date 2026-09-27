@@ -470,5 +470,64 @@
     "open": "奖章展示框",
     "caption": "奖章、飞行徽与部队标志的展示框。",
     "rank_is": "{rank}"
+  },
+  "diary": {
+    "title": "战时日志",
+    "back": "服役记录",
+    "print": "打印",
+    "open": "战时日志",
+    "days": {
+      "other": "{n} 天"
+    },
+    "empty": "这个生涯中还没有发生任何事。",
+    "failed": "无法读取战时日志。",
+    "no_career": "未指定生涯。",
+    "mission_num": "第 {n} 次任务",
+    "unscheduled": "临时任务",
+    "against": "目标 {place}",
+    "targets": {
+      "other": "摧毁 {n} 个目标"
+    },
+    "you_flew": "您参加了此次任务",
+    "granted": {
+      "other": "全中队获得 {n} 项勋章"
+    },
+    "presented": {
+      "other": "颁授 {n} 项勋章"
+    },
+    "reported": {
+      "other": "{names}报到入队"
+    },
+    "plane_delivered": {
+      "other": "接收 {n} 架飞机"
+    },
+    "plane_repair": {
+      "other": "{n} 架飞机正在维修"
+    },
+    "plane_repaired": {
+      "other": "{n} 架飞机重新投入使用"
+    },
+    "plane_lost": "{who} 损失了座机",
+    "pilot_kia": "{who} 阵亡",
+    "pilot_missing": "{who} 作战失踪",
+    "wounded": "{who} 作战负伤",
+    "to_hospital": "{who} 送入医院",
+    "returned_to_duty": "{who} 归队",
+    "friendly_destroyed": "{who} 摧毁了己方的{what}",
+    "commander_assigned": "{who} 接任中队长",
+    "successor": "{who} 接管了这个生涯",
+    "unit_award": "中队获得嘉奖",
+    "efficiency": "中队效能现为 {value}",
+    "resources_destroyed": "机场物资遭到打击",
+    "operation_begin": "{name} 开始",
+    "operation_end": "{name} 结束",
+    "own_granted": "您获得了{award}",
+    "own_presented": "您被授予{award}",
+    "open_hint": "中队的战时日志，逐日记载",
+    "transfer_ordered": "中队奉命转场至 {field}",
+    "transfer_done": "中队现驻 {field}",
+    "and_others": {
+      "other": "等 {n} 人"
+    }
   }
 }

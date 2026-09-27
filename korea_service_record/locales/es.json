@@ -470,5 +470,73 @@
     "open": "Vitrina",
     "caption": "Condecoraciones, distintivo e insignias de unidad en una vitrina.",
     "rank_is": "{rank}"
+  },
+  "diary": {
+    "title": "Diario de guerra",
+    "back": "Hoja de Servicios",
+    "print": "Imprimir",
+    "open": "Diario de guerra",
+    "days": {
+      "one": "{n} día",
+      "other": "{n} días"
+    },
+    "empty": "Todavía no ha ocurrido nada en esta carrera.",
+    "failed": "No se pudo leer el diario de guerra.",
+    "no_career": "No se indicó ninguna carrera.",
+    "mission_num": "Misión {n}",
+    "unscheduled": "No programada",
+    "against": "contra {place}",
+    "targets": {
+      "one": "{n} objetivo destruido",
+      "other": "{n} objetivos destruidos"
+    },
+    "you_flew": "Usted voló esta misión",
+    "granted": {
+      "one": "{n} condecoración obtenida en todo el escuadrón",
+      "other": "{n} condecoraciones obtenidas en todo el escuadrón"
+    },
+    "presented": {
+      "one": "{n} condecoración entregada",
+      "other": "{n} condecoraciones entregadas"
+    },
+    "reported": {
+      "one": "{names} se incorporó al servicio",
+      "other": "{names} se incorporaron al servicio"
+    },
+    "plane_delivered": {
+      "one": "{n} aeronave entregada",
+      "other": "{n} aeronaves entregadas"
+    },
+    "plane_repair": {
+      "one": "{n} aeronave en reparación",
+      "other": "{n} aeronaves en reparación"
+    },
+    "plane_repaired": {
+      "one": "{n} aeronave de nuevo operativa",
+      "other": "{n} aeronaves de nuevo operativas"
+    },
+    "plane_lost": "{who} perdió su aeronave",
+    "pilot_kia": "{who} cayó en combate",
+    "pilot_missing": "{who} está desaparecido en combate",
+    "wounded": "{who} resultó herido en combate",
+    "to_hospital": "{who} fue trasladado al hospital",
+    "returned_to_duty": "{who} se reincorporó al servicio",
+    "friendly_destroyed": "{who} destruyó un {what} propio",
+    "commander_assigned": "{who} tomó el mando del escuadrón",
+    "successor": "{who} se hizo cargo de la carrera",
+    "unit_award": "El escuadrón fue citado",
+    "efficiency": "La eficiencia del escuadrón es ahora {value}",
+    "resources_destroyed": "Los almacenes del aeródromo fueron alcanzados",
+    "operation_begin": "Comienza {name}",
+    "operation_end": "Termina {name}",
+    "own_granted": "Usted obtuvo {award}",
+    "own_presented": "Le fue entregada {award}",
+    "open_hint": "El diario de guerra del escuadrón, día a día",
+    "transfer_ordered": "Se ordena al escuadrón trasladarse a {field}",
+    "transfer_done": "El escuadrón tiene ahora su base en {field}",
+    "and_others": {
+      "one": "y {n} más",
+      "other": "y {n} más"
+    }
   }
 }

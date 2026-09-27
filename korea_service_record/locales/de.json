@@ -470,5 +470,73 @@
     "open": "Schaukasten",
     "caption": "Orden, Abzeichen und Verbandsabzeichen in einem Schaukasten.",
     "rank_is": "{rank}"
+  },
+  "diary": {
+    "title": "Kriegstagebuch",
+    "back": "Dienstakte",
+    "print": "Drucken",
+    "open": "Kriegstagebuch",
+    "days": {
+      "one": "{n} Tag",
+      "other": "{n} Tage"
+    },
+    "empty": "In dieser Laufbahn ist noch nichts geschehen.",
+    "failed": "Das Kriegstagebuch konnte nicht gelesen werden.",
+    "no_career": "Es wurde keine Laufbahn angegeben.",
+    "mission_num": "Einsatz {n}",
+    "unscheduled": "Außerplanmäßig",
+    "against": "gegen {place}",
+    "targets": {
+      "one": "{n} Ziel zerstört",
+      "other": "{n} Ziele zerstört"
+    },
+    "you_flew": "Diesen Einsatz sind Sie geflogen",
+    "granted": {
+      "one": "{n} Auszeichnung staffelweit erworben",
+      "other": "{n} Auszeichnungen staffelweit erworben"
+    },
+    "presented": {
+      "one": "{n} Auszeichnung verliehen",
+      "other": "{n} Auszeichnungen verliehen"
+    },
+    "reported": {
+      "one": "{names} hat sich zum Dienst gemeldet",
+      "other": "{names} haben sich zum Dienst gemeldet"
+    },
+    "plane_delivered": {
+      "one": "{n} Flugzeug geliefert",
+      "other": "{n} Flugzeuge geliefert"
+    },
+    "plane_repair": {
+      "one": "{n} Flugzeug in Reparatur",
+      "other": "{n} Flugzeuge in Reparatur"
+    },
+    "plane_repaired": {
+      "one": "{n} Flugzeug wieder einsatzbereit",
+      "other": "{n} Flugzeuge wieder einsatzbereit"
+    },
+    "plane_lost": "{who} verlor sein Flugzeug",
+    "pilot_kia": "{who} ist gefallen",
+    "pilot_missing": "{who} wird vermisst",
+    "wounded": "{who} wurde im Einsatz verwundet",
+    "to_hospital": "{who} kam ins Lazarett",
+    "returned_to_duty": "{who} ist zum Dienst zurückgekehrt",
+    "friendly_destroyed": "{who} zerstörte eine eigene {what}",
+    "commander_assigned": "{who} übernahm das Kommando über die Staffel",
+    "successor": "{who} übernahm die Laufbahn",
+    "unit_award": "Die Staffel wurde belobigt",
+    "efficiency": "Einsatzbereitschaft der Staffel jetzt {value}",
+    "resources_destroyed": "Die Vorräte des Flugplatzes wurden getroffen",
+    "operation_begin": "{name} beginnt",
+    "operation_end": "{name} endet",
+    "own_granted": "Sie haben sich {award} verdient",
+    "own_presented": "Ihnen wurde {award} verliehen",
+    "open_hint": "Das Kriegstagebuch der Staffel, Tag für Tag",
+    "transfer_ordered": "Die Staffel erhält Befehl zur Verlegung nach {field}",
+    "transfer_done": "Die Staffel liegt jetzt in {field}",
+    "and_others": {
+      "one": "und {n} weiterer",
+      "other": "und {n} weitere"
+    }
   }
 }

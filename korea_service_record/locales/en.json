@@ -470,5 +470,73 @@
     "open": "Shadowbox",
     "caption": "Decorations, badge and unit insignia in a display case.",
     "rank_is": "{rank}"
+  },
+  "diary": {
+    "title": "War Diary",
+    "back": "Service Record",
+    "print": "Print",
+    "open": "War diary",
+    "days": {
+      "one": "{n} day",
+      "other": "{n} days"
+    },
+    "empty": "Nothing has happened in this career yet.",
+    "failed": "The war diary could not be read.",
+    "no_career": "No career was given.",
+    "mission_num": "Mission {n}",
+    "unscheduled": "Unscheduled",
+    "against": "against {place}",
+    "targets": {
+      "one": "{n} target destroyed",
+      "other": "{n} targets destroyed"
+    },
+    "you_flew": "You flew this one",
+    "granted": {
+      "one": "{n} decoration earned, squadron-wide",
+      "other": "{n} decorations earned, squadron-wide"
+    },
+    "presented": {
+      "one": "{n} decoration presented",
+      "other": "{n} decorations presented"
+    },
+    "reported": {
+      "one": "{names} reported for duty",
+      "other": "{names} reported for duty"
+    },
+    "plane_delivered": {
+      "one": "{n} aircraft delivered",
+      "other": "{n} aircraft delivered"
+    },
+    "plane_repair": {
+      "one": "{n} aircraft under repair",
+      "other": "{n} aircraft under repair"
+    },
+    "plane_repaired": {
+      "one": "{n} aircraft back on the line",
+      "other": "{n} aircraft back on the line"
+    },
+    "plane_lost": "{who} lost his aircraft",
+    "pilot_kia": "{who} was killed in action",
+    "pilot_missing": "{who} is missing in action",
+    "wounded": "{who} was wounded in action",
+    "to_hospital": "{who} was taken to hospital",
+    "returned_to_duty": "{who} returned to duty",
+    "friendly_destroyed": "{who} destroyed a friendly {what}",
+    "commander_assigned": "{who} took command of the squadron",
+    "successor": "{who} took over the career",
+    "unit_award": "The squadron was cited",
+    "efficiency": "Squadron efficiency is now {value}",
+    "resources_destroyed": "The airfield's stores were hit",
+    "operation_begin": "{name} begins",
+    "operation_end": "{name} ends",
+    "own_granted": "You earned the {award}",
+    "own_presented": "You were presented with the {award}",
+    "open_hint": "The squadron's war diary, day by day",
+    "transfer_ordered": "The squadron is ordered to move to {field}",
+    "transfer_done": "The squadron is now based at {field}",
+    "and_others": {
+      "one": "and {n} other",
+      "other": "and {n} others"
+    }
   }
 }

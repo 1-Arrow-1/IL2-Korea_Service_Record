@@ -1,0 +1,88 @@
+/**
+ * The squadron's war diary.
+ *
+ * A unit diary was a bound book written up at the end of each day, so
+ * this is one column on one sheet rather than cards: date, what was
+ * flown, what happened. Quiet days are set smaller and closer, because a
+ * day on which one aeroplane came out of the shop should not occupy the
+ * same space as the day the squadron lost four.
+ */
+
+.diary-page { background: var(--desk); padding: 1rem 1rem 3rem; }
+.diary-bar {
+    display: flex; align-items: center; gap: 1rem;
+    max-width: 52rem; margin: 0 auto 1rem;
+}
+.diary-bar .wd-note {
+    flex: 1; font-size: .84rem; color: var(--ink-muted); font-style: italic;
+}
+
+#wd-sheet {
+    background: var(--paper); color: var(--ink);
+    max-width: 52rem; margin: 0 auto; padding: 2rem 2.4rem 2.6rem;
+    box-shadow: var(--shadow-soft);
+}
+.wd-head { border-bottom: 2px solid var(--ink-strong); padding-bottom: .7rem; margin-bottom: 1.4rem; }
+.wd-head h1 {
+    font-size: 1.5rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-strong); margin: 0;
+}
+.wd-sub { margin: .3rem 0 0; font-size: .9rem; color: var(--ink-muted); }
+
+.wd-days { list-style: none; margin: 0; padding: 0; }
+.wd-day { padding: .9rem 0; border-bottom: 1px dotted var(--rule, #d8cbb0); }
+.wd-day:last-child { border-bottom: 0; }
+/* A day with nothing but a repair booked against it. */
+.wd-day.quiet { padding: .38rem 0; }
+.wd-day.quiet .wd-date { font-size: .84rem; color: var(--ink-muted); letter-spacing: .06em; }
+
+.wd-date {
+    font-size: 1rem; margin: 0 0 .45rem; color: var(--ink-strong);
+    letter-spacing: .08em; font-variant-numeric: tabular-nums;
+}
+.wd-day.quiet .wd-notes { display: inline; }
+.wd-day.quiet .wd-notes li { display: inline; font-size: .84rem; }
+
+/* -- the day's flying ------------------------------------------------- */
+.wd-missions { list-style: none; margin: 0 0 .45rem; padding: 0; }
+.wd-mission {
+    display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap;
+    padding: .12rem 0 .12rem .6rem; font-size: .88rem;
+    border-left: 3px solid var(--border-soft);
+}
+/* The ones he was on himself. The whole diary is read looking for these. */
+.wd-mission.flown { border-left-color: var(--accent); }
+.wd-m-head {
+    min-width: 5.5rem; color: var(--ink-muted); font-variant-numeric: tabular-nums;
+}
+.wd-m-type { font-weight: 600; color: var(--ink-strong); }
+.wd-m-rest { color: var(--ink-muted); font-size: .84rem; }
+.wd-flown { margin-left: auto; color: var(--accent); font-size: .8rem; }
+
+/* -- everything else that happened ------------------------------------ */
+.wd-notes { list-style: none; margin: .2rem 0 0; padding: 0 0 0 .6rem; }
+.wd-notes li { font-size: .88rem; padding: .08rem 0; }
+.wd-notes li::before { content: "\2014\00a0"; color: var(--border-soft); }
+.wd-day.quiet .wd-notes li::before { content: "\00a0\2014\00a0"; }
+/* A man hurt or an aeroplane gone is the diary's darkest ink; his own
+   decorations are the only thing set in the accent, so a reader turning
+   pages can find his own thread. */
+.wd-notes li.loss { color: var(--ink-strong); }
+.wd-notes li.mine { color: var(--accent-dark); font-style: italic; }
+.wd-notes li.op { color: var(--ink-muted); letter-spacing: .02em; }
+
+.wd-tally {
+    margin: .35rem 0 0 .6rem; font-size: .8rem; color: var(--ink-muted);
+    font-style: italic;
+}
+
+@media (max-width: 40rem) {
+    #wd-sheet { padding: 1.2rem 1rem 1.6rem; }
+    .wd-m-head { min-width: 0; }
+}
+
+@media print {
+    .diary-page { background: #fff; padding: 0; }
+    #wd-sheet { box-shadow: none; max-width: none; background: #fff; }
+    .wd-day { break-inside: avoid; }
+}

@@ -218,9 +218,34 @@ EVENT_TYPES: Dict[int, EventType] = {
                   "string carEventResourcesDestroyed. Fired ten minutes after "
                   "an unscheduled mission was raised against the airfield."),
 
+    30: EventType(30, "transfer", "Squadron transfer", CONFIRMED,
+                  "The squadron moving to another airfield. ipar1 = 0 the "
+                  "move is ordered, 1 it is complete; tpar1 = the "
+                  "destination ('K-16_Seoul'). Two rows in the reference "
+                  "career, 1951.05.07 and 1951.05.08 at 06:00, against a "
+                  "squadron.airfield still reading K-13_Suwon - consistent, "
+                  "because the career stands on the 7th and the move has not "
+                  "finished. Confirmed by the game itself: with the career on "
+                  "that date it briefs the player that his next mission is to "
+                  "move the squadron. career.transferInfo stays empty "
+                  "throughout, so it is not the field to read for this."),
+
     33: EventType(33, "operation", "Operation", CONFIRMED,
-                  "ipar1 = 0 begin / 1 end, tpar1 = operation name."),
+                  "ipar1 = 0 begin / 1 end, tpar1 = operation name. Every "
+                  "name observed carries a 'WB ' prefix - a builder tag, not "
+                  "part of the name."),
 }
+
+# Casualty rows the game writes twice. Maurice Dillard's F-51D on
+# 1951.04.18 is events 1041 and 1042: same second, same mission, same
+# pilot, and he flew one sortie on that mission, ending planeStatus 3.
+# Bryan Bickle on 1951.05.01 is the same pair (2528, 2529). Winton White,
+# killed on that sortie, and the player, who walked away from it, each get
+# a single row - so whatever doubles them, it is not a second aircraft.
+# Anything counting losses per pilot per moment must fold them; anything
+# counting kills must not, since two kill rows in one second are two
+# objects.
+DOUBLED_TYPES = (2, 3, 4, 5, 16)
 
 
 def describe(type_code: int) -> EventType:

@@ -470,5 +470,73 @@
     "open": "Vitrine",
     "caption": "Décorations, brevet et insignes d’unité dans une vitrine.",
     "rank_is": "{rank}"
+  },
+  "diary": {
+    "title": "Journal de marche",
+    "back": "État de service",
+    "print": "Imprimer",
+    "open": "Journal de marche",
+    "days": {
+      "one": "{n} jour",
+      "other": "{n} jours"
+    },
+    "empty": "Rien ne s’est encore produit dans cette carrière.",
+    "failed": "Le journal de marche n’a pas pu être lu.",
+    "no_career": "Aucune carrière n’a été indiquée.",
+    "mission_num": "Mission {n}",
+    "unscheduled": "Non programmée",
+    "against": "contre {place}",
+    "targets": {
+      "one": "{n} objectif détruit",
+      "other": "{n} objectifs détruits"
+    },
+    "you_flew": "Vous avez volé sur cette mission",
+    "granted": {
+      "one": "{n} décoration méritée dans l’escadrille",
+      "other": "{n} décorations méritées dans l’escadrille"
+    },
+    "presented": {
+      "one": "{n} décoration remise",
+      "other": "{n} décorations remises"
+    },
+    "reported": {
+      "one": "{names} s’est présenté au service",
+      "other": "{names} se sont présentés au service"
+    },
+    "plane_delivered": {
+      "one": "{n} avion livré",
+      "other": "{n} avions livrés"
+    },
+    "plane_repair": {
+      "one": "{n} avion en réparation",
+      "other": "{n} avions en réparation"
+    },
+    "plane_repaired": {
+      "one": "{n} avion de nouveau disponible",
+      "other": "{n} avions de nouveau disponibles"
+    },
+    "plane_lost": "{who} a perdu son avion",
+    "pilot_kia": "{who} est tombé au combat",
+    "pilot_missing": "{who} est porté disparu",
+    "wounded": "{who} a été blessé au combat",
+    "to_hospital": "{who} a été évacué à l’hôpital",
+    "returned_to_duty": "{who} a repris son service",
+    "friendly_destroyed": "{who} a détruit un {what} ami",
+    "commander_assigned": "{who} a pris le commandement de l’escadrille",
+    "successor": "{who} a repris la carrière",
+    "unit_award": "L’escadrille a été citée",
+    "efficiency": "L’efficacité de l’escadrille est maintenant de {value}",
+    "resources_destroyed": "Les stocks du terrain ont été touchés",
+    "operation_begin": "{name} commence",
+    "operation_end": "{name} se termine",
+    "own_granted": "Vous avez mérité {award}",
+    "own_presented": "{award} vous a été remise",
+    "open_hint": "Le journal de marche de l’escadrille, jour par jour",
+    "transfer_ordered": "L’escadrille reçoit l’ordre de rejoindre {field}",
+    "transfer_done": "L’escadrille est désormais basée à {field}",
+    "and_others": {
+      "one": "et {n} autre",
+      "other": "et {n} autres"
+    }
   }
 }

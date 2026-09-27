@@ -66,6 +66,38 @@ const i18n = {
     },
 
     /**
+     * A key whose value is an object of plural forms, or null.
+     *
+     * English needs two forms and Russian four ("1 вылет", "2 вылета",
+     * "5 вылетов"), so a countable string is written as
+     * {"one": "...", "other": "..."} and the right form is chosen by
+     * Intl.PluralRules for the reader's own language. Chinese supplies
+     * "other" alone and is correct with it.
+     */
+    _forms(bundle, key) {
+        let node = bundle;
+        for (const part of key.split(".")) {
+            if (!node || typeof node !== "object" || !(part in node)) return null;
+            node = node[part];
+        }
+        return node && typeof node === "object" && !Array.isArray(node) ? node : null;
+    },
+
+    /** The plural form of `key` for `n`, in `locale`, or null. */
+    _plural(bundle, key, locale, n) {
+        const forms = this._forms(bundle, key);
+        if (!forms) return null;
+        let category = "other";
+        try {
+            category = new Intl.PluralRules(locale).select(n);
+        } catch (err) { /* an unknown locale falls back to "other" */ }
+        // "other" is the only form every language is guaranteed to have,
+        // so it is the backstop for a translation that supplied fewer.
+        const text = forms[category] != null ? forms[category] : forms.other;
+        return typeof text === "string" ? text : null;
+    },
+
+    /**
      * Translate one key. Unknown keys return the key itself rather than an
      * empty string — a visible "roster.status" in the UI is a bug report;
      * a blank cell is a mystery.
@@ -79,6 +111,15 @@ const i18n = {
     t(key, params) {
         let text = this._lookup(this.loaded[this.locale], key);
         if (text === null) text = this._lookup(this.loaded[this.fallback], key);
+        // A countable string: params.n picks the form. Only when n really
+        // is a number - a caller passing a formatted "1,551" gets the
+        // plain lookup, and nothing silently becomes "other".
+        if (text === null && params && typeof params.n === "number") {
+            text = this._plural(this.loaded[this.locale], key, this.locale, params.n);
+            if (text === null) {
+                text = this._plural(this.loaded[this.fallback], key, this.fallback, params.n);
+            }
+        }
         if (text === null) return key;
         if (params) {
             text = text.replace(/\{(\w+)\}/g, (match, name) =>

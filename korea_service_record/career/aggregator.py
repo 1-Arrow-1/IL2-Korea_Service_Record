@@ -36,6 +36,7 @@ from ..gamedata import (COUNTRY_FLAGS, COUNTRY_NAMES, COUNTRY_SEALS, COUNTRY_STA
 from ..geo import (MapTiles, Overlay, WAYPOINT_TAKEOFF, WAYPOINT_LANDING,
                    parse_point, parse_route)
 from ..icons import IconLibrary
+from ..diary import DiaryBuilder
 from .. import citations, corrections, ribbons
 from .. import medals as medal_art
 
@@ -1587,6 +1588,30 @@ class CareerAggregator:
             })
             return summary
 
+    def diary(self, career_id: str) -> Optional[Dict[str, Any]]:
+        """
+        The squadron's war diary: every day of the career that has one.
+
+        Its own page rather than another panel on the record - the detail
+        page already carries fifteen of them - and its own endpoint, the
+        way the logbook and the certificate have theirs.
+        """
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            career = db.career()
+            today = (career["currentDate"] or "")[:10] if career else ""
+            data = DiaryBuilder(self, db, today).build()
+            player = db.player()
+            data.update({
+                "career_id": career_id,
+                "squadron": meta.squadron_name,
+                "pilot": f"{player['name']} {player['lastName']}".strip() if player else "",
+                "today": today,
+            })
+            return data
+
     @staticmethod
     def _squadron_plane(db) -> str:
         """
@@ -2048,6 +2073,40 @@ class CareerAggregator:
         point["type"] = row["type"]
         return point
 
+    def place_of(self, db, mission, features) -> str:
+        """
+        The nearest named place to a mission's target, for prose.
+
+        A town is preferred to an airfield: "Sinuiju" reads as a place a
+        squadron was sent to, "K-13 Suwon" reads as an address. The airfield
+        is the fallback, stripped of its K-number for the same reason. A
+        town within 15 km wins outright even when a field is nearer, because
+        the field is usually the target *at* the town.
+
+        Written for the citation and reused by the war diary, which is why
+        it takes its features list rather than fetching one per mission -
+        the overlay is a few thousand points and a diary asks 28 times.
+        """
+        pt = self._target_point(db, mission["targetId"]) if mission else None
+        if pt is None:
+            pts = parse_route(mission["route"]) if mission else []
+            pt = next((p for p in pts if p["type"] == WAYPOINT_TARGET), None)
+        if pt is None or not features:
+            return ""
+        towns = [f for f in features if f["kind"] in ("city", "town") and f["name"]]
+        fields = [f for f in features if f["kind"] == "airfield" and f["name"]]
+
+        def dist(f):
+            return ((f["x"] - pt["x"]) ** 2 + (f["z"] - pt["z"]) ** 2) ** 0.5
+        near_town = min(towns, key=dist) if towns else None
+        near_field = min(fields, key=dist) if fields else None
+        if near_town and (near_field is None or dist(near_town) <= 15000
+                          or dist(near_town) <= dist(near_field)):
+            return near_town["name"]
+        if near_field:
+            return re.sub(r"^K-\d+\s+", "", near_field["name"])
+        return near_town["name"] if near_town else ""
+
     def career_map(self, career_id: str,
                    pilot_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
         """
@@ -2206,23 +2265,7 @@ class CareerAggregator:
 
             features = self.overlay.features()
             def place_of(m) -> str:
-                pt = self._target_point(db, m["targetId"]) if m else None
-                if pt is None:
-                    pts = parse_route(m["route"]) if m else []
-                    pt = next((p for p in pts if p["type"] == WAYPOINT_TARGET), None)
-                if pt is None or not features:
-                    return ""
-                towns = [f for f in features if f["kind"] in ("city", "town") and f["name"]]
-                fields = [f for f in features if f["kind"] == "airfield" and f["name"]]
-                def dist(f):
-                    return ((f["x"] - pt["x"]) ** 2 + (f["z"] - pt["z"]) ** 2) ** 0.5
-                near_town = min(towns, key=dist) if towns else None
-                near_field = min(fields, key=dist) if fields else None
-                if near_town and (near_field is None or dist(near_town) <= 15000 or dist(near_town) <= dist(near_field)):
-                    return near_town["name"]
-                if near_field:
-                    return re.sub(r"^K-\d+\s+", "", near_field["name"])
-                return near_town["name"] if near_town else ""
+                return self.place_of(db, m, features)
 
             # For the Soviet form: what he held before this award, whether
             # he was wounded up to then, and who commands the squadron.

@@ -1398,6 +1398,12 @@
                 (d.player && d.player.id != null ? "&pilot=" + encodeURIComponent(d.player.id) : "");
             logbook.title = T("logbook.open_hint");
             logbook.hidden = false;
+            // The war diary is the squadron's, not one pilot's, so it takes
+            // no pilot id - the same page whoever the record belongs to.
+            const diary = el("d-diary");
+            diary.href = "/diary?career=" + encodeURIComponent(careerId);
+            diary.title = T("diary.open_hint");
+            diary.hidden = false;
             rackEl.classList.toggle("wearable", Boolean(d.ribbon_rack && d.ribbon_rack.tunic));
             rackEl.title = d.ribbon_rack && d.ribbon_rack.tunic ? T("awards.tunic_hint") : "";
             rackEl.onclick = () => openTunic(d.player ? d.player.name : "");

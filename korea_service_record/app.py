@@ -528,6 +528,13 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
                 cert["commissar_tr"] = other["certificate"].get("commissar_tr", "")
         return jsonify(data or {})
 
+    @app.route("/diary")
+    def diary_page():
+        """The squadron's war diary on its own page - the record is full."""
+        html = (Path(app.static_folder) / "diary.html").read_text(encoding="utf-8")
+        html = html.replace("__ASSET_VERSION__", asset_version())
+        return Response(html, mimetype="text/html", headers={"Cache-Control": "no-store"})
+
     @app.route("/certificate")
     def certificate_page():
         """The award's certificate or decree on its own page, to print."""
@@ -554,6 +561,17 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         wanted = {"usaf": "en", "sov": "ru"}.get(data["form"])
         if wanted and wanted != app.config["SETTINGS"].resolve(career_id):
             data = aggregator_for(wanted).logbook(career_id, pilot_id) or data
+        return jsonify(data)
+
+    @app.route("/api/diary/<path:career_id>")
+    def api_diary(career_id: str):
+        """The war diary, day by day, in the page's language."""
+        agg = aggregator(career_id)
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        data = agg.diary(career_id)
+        if data is None:
+            return jsonify({"error": "career_not_found"}), 404
         return jsonify(data)
 
     @app.route("/api/track/<path:career_id>/<int:mission_id>")
