@@ -1271,6 +1271,10 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
 .p-body {
     display: flex; align-items: baseline; gap: .45rem;
     flex-wrap: wrap; justify-content: flex-end; white-space: nowrap;
+    /* A grid item's floor is its min-content width, and nowrap makes that
+       the whole unbroken string. Without this the folded routes pushed the
+       auto track wider than the panel and gave the page a sideways scroll. */
+    min-width: 0;
 }
 /* routes are the one thing long enough to need a second line */
 .p-routes { white-space: normal; text-align: right; }
@@ -1307,6 +1311,11 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     list-style: none; margin: .25rem 0 0; padding: 0 0 0 .6rem;
     border-left: 2px solid var(--border-soft); font-size: .8rem;
     color: var(--ink-muted, #6b5a3f); text-align: left;
+    /* A route is a sentence, not a figure: it wraps. It inherits nowrap
+       from the body, where the bar and its numbers must stay on one line,
+       and "15.8 / 300 hours + not before 1952.08.01" then ran off the
+       right edge of the panel in a narrow column. */
+    white-space: normal; overflow-wrap: break-word;
 }
 .progress-list ul.p-alts li { margin: .12rem 0; }
 @media (prefers-reduced-motion: reduce) { .progress-list .route-toggle svg { transition: none; } }
