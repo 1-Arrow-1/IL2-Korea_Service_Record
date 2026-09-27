@@ -38,6 +38,7 @@ for anything a translation has not caught up with, not the primary text.
 from collections import Counter, defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
+from . import ribbons as ribbon_art
 from .career.events import describe
 
 # Counted, never listed: see the module docstring.
@@ -265,7 +266,12 @@ class DiaryBuilder:
             label = {"own_both": f"You earned and were presented with the {name}",
                      "own_presented": f"You were presented with the {name}",
                      "own_granted": f"You earned the {name}"}[key]
-            out.append(_entry(key, label, award=name, award_id=award_id))
+            # Not every decoration has a ribbon: the Pilot's Badge is worn
+            # above them, not among them, and `/api/ribbon/` has nothing
+            # for it. The page shows the atlas icon for those instead of
+            # asking for a picture that does not exist.
+            out.append(_entry(key, label, award=name, award_id=award_id,
+                              ribbon=award_id in ribbon_art.RIBBONS))
         return out, tally
 
     # -- names -------------------------------------------------------------

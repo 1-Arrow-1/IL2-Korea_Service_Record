@@ -82,6 +82,32 @@
         return text === "diary." + key ? (n.label || "") : text;
     }
 
+    // The ribbon itself, in front of his own decorations. The only colour
+    // on the sheet, so the reader's own thread is findable at a glance.
+    const artArg = () => (data.art_rev ? "?r=" + encodeURIComponent(data.art_rev) : "");
+    function ribbon(n) {
+        if (!n.award_id) { return ""; }
+        // A badge has no ribbon - it is worn above them - so it shows as
+        // the atlas icon instead. The server says which is which, rather
+        // than the page finding out by asking for a 404.
+        const src = n.ribbon
+            ? "/api/ribbon/" + encodeURIComponent(n.award_id) + artArg() +
+              (data.navy ? (artArg() ? "&" : "?") + "svc=navy" : "")
+            : "/api/icon/award/" + encodeURIComponent(n.award_id) + "?h=48" +
+              (data.art_rev ? "&r=" + encodeURIComponent(data.art_rev) : "");
+        return '<img class="wd-ribbon' + (n.ribbon ? "" : " badge") + '" alt="" src="' +
+            src + '" onerror="this.style.display=&quot;none&quot;">';
+    }
+
+    // The stamp struck against a casualty, from the same set the roster
+    // uses. A period document said this with a rubber stamp, not a word.
+    const STAMPS = {pilot_kia: "kia", pilot_missing: "missing", wounded: "wounded"};
+    function stamp(key) {
+        const name = STAMPS[key];
+        return name ? '<img class="wd-stamp" alt="" src="/static/images/stamps/' +
+            name + '.png">' : "";
+    }
+
     function noteClass(n) {
         const key = n.key.replace(/^diary\./, "");
         if (["pilot_kia", "pilot_missing", "wounded", "plane_lost",
@@ -111,19 +137,38 @@
             "</li>";
     }
 
+    // An operation beginning or ending divides the diary into chapters.
+    // Pulled out of the day's lines and set as a band across the sheet,
+    // because it is the only thing in the file that changes what the
+    // squadron is for.
+    function bandsOf(day) {
+        return day.notes.filter((n) => /operation_(begin|end)$/.test(n.key));
+    }
+    function band(n) {
+        const ending = /operation_end$/.test(n.key);
+        return '<li class="wd-band' + (ending ? " ending" : "") + '">' +
+            '<span>' + esc(noteText(n)) + "</span></li>";
+    }
+
     function dayBlock(day) {
         const tallies = [];
         if (day.granted) { tallies.push(T("granted", {n: day.granted})); }
         if (day.presented) { tallies.push(T("presented", {n: day.presented})); }
         if (day.targets) { tallies.push(T("targets", {n: day.targets})); }
+        const bands = bandsOf(day);
+        day = Object.assign({}, day, {notes: day.notes.filter((n) => !bands.includes(n))});
         const quiet = !day.missions.length && day.notes.length <= 1 && !tallies.length;
-        return '<li class="wd-day' + (quiet ? " quiet" : "") + '">' +
+        return bands.map(band).join("") +
+            '<li class="wd-day' + (quiet ? " quiet" : "") + '">' +
             '<h2 class="wd-date">' + esc(longDate(day.date)) + "</h2>" +
             (day.missions.length
                 ? '<ul class="wd-missions">' + day.missions.map(missionLine).join("") + "</ul>" : "") +
             (day.notes.length
-                ? '<ul class="wd-notes">' + day.notes.map((n) =>
-                    '<li class="' + noteClass(n) + '">' + esc(noteText(n)) + "</li>").join("") + "</ul>" : "") +
+                ? '<ul class="wd-notes">' + day.notes.map((n) => {
+                    const key = n.key.replace(/^diary\./, "");
+                    return '<li class="' + noteClass(n) + '">' + ribbon(n) +
+                        esc(noteText(n)) + stamp(key) + "</li>";
+                }).join("") + "</ul>" : "") +
             (tallies.length
                 ? '<p class="wd-tally">' + esc(tallies.join(" · ")) + "</p>" : "") +
             "</li>";
@@ -131,6 +176,23 @@
 
     document.title = T("title") + " — " + (data.squadron || "");
     el("wd-sub").textContent = [data.squadron, data.pilot].filter(Boolean).join(" · ");
+    // The squadron's own emblem beside the title, its service's seal
+    // blind-struck in the corner, and the aeroplane it flies along the
+    // foot of the header. All three are art the tracker already holds.
+    if (data.squadron_key) {
+        el("wd-emblem").src = "/api/icon/squadron/" +
+            encodeURIComponent(data.squadron_key) + "?h=128" +
+            (data.art_rev ? "&r=" + encodeURIComponent(data.art_rev) : "");
+        el("wd-emblem").hidden = false;
+    }
+    if (data.seal) {
+        el("wd-seal").src = "/static/images/stamps/seal_" + data.seal + ".png";
+        el("wd-seal").hidden = false;
+    }
+    if (data.plane) {
+        el("wd-plane").src = "/static/images/planes/" + data.plane + ".png";
+        el("wd-plane").hidden = false;
+    }
     if (!data.days.length) { fail("diary.empty"); return; }
     el("wd-note").textContent = T("days", {n: data.days.length});
     el("wd-days").innerHTML = data.days.map(dayBlock).join("");

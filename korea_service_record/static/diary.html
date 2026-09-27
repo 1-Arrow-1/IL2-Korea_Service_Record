@@ -19,9 +19,17 @@
         <button id="wd-print" class="nav-btn" data-i18n="diary.print">Print</button>
     </div>
     <main id="wd-sheet">
+        <!-- The service's seal, struck blind in the corner the way a
+             cover sheet carries one. Decoration, so it is hidden from
+             anything reading the page aloud. -->
+        <img id="wd-seal" class="wd-seal" alt="" aria-hidden="true" hidden>
         <header class="wd-head">
-            <h1 id="wd-title" data-i18n="diary.title">War Diary</h1>
-            <p id="wd-sub" class="wd-sub"></p>
+            <img id="wd-emblem" class="wd-emblem" alt="" aria-hidden="true" hidden>
+            <div class="wd-headings">
+                <h1 id="wd-title" data-i18n="diary.title">War Diary</h1>
+                <p id="wd-sub" class="wd-sub"></p>
+            </div>
+            <img id="wd-plane" class="wd-plane" alt="" aria-hidden="true" hidden>
         </header>
         <ol id="wd-days" class="wd-days"></ol>
     </main>

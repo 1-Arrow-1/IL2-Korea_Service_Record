@@ -572,6 +572,10 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         data = agg.diary(career_id)
         if data is None:
             return jsonify({"error": "career_not_found"}), 404
+        # The ribbons are cut from the mod's atlases, which the user may
+        # re-cut; the token moves with the art so a changed ribbon reaches
+        # the page instead of a year-old cached one.
+        data["art_rev"] = agg.icons.art_version()
         return jsonify(data)
 
     @app.route("/api/track/<path:career_id>/<int:mission_id>")

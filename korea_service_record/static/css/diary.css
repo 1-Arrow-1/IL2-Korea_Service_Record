@@ -2,10 +2,16 @@
  * The squadron's war diary.
  *
  * A unit diary was a bound book written up at the end of each day, so
- * this is one column on one sheet rather than cards: date, what was
+ * this is one ruled column on one sheet rather than cards: date, what was
  * flown, what happened. Quiet days are set smaller and closer, because a
  * day on which one aeroplane came out of the shop should not occupy the
  * same space as the day the squadron lost four.
+ *
+ * The colour on the page is rationed deliberately. The ribbons of his own
+ * decorations and the casualty stamps are the only things that carry any,
+ * so a reader turning pages finds the two things worth stopping at
+ * without reading a word. Decorating every line would cost exactly the
+ * quality the page is for.
  */
 
 .diary-page { background: var(--desk); padding: 1rem 1rem 3rem; }
@@ -17,19 +23,56 @@
     flex: 1; font-size: .84rem; color: var(--ink-muted); font-style: italic;
 }
 
+/* -- the sheet -------------------------------------------------------- */
 #wd-sheet {
-    background: var(--paper); color: var(--ink);
-    max-width: 52rem; margin: 0 auto; padding: 2rem 2.4rem 2.6rem;
+    position: relative;
+    background-color: var(--paper);
+    /* The book's ruling, then the paper's own grain beneath it. The red
+       rule is the margin a bound daybook is printed with; the feint lines
+       are set to the notes' line height so the text sits on them. */
+    background-image:
+        linear-gradient(to right, transparent 3.5rem,
+                        rgba(150, 46, 38, .30) 3.5rem, rgba(150, 46, 38, .30) calc(3.5rem + 1px),
+                        transparent calc(3.5rem + 1px)),
+        url("../images/paper.png");
+    background-repeat: repeat-y, repeat;
+    background-size: 100% 100%, 512px 512px;
+    color: var(--ink);
+    max-width: 52rem; margin: 0 auto; padding: 2rem 2.4rem 2.6rem 5rem;
     box-shadow: var(--shadow-soft);
 }
-.wd-head { border-bottom: 2px solid var(--ink-strong); padding-bottom: .7rem; margin-bottom: 1.4rem; }
+
+/* -- the header's furniture ------------------------------------------- */
+.wd-head {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+    gap: 0 1.1rem;
+    border-bottom: 2px solid var(--ink-strong); padding-bottom: .7rem; margin-bottom: 1.4rem;
+}
+.wd-emblem { height: 64px; width: auto; }
+.wd-headings { min-width: 0; }
 .wd-head h1 {
     font-size: 1.5rem; letter-spacing: .14em; text-transform: uppercase;
     color: var(--ink-strong); margin: 0;
 }
 .wd-sub { margin: .3rem 0 0; font-size: .9rem; color: var(--ink-muted); }
+/* The aeroplane the squadron flies, in the ink of the page rather than
+   in its own colours: a silhouette on a form, not a photograph. */
+.wd-plane {
+    height: 30px; width: auto; opacity: .5;
+    filter: grayscale(1) contrast(1.4) brightness(.55);
+}
+/* Struck blind, the way a seal embossed into paper reads - no ink, just
+   the shape of it. At the foot of the sheet, where a closing seal goes:
+   the top corner is the aeroplane's, and the two were printing over one
+   another there. */
+.wd-seal {
+    position: absolute; bottom: 1.4rem; right: 1.8rem;
+    width: 132px; height: auto; opacity: .1; pointer-events: none;
+    filter: grayscale(1);
+}
 
-.wd-days { list-style: none; margin: 0; padding: 0; }
+/* -- the days --------------------------------------------------------- */
+.wd-days { list-style: none; margin: 0; padding: 0 0 2.5rem; }
 .wd-day { padding: .9rem 0; border-bottom: 1px dotted var(--rule, #d8cbb0); }
 .wd-day:last-child { border-bottom: 0; }
 /* A day with nothing but a repair booked against it. */
@@ -43,7 +86,21 @@
 .wd-day.quiet .wd-notes { display: inline; }
 .wd-day.quiet .wd-notes li { display: inline; font-size: .84rem; }
 
-/* -- the day's flying ------------------------------------------------- */
+/* -- an operation is a chapter ---------------------------------------- */
+.wd-band {
+    list-style: none; margin: 1.1rem 0 .6rem; text-align: center;
+    border-top: 1px solid var(--accent-dark); border-bottom: 1px solid var(--accent-dark);
+    padding: .3rem 0; background: rgba(139, 111, 74, .07);
+}
+.wd-band span {
+    font-size: .82rem; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--accent-dark);
+}
+.wd-band.ending { border-color: var(--border-soft); background: none; }
+.wd-band.ending span { color: var(--ink-muted); letter-spacing: .16em; }
+.wd-days > .wd-band:first-child { margin-top: 0; }
+
+/* -- the day's flying -------------------------------------------------- */
 .wd-missions { list-style: none; margin: 0 0 .45rem; padding: 0; }
 .wd-mission {
     display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap;
@@ -70,6 +127,28 @@
 .wd-notes li.loss { color: var(--ink-strong); }
 .wd-notes li.mine { color: var(--accent-dark); font-style: italic; }
 .wd-notes li.op { color: var(--ink-muted); letter-spacing: .02em; }
+/* A line carrying a ribbon leads with it, so the bullet would be a third
+   mark before the text. */
+.wd-notes li.mine:has(.wd-ribbon)::before { content: none; }
+
+/* The ribbon bar of the decoration, at the height of the line's text. */
+.wd-ribbon {
+    height: .82rem; width: auto; vertical-align: -.08rem;
+    margin-right: .45rem; border: 1px solid rgba(31, 20, 10, .35);
+    box-shadow: 0 1px 1px rgba(31, 20, 10, .18);
+}
+/* A badge is not a bar of cloth: no border, no shadow, and taller,
+   because it is a wider, sparser shape at the same height. */
+.wd-ribbon.badge {
+    height: 1.15rem; border: 0; box-shadow: none; vertical-align: -.25rem;
+}
+/* Struck after the line, tilted, in the faded red of a rubber stamp that
+   has been used all week. */
+.wd-stamp {
+    height: 1.35rem; width: auto; margin-left: .55rem;
+    vertical-align: -.32rem; opacity: .66;
+    transform: rotate(-4deg); transform-origin: left center;
+}
 
 .wd-tally {
     margin: .35rem 0 0 .6rem; font-size: .8rem; color: var(--ink-muted);
@@ -77,12 +156,18 @@
 }
 
 @media (max-width: 40rem) {
-    #wd-sheet { padding: 1.2rem 1rem 1.6rem; }
+    /* No room for a margin rule on a phone. */
+    #wd-sheet {
+        padding: 1.2rem 1rem 1.6rem; background-image: url("../images/paper.png");
+        background-size: 512px 512px;
+    }
+    .wd-head { grid-template-columns: auto 1fr; }
+    .wd-plane { display: none; }
     .wd-m-head { min-width: 0; }
 }
 
 @media print {
     .diary-page { background: #fff; padding: 0; }
-    #wd-sheet { box-shadow: none; max-width: none; background: #fff; }
-    .wd-day { break-inside: avoid; }
+    #wd-sheet { box-shadow: none; max-width: none; }
+    .wd-day, .wd-band { break-inside: avoid; }
 }

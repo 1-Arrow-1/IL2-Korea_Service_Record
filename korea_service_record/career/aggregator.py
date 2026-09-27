@@ -1604,11 +1604,21 @@ class CareerAggregator:
             today = (career["currentDate"] or "")[:10] if career else ""
             data = DiaryBuilder(self, db, today).build()
             player = db.player()
+            squad = db.squadron()
+            country = player["country"] if player else 601
             data.update({
                 "career_id": career_id,
                 "squadron": meta.squadron_name,
                 "pilot": f"{player['name']} {player['lastName']}".strip() if player else "",
                 "today": today,
+                # The page's furniture: the squadron's own emblem, its
+                # service's seal, and the aeroplane it flies, all of which
+                # the tracker already holds.
+                "squadron_key": str(squad["configId"]) if squad else "",
+                "country": country,
+                "seal": COUNTRY_SEALS.get(country, ""),
+                "plane": self._squadron_plane(db),
+                "navy": country in (602, 603),
             })
             return data
 
