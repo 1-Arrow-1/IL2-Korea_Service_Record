@@ -43,18 +43,36 @@
 }
 
 /* -- the header's furniture ------------------------------------------- */
-.wd-head {
+.wd-head { margin-bottom: 1.4rem; }
+/* The squadron's own things, above the letterhead: its emblem, who is
+   writing, and what it flies. They sit clear of the band because the
+   band's scrollwork occupies both of its ends. */
+.wd-head-top {
     display: grid; grid-template-columns: auto 1fr auto; align-items: center;
-    gap: 0 1.1rem;
-    border-bottom: 2px solid var(--ink-strong); padding-bottom: .7rem; margin-bottom: 1.4rem;
+    gap: 0 1.1rem; margin-bottom: .5rem;
 }
 .wd-emblem { height: 64px; width: auto; }
-.wd-headings { min-width: 0; }
-.wd-head h1 {
-    font-size: 1.5rem; letter-spacing: .14em; text-transform: uppercase;
-    color: var(--ink-strong); margin: 0;
+.wd-sub {
+    margin: 0; font-size: .95rem; color: var(--ink-muted); text-align: center;
+    letter-spacing: .04em;
 }
-.wd-sub { margin: .3rem 0 0; font-size: .9rem; color: var(--ink-muted); }
+
+/* The engraved band, drawn at 1600x220. It keeps that ratio at any width
+   so the rules stay hairlines and the rosettes stay round. */
+.wd-letterhead {
+    background-image: url("../images/diary/header_band.png");
+    background-size: 100% 100%; background-repeat: no-repeat;
+    aspect-ratio: 1600 / 220;
+    display: grid; place-items: center;
+}
+.wd-head h1 {
+    /* Confined to the band's clear centre - 29% to 71% of its width - and
+       shrunk by script to fit, because "War Diary" is nine characters and
+       "Журнал боевых действий" is twenty-two. */
+    max-width: 41%; margin: 0; white-space: nowrap;
+    font-size: 1.5rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-strong); line-height: 1;
+}
 /* The aeroplane the squadron flies, in the ink of the page rather than
    in its own colours: a silhouette on a form, not a photograph. */
 .wd-plane {
@@ -161,7 +179,7 @@
         padding: 1.2rem 1rem 1.6rem; background-image: url("../images/paper.png");
         background-size: 512px 512px;
     }
-    .wd-head { grid-template-columns: auto 1fr; }
+    .wd-head-top { grid-template-columns: auto 1fr; }
     .wd-plane { display: none; }
     .wd-m-head { min-width: 0; }
 }

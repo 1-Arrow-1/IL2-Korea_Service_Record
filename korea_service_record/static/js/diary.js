@@ -27,6 +27,23 @@
     el("wd-back").href = careerId ? "/#career/" + encodeURIComponent(careerId) : "/";
     el("wd-print").addEventListener("click", () => window.print());
 
+    // The letterhead's engraving reaches in from both ends and leaves the
+    // middle 41% clear. CSS caps the title at that span; this shrinks the
+    // type until it actually fits inside it, because the word is nine
+    // characters in English and twenty-two in Russian.
+    function fitTitle() {
+        const h1 = el("wd-title");
+        if (!h1 || !h1.offsetWidth) { return; }
+        let size = 1.5;
+        h1.style.fontSize = size + "rem";
+        // scrollWidth exceeds clientWidth exactly while the text overflows
+        // the capped box; 0.55rem is small but still legible on a phone.
+        while (h1.scrollWidth > h1.clientWidth + 1 && size > 0.55) {
+            size -= 0.04;
+            h1.style.fontSize = size.toFixed(2) + "rem";
+        }
+    }
+
     const fail = (key) => {
         el("wd-state").textContent = i18n.t(key);
         el("wd-state").hidden = false;
@@ -193,6 +210,8 @@
         el("wd-plane").src = "/static/images/planes/" + data.plane + ".png";
         el("wd-plane").hidden = false;
     }
+    fitTitle();
+    addEventListener("resize", fitTitle);
     if (!data.days.length) { fail("diary.empty"); return; }
     el("wd-note").textContent = T("days", {n: data.days.length});
     el("wd-days").innerHTML = data.days.map(dayBlock).join("");
