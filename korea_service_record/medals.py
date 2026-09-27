@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 ART = Path(__file__).resolve().parent / "static" / "images" / "medals"
 # Bump whenever the composition or the art changes; it is part of the URLs.
-REVISION = 26
+REVISION = 27
 
 # --- US: drawn art -----------------------------------------------------------
 # Every base medal is drawn 224 px wide - the drape is 1 3/8 inch, the same
@@ -224,6 +224,68 @@ def _widest(img) -> int:
     return best
 
 
+# --- the roll of the drape -------------------------------------------------
+# The drawn bases are woven but flat. A ribbon bar bows over its mount and
+# so shades down its height (ribbons.roll); a drape hangs and bows across
+# its width, and it narrows through the chevron, so the curve has to follow
+# each row's own edges rather than the canvas. It fades out above the waist,
+# which leaves the medal exactly as painted - nothing below that row is
+# touched at all.
+DRAPE_CREST = 0.42     # where the cloth is brightest, across its own width
+DRAPE_AMP = 0.22       # how far it falls to the selvedges
+DRAPE_RIM = 0.16       # extra darkening at the very edges
+DRAPE_SHEEN = 0.08     # a soft highlight along the crest
+DRAPE_FADE = 0.18      # the share of the drop over which it fades to nothing
+
+# The waist - the suspension ring or clasp - is looked for between these
+# fractions of the height. Above is cloth, below is medal.
+WAIST_BAND = (0.30, 0.72)
+
+
+def waist(alpha) -> int:
+    """The row where the ribbon hands the weight to the medal."""
+    import numpy as np
+
+    wide = (alpha > 100).sum(axis=1)
+    lo, hi = (int(len(wide) * f) for f in WAIST_BAND)
+    return lo + int(np.argmin(wide[lo:hi]))
+
+
+def roll(img):
+    """Light the drape as hanging cloth, leaving the medal untouched."""
+    import numpy as np
+    from PIL import Image
+
+    a = np.asarray(img.convert("RGBA")).astype(float)
+    al = a[..., 3]
+    h, w = al.shape
+    cut = waist(al)
+    opaque = al > 100
+    if not opaque.any():
+        return img
+
+    # each row's own span, so the chevron stays lit as it narrows
+    left = np.argmax(opaque, axis=1)
+    right = w - 1 - np.argmax(opaque[:, ::-1], axis=1)
+    span = np.maximum(right - left, 1)[:, None]
+    u = np.clip((np.arange(w)[None, :] - left[:, None]) / span, 0.0, 1.0)
+
+    v = np.where(u < DRAPE_CREST, (DRAPE_CREST - u) / DRAPE_CREST,
+                 (u - DRAPE_CREST) / (1.0 - DRAPE_CREST))
+    k = 1.0 - DRAPE_AMP * v ** 2
+    k *= 1.0 - DRAPE_RIM * (1.0 - np.clip(np.minimum(u, 1 - u) / 0.08, 0, 1))
+    k *= 1.0 + DRAPE_SHEEN * np.exp(-((u - 0.33) / 0.12) ** 2)
+
+    y = np.arange(h)[:, None]
+    ramp = max(cut * DRAPE_FADE, 1.0)
+    strength = np.where(y >= cut, 0.0, np.clip((cut - y) / ramp, 0.0, 1.0))
+    k = 1.0 + (k - 1.0) * strength
+
+    out = a.copy()
+    out[..., :3] = np.clip(a[..., :3] * k[..., None], 0, 255)
+    return Image.fromarray(out.astype(np.uint8), "RGBA")
+
+
 class MedalRenderer:
     """Composes one medal per award id and caches the PNG on disk."""
 
@@ -241,8 +303,12 @@ class MedalRenderer:
         img = Image.open(path).convert("RGBA") if path.is_file() else None
         if img is None:
             logger.warning("Medal art missing: %s", path.name)
-        elif img.size != DRAPE:
-            img = img.resize(DRAPE, Image.LANCZOS)
+        else:
+            if img.size != DRAPE:
+                img = img.resize(DRAPE, Image.LANCZOS)
+            # Shaded once per base, not per rung: the lighting is the same
+            # whatever devices end up on the ribbon.
+            img = roll(img)
         self._art[base] = img
         return img
 
