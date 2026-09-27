@@ -308,15 +308,15 @@ table.roster td.award-cell { white-space: normal; }
    own overlap once a row runs wider: a third of a medal at four, a half at
    five, which is the 50% the regulation calls the limit. */
 /* The Air Force rack read small, so in full dress its medals are drawn at
-   29% of the container rather than 25%. Shortening the ribbon instead does
-   nothing for this: the coat sizes a medal by its width, so a shorter drape
-   only makes the rack more compact. The spacing is the same geometry put
-   through the larger medal - a third of one at four to a row, a half at
-   five - and the row pull is the base 0.484 of its 61.37% height. */
-.tunic[data-coat="usaf"].full .medal { width: 29%; }
-.tunic[data-coat="usaf"] .medal-row.n4 .medal + .medal { margin-left: -9.667%; }
-.tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -14.5%; }
-.tunic[data-coat="usaf"].full .medal-row + .medal-row { margin-top: -29.7%; }
+   25.81% of the container rather than 25%. Shortening the ribbon instead
+   does nothing for this: the coat sizes a medal by its width, so a shorter
+   drape only makes the rack more compact. The spacing is the same geometry
+   put through that medal - a third of one at four to a row, a half at
+   five - and the row pull is the base 0.484 of its 54.62% height. */
+.tunic[data-coat="usaf"].full .medal { width: 25.81%; }
+.tunic[data-coat="usaf"] .medal-row.n4 .medal + .medal { margin-left: -8.603%; }
+.tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -12.905%; }
+.tunic[data-coat="usaf"].full .medal-row + .medal-row { margin-top: -26.43%; }
 .tunic[data-coat="usmc"] .medal-row + .medal-row { margin-top: -27.35%; }
 /* 58.19% of the container tall at the larger size, less the 48.3% of it the
    next row shows. */
