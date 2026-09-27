@@ -1383,6 +1383,32 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
    sitting outside the case. */
 .sbox-glass { position: absolute; pointer-events: none; }
 
+.sbox-actions {
+    display: flex; gap: .5rem; justify-content: center; margin-top: .2rem;
+}
+
+/* Printing the case prints the case: the record behind it, the backdrop,
+   the close button and the two buttons themselves all go, and the panel
+   stops being a floating dialog and becomes the sheet. */
+@media print {
+    /* The case lives inside #app beside the record, not beside it at body
+       level - hiding body's other children hid the lot. */
+    body.lightbox-open #app > *:not(#shadowbox) { display: none !important; }
+    body.lightbox-open #shadowbox {
+        position: static; display: block; background: none; padding: 0;
+    }
+    body.lightbox-open .lightbox-backdrop,
+    body.lightbox-open .lightbox-close { display: none !important; }
+    body.lightbox-open .sbox-panel {
+        max-height: none; box-shadow: none; background: none;
+        padding: 0; max-width: none; width: 100%;
+    }
+    body.lightbox-open .sbox-frame {
+        max-width: 100%; max-height: none; width: 100%;
+    }
+    body.lightbox-open .sbox-title { color: #000; }
+}
+
 /* The engraving. Centred on the brass, in small caps, and clipped to the
    plate so a long name cannot run off the metal. The size is set from the
    plate's own height in script, because the plate is a percentage of a box

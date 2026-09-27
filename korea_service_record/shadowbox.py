@@ -435,6 +435,11 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
         "glass": {"src": f"/static/images/shadowbox/{FURNITURE}/glass.png?v={rev}",
                   **_pct(GLASS_AT[0], GLASS_AT[1], 1970, 1482)},
         "aspect": round(FRAME[0] / FRAME[1], 6),
+        # The frame's own pixel size. The page lays the case out in
+        # percentages and does not need it, but an exported picture should
+        # be cut at the size the artwork was drawn at, not at whatever the
+        # window happened to be.
+        "size": list(FRAME),
         "items": items,
         "plate": _pct(*plate),
     }

@@ -262,3 +262,12 @@ body.lightbox-open { overflow: hidden; }
 }
 .lang-picker.small { font-size: 0.76rem; }
 .lang-picker.small select { font-size: 0.86rem; }
+
+/* Screen furniture that must not reach the paper: toolbars, back links,
+   the buttons that started the printing. It was defined in the certificate
+   and logbook stylesheets only, so the class did nothing on the record or
+   on the war diary, where it was being used in good faith. Defined here,
+   it means the same thing on every page that loads this file. */
+@media print {
+    .no-print { display: none !important; }
+}

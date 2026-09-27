@@ -469,7 +469,10 @@
   "shadowbox": {
     "open": "Shadowbox",
     "caption": "Decorations, badge and unit insignia in a display case.",
-    "rank_is": "{rank}"
+    "rank_is": "{rank}",
+    "save": "Save picture",
+    "print": "Print",
+    "save_hint": "Save the case as a picture, at full size"
   },
   "diary": {
     "title": "War Diary",

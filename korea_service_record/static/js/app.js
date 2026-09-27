@@ -609,6 +609,7 @@
             box = await res.json();
         } catch (err) { return; }
         sboxFor = who.id;
+        sboxData = box;
         el("sbox-title").textContent = who.name || "";
         el("sbox-frame").src = box.frame;
         el("sbox-items").innerHTML = (box.items || []).map((it) =>
@@ -645,6 +646,109 @@
         const frame = el("sbox-frame");
         if (frame.complete) { fitPlate(); } else { frame.onload = fitPlate; }
         requestAnimationFrame(fitPlate);
+    }
+
+    // -- taking the case away ------------------------------------------
+    //
+    // Composited in the browser rather than on the server, for one hard
+    // reason: the plate is engraved text and the tracker bundles no font.
+    // The page has the fonts, has every piece already loaded, and knows
+    // exactly what it drew - so it redraws the same thing at the size the
+    // artwork was cut at. Everything is same-origin, so the canvas does
+    // not taint and toBlob works.
+    let sboxData = null;
+
+    function drawPiece(ctx, img, it, W, H) {
+        const x = it.left / 100 * W, y = it.top / 100 * H;
+        const w = it.width / 100 * W, h = it.height / 100 * H;
+        if ((it.cls || "").includes("sbox-board-right")) {
+            // The right-hand shoulder board is the one tile mirrored, the
+            // same as the CSS does, so its button faces inboard.
+            ctx.save();
+            ctx.translate(x + w, y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(img, 0, 0, w, h);
+            ctx.restore();
+            return;
+        }
+        if ((it.cls || "").includes("sbox-emblem")) {
+            // The flat drawings carry no shadow of their own; the page adds
+            // one in CSS and the picture should not lose it.
+            ctx.save();
+            ctx.shadowColor = "rgba(0, 0, 0, .55)";
+            ctx.shadowBlur = 7 / 1150 * W;
+            ctx.shadowOffsetY = 6 / 1150 * W;
+            ctx.drawImage(img, x, y, w, h);
+            ctx.restore();
+            return;
+        }
+        ctx.drawImage(img, x, y, w, h);
+    }
+
+    const loadImage = (src) => new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);       // a missing piece is skipped
+        img.src = src;
+    });
+
+    async function exportShadowbox() {
+        const box = sboxData;
+        if (!box) { return; }
+        const [W, H] = box.size || [2050, 1860];
+        const canvas = document.createElement("canvas");
+        canvas.width = W; canvas.height = H;
+        const ctx = canvas.getContext("2d");
+
+        const sources = [box.frame].concat((box.items || []).map((i) => i.src))
+            .concat([box.glass.src]);
+        const images = await Promise.all(sources.map(loadImage));
+        if (images[0]) { ctx.drawImage(images[0], 0, 0, W, H); }
+        (box.items || []).forEach((it, n) => {
+            const img = images[n + 1];
+            if (img) { drawPiece(ctx, img, it, W, H); }
+        });
+
+        // The engraving, fitted to the brass the same way the page fits it,
+        // then the glass over the top of it as on screen.
+        const p = box.plate;
+        const px = p.left / 100 * W, py = p.top / 100 * H;
+        const pw = p.width / 100 * W, ph = p.height / 100 * H;
+        const text = (el("sbox-plate-text").firstElementChild.textContent || "").trim();
+        if (text) {
+            const room = pw * 0.77;
+            let size = ph * 0.42;
+            ctx.font = "600 " + size + 'px "Times New Roman", Georgia, serif';
+            const run = ctx.measureText(text).width;
+            if (run > room) {
+                size = size * room / run;
+                ctx.font = "600 " + size + 'px "Times New Roman", Georgia, serif';
+            }
+            ctx.fillStyle = "#4a3410";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(text, px + pw / 2, py + ph / 2);
+        }
+        const glass = images[images.length - 1];
+        if (glass) {
+            const g = box.glass;
+            ctx.drawImage(glass, g.left / 100 * W, g.top / 100 * H,
+                          g.width / 100 * W, g.height / 100 * H);
+        }
+
+        const name = [el("sbox-title").textContent, box.squadron]
+            .filter(Boolean).join(" - ").replace(/[\/:*?"<>|]/g, "") || "shadowbox";
+        canvas.toBlob((blob) => {
+            if (!blob) { return; }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = name + ".png";
+            a.click();
+            // Revoked on the next tick: Firefox needs the URL to survive the
+            // click, and leaving it costs the tab the whole bitmap.
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }, "image/png");
     }
 
     function closeShadowbox() {
@@ -1411,6 +1515,8 @@
             const sboxBtn = el("d-shadowbox-btn");
             sboxBtn.hidden = !d.shadowbox;
             sboxBtn.onclick = openShadowbox;
+            el("sbox-save").onclick = exportShadowbox;
+            el("sbox-print").onclick = () => window.print();
 
             el("d-promotions").innerHTML = d.promotions.length
                 ? d.promotions.map(promotionItem).join("")

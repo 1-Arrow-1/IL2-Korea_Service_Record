@@ -469,7 +469,10 @@
   "shadowbox": {
     "open": "奖章展示框",
     "caption": "奖章、飞行徽与部队标志的展示框。",
-    "rank_is": "{rank}"
+    "rank_is": "{rank}",
+    "save": "保存图片",
+    "print": "打印",
+    "save_hint": "以原始尺寸将陈列柜保存为图片"
   },
   "diary": {
     "title": "战时日志",

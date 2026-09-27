@@ -469,7 +469,10 @@
   "shadowbox": {
     "open": "Vitrine",
     "caption": "Décorations, brevet et insignes d’unité dans une vitrine.",
-    "rank_is": "{rank}"
+    "rank_is": "{rank}",
+    "save": "Enregistrer l’image",
+    "print": "Imprimer",
+    "save_hint": "Enregistrer la vitrine en image, en pleine taille"
   },
   "diary": {
     "title": "Journal de marche",
