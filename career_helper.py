@@ -119,7 +119,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "revive": "Revive",
         "revive_confirm": "Bring {name} back into the line-up?",
         "revived": "{name} is back in the line-up. Backup: {backup}",
-        "rule": "A squadron mate can be revived on the day he was lost or the day after; your own pilot at any time. Today is {date}.",
+        "rule": "A pilot can be revived on the day he was lost or the day after, your own as well as your squadron mates. Today is {date}.",
         "points_now": "The squadron's award points now: {points}",
         "points_add": "Add",
         "points_added": "Award points are now {points}. Backup: {backup}",
@@ -233,7 +233,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "revive": "Zurückholen",
         "revive_confirm": "{name} wieder in die Aufstellung nehmen?",
         "revived": "{name} ist zurück in der Aufstellung. Sicherung: {backup}",
-        "rule": "Ein Staffelkamerad kann am Tag seines Verlusts oder am Tag danach zurückgeholt werden, der eigene Pilot jederzeit. Heute ist der {date}.",
+        "rule": "Ein Pilot kann am Tag seines Verlusts oder am Tag danach zurückgeholt werden, der eigene ebenso wie die Staffelkameraden. Heute ist der {date}.",
         "points_now": "Auszeichnungspunkte der Staffel: {points}",
         "points_add": "Hinzufügen",
         "points_added": "Die Auszeichnungspunkte betragen jetzt {points}. Sicherung: {backup}",
@@ -347,7 +347,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "revive": "Recuperar",
         "revive_confirm": "¿Devolver a {name} a la alineación?",
         "revived": "{name} vuelve a estar en la alineación. Copia de seguridad: {backup}",
-        "rule": "Un compañero de escuadrón puede recuperarse el día en que se perdió o el día siguiente; tu propio piloto, en cualquier momento. Hoy es {date}.",
+        "rule": "Un piloto puede recuperarse el día en que se perdió o el día siguiente, tanto el tuyo como tus compañeros de escuadrón. Hoy es {date}.",
         "points_now": "Puntos de condecoración del escuadrón: {points}",
         "points_add": "Añadir",
         "points_added": "Los puntos de condecoración son ahora {points}. Copia de seguridad: {backup}",
@@ -461,7 +461,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "revive": "Ramener",
         "revive_confirm": "Remettre {name} dans l’ordre de bataille ?",
         "revived": "{name} est de retour dans l’ordre de bataille. Sauvegarde : {backup}",
-        "rule": "Un camarade d’escadrille peut être ramené le jour de sa perte ou le lendemain ; votre propre pilote, à tout moment. Nous sommes le {date}.",
+        "rule": "Un pilote peut être ramené le jour de sa perte ou le lendemain, le vôtre comme vos camarades d’escadrille. Nous sommes le {date}.",
         "points_now": "Points de décoration de l’escadron : {points}",
         "points_add": "Ajouter",
         "points_added": "Les points de décoration sont maintenant à {points}. Sauvegarde : {backup}",
@@ -575,7 +575,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "revive": "Вернуть",
         "revive_confirm": "Вернуть {name} в строй?",
         "revived": "{name} снова в строю. Резервная копия: {backup}",
-        "rule": "Товарища по эскадрилье можно вернуть в день его потери или на следующий день, собственного лётчика — в любое время. Сегодня {date}.",
+        "rule": "Лётчика можно вернуть в день его потери или на следующий день — как своего, так и товарищей по эскадрилье. Сегодня {date}.",
         "points_now": "Наградные очки эскадрильи: {points}",
         "points_add": "Добавить",
         "points_added": "Наградных очков теперь {points}. Резервная копия: {backup}",
@@ -689,7 +689,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "revive": "复活",
         "revive_confirm": "让 {name} 重返编队？",
         "revived": "{name} 已重返编队。备份：{backup}",
-        "rule": "僚机飞行员可在损失当天或次日复活，您本人的飞行员则随时可以。今天是 {date}。",
+        "rule": "飞行员可在损失当天或次日复活，您本人的飞行员与僚机飞行员同样如此。今天是 {date}。",
         "points_now": "中队当前授勋点数：{points}",
         "points_add": "增加",
         "points_added": "授勋点数现为 {points}。备份：{backup}",
@@ -808,19 +808,13 @@ class Career:
         missing - it has no exclusion - and there was then no way back
         through the interface for the one pilot a career cannot do without.
 
-        The window is not the same day. It is the day of the loss and the
-        one after it, because the mistake this tab exists to undo is
-        usually noticed one click too late - the man is marked, End Day is
-        pressed out of habit, and the career has already moved on. One
-        day's grace costs a replacement pilot sharing a slot for an
-        evening; refusing it costs the whole career.
-
-        No window at all applies to the player. The rule is there because
-        the game fills a dead squadron mate's place overnight, so a late
-        revival can leave two men in one slot. It cannot replace the
-        player: what it does instead is ask for a new commander, which is
-        a change of role and not a second avatar. So there is nothing for
-        him to collide with, however many days have passed.
+        The window is the day of the loss and the one after it, the same
+        for everybody. One day, because the mistake this tab exists to
+        undo is usually noticed one click too late - the man is marked,
+        End Day is pressed out of habit, and the career has moved on. Only
+        one day, because a pilot brought back later walks into a squadron
+        whose war went on without him: days of sorties he was not on,
+        losses he did not see. That is worse than the hole he leaves.
         """
         today = self.current_date()[:10]
         cutoff = self.yesterday()
@@ -839,7 +833,7 @@ class Career:
                     "state": r["state"],
                     "lost_on": lost_on,
                     "player": is_player,
-                    "revivable": is_player or lost_on in (today, cutoff),
+                    "revivable": lost_on in (today, cutoff),
                 })
         return out
 

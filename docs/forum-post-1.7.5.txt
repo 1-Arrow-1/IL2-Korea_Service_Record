@@ -107,13 +107,14 @@ you have modded award art, it should finally show what you drew.
 The Career Helper's Revive tab has a way back for your own pilot. Its Captured tab
 will always mark him missing - that is the point of it - but Revive used to list only
 your squadron mates, so marking your own man was a one-way door, and one of you walked
-through it. He is on the list now, and no time limit applies to him: the game cannot
-send a replacement for the player, it only asks you to take a new commander, so there
-is nothing for a late revival to collide with.
+through it. He is on the list now.
 
-For everybody else the window is now the day of the loss and the day after, not the day
-alone. That mistake is nearly always noticed one click too late, with End Day already
-pressed.
+The window also widens from the day of the loss to that day and the one after, for your
+pilot and your squadron mates alike. That mistake is nearly always noticed one click too
+late, with End Day already pressed. One day and no more, though: a man brought back a
+week on walks into a squadron whose war went without him, days of sorties he was not on
+and losses he never saw. If you are past the window, your last backup is the way back -
+the Helper writes one before every change it makes.
 
 And the Career Helper no longer offers awards for withdrawal as "#188 pilot 20 award
 601014". It names the man and the decoration.
