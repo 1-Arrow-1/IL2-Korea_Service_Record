@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 # Bumped whenever a constant below moves, so a cached layout is not drawn
 # against a frame it was not measured for.
-REVISION = 4
+REVISION = 5
 
 # The frame photograph. Every number below is in its pixel space.
 FRAME = (2050, 1860)
@@ -132,10 +132,38 @@ RANK_UNHANDED = {6, 7}
 RANK_SIZE = {0: (64, 166), 1: (65, 165), 2: (168, 167), 3: (173, 188),
              4: (173, 188), 5: (296, 161), 6: (185, 184), 7: (394, 196)}
 
-# Only the Air Force is furnished. The Navy, the Marines and the Soviet and
-# Korean air forces want their own frame, cloth and devices, and a box built
-# out of USAF furniture would be wrong rather than merely plain.
-COUNTRIES = (601,)
+# The Soviet case, measured off docs/reference the same way. It shares the
+# Air Force's frame, cloth and brass - the reference box was built on that
+# photograph and the moulding matches it to within a pixel - and differs in
+# what hangs inside.
+#
+# Soviet awards divide by how they are worn rather than by precedence alone:
+# orders and medals suspended on a pentagonal mount, screw-back orders with
+# no ribbon at all, and the Gold Star above them. So the case has a row for
+# each instead of the Air Force's single descending line.
+SOV_ROW1_LINE = 150          # where every suspended ribbon's top edge lands
+SOV_STAR_GAP = 92            # the air either side of the Gold Star
+SOV_GAP = 9                  # between neighbours, measured ink to ink
+SOV_ROW2_Y = 753             # the screw-back orders' middle
+SOV_ROW2_GAP = 160
+SOV_ARMS_AT = (452, 1196)
+SOV_BADGE_AT = (1019, 1100)
+SOV_PROP_AT = (1019, 1290)
+SOV_PATCH_AT = (1615, 1193)
+# The plate sits higher than the Air Force's: the shoulder boards are 194
+# tall against a rank device's 166, and at the Air Force's height they would
+# come within twenty pixels of the moulding.
+SOV_PLATE = (655, 1497, 738, 141)
+SOV_BOARD_Y = 1570
+SOV_BOARD_GAP = 46
+
+# Furniture is shared. Both cases are the same photographed box.
+FURNITURE = "601"
+
+# Only these two air forces are furnished. The Navy, the Marines and the
+# Koreans want their own frame, cloth and devices, and a box built out of
+# USAF furniture would be wrong rather than merely plain.
+COUNTRIES = (601, 501)
 
 
 # Measured art, by award id. The atlas does not change while the tracker is
@@ -158,6 +186,28 @@ def _measure(data: bytes) -> Tuple[int, int, int]:
     return im.width, im.height, top
 
 
+_SPANS: Dict[str, Tuple[int, int]] = {}
+
+
+def _span(src: str, data: bytes) -> Tuple[int, int]:
+    """
+    The art's left and right ink edges within its canvas.
+
+    Rows are packed by this, not by the canvas: the Soviet tiles carry a
+    transparent margin, and spacing three Red Banners by their canvases put
+    the outermost one through the moulding.
+    """
+    if src not in _SPANS:
+        import io
+        import numpy as np
+        from PIL import Image
+
+        opaque = np.asarray(Image.open(io.BytesIO(data)).convert("RGBA"))[..., 3] > 40
+        cols = np.where(opaque.any(axis=0))[0]
+        _SPANS[src] = (int(cols.min()), int(cols.max())) if len(cols) else (0, 0)
+    return _SPANS[src]
+
+
 def _tile(icons, kind: str, ident: str) -> Optional[Tuple[str, int, int, int]]:
     """Source and measurements for one tile of any of the game's sheets."""
     key = f"{kind}:{ident}"
@@ -168,6 +218,7 @@ def _tile(icons, kind: str, ident: str) -> Optional[Tuple[str, int, int, int]]:
             return None
         try:
             _TILES[key] = _measure(data)
+            _span(f"/api/icon/{kind}/{ident}", data)
         except Exception as exc:                  # pragma: no cover - art only
             logger.warning("Cannot measure %s %s: %s", kind, ident, exc)
             return None
@@ -200,6 +251,7 @@ def _art(icons, award_id: int) -> Optional[Tuple[str, int, int, int]]:
         src = f"/api/icon/award/{award_id}"
     try:
         _GEOMETRY[award_id] = _measure(data)
+        _span(src, data)
     except Exception as exc:                      # pragma: no cover - art only
         logger.warning("Cannot measure award %s: %s", award_id, exc)
         return None
@@ -286,7 +338,7 @@ def plate_text(rank: str, name: str) -> Dict[str, str]:
 
 
 def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[str],
-           icons, rev: int = 0) -> Dict[str, Any]:
+           icons, country: int = 601, rev: int = 0) -> Dict[str, Any]:
     """
     Every piece in the box, in the order it should be drawn.
 
@@ -295,6 +347,150 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
     can never disagree about what he has been given. ``icons`` is the sheet
     reader the medals and badges are sliced from.
     """
+    build = _soviet if country == 501 else _usaf
+    items, plate = build(rack, rank_id, squadron_key, icons, rev)
+    return {
+        "rev": REVISION,
+        "frame": f"/static/images/shadowbox/{FURNITURE}/frame.png?v={rev}",
+        "glass": {"src": f"/static/images/shadowbox/{FURNITURE}/glass.png?v={rev}",
+                  **_pct(GLASS_AT[0], GLASS_AT[1], 1970, 1482)},
+        "aspect": round(FRAME[0] / FRAME[1], 6),
+        "items": items,
+        "plate": _pct(*plate),
+    }
+
+
+def _soviet(rack, rank_id, squadron_key, icons, rev):
+    """
+    The Soviet case: suspended awards, then the screw-back orders, then the
+    arms, the pilot's badge and his squadron, over the boards and the plate.
+    """
+    items: List[Dict[str, Any]] = []
+
+    def add(src, box, name="", cls=""):
+        x, y, w, h = box
+        items.append({"src": src, "name": name, "cls": cls, **_pct(x, y, w, h)})
+
+    def art_of(award_id, name=""):
+        got = _art(icons, award_id)
+        return None if got is None else (got, name)
+
+    # --- row one: what hangs from a ribbon ------------------------------
+    # The Gold Star takes the middle with air either side. A repeat awarding
+    # is a separate order rather than a device, so the Red Banners are three
+    # of the same picture; they stay together on the left, highest awarding
+    # first, and the rest follow the star in precedence. With no repeat to
+    # group, the row simply splits around the star.
+    bar = [m["type"] for m in rack.get("medals") or []]
+    names = {m["type"]: m.get("name") or "" for m in rack.get("medals") or []}
+    repeats = _repeat_group(bar)
+    if repeats:
+        # placed outward from the star, so the first awarding ends up
+        # nearest it and the third furthest out, as the reference box has it
+        left = list(repeats)
+        right = [a for a in bar if a not in repeats]
+    else:
+        half = len(bar) // 2
+        left, right = bar[:half], bar[half:]
+
+    hero = (rack.get("hero") or {}).get("type") if isinstance(rack.get("hero"), dict) else None
+    star = art_of(hero, (rack.get("hero") or {}).get("name", "")) if hero else None
+    if star:
+        (src, w, h, ribbon), nm = star
+        sl, sr = _SPANS.get(src, (0, w - 1))
+        add(f"{src}?v={rev}",
+            (CENTRE_X - (sl + sr) / 2.0, SOV_ROW1_LINE - ribbon, w, h),
+            nm, "sbox-medal")
+        sl, sr = _SPANS.get(src, (0, w - 1))
+        x = CENTRE_X - (sr - sl + 1) / 2.0 - SOV_STAR_GAP
+        for a in left:
+            got = art_of(a, names.get(a, ""))
+            if not got:
+                continue
+            (s, aw, ah, rb), nm = got
+            il, ir = _SPANS.get(s, (0, aw - 1))
+            add(f"{s}?v={rev}", (x - ir - 1, SOV_ROW1_LINE - rb, aw, ah), nm, "sbox-medal")
+            x -= (ir - il + 1) + SOV_GAP
+        x = CENTRE_X + (sr - sl + 1) / 2.0 + SOV_STAR_GAP
+        for a in right:
+            got = art_of(a, names.get(a, ""))
+            if not got:
+                continue
+            (s, aw, ah, rb), nm = got
+            il, ir = _SPANS.get(s, (0, aw - 1))
+            add(f"{s}?v={rev}", (x - il, SOV_ROW1_LINE - rb, aw, ah), nm, "sbox-medal")
+            x += (ir - il + 1) + SOV_GAP
+    else:
+        row = [art_of(a, names.get(a, "")) for a in bar]
+        row = [r for r in row if r]
+        boxes = _place_row([(w, h, rb) for (_, w, h, rb), _ in row], SOV_ROW1_LINE)
+        for ((s, *_), nm), box in zip(row, boxes):
+            add(f"{s}?v={rev}", box, nm, "sbox-medal")
+
+    # --- row two: the screw-backs, in precedence -------------------------
+    pinned = [art_of(m["type"], m.get("name") or "") for m in rack.get("pinned") or []]
+    pinned = [p for p in pinned if p]
+    if pinned:
+        widths = [w for (_, w, _, _), _ in pinned]
+        total = sum(widths) + SOV_ROW2_GAP * (len(pinned) - 1)
+        x = CENTRE_X - total / 2.0
+        for (s, w, h, _), nm in pinned:
+            add(f"{s}?v={rev}", (x, SOV_ROW2_Y - h / 2.0, w, h), nm, "sbox-pinned")
+            x += w + SOV_ROW2_GAP
+
+    # --- row three: arms, badge and squadron -----------------------------
+    for name, at, size in (("USSR_coat_of_arms.png", SOV_ARMS_AT, (301, 315)),
+                           ("VVS_winged_propeller.png", SOV_PROP_AT, (264, 167))):
+        add(f"/static/images/shadowbox/501/{name}?v={rev}",
+            _centred(*at, *size), "", "sbox-emblem")
+
+    wings = rack.get("wings")
+    badge = art_of(wings["type"], wings.get("name") or "") if wings else None
+    if badge:
+        (s, w, h, _), nm = badge
+        add(f"{s}?v={rev}", _centred(*SOV_BADGE_AT, w, h), nm, "sbox-badge")
+
+    patch = _tile(icons, "squadron", squadron_key) if squadron_key else None
+    if patch:
+        s, w, h, _ = patch
+        add(f"{s}?v={rev}", _centred(*SOV_PATCH_AT, w, h), "", "sbox-patch")
+
+    # --- the plate and the shoulder boards -------------------------------
+    px, py, pw, ph = SOV_PLATE
+    add(f"/static/images/shadowbox/{FURNITURE}/nameplate.png?v={rev}",
+        _plate_box(SOV_PLATE), "", "sbox-plate")
+
+    board = _tile(icons, "rank", f"501{rank_id}") if rank_id is not None else None
+    if board:
+        s, w, h, _ = board
+        for side, x in (("left", px - SOV_BOARD_GAP - w),
+                        ("right", px + pw + SOV_BOARD_GAP)):
+            add(f"{s}?v={rev}", (x, SOV_BOARD_Y - h / 2.0, w, h), "",
+                f"sbox-board sbox-board-{side}")
+
+    return items, SOV_PLATE
+
+
+def _repeat_group(bar: Sequence[int]) -> List[int]:
+    """
+    The awards in ``bar`` that are repeat awardings of one order.
+
+    Three Red Banners are three tiles of the same base; nothing else in a
+    Soviet rack repeats, so the longest such run is the group to keep whole.
+    """
+    from . import ribbons
+
+    runs: Dict[int, List[int]] = {}
+    for aid in bar:
+        spec = ribbons.RIBBONS.get(aid)
+        if spec is not None:
+            runs.setdefault(spec.base, []).append(aid)
+    best = max(runs.values(), key=len, default=[])
+    return best if len(best) > 1 else []
+
+
+def _usaf(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[str],
+          icons, rev: int):
     items: List[Dict[str, Any]] = []
 
     def add(src: str, box: tuple, name: str = "", cls: str = "") -> None:
@@ -362,7 +558,7 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
 
     # --- the plate and its rank devices ----------------------------------
     px, py, pw, ph = PLATE
-    add(f"/static/images/shadowbox/601/nameplate.png?v={rev}",
+    add(f"/static/images/shadowbox/{FURNITURE}/nameplate.png?v={rev}",
         _plate_box(), "", "sbox-plate")
 
     if rank_id is not None and rank_id in RANK_FILES:
@@ -375,27 +571,20 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
             add(f"/static/images/insignia/{name}?v={rev}",
                 (x, cy - rh / 2.0, rw, rh), "", f"sbox-rank sbox-rank-{side}")
 
-    return {
-        "rev": REVISION,
-        "frame": f"/static/images/shadowbox/601/frame.png?v={rev}",
-        "glass": {"src": f"/static/images/shadowbox/601/glass.png?v={rev}",
-                  **_pct(GLASS_AT[0], GLASS_AT[1], 1970, 1482)},
-        "aspect": round(FRAME[0] / FRAME[1], 6),
-        "items": items,
-        "plate": _pct(px, py, pw, ph),
-    }
+    return items, PLATE
 
 
-def _plate_box() -> tuple:
+def _plate_box(slot=None) -> tuple:
     """
-    Where the brass art goes so that its *plate* lands on ``PLATE``.
+    Where the brass art goes so that its *plate* lands on ``slot``.
 
     The file is 2508x627 with the plate itself inked from (60, 73) to
     (2451, 530); placing the canvas on the slot would put the brass low and
     to the right of where it was measured.
     """
-    ink_x, ink_y, ink_w, ink_h = 60, 73, 2392, 458
+    slot = PLATE if slot is None else slot
+    ink_x, ink_y, ink_w = 60, 73, 2392
     canvas_w, canvas_h = 2508, 627
-    scale = PLATE[2] / ink_w
-    return (PLATE[0] - ink_x * scale, PLATE[1] - ink_y * scale,
+    scale = slot[2] / ink_w
+    return (slot[0] - ink_x * scale, slot[1] - ink_y * scale,
             canvas_w * scale, canvas_h * scale)

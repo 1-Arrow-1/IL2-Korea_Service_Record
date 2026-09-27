@@ -1339,9 +1339,9 @@
             rackEl.classList.toggle("wearable", Boolean(d.ribbon_rack && d.ribbon_rack.tunic));
             rackEl.title = d.ribbon_rack && d.ribbon_rack.tunic ? T("awards.tunic_hint") : "";
             rackEl.onclick = () => openTunic(d.player ? d.player.name : "");
-            // Only the Air Force has a case drawn for it so far.
+            // The server knows which air forces have a case furnished.
             const sboxBtn = el("d-shadowbox-btn");
-            sboxBtn.hidden = !(d.player && d.player.country === 601);
+            sboxBtn.hidden = !d.shadowbox;
             sboxBtn.onclick = openShadowbox;
 
             el("d-promotions").innerHTML = d.promotions.length

@@ -1336,6 +1336,9 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
    the image fills its slot exactly and nothing here may resize it - an
    object-fit or a max-width would break the ribbon line the rows hang from. */
 .sbox-items img { position: absolute; }
+/* Soviet shoulder boards are handed. The atlas holds one tile, so the
+   right-hand board is that tile mirrored, which puts its button inboard. */
+.sbox-board-right { transform: scaleX(-1); }
 
 /* The glass goes over everything, including the plate engraving: it is a
    photograph of the pane, so anything it does not cover reads as if it were

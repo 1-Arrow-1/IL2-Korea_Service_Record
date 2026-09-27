@@ -1014,6 +1014,12 @@ class CareerAggregator:
                 country = 602 if wanted == "navy" else 603
                 citations = [{"type": t, "category": 2, "isDeleted": 0}
                              for t in (602041, 602047, 601049)]
+            elif wanted in ("sov", "dprk"):
+                # The switch set a country for the naval racks but not for
+                # these two, so a Soviet preview came back on an Air Force
+                # coat and could never reach the Soviet case.
+                country = 501 if wanted == "sov" else 503
+                citations = []
             elif preview[0] == 601041:
                 citations = [{"type": t, "category": 2, "isDeleted": 0}
                              for t in (601046, 601049)]
@@ -1083,6 +1089,9 @@ class CareerAggregator:
             "badge": badge,
             "badge_name": name(badge),
             "tunic": coat,
+            # The air force this kit belongs to, which is not always the
+            # pilot's own: the preview switch dresses him in another's.
+            "country": int(country_code) if country_code.isdigit() else None,
             "rank_overlay": (NAVY_RANK_OVERLAYS.get(rank_id) if coat == "usnavy" else
                              USMC_RANK_OVERLAYS.get(rank_id) if coat == "usmc" else
                              USAF_ST_RANK_OVERLAYS.get(rank_id) if coat == "usaf" else None),

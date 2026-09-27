@@ -401,6 +401,11 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         # Moves when the mod's atlases do, so a remodelled medal is not
         # hidden behind a year-long browser cache on an unchanged URL.
         detail["art_rev"] = agg.icons.art_version()
+        # Whether this pilot's air force has a case furnished for it, so the
+        # page does not carry its own copy of the list.
+        rack = detail.get("ribbon_rack") or {}
+        detail["shadowbox"] = shadowbox_art.available(
+            rack.get("country") or (detail.get("player") or {}).get("country"))
         detail["language"] = settings.resolve(career_id)
         detail["language_override"] = settings.career_language(career_id) or ""
         return jsonify(detail)
@@ -426,7 +431,9 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if detail is None:
             return jsonify({"error": "career_not_found"}), 404
         player = detail.get("player") or {}
-        country = player.get("country")
+        # The kit's own air force, which the preview switch can change.
+        rack = detail.get("ribbon_rack") or {}
+        country = rack.get("country") or player.get("country")
         if not shadowbox_art.available(country):
             return jsonify({"error": "no_case"}), 404
         rank_id = player.get("rank_id")
@@ -434,7 +441,7 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         rank = english.locale.rank_name(country, rank_id) if rank_id is not None else ""
         data = shadowbox_art.layout(detail["ribbon_rack"], rank_id,
                                     detail.get("squadron_key"), agg.icons,
-                                    rev=asset_version())
+                                    country=country, rev=asset_version())
         data["text"] = shadowbox_art.plate_text(rank, player.get("name") or "")
         data["squadron"] = detail.get("squadron") or ""
         return jsonify(data)
