@@ -343,11 +343,15 @@ table.roster td.award-cell { white-space: normal; }
    bottom row clears the pocket. The flap's top edge is 48% of the way down
    this photograph - measured with the rack hidden, because with it drawn
    the flap's own top is the one thing the rack covers. */
-.tunic[data-coat="usaf"]:not(.full) .tunic-right { width: 29.3%; bottom: 53.9%; }
+.tunic[data-coat="usaf"]:not(.full) .tunic-right { width: 27.84%; bottom: 53.9%; }
 /* The larger medals make the rack about 13% of its own width taller, and it
    hangs from its bottom edge, so it grew up into the aviator badge. Hung
    that much lower - 5.4% of the coat's height - to clear it again. */
-.tunic[data-coat="usaf"].full .tunic-right { bottom: 21.9%; }
+/* Hung by the lowest row's ribbon, not by the pendants: that row's top
+   edge belongs just above the pocket flap, whose seam is 52% of the way
+   down this photograph, and the medals hang over the pocket from there.
+   At this height it lands at 50.5%. */
+.tunic[data-coat="usaf"].full .tunic-right { bottom: 26.6%; }
 .tunic[data-coat="usaf"] .tunic-neck { inset: 0; width: 100%; transform: none; }
 .tunic[data-coat="usaf"] .tunic-neck, .tunic[data-coat="usaf"] .neck-medal { pointer-events: none; }
 .tunic[data-coat="usaf"] .neck-hotspot { display: block; position: absolute; pointer-events: auto;
