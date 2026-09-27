@@ -96,13 +96,24 @@ it does in life, brightest a little above centre and falling away to the edges. 
 weave is untouched — it is only the light that is new.
 
 
-TWO FIXES WORTH KNOWING
+THREE FIXES WORTH KNOWING
 
 If you have been looking at a medal in the tracker and thinking it did not match the one
 in the game, that was real and it was mine. Award pictures were being cached in your
 browser for a year against an address that never changed, so a decoration you remodelled
 never reached the page. Fixed properly: the address now moves when the atlas does. If
 you have modded award art, it should finally show what you drew.
+
+The Career Helper's Revive tab has a way back for your own pilot. Its Captured tab
+will always mark him missing - that is the point of it - but Revive used to list only
+your squadron mates, so marking your own man was a one-way door, and one of you walked
+through it. He is on the list now, and no time limit applies to him: the game cannot
+send a replacement for the player, it only asks you to take a new commander, so there
+is nothing for a late revival to collide with.
+
+For everybody else the window is now the day of the loss and the day after, not the day
+alone. That mistake is nearly always noticed one click too late, with End Day already
+pressed.
 
 And the Career Helper no longer offers awards for withdrawal as "#188 pilot 20 award
 601014". It names the man and the decoration.
@@ -118,10 +129,10 @@ DOWNLOAD
     https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v1.7.5
 
 Installer  IL2_Korea_Service_Record_Setup_v1.7.5.exe
-           SHA-256  2302e36f9a3de5ae8a6ea7856f45fd2a9e00ca6253466eb219c10c11f5095eaa
+           SHA-256  c8bd599268f3539adec92e222a1f405fe23eadbaea3052909f47d6d465549cbd
 
 Zip        IL-2.Korea.Service.Record.v1.7.5.zip
-           SHA-256  b4f893d4beec671cb16fc0a965cec45730558d1774201ae48e32484555cda762
+           SHA-256  7a674486514fadee41dd38da67b0d32cf7f1cf4d9e2820f48f004d92d63df256
 
 (GitHub writes the zip's name with dots where I put spaces. The file is the same one.)
 
