@@ -86,7 +86,7 @@
         const key = n.key.replace(/^diary\./, "");
         if (["pilot_kia", "pilot_missing", "wounded", "plane_lost",
              "friendly_destroyed", "resources_destroyed"].includes(key)) { return "loss"; }
-        if (["own_granted", "own_presented"].includes(key)) { return "mine"; }
+        if (["own_granted", "own_presented", "own_both"].includes(key)) { return "mine"; }
         if (["operation_begin", "operation_end", "transfer_ordered", "transfer_done"].includes(key)) { return "op"; }
         return "";
     }

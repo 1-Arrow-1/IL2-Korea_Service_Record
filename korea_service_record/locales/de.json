@@ -529,6 +529,7 @@
     "operation_begin": "{name} beginnt",
     "operation_end": "{name} endet",
     "own_granted": "Sie haben sich {award} verdient",
+    "own_both": "Sie haben sich {award} verdient und erhalten",
     "own_presented": "Ihnen wurde {award} verliehen",
     "open_hint": "Das Kriegstagebuch der Staffel, Tag für Tag",
     "transfer_ordered": "Die Staffel erhält Befehl zur Verlegung nach {field}",

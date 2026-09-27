@@ -145,7 +145,7 @@ class DiaryBuilder:
         """
         out: List[Dict[str, Any]] = []
         arrivals: List[str] = []
-        mine: List[Dict[str, Any]] = []
+        mine: Dict[int, set] = {}
         delivered = 0
         repairs_begun = 0
         repairs_done = 0
@@ -173,11 +173,7 @@ class DiaryBuilder:
                 if r["pilotId"] == self.player_id:
                     # The reader's own thread through the diary. ipar2 is
                     # the award type; ipar1 is the row in the award table.
-                    mine.append(_entry(
-                        "own_presented" if action == PRESENTED else "own_granted",
-                        self.agg.award_name(r["ipar2"]),
-                        award=self.agg.award_name(r["ipar2"]),
-                        promotion=bool(key == "promotion")))
+                    mine.setdefault(r["ipar2"], set()).add(action)
                 continue
             if key == "reported":
                 arrivals.append(who)
@@ -257,9 +253,19 @@ class DiaryBuilder:
             out.append(_entry("plane_repaired",
                               f"{repairs_done} aircraft back on the line",
                               count=repairs_done))
-        # His own decorations last, and undeduplicated: the game can grant
-        # and present the same medal on one day, and both are true.
-        out.extend(mine)
+        # His own decorations last, one line each. The game commonly grants
+        # and presents the same medal on the same day - there were three
+        # such pairs in the reference career - and two lines saying so is
+        # one event reported twice.
+        for award_id, actions in mine.items():
+            both = {GRANTED, PRESENTED} <= actions
+            name = self.agg.award_name(award_id)
+            key = ("own_both" if both
+                   else "own_presented" if PRESENTED in actions else "own_granted")
+            label = {"own_both": f"You earned and were presented with the {name}",
+                     "own_presented": f"You were presented with the {name}",
+                     "own_granted": f"You earned the {name}"}[key]
+            out.append(_entry(key, label, award=name, award_id=award_id))
         return out, tally
 
     # -- names -------------------------------------------------------------

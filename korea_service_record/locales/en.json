@@ -529,6 +529,7 @@
     "operation_begin": "{name} begins",
     "operation_end": "{name} ends",
     "own_granted": "You earned the {award}",
+    "own_both": "You earned and were presented with the {award}",
     "own_presented": "You were presented with the {award}",
     "open_hint": "The squadron's war diary, day by day",
     "transfer_ordered": "The squadron is ordered to move to {field}",

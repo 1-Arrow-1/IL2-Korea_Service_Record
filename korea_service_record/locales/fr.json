@@ -529,6 +529,7 @@
     "operation_begin": "{name} commence",
     "operation_end": "{name} se termine",
     "own_granted": "Vous avez mérité {award}",
+    "own_both": "Vous avez mérité et reçu {award}",
     "own_presented": "{award} vous a été remise",
     "open_hint": "Le journal de marche de l’escadrille, jour par jour",
     "transfer_ordered": "L’escadrille reçoit l’ordre de rejoindre {field}",
