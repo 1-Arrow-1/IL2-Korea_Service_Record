@@ -38,8 +38,21 @@
     background-repeat: repeat-y, repeat;
     background-size: 100% 100%, 512px 512px;
     color: var(--ink);
-    max-width: 52rem; margin: 0 auto; padding: 2rem 2.4rem 2.6rem 5rem;
+    max-width: 52rem; margin: 0 auto; padding: 3.6rem 2.4rem 2.6rem 5rem;
     box-shadow: var(--shadow-soft);
+}
+
+/* The binding cloth across the head of the sheet, repeated horizontally -
+   the strip's two ends are plain, so the join does not show. It sits over
+   the top edge of the paper, its frayed lower edge hanging onto the page,
+   and the sheet's top padding keeps the header clear of it. */
+.wd-edge {
+    position: absolute; left: 0; right: 0; top: 0; height: 2.6rem;
+    background-image: url("../images/diary/edge.png");
+    background-repeat: repeat-x;
+    background-size: auto 100%;
+    background-position: left top;
+    pointer-events: none;
 }
 
 /* -- the header's furniture ------------------------------------------- */
@@ -176,9 +189,10 @@
 @media (max-width: 40rem) {
     /* No room for a margin rule on a phone. */
     #wd-sheet {
-        padding: 1.2rem 1rem 1.6rem; background-image: url("../images/paper.png");
+        padding: 3rem 1rem 1.6rem; background-image: url("../images/paper.png");
         background-size: 512px 512px;
     }
+    .wd-edge { height: 2rem; }
     .wd-head-top { grid-template-columns: auto 1fr; }
     .wd-plane { display: none; }
     .wd-m-head { min-width: 0; }
