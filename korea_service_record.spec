@@ -59,10 +59,12 @@ hiddenimports = [
 ]
 
 excludes = [
-    # numpy is a build-time dependency of tools/make_paper.py and
-    # tools/make_plane_art.py, which generate artwork that ships as PNG.
-    # Nothing at runtime imports it, and it is 30 MB.
-    "numpy",
+    # numpy WAS excluded here as a build-time-only dependency. It is not one
+    # any more: the roll on a ribbon and on a drape (ribbons.roll,
+    # medals.roll) and every measurement the shadowbox takes of a piece of
+    # art go through it. Excluding it built an exe that served the page and
+    # the atlas slices perfectly and then returned 500 for every composed
+    # medal - which source runs never show, because numpy is installed here.
     "matplotlib",
     "pandas",
     "pytest",
