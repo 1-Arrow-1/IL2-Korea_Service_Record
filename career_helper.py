@@ -54,7 +54,18 @@ from korea_service_record.assets import default_cache_dir      # noqa: E402
 from korea_service_record import corrections                   # noqa: E402
 
 BACKUPS = default_cache_dir().parent / "backups"
-LINEUP = range(0, 20)          # squadron line-up slots
+# The squadron's seats. 24 of them, which is what Career.SEATS has always
+# used for the seating chart and what the game actually fills: this career
+# has men in slots 20 to 23 right now. This constant said 20, so the four
+# highest seats were invisible to everything that used it - a revived pilot
+# was sent to the reserve pool with seats free, and a man whose place was
+# 22 could not keep it.
+#
+# It is right for the American establishment and too small for the eastern
+# one. scg/2/squadrons.cfg declares exactly two: 40 pilots / 24 aircraft
+# (185 units, US pattern) and 48 / 48 (190 units, Soviet, Chinese and
+# North Korean). A 48-seat regiment cannot be fully seated here yet.
+LINEUP = range(0, 24)          # squadron line-up slots
 RESERVE_BASE = 2000            # the replacement pool, when the line-up is full
 STATE_NAMES = {2: "kia", 3: "mia"}
 
