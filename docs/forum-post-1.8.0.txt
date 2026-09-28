@@ -1,0 +1,133 @@
+IL-2 Korea Service Record 1.8.0 — the squadron's war diary, and a seating chart that
+fits your regiment
+
+
+Gentlemen,
+
+Two things in this one. A new page that tells the story of your squadron day by day,
+and a fix to the Career Helper that anyone flying a Soviet, Chinese or North Korean
+unit needs.
+
+
+THE WAR DIARY
+
+There is a new button beside the flight record on a pilot's page. It opens the
+squadron's war diary: the whole career, written up a day at a time.
+
+    17 April 1951
+      Mission 14   Attack Frontline   Hagalgye · 15 targets destroyed   ★
+        — Hugh Gillespie lost his aircraft
+        — Jose Castro lost his aircraft
+        — Jose Castro was killed in action           [KIA]
+        — Hugh Gillespie was killed in action        [KIA]
+        — You earned and were presented with the Distinguished Flying Cross
+        3 decorations earned, squadron-wide · 2 presented
+
+Every line is something the game wrote down. Nothing is generated, nothing is invented.
+Sorties and where they went, who reported for duty, who was wounded, who was lost,
+which aircraft arrived and which came out of the shop, when an operation began and
+ended, and when the squadron was ordered to move to a new field.
+
+The missions you flew yourself are marked, and your own decorations are the only lines
+in colour, so you can find your own thread down a long career at a glance. Quiet days
+collapse to a single line — one aeroplane back on strength does not deserve the same
+space as the day you lost four.
+
+It prints, and the diary stops at the day your career has reached. It never shows you
+tomorrow, even though the game sometimes writes tomorrow down in advance.
+
+Three things I had to get right, which are worth knowing because they would each have
+made it lie:
+
+  * An award event is not an award. Of the 1,718 in the career I built this against,
+    244 are decorations earned, 229 presentations, and 1,245 are removals — the
+    bookkeeping behind a cluster replacing the medal it supersedes. Counted together
+    they said the squadron was decorated 99 times on a day it was decorated 29.
+  * The game writes some casualty rows twice. One pilot's Mustang is logged as lost
+    twice in the same second on the same sortie. The diary folds those; it does not
+    fold kills, because two kills in one second really are two things destroyed.
+  * An unscheduled sortie is numbered -1, -2 and downwards internally. It says
+    "Unscheduled" rather than "Mission -1".
+
+One discovery along the way. Event type 30 was unidentified until Alex checked what the
+game was telling him: it is the squadron being ordered to move to another airfield, and
+the diary now says so by name.
+
+
+THE DISPLAY CASE, TO KEEP
+
+The shadowbox has two buttons under it now: Save picture and Print.
+
+The picture comes out at 2050 x 1860 — the size the artwork was drawn at, not the size
+of your window — with the engraved plate and everything in place, named after the pilot
+and his squadron. Post it wherever you like.
+
+
+THE CAREER HELPER: EASTERN REGIMENTS
+
+This is the important one if you fly for the VVS, the PLAAF or the KPAF.
+
+An American squadron is 24 seats: six flights of four. An eastern regiment is not the
+same thing with fewer men in it — it is a commander and his wingman, then three
+squadrons of twelve, thirty-eight positions in all. The seating chart only ever drew
+24 of them. If you flew a MiG regiment or a ShAP, a third of your unit was invisible.
+
+It now reads the establishment from your own career file and draws the whole thing:
+
+    Commander Flight
+    1st Squadron                        2nd Squadron
+    3rd Squadron
+
+Six columns, and the tab scrolls, so the bench and the buttons stay reachable. Every
+part is named the way the game names it, in your own language.
+
+Worth saying plainly: the game's own Combat Units screen cannot show you the 3rd
+Squadron at all. It lays the regiment out sideways, runs out of width, and has no
+horizontal scrollbar. That is not something the tracker introduced and it is not
+something you were doing wrong.
+
+My thanks to Swoose, who reported that his 57th ShAP had 38 positions and asked whether
+the chart could hold them. It could not, and chasing that turned up three further
+defects in the same code.
+
+
+THE CAREER HELPER: REVIVING A PILOT
+
+Two changes here as well.
+
+Your own pilot can now be revived. The Captured tab has always been willing to mark
+your own commander missing — that is what it is for — but Revive only ever listed your
+squadron mates, so marking your own man was a one-way door. One of you walked through
+it. He is on the list now.
+
+And the window widened from the day of the loss to that day and the day after. The
+mistake this tab exists to undo is nearly always noticed one click too late, with End
+Day already pressed. One day and no more, though: a man brought back a week on walks
+into a squadron whose war went without him. Past the window, the backup the Helper
+writes before every change is the way back.
+
+
+THE MOD
+
+Unchanged from 1.7.0, byte for byte. Nothing to merge or redo.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v1.8.0
+
+Installer  IL2_Korea_Service_Record_Setup_v1.8.0.exe
+           SHA-256  68f8d53ef4618853ae88e8290956e291dc632a6878f91bc6244e5d88c890c38f
+
+Zip        IL-2.Korea.Service.Record.v1.8.0.zip
+           SHA-256  fcba46d514a7641963ea3649606e038b745f7ba31fe59f2596d4bfc9b247253a
+
+(GitHub writes the zip's name with dots where I put spaces. It is the same file.)
+
+One known nuisance, unrelated to this release: Windows Smart App Control blocks the
+Career Helper on some machines, because the build is not code-signed. If you turn Smart
+App Control off to get past it, be aware that Windows will not let you turn it back on
+again without a reinstall. I am looking at getting the builds signed.
+
+As ever: if something does not match what you see in your own career, say so and I will
+go and look.
