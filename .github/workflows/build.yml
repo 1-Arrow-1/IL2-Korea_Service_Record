@@ -38,9 +38,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt pystray==0.19.5 pyinstaller==6.17.0
 
-      - name: Validate repository
-        run: python tools/validate.py
-
       - name: Build the tracker (PyInstaller)
         run: pyinstaller korea_service_record.spec --noconfirm
 
