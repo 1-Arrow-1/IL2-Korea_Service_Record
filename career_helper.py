@@ -2251,7 +2251,9 @@ class App(tk.Tk):
         """
         for flight, head in self.fl_heads.items():
             seats = set(range(flight * 4, flight * 4 + 4))
-            title = self.t[f"fl_c{flight + 1}"]
+            # Same fallback as the board build: the named headings stop at
+            # six, and an eastern regiment has more columns than that.
+            title = self.t.get(f"fl_c{flight + 1}") or self.t["fl_num"].format(n=flight + 1)
             if seats and seats <= self.fl_alert:
                 title += "  " + self.t["fl_alert"]
             head.configure(text=title)
