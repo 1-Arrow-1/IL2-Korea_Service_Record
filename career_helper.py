@@ -43,7 +43,7 @@ import sys
 import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, ttk
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, NamedTuple, Optional
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -52,6 +52,8 @@ from korea_service_record.locate import find_game_dir          # noqa: E402
 from korea_service_record.settings import Settings             # noqa: E402
 from korea_service_record.assets import default_cache_dir      # noqa: E402
 from korea_service_record import corrections                   # noqa: E402
+from korea_service_record.assets import AssetResolver           # noqa: E402
+from korea_service_record.gamedata import loads_lenient         # noqa: E402
 
 BACKUPS = default_cache_dir().parent / "backups"
 # The squadron's seats. 24 of them, which is what Career.SEATS has always
@@ -103,6 +105,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c5": "5 · White",
         "fl_c6": "6 · Black",
         "fl_num": "Flight {n}",
+        "fl_commander": "Commander Flight",
+        "fl_squadron": "{n} Squadron",
         "fl_alert": "alert",
         "fl_empty": "— empty —",
         "fl_propose": "Propose a seating",
@@ -218,6 +222,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c5": "5 · Weiß",
         "fl_c6": "6 · Schwarz",
         "fl_num": "Kette {n}",
+        "fl_commander": "Stabsschwarm",
+        "fl_squadron": "{n}. Staffel",
         "fl_alert": "Alarm",
         "fl_empty": "— frei —",
         "fl_propose": "Besetzung vorschlagen",
@@ -333,6 +339,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c5": "5 · Blanco",
         "fl_c6": "6 · Negro",
         "fl_num": "Vuelo {n}",
+        "fl_commander": "Vuelo del mando",
+        "fl_squadron": "{n}.º Escuadrón",
         "fl_alert": "alerta",
         "fl_empty": "— libre —",
         "fl_propose": "Proponer una formación",
@@ -448,6 +456,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c5": "5 · Blanc",
         "fl_c6": "6 · Noir",
         "fl_num": "Patrouille {n}",
+        "fl_commander": "Patrouille du commandant",
+        "fl_squadron": "{n}e Escadrille",
         "fl_alert": "alerte",
         "fl_empty": "— libre —",
         "fl_propose": "Proposer une répartition",
@@ -563,6 +573,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c5": "5 · Белое",
         "fl_c6": "6 · Чёрное",
         "fl_num": "Звено {n}",
+        "fl_commander": "Звено управления",
+        "fl_squadron": "{n}-я эскадрилья",
         "fl_alert": "дежурное",
         "fl_empty": "— свободно —",
         "fl_propose": "Предложить расстановку",
@@ -678,6 +690,8 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c5": "5 · 白队",
         "fl_c6": "6 · 黑队",
         "fl_num": "第 {n} 编队",
+        "fl_commander": "指挥官飞行小队",
+        "fl_squadron": "第{n}中队",
         "fl_alert": "待命",
         "fl_empty": "— 空缺 —",
         "fl_propose": "生成建议编排",
@@ -765,6 +779,96 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "the_squadron": "中队",
     },
 }
+
+
+# The game's own word for each part of a line-up, in the player's own
+# language. Taking these from the game rather than translating them here
+# means Career Helper and the Combat Units screen call the same thing by
+# the same name - Stabsschwarm, Звено управления, 指挥官飞行小队 - and
+# there is no term for us to get wrong.
+GAME_LANGS = {"en": "eng", "de": "ger", "es": "spa",
+              "fr": "fra", "ru": "rus", "zh": "chs"}
+
+
+def game_labels(lang: str) -> Dict[str, str]:
+    """
+    Commander Flight, 1st/2nd/3rd Squadron, Flight N, Section N.
+
+    Returns {} if the file cannot be read, and every caller falls back to
+    its own string, so a missing locale costs a word and not a crash.
+    """
+    try:
+        text = AssetResolver(find_game_dir()).read_text(
+            f"nsdata/assets/locale/career.locale={GAME_LANGS.get(lang, 'eng')}.json")
+        return loads_lenient(text) if text else {}
+    except Exception:            # noqa: BLE001 - a label is never worth failing over
+        return {}
+
+
+class Group(NamedTuple):
+    """One headed block of seats on the board."""
+    label: str
+    start: int
+    size: int
+    row: int                     # which row of the board it sits on
+    col: int                     # and which column within that row
+    row_label: str = ""          # a heading spanning the row, on its first block
+
+
+def line_up_shape(country: int, seats: int, t: Dict[str, str],
+                  game: Optional[Dict[str, str]] = None) -> List[Group]:
+    """
+    How this air force arranges its line-up, as headed blocks of seats.
+
+    Two shapes, both measured rather than assumed. The American squadron
+    is 24 seats in six flights of four, all in one row - which is what the
+    game draws and what this chart has always drawn.
+
+    The eastern regiment is a commander pair and three squadrons of twelve,
+    each squadron three flights of four: 38 seats. Proved against a Chinese
+    career by matching the game's Combat Units screen to the database name
+    by name - slots 0-1 the commander and his wingman, 2-13 the 1st
+    Squadron, 14-19 the six men of the 2nd it had at the time. That the 3rd
+    Squadron is 26-37 follows by extension and has not been seen occupied.
+
+    The squadrons are stacked rather than set side by side. Side by side is
+    what the game does, and it is why the game cannot show them: ten columns
+    do not fit, there is no horizontal scrollbar, and the 3rd Squadron is
+    simply unreachable. Stacked, the board is three columns wide and reads
+    the way the unit is organised.
+    """
+    game = game or {}
+    flight_word = game.get("carFlightNum") or t.get("fl_num") or "Flight $[value]"
+
+    def flight_label(n: int) -> str:
+        return flight_word.replace("$[value]", str(n)).replace("{n}", str(n))
+
+    if country not in (501, 502, 503):
+        # Six flights of four, named for their colours as the game names them.
+        return [Group(t.get(f"fl_c{f + 1}") or flight_label(f + 1), f * 4, 4, 0, f)
+                for f in range(max(6, seats // 4))]
+
+    # The game's German calls a squadron and a flight the same thing -
+    # carSquadron1 is "Schwarm 1" and carFlightNum is "Schwarm $[value]" -
+    # so heading a column "Schwarm 1" inside a row headed "Schwarm 1" says
+    # nothing. Where the game's own two words collide, its flight word is
+    # kept for the columns and ours is used for the row.
+    collides = (game.get("carSquadron1") or "") == flight_label(1)
+
+    def squadron_label(n: int) -> str:
+        if not collides:
+            named = game.get(f"carSquadron{n}")
+            if named:
+                return named
+        return t["fl_squadron"].format(n=n)
+
+    groups = [Group(game.get("carCommanderFlight") or t["fl_commander"], 0, 2, 0, 0)]
+    squadrons = max(3, -(-(max(0, seats - 2)) // 12))
+    for s in range(squadrons):
+        for f in range(3):
+            groups.append(Group(flight_label(f + 1), 2 + s * 12 + f * 4, 4, s + 1, f,
+                                squadron_label(s + 1) if f == 0 else ""))
+    return groups
 
 
 def pick_language() -> str:
@@ -1070,7 +1174,8 @@ class Career:
     # inheriting the seat's aeroplane. A reseat here has to move the pair or
     # somebody ends up in a wreck.
 
-    SEATS = 24                           # the smallest line-up the game builds
+    SEATS = 24                           # the American establishment
+    EAST_SEATS = 38                      # commander pair + three squadrons of twelve
     FLIGHTS = 6
     BENCH_BASE = 1000                    # at or above this a man is off the board
     PARK = 9000                          # scratch slots while a permutation lands
@@ -1174,9 +1279,12 @@ class Career:
         flight. It grows with the unit and never invents a seat the game
         has not made.
 
-        Floored at SEATS so a fresh career - which starts with twenty men
-        in seats 0 to 19, whatever its air force - still shows the six
-        flights it has always shown.
+        Rounded to its own establishment, not to a flat four: an eastern
+        regiment is a commander pair and squadrons of twelve, so its seat
+        count is 2 + 12n and never 40. Floored at the full establishment -
+        24 in the west, 38 in the east - so a fresh career shows the empty
+        seats the game shows, including the 3rd Squadron the game itself
+        cannot scroll to.
         """
         with self._open() as con:
             hi = con.execute(
@@ -1185,9 +1293,22 @@ class Career:
                        UNION ALL
                        SELECT slot FROM plane WHERE isDeleted=0 AND slot<?)""",
                 (self.BENCH_BASE, self.BENCH_BASE)).fetchone()[0]
-        if hi is None:
-            return self.SEATS
-        return max(self.SEATS, -(-(hi + 1) // 4) * 4)
+            row = con.execute(
+                "SELECT country FROM pilot WHERE id=(SELECT playerId FROM career)"
+            ).fetchone()
+        country = row[0] if row else 601
+        used = 0 if hi is None else hi + 1
+        if country in (501, 502, 503):
+            return max(self.EAST_SEATS, 2 + 12 * -(-max(0, used - 2) // 12))
+        return max(self.SEATS, -(-used // 4) * 4)
+
+    def country(self) -> int:
+        """The air force this career belongs to, which chooses the shape."""
+        with self._open() as con:
+            row = con.execute(
+                "SELECT country FROM pilot WHERE id=(SELECT playerId FROM career)"
+            ).fetchone()
+        return row[0] if row else 601
 
     PILOT_COLS = """SELECT id, slot, name, lastName, persLevel, leadLevel,
                            health, state, isPlayer, sorties FROM pilot
@@ -1573,7 +1694,12 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.t = STRINGS[pick_language()]
+        lang = pick_language()
+        self.t = STRINGS[lang]
+        # The game's own names for the parts of a line-up, so the board and
+        # the Combat Units screen agree. Read once; {} if it cannot be, and
+        # every use falls back to our own string.
+        self.game_t = game_labels(lang)
         self.title(self.t["title"])
         # wide enough for the Flights board - six columns of cards - without
         # the reader having to stretch the window before it is any use
@@ -1786,7 +1912,8 @@ class App(tk.Tk):
         board.pack(anchor="w", padx=8)
         self.fl_board = board
         self.fl_seats = Career.SEATS
-        self._build_board(board, Career.SEATS)
+        self.fl_groups: List[Group] = line_up_shape(601, Career.SEATS, self.t, self.game_t)
+        self._build_board(board, self.fl_groups)
         tk.Label(fl, text="\u2605 " + self.t["fl_cmd"], background=self.PANEL,
                  foreground=self.ACCENT, font=("", 9), anchor="w").pack(
             anchor="w", padx=10, pady=(8, 0))
@@ -2138,36 +2265,44 @@ class App(tk.Tk):
 
     # -- flights ---------------------------------------------------------------
 
-    def _build_board(self, board: tk.Frame, seats: int) -> None:
+    def _build_board(self, board: tk.Frame, groups: List[Group]) -> None:
         """
-        The flights as the Combat Units screen draws them: a column each,
-        four seats down it, a rule between the two sections.
+        The line-up, laid out the way its air force organises it.
 
-        The number of columns is the career's, not a constant. An American
-        squadron is six flights of four; an eastern regiment is larger, and
-        the game's own screen cannot even scroll to its 3rd Squadron. The
-        board is rebuilt whenever a career with a different line-up is
-        chosen, which is why the cards are cleared here rather than kept.
+        An American squadron is six flights of four in one row. An eastern
+        regiment is a commander pair and three squadrons of twelve, stacked
+        one squadron to a row - three columns wide instead of ten. Side by
+        side is what the game does and it is why the game cannot show them:
+        there is no horizontal scrollbar and the 3rd Squadron is out of
+        reach.
+
+        Rebuilt whenever a career with a different shape is chosen, which
+        is why the cards are cleared here rather than kept.
         """
         for child in board.winfo_children():
             child.destroy()
         self.fl_cards.clear()
         self.fl_heads.clear()
-        for f in range(seats // 4):
+        for n, g in enumerate(groups):
+            # Two grid rows per board row: the squadron's name, then its
+            # flights. The name spans the row because a column headed
+            # "Flight 1" means nothing until you know whose flight it is.
+            if g.row_label:
+                tk.Label(board, text=g.row_label, background=self.PANEL,
+                         foreground=self.ACCENT, font=("Georgia", 11, "bold"),
+                         anchor="w", pady=2).grid(row=g.row * 2, column=0,
+                                                  columnspan=3, sticky="w", padx=4)
             col = tk.Frame(board, background=self.PANEL)
-            col.grid(row=0, column=f, padx=2, sticky="n")
-            # Named for the first six; numbered beyond, because the strings
-            # stop at six and an eastern regiment has more columns than that.
-            title = self.t.get(f"fl_c{f + 1}") or self.t["fl_num"].format(n=f + 1)
-            head = tk.Label(col, text=title, background=self.DESK,
+            col.grid(row=g.row * 2 + 1, column=g.col, padx=2, pady=(0, 6), sticky="n")
+            head = tk.Label(col, text=g.label, background=self.DESK,
                             foreground=self.ACCENT_DARK, font=("Georgia", 10, "bold"),
                             width=17, pady=4)
             head.pack(fill="x")
-            self.fl_heads[f] = head
-            for pos in range(4):
-                if pos == 2:                      # the section rule
+            self.fl_heads[n] = head
+            for pos in range(g.size):
+                if pos and pos % 2 == 0:          # the section rule
                     tk.Frame(col, background=self.BORDER, height=1).pack(fill="x", pady=2)
-                slot = f * 4 + pos
+                slot = g.start + pos
                 card = tk.Frame(col, background=self.PAPER, padx=4, pady=2,
                                 highlightthickness=1, highlightbackground=self.BORDER)
                 card.pack(fill="x", pady=1)
@@ -2188,11 +2323,20 @@ class App(tk.Tk):
     def _fill_flights(self) -> None:
         """Read the line-up and the bench back from the career and draw them."""
         self.fl_pick = self.fl_up = None
-        # This career's line-up may be bigger than the last one's.
-        seats = self.career.seats() if self.career is not None else Career.SEATS
-        if seats != self.fl_seats:
+        # This career's line-up may be a different size, or a different
+        # shape: an American squadron and an eastern regiment are not the
+        # same board with more cards on it.
+        if self.career is None:
+            seats, country = Career.SEATS, 601
+        else:
+            seats, country = self.career.seats(), self.career.country()
+        groups = line_up_shape(country, seats, self.t, self.game_t)
+        if [g[1:] for g in groups] != [g[1:] for g in self.fl_groups]:
+            self.fl_groups = groups
             self.fl_seats = seats
-            self._build_board(self.fl_board, seats)
+            self._build_board(self.fl_board, groups)
+        else:
+            self.fl_groups = groups
         self.fl_men, self.fl_plan = {}, {s: None for s in range(seats)}
         if self.career is None:
             self._draw_seats()
@@ -2249,12 +2393,16 @@ class App(tk.Tk):
         seat on alert gets the duty edge - which flight that is comes from
         squadron.watchmen, since the player can put the D flight anywhere.
         """
-        for flight, head in self.fl_heads.items():
-            seats = set(range(flight * 4, flight * 4 + 4))
-            # Same fallback as the board build: the named headings stop at
-            # six, and an eastern regiment has more columns than that.
-            title = self.t.get(f"fl_c{flight + 1}") or self.t["fl_num"].format(n=flight + 1)
-            if seats and seats <= self.fl_alert:
+        for n, head in self.fl_heads.items():
+            g = self.fl_groups[n]
+            block = set(range(g.start, g.start + g.size))
+            title = g.label
+            # The duty group is four consecutive seats and need not line up
+            # with a block: in a Chinese regiment it was slots 16-19, the
+            # back half of one flight and the front half of the next. So the
+            # heading is marked when any of its seats are on duty, and the
+            # seats themselves carry the edge.
+            if block & self.fl_alert:
                 title += "  " + self.t["fl_alert"]
             head.configure(text=title)
         for slot, (card, who, line, stat, note) in self.fl_cards.items():
