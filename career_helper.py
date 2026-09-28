@@ -817,6 +817,33 @@ class Group(NamedTuple):
     row_label: str = ""          # a heading spanning the row, on its first block
 
 
+def line_up_blocks(country: int, seats: int) -> List[tuple]:
+    """
+    Where each block of seats begins and how many it holds, as (start, size).
+
+    The single source of truth for the board's arithmetic. A seat's flight,
+    its section and whether it leads are all its position within its own
+    block - never slot % 4, which is only right when the blocks begin at 0,
+    4, 8. An eastern regiment's flights begin at 2, 6, 10, so slot % 4 put
+    the lead star two seats into every flight.
+    """
+    if country not in (501, 502, 503):
+        return [(f * 4, 4) for f in range(max(6, seats // 4))]
+    blocks = [(0, 2)]
+    squadrons = max(3, -(-(max(0, seats - 2)) // 12))
+    for s in range(squadrons):
+        blocks += [(2 + s * 12 + f * 4, 4) for f in range(3)]
+    return blocks
+
+
+def seat_position(blocks: List[tuple], slot: int) -> tuple:
+    """(block number, index within it) for a seat."""
+    for n, (start, size) in enumerate(blocks):
+        if start <= slot < start + size:
+            return n, slot - start
+    return len(blocks) - 1, 0
+
+
 def line_up_shape(country: int, seats: int, t: Dict[str, str],
                   game: Optional[Dict[str, str]] = None) -> List[Group]:
     """
@@ -851,10 +878,11 @@ def line_up_shape(country: int, seats: int, t: Dict[str, str],
     def flight_label(n: int) -> str:
         return flight_word.replace("$[value]", str(n)).replace("{n}", str(n))
 
+    blocks = line_up_blocks(country, seats)
     if country not in (501, 502, 503):
         # Six flights of four, named for their colours as the game names them.
-        return [Group(t.get(f"fl_c{f + 1}") or flight_label(f + 1), f * 4, 4, 0, f)
-                for f in range(max(6, seats // 4))]
+        return [Group(t.get(f"fl_c{f + 1}") or flight_label(f + 1), start, size, 0, f)
+                for f, (start, size) in enumerate(blocks)]
 
     # The game's German calls a squadron and a flight the same thing -
     # carSquadron1 is "Schwarm 1" and carFlightNum is "Schwarm $[value]" -
@@ -1352,15 +1380,20 @@ class Career:
                 (count,))}
             row = con.execute("SELECT watchmen FROM squadron").fetchone()
         alert = self.parse_watchmen(row[0] if row else "")
+        blocks = line_up_blocks(self.country(), count)
         seats = []
         for slot in range(count):
+            block, pos = seat_position(blocks, slot)
             row, air = men.get(slot), planes.get(slot)
             man = None
             if row is not None:
                 man = self._read_man(
                     row, decode_tcode(air["tcode"]) if air is not None else "", slot)
-            seats.append({"slot": slot, "flight": slot // 4, "section": slot // 2,
-                          "lead": slot % 4 == 0, "alert": slot in alert, "pilot": man,
+            seats.append({"slot": slot, "flight": block, "section": pos // 2,
+                          # A lead is the first seat of its own block, and a
+                          # section lead the first of its pair within it.
+                          "lead": pos == 0, "sec_lead": pos % 2 == 0,
+                          "alert": slot in alert, "pilot": man,
                           "plane_state": air["state"] if air is not None else None})
         return seats
 
@@ -1669,9 +1702,13 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
         plan[player["home"]] = player["id"]
         pool.remove(player)
 
+    # Flight leads first, then section leads, then the rest - read off the
+    # seat itself, because which numbers those are depends on the shape.
+    rank_of = {s["slot"]: (0 if s["lead"] else 1 if s.get("sec_lead") else 2)
+               for s in taken}
+    lead_seat = {s["slot"]: bool(s.get("sec_lead")) for s in taken}
     open_seats = [s["slot"] for s in taken if s["slot"] not in plan]
-    tiers = {0: 0, 2: 1}                         # flight lead, section lead, the rest
-    open_seats.sort(key=lambda s: (tiers.get(s % 4, 2), s))
+    open_seats.sort(key=lambda s: (rank_of.get(s, 2), s))
 
     # The trailing "is he already here" term leaves a man where he sits when
     # nothing else separates him from the alternative: a proposal you have to
@@ -1689,11 +1726,11 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
         take = pool
         if slot in alert:                        # scrambles without warning
             take = [m for m in take if m["available"] and not m["hurt"]] or pool
-        if slot % 2 == 0:                        # a flight or section lead
+        if lead_seat.get(slot):                  # a flight or section lead
             here = [m for m in take if m["available"]]
             take = [m for m in (here or take)
                     if m["ai"] >= Career.LEAD_MIN_AI] or here or take
-        rank = as_lead if slot % 2 == 0 else as_wingman
+        rank = as_lead if lead_seat.get(slot) else as_wingman
         pick = max(take, key=lambda m: rank(m, slot))
         plan[slot] = pick["id"]
         pool.remove(pick)
@@ -2430,6 +2467,7 @@ class App(tk.Tk):
         seat on alert gets the duty edge - which flight that is comes from
         squadron.watchmen, since the player can put the D flight anywhere.
         """
+        self.fl_lead_seats = {g.start for g in self.fl_groups}
         for n, head in self.fl_heads.items():
             g = self.fl_groups[n]
             block = set(range(g.start, g.start + g.size))
@@ -2456,7 +2494,11 @@ class App(tk.Tk):
                            highlightbackground=edge)
             for widget in (who, line, stat, note):
                 widget.configure(background=back)
-            lead = slot % 4 == 0             # a flight lead: he may command
+            # A lead is the first seat of its own block. slot % 4 is only
+            # that when blocks begin at 0, 4, 8 - an eastern regiment's
+            # flights begin at 2, 6, 10, which put the star on the third
+            # card of every flight.
+            lead = slot in self.fl_lead_seats
             if man is None:
                 who.configure(text=self.t["fl_empty"], foreground="#a3947c")
                 line.configure(text="")
