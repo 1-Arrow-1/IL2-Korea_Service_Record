@@ -55,6 +55,15 @@ UninstallDisplayName={#MyAppName}
 UninstallDisplayIcon={app}\{#MyAppExeName}
 SetupIconFile=IL2_Korea_Service_Record.ico
 
+; Release builds pass an Azure Artifact Signing command to ISCC as the
+; "azureartifacts" Sign Tool. Development/CI builds omit AZURE_SIGNING and
+; remain unsigned. When enabled, Inno signs both Setup and the generated
+; uninstaller; SignedUninstaller is made explicit for clarity.
+#ifdef AZURE_SIGNING
+SignTool=azureartifacts
+SignedUninstaller=yes
+#endif
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "german"; MessagesFile: "compiler:Languages\German.isl"
