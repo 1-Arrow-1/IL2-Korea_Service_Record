@@ -36,7 +36,8 @@
     "sorties": "Salidas",
     "sorties_value": "{total} ({good} con éxito)",
     "flight_time": "Horas de vuelo",
-    "award_points": "Puntos de condecoración"
+    "award_points": "Puntos de condecoración",
+    "document": "Hoja de Servicios"
   },
   "pilot": {
     "heading": "Datos del piloto",

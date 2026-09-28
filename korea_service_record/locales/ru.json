@@ -36,7 +36,8 @@
     "sorties": "Вылеты",
     "sorties_value": "{total} ({good} успешных)",
     "flight_time": "Налёт",
-    "award_points": "Наградные очки"
+    "award_points": "Наградные очки",
+    "document": "Послужной список"
   },
   "pilot": {
     "heading": "Сведения о лётчике",

@@ -2,6 +2,40 @@
  * Career detail — player card, awards, service record, squadron roster.
  */
 
+/* The file the record came out of. The tab sits on top of the heading's
+   upper rule, the way a folder tab stands above the sheet inside it, so
+   the two read as one object rather than two decorations. */
+.record-tab {
+    width: 13rem; aspect-ratio: 420 / 136; margin: 0 0 -0.55rem 1.6rem;
+    background: url("../images/record/tab.png") no-repeat center / 100% 100%;
+}
+/* The form's printed heading. Drawn at 1600x165 and held to that ratio so
+   its rules stay hairlines however wide the window is. */
+.record-heading {
+    position: relative; aspect-ratio: 1600 / 165; margin-bottom: 1.1rem;
+    background: url("../images/record/heading.png") no-repeat center / 100% 100%;
+}
+/* Both boxes are measured off the artwork: the title box runs 1.25% to
+   34.25% across, the service box 88.19% to 98.75%, and the printed
+   interior 6.67% to 92.12% down. The type is placed in them rather than
+   guessed at, so it can never sit on a rule. */
+.record-heading span {
+    position: absolute; top: 6.67%; height: 85.45%;
+    display: grid; place-items: center;
+    text-transform: uppercase; color: var(--ink-strong);
+    white-space: nowrap; line-height: 1;
+}
+.rh-title {
+    left: 1.25%; width: 33%;
+    font-size: clamp(.62rem, 1.35vw, 1.05rem); letter-spacing: .22em;
+}
+.rh-form {
+    left: 88.19%; width: 10.56%;
+    font-size: clamp(.5rem, .85vw, .74rem); letter-spacing: .12em;
+    color: var(--ink-muted);
+}
+@media (max-width: 40rem) { .record-tab { display: none; } }
+
 .record-head {
     display: flex;
     align-items: flex-start;

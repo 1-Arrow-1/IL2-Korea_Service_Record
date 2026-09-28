@@ -36,7 +36,8 @@
     "sorties": "出击",
     "sorties_value": "{total}（成功 {good}）",
     "flight_time": "飞行时间",
-    "award_points": "勋章点数"
+    "award_points": "勋章点数",
+    "document": "服役记录"
   },
   "pilot": {
     "heading": "飞行员信息",

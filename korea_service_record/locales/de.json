@@ -36,7 +36,8 @@
     "sorties": "Einsätze",
     "sorties_value": "{total} ({good} erfolgreich)",
     "flight_time": "Flugzeit",
-    "award_points": "Auszeichnungspunkte"
+    "award_points": "Auszeichnungspunkte",
+    "document": "Dienstakte"
   },
   "pilot": {
     "heading": "Angaben zum Piloten",

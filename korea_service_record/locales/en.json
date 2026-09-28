@@ -36,7 +36,8 @@
     "sorties": "Sorties",
     "sorties_value": "{total} ({good} successful)",
     "flight_time": "Flight Time",
-    "award_points": "Award Points"
+    "award_points": "Award Points",
+    "document": "Service Record"
   },
   "pilot": {
     "heading": "Pilot Information",
