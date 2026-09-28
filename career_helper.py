@@ -1909,7 +1909,33 @@ class App(tk.Tk):
         # -- flights tab
         fl = ttk.Frame(nb)
         nb.add(fl, text=self.t["tab_flights"])
-        ttk.Label(fl, text=self.t["fl_intro"], wraplength=1080,
+        # The eastern board is a commander pair and three squadrons - taller
+        # than the window on any ordinary screen - so the whole tab scrolls,
+        # not just the seats: the bench and the buttons belong below it and
+        # must stay reachable. A canvas with a frame inside it is the only
+        # way Tk does this.
+        fl_canvas = tk.Canvas(fl, borderwidth=0, highlightthickness=0,
+                              background=self.PANEL)
+        fl_bar = ttk.Scrollbar(fl, orient="vertical", command=fl_canvas.yview)
+        fl_canvas.configure(yscrollcommand=fl_bar.set)
+        fl_bar.pack(side="right", fill="y")
+        fl_canvas.pack(side="left", fill="both", expand=True)
+        body = tk.Frame(fl_canvas, background=self.PANEL)
+        fl_window = fl_canvas.create_window((0, 0), window=body, anchor="nw")
+        body.bind("<Configure>",
+                  lambda _e: fl_canvas.configure(scrollregion=fl_canvas.bbox("all")))
+        # The inner frame follows the canvas's width so the wrapped text and
+        # the bench stretch with the window instead of being clipped.
+        fl_canvas.bind("<Configure>",
+                       lambda e: fl_canvas.itemconfigure(fl_window, width=e.width))
+
+        # The wheel is bound while the pointer is over this tab and released
+        # when it leaves, so it cannot steal scrolling from the other tabs.
+        def _fl_wheel(event):
+            fl_canvas.yview_scroll(-1 if event.delta > 0 else 1, "units")
+        fl_canvas.bind("<Enter>", lambda _e: fl_canvas.bind_all("<MouseWheel>", _fl_wheel))
+        fl_canvas.bind("<Leave>", lambda _e: fl_canvas.unbind_all("<MouseWheel>"))
+        ttk.Label(body, text=self.t["fl_intro"], wraplength=1080,
                   foreground="#444").pack(anchor="w", padx=8, pady=(8, 6))
         self.fl_men: Dict[int, Dict] = {}
         self.fl_plan: Dict[int, Optional[int]] = {}
@@ -1917,27 +1943,27 @@ class App(tk.Tk):
         self.fl_heads: Dict[int, tk.Label] = {}
         self.fl_alert: set = set()
         self.fl_pick: Optional[int] = None
-        board = tk.Frame(fl, background=self.PANEL)
+        board = tk.Frame(body, background=self.PANEL)
         board.pack(anchor="w", padx=8)
         self.fl_board = board
         self.fl_seats = Career.SEATS
         self.fl_groups: List[Group] = line_up_shape(601, Career.SEATS, self.t, self.game_t)
         self._build_board(board, self.fl_groups)
-        tk.Label(fl, text="\u2605 " + self.t["fl_cmd"], background=self.PANEL,
+        tk.Label(body, text="\u2605 " + self.t["fl_cmd"], background=self.PANEL,
                  foreground=self.ACCENT, font=("", 9), anchor="w").pack(
             anchor="w", padx=10, pady=(8, 0))
-        tk.Label(fl, text=self.t["fl_legend"], background=self.PANEL,
+        tk.Label(body, text=self.t["fl_legend"], background=self.PANEL,
                  foreground=self.INK_MUTED, font=("", 9), anchor="w",
                  justify="left", wraplength=1060).pack(anchor="w", padx=10, pady=(2, 0))
-        ttk.Separator(fl).pack(fill="x", padx=8, pady=(10, 6))
-        tk.Label(fl, text=self.t["fl_bench"], background=self.PANEL,
+        ttk.Separator(body).pack(fill="x", padx=8, pady=(10, 6))
+        tk.Label(body, text=self.t["fl_bench"], background=self.PANEL,
                  foreground=self.ACCENT_DARK, font=("Georgia", 10, "bold"),
                  anchor="w").pack(anchor="w", padx=10)
-        tk.Label(fl, text=self.t["fl_bench_hint"], background=self.PANEL,
+        tk.Label(body, text=self.t["fl_bench_hint"], background=self.PANEL,
                  foreground=self.INK_MUTED, font=("", 9), anchor="w").pack(
             anchor="w", padx=10, pady=(0, 4))
         bcols = ("who", "stats", "ai", "boost", "state")
-        self.bench_tree = ttk.Treeview(fl, columns=bcols, show="headings",
+        self.bench_tree = ttk.Treeview(body, columns=bcols, show="headings",
                                        height=5, selectmode="browse")
         self.bench_tree.tag_configure("odd", background=self.STRIPE)
         self.bench_tree.tag_configure("gone", foreground=self.BAD)
@@ -1953,7 +1979,7 @@ class App(tk.Tk):
         self.bench_tree.bind("<<TreeviewSelect>>", self._pick_bench)
         self.fl_up: Optional[int] = None
 
-        frow = ttk.Frame(fl)
+        frow = ttk.Frame(body)
         frow.pack(anchor="w", padx=8, pady=(8, 10))
         ttk.Button(frow, text=self.t["fl_propose"],
                    command=self._propose_seats).pack(side="left")
