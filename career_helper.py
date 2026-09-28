@@ -102,6 +102,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c4": "4 · Yellow",
         "fl_c5": "5 · White",
         "fl_c6": "6 · Black",
+        "fl_num": "Flight {n}",
         "fl_alert": "alert",
         "fl_empty": "— empty —",
         "fl_propose": "Propose a seating",
@@ -216,6 +217,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c4": "4 · Gelb",
         "fl_c5": "5 · Weiß",
         "fl_c6": "6 · Schwarz",
+        "fl_num": "Kette {n}",
         "fl_alert": "Alarm",
         "fl_empty": "— frei —",
         "fl_propose": "Besetzung vorschlagen",
@@ -330,6 +332,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c4": "4 · Amarillo",
         "fl_c5": "5 · Blanco",
         "fl_c6": "6 · Negro",
+        "fl_num": "Vuelo {n}",
         "fl_alert": "alerta",
         "fl_empty": "— libre —",
         "fl_propose": "Proponer una formación",
@@ -444,6 +447,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c4": "4 · Jaune",
         "fl_c5": "5 · Blanc",
         "fl_c6": "6 · Noir",
+        "fl_num": "Patrouille {n}",
         "fl_alert": "alerte",
         "fl_empty": "— libre —",
         "fl_propose": "Proposer une répartition",
@@ -558,6 +562,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c4": "4 · Жёлтое",
         "fl_c5": "5 · Белое",
         "fl_c6": "6 · Чёрное",
+        "fl_num": "Звено {n}",
         "fl_alert": "дежурное",
         "fl_empty": "— свободно —",
         "fl_propose": "Предложить расстановку",
@@ -672,6 +677,7 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c4": "4 · 黄队",
         "fl_c5": "5 · 白队",
         "fl_c6": "6 · 黑队",
+        "fl_num": "第 {n} 编队",
         "fl_alert": "待命",
         "fl_empty": "— 空缺 —",
         "fl_propose": "生成建议编排",
@@ -1064,8 +1070,9 @@ class Career:
     # inheriting the seat's aeroplane. A reseat here has to move the pair or
     # somebody ends up in a wreck.
 
-    SEATS = 24
+    SEATS = 24                           # the smallest line-up the game builds
     FLIGHTS = 6
+    BENCH_BASE = 1000                    # at or above this a man is off the board
     PARK = 9000                          # scratch slots while a permutation lands
 
     # Fatigue is deliberately absent. It exists in the database and runs 0 to
@@ -1151,6 +1158,37 @@ class Career:
         man["available"] = man["state"] == 0
         return man
 
+    def seats(self) -> int:
+        """
+        How many seats this squadron's line-up has, read from its own data.
+
+        Not a constant, because the establishments differ. An American
+        squadron is 24 seats in six flights of four. An eastern regiment is
+        a commander pair and three squadrons of twelve - 38 - which the
+        game's own Combat Units screen cannot even scroll to: there is no
+        horizontal scrollbar and the 3rd Squadron is simply unreachable.
+
+        Rather than encode either establishment, or trust squadrons.cfg
+        (whose pilotsCap of 48 matches neither seat count), the chart takes
+        the highest seat the career actually uses and rounds up to a whole
+        flight. It grows with the unit and never invents a seat the game
+        has not made.
+
+        Floored at SEATS so a fresh career - which starts with twenty men
+        in seats 0 to 19, whatever its air force - still shows the six
+        flights it has always shown.
+        """
+        with self._open() as con:
+            hi = con.execute(
+                """SELECT max(slot) FROM (
+                       SELECT slot FROM pilot WHERE isDeleted=0 AND slot<?
+                       UNION ALL
+                       SELECT slot FROM plane WHERE isDeleted=0 AND slot<?)""",
+                (self.BENCH_BASE, self.BENCH_BASE)).fetchone()[0]
+        if hi is None:
+            return self.SEATS
+        return max(self.SEATS, -(-(hi + 1) // 4) * 4)
+
     PILOT_COLS = """SELECT id, slot, name, lastName, persLevel, leadLevel,
                            health, state, isPlayer, sorties FROM pilot
                     WHERE isDeleted=0"""
@@ -1166,24 +1204,26 @@ class Career:
         through that band as a staging step while a move commits. Neither has
         an aircraft of his own, so no tail number is shown.
         """
+        count = self.seats()
         with self._open() as con:
             rows = con.execute(
                 f"{self.PILOT_COLS} AND slot>=? AND slot<? ORDER BY slot",
-                (self.SEATS, self.RESERVE_TOP)).fetchall()
+                (count, self.RESERVE_TOP)).fetchall()
         return [self._read_man(r, "", r["slot"]) for r in rows]
 
     def flight_seats(self) -> List[Dict]:
-        """All 24 seats in order, each with its pilot and aircraft or None."""
+        """Every seat in order, each with its pilot and aircraft or None."""
+        count = self.seats()
         with self._open() as con:
             men = {r["slot"]: r for r in con.execute(
-                f"{self.PILOT_COLS} AND slot<?", (self.SEATS,))}
+                f"{self.PILOT_COLS} AND slot<?", (count,))}
             planes = {r["slot"]: r for r in con.execute(
                 "SELECT id, slot, tcode, state FROM plane WHERE isDeleted=0 AND slot<?",
-                (self.SEATS,))}
+                (count,))}
             row = con.execute("SELECT watchmen FROM squadron").fetchone()
         alert = self.parse_watchmen(row[0] if row else "")
         seats = []
-        for slot in range(self.SEATS):
+        for slot in range(count):
             row, air = men.get(slot), planes.get(slot)
             man = None
             if row is not None:
@@ -1213,14 +1253,15 @@ class Career:
         renumbered from 2000 with no gaps, which is what the game does.
         Returns the backup path.
         """
+        count = self.seats()
         backup = self.backup()
         with self._open(write=True) as con:
             con.execute("BEGIN IMMEDIATE")
             seated = {r["slot"]: r["id"] for r in con.execute(
-                "SELECT id, slot FROM pilot WHERE isDeleted=0 AND slot<?", (self.SEATS,))}
+                "SELECT id, slot FROM pilot WHERE isDeleted=0 AND slot<?", (count,))}
             benched = [r["id"] for r in con.execute(
                 """SELECT id FROM pilot WHERE isDeleted=0 AND slot>=? AND slot<?
-                   ORDER BY slot""", (self.SEATS, self.RESERVE_TOP))]
+                   ORDER BY slot""", (count, self.RESERVE_TOP))]
             # the 2000 band is the queue that renumbers; the 1000 band means
             # a man whose aircraft is in repair and is left exactly where it
             # is, or a promotion would quietly change what his status says
@@ -1236,13 +1277,13 @@ class Career:
                 raise ValueError("the exchange must be one for one")
 
             planes = {r["slot"]: r["id"] for r in con.execute(
-                "SELECT id, slot FROM plane WHERE isDeleted=0 AND slot<?", (self.SEATS,))}
+                "SELECT id, slot FROM plane WHERE isDeleted=0 AND slot<?", (count,))}
             home = {pid: slot for slot, pid in seated.items()}
             promoted = [pid for pid in plan.values() if pid not in home]
             demoted = [pid for pid in seated.values() if pid not in set(plan.values())]
             pilot_home = {r["id"]: r["slot"] for r in con.execute(
                 """SELECT id, slot FROM pilot WHERE isDeleted=0
-                   AND slot>=? AND slot<?""", (self.SEATS, self.RESERVE_TOP))}
+                   AND slot>=? AND slot<?""", (count, self.RESERVE_TOP))}
 
             # park the line-up out of range: writing a seat that its new
             # occupant has not yet vacated would put two men in one aeroplane
@@ -1743,7 +1784,9 @@ class App(tk.Tk):
         self.fl_pick: Optional[int] = None
         board = tk.Frame(fl, background=self.PANEL)
         board.pack(anchor="w", padx=8)
-        self._build_board(board)
+        self.fl_board = board
+        self.fl_seats = Career.SEATS
+        self._build_board(board, Career.SEATS)
         tk.Label(fl, text="\u2605 " + self.t["fl_cmd"], background=self.PANEL,
                  foreground=self.ACCENT, font=("", 9), anchor="w").pack(
             anchor="w", padx=10, pady=(8, 0))
@@ -2095,16 +2138,28 @@ class App(tk.Tk):
 
     # -- flights ---------------------------------------------------------------
 
-    def _build_board(self, board: tk.Frame) -> None:
+    def _build_board(self, board: tk.Frame, seats: int) -> None:
         """
-        The six flights as the Combat Units screen draws them: a column each,
-        four seats down it, a rule between the two sections. The structure
-        never changes, so it is built once and only repainted afterwards.
+        The flights as the Combat Units screen draws them: a column each,
+        four seats down it, a rule between the two sections.
+
+        The number of columns is the career's, not a constant. An American
+        squadron is six flights of four; an eastern regiment is larger, and
+        the game's own screen cannot even scroll to its 3rd Squadron. The
+        board is rebuilt whenever a career with a different line-up is
+        chosen, which is why the cards are cleared here rather than kept.
         """
-        for f in range(Career.FLIGHTS):
+        for child in board.winfo_children():
+            child.destroy()
+        self.fl_cards.clear()
+        self.fl_heads.clear()
+        for f in range(seats // 4):
             col = tk.Frame(board, background=self.PANEL)
             col.grid(row=0, column=f, padx=2, sticky="n")
-            head = tk.Label(col, text=self.t[f"fl_c{f + 1}"], background=self.DESK,
+            # Named for the first six; numbered beyond, because the strings
+            # stop at six and an eastern regiment has more columns than that.
+            title = self.t.get(f"fl_c{f + 1}") or self.t["fl_num"].format(n=f + 1)
+            head = tk.Label(col, text=title, background=self.DESK,
                             foreground=self.ACCENT_DARK, font=("Georgia", 10, "bold"),
                             width=17, pady=4)
             head.pack(fill="x")
@@ -2133,7 +2188,12 @@ class App(tk.Tk):
     def _fill_flights(self) -> None:
         """Read the line-up and the bench back from the career and draw them."""
         self.fl_pick = self.fl_up = None
-        self.fl_men, self.fl_plan = {}, {s: None for s in range(Career.SEATS)}
+        # This career's line-up may be bigger than the last one's.
+        seats = self.career.seats() if self.career is not None else Career.SEATS
+        if seats != self.fl_seats:
+            self.fl_seats = seats
+            self._build_board(self.fl_board, seats)
+        self.fl_men, self.fl_plan = {}, {s: None for s in range(seats)}
         if self.career is None:
             self._draw_seats()
             self._fill_bench()
@@ -2308,7 +2368,7 @@ class App(tk.Tk):
         if not self.fl_men:
             self.fl_var.set(self.t["fl_none"])
             return
-        self.fl_plan = {s: None for s in range(Career.SEATS)}
+        self.fl_plan = {s: None for s in range(self.fl_seats)}
         self.fl_plan.update(
             propose_seating(seats, bench if self.fl_pool_var.get() else None))
         self.fl_pick = self.fl_up = None
