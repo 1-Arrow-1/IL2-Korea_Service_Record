@@ -145,6 +145,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_col_who": "Pilot",
         "pend_col_award": "Award",
         "pend_col_earned": "Earned",
+        "pend_col_sk": "Skill",
+        "pend_col_di": "Discipline",
+        "pend_col_co": "Courage",
+        "pend_col_after": "after",
         "pend_all": "All",
         "pend_none": "None",
         "pend_grant": "Present the ticked awards",
@@ -262,6 +266,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_col_who": "Pilot",
         "pend_col_award": "Auszeichnung",
         "pend_col_earned": "Erworben",
+        "pend_col_sk": "Können",
+        "pend_col_di": "Disziplin",
+        "pend_col_co": "Mut",
+        "pend_col_after": "danach",
         "pend_all": "Alle",
         "pend_none": "Keine",
         "pend_grant": "Markierte verleihen",
@@ -379,6 +387,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_col_who": "Piloto",
         "pend_col_award": "Condecoración",
         "pend_col_earned": "Ganada",
+        "pend_col_sk": "Pericia",
+        "pend_col_di": "Disciplina",
+        "pend_col_co": "Valor",
+        "pend_col_after": "después",
         "pend_all": "Todas",
         "pend_none": "Ninguna",
         "pend_grant": "Entregar las marcadas",
@@ -496,6 +508,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_col_who": "Pilote",
         "pend_col_award": "Décoration",
         "pend_col_earned": "Méritée",
+        "pend_col_sk": "Habileté",
+        "pend_col_di": "Discipline",
+        "pend_col_co": "Courage",
+        "pend_col_after": "après",
         "pend_all": "Toutes",
         "pend_none": "Aucune",
         "pend_grant": "Remettre les décorations cochées",
@@ -613,6 +629,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_col_who": "Лётчик",
         "pend_col_award": "Награда",
         "pend_col_earned": "Заслужена",
+        "pend_col_sk": "Навык",
+        "pend_col_di": "Дисциплина",
+        "pend_col_co": "Смелость",
+        "pend_col_after": "после",
         "pend_all": "Все",
         "pend_none": "Ни одной",
         "pend_grant": "Вручить отмеченные",
@@ -730,6 +750,10 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "pend_col_who": "飞行员",
         "pend_col_award": "奖励",
         "pend_col_earned": "获得日期",
+        "pend_col_sk": "技能",
+        "pend_col_di": "纪律",
+        "pend_col_co": "勇气",
+        "pend_col_after": "之后",
         "pend_all": "全选",
         "pend_none": "全不选",
         "pend_grant": "授予已选奖励",
@@ -1089,6 +1113,31 @@ class Career:
     # discipline, one written 3 moved courage.
     QUAL = {1: ("skills", 0), 2: ("discipline", 2), 3: ("courage", 1)}
     QUAL_CAP = 4                      # stored 4, drawn as 5
+
+    def attributes(self, pilot_ids=None) -> Dict[int, tuple]:
+        """
+        Skill, discipline and courage per pilot, as the game's own panel
+        prints them.
+
+        persLevel packs the three into nibbles - 0 skill, 1 courage,
+        2 discipline - each stored one lower than it is shown, which is why
+        every value here is the nibble plus one. leadLevel, which holds the
+        boosters, is deliberately not read: a decoration does not move them.
+        Promotions do.
+        """
+        sql = "SELECT id, persLevel FROM pilot WHERE isDeleted=0"
+        params: tuple = ()
+        if pilot_ids:
+            ids = [int(i) for i in pilot_ids]
+            sql += " AND id IN (%s)" % ",".join("?" * len(ids))
+            params = tuple(ids)
+        with self._open() as con:
+            rows = con.execute(sql, params).fetchall()
+        out = {}
+        for r in rows:
+            v = int(r["persLevel"] or 0)
+            out[r["id"]] = ((v & 15) + 1, ((v >> 8) & 15) + 1, ((v >> 4) & 15) + 1)
+        return out
 
     def pending_awards(self, game: Optional[Path] = None) -> List[Dict]:
         """
@@ -1917,8 +1966,13 @@ class App(tk.Tk):
         ttk.Separator(pts).pack(fill="x", padx=8, pady=(14, 8))
         ttk.Label(pts, text=self.t["pending_intro"], wraplength=720,
                   foreground="#444").pack(anchor="w", padx=8)
-        self.pend_tree = ttk.Treeview(pts, columns=("who", "status", "award", "earned"),
-                                      show="headings", height=9, selectmode="none")
+        # Three attributes, each as a pair: what the man had before the
+        # awards were presented and what he has after. Boosters are not
+        # shown - a decoration never moves them, only a promotion does.
+        self.pend_tree = ttk.Treeview(
+            pts, columns=("who", "status", "award", "earned",
+                          "sk0", "sk1", "di0", "di1", "co0", "co1"),
+            show="headings", height=9, selectmode="none")
         # The fallen are listed but stand out: a posthumous award is the
         # commander's decision, not something to tick past by accident.
         self.pend_tree.tag_configure("gone", foreground=self.BAD)
@@ -1926,6 +1980,16 @@ class App(tk.Tk):
         for col, w in (("who", 170), ("status", 100), ("award", 300), ("earned", 100)):
             self.pend_tree.heading(col, text=self.t["pend_col_" + col], anchor="w")
             self.pend_tree.column(col, width=w, anchor="w")
+        # The pairs are narrow and centred: the eye compares them down the
+        # column, and the "after" heading repeats so each pair reads as one.
+        for col, head in (("sk0", "pend_col_sk"), ("sk1", "pend_col_after"),
+                          ("di0", "pend_col_di"), ("di1", "pend_col_after"),
+                          ("co0", "pend_col_co"), ("co1", "pend_col_after")):
+            self.pend_tree.heading(col, text=self.t[head], anchor="center")
+            self.pend_tree.column(col, width=58 if col.endswith("0") else 48,
+                                  anchor="center", stretch=False)
+        # A value that went up is worth seeing at a glance.
+        self.pend_tree.tag_configure("bumped", foreground=self.ACCENT_DARK)
         self.pend_tree.pack(fill="both", expand=True, padx=8, pady=(6, 4))
         # A checkbox per row would need a third-party widget; a tick in the
         # first column and a click to toggle does the same job with ttk alone.
@@ -2275,23 +2339,37 @@ class App(tk.Tk):
     def _fill_pending(self) -> None:
         self.pend_tree.delete(*self.pend_tree.get_children())
         self.pending = [] if self.career is None else self.career.pending_awards(find_game_dir())
+        # What every man on the list stands at now. Read once, before
+        # anything is presented, so the pair of columns has a left-hand side.
+        self.pend_before = ({} if self.career is None
+                            else self.career.attributes({a["pilot"] for a in self.pending}))
+        self.pend_after: Dict[int, tuple] = {}
         # everyone ticked but the dead - those are opted in, not out
         self.pend_checked = {a["id"] for a in self.pending
                              if a["status"] not in ("kia", "mia")}
         for n, a in enumerate(self.pending):
             tags = (("gone",) if a["status"] in ("kia", "mia") else ()) + (("odd",) if n % 2 else ())
-            self.pend_tree.insert("", "end", iid=str(a["id"]), tags=tags,
-                                  values=(a["who"], self.t["st_" + a["status"]],
-                                          a["award"], a["earned"]))
+            self.pend_tree.insert("", "end", iid=str(a["id"]), tags=tags, values=())
         self._mark_pending()
 
     def _mark_pending(self) -> None:
         """Redraw the ticks and the running cost."""
         for a in self.pending:
             on = a["id"] in self.pend_checked
+            before = self.pend_before.get(a["pilot"])
+            after = self.pend_after.get(a["pilot"])
+            cells = []
+            for n in range(3):
+                cells.append("" if before is None else str(before[n]))
+                # Blank until the awards are presented; then the new value,
+                # with an arrow only where it actually moved.
+                if after is None or before is None:
+                    cells.append("")
+                else:
+                    cells.append(("↑ " if after[n] > before[n] else "") + str(after[n]))
             self.pend_tree.item(str(a["id"]), values=(
                 ("✓  " if on else "   ") + a["who"],
-                self.t["st_" + a["status"]], a["award"], a["earned"]))
+                self.t["st_" + a["status"]], a["award"], a["earned"], *cells))
         cost = sum(a["cost"] for a in self.pending if a["id"] in self.pend_checked)
         points = self.career.award_points() if self.career else 0
         self.pend_var.set(self.t["pend_cost"].format(n=len(self.pend_checked),
@@ -2333,7 +2411,13 @@ class App(tk.Tk):
         self.points_var.set(self.t["points_now"].format(points=points))
         self.status.set(self.t["pend_done"].format(n=done["granted"], spent=done["spent"],
                                                    backup=done["backup"]))
-        self._fill_pending()
+        # The rows stay up with both sides filled in, so the reader can see
+        # what the ceremony moved. They clear on the next refresh or when
+        # another career is chosen - by then the awards are history.
+        self.pend_after = self.career.attributes(set(self.pend_before))
+        self.pend_checked = set()
+        self._mark_pending()
+        self.pend_btn.state(["disabled"])
 
     # -- flights ---------------------------------------------------------------
 
