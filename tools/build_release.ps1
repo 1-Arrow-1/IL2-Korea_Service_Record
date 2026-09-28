@@ -123,7 +123,7 @@ try {
         $MetadataPath +
         '$q -File $f'
 
-    & $iscc "-dAZURE_SIGNING=1" "--signtool=$innoSignCommand" $iss
+    & $iscc "-dAZURE_SIGNING=1" "-s$innoSignCommand" $iss
     Assert-NativeSuccess "Inno Setup compilation"
 
     if (-not (Test-Path -LiteralPath $setupExe -PathType Leaf)) {
