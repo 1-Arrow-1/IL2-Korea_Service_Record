@@ -91,18 +91,26 @@ Profile Signer** role:
     az login
     .\tools\build_release.ps1
 
-The script is fail-closed and performs the complete release chain:
+The script is fail-closed for the reproducible build/sign/package chain:
 
-1. `python tools/validate.py`
-2. PyInstaller build
-3. Azure-sign and verify **both** `IL2_Korea_Service_Record.exe` and
+1. PyInstaller build
+2. Azure-sign and verify **both** `IL2_Korea_Service_Record.exe` and
    `IL2_Korea_Career_Helper.exe`
-4. `python tools/stage_release.py`
-5. Inno Setup build; Inno invokes the same Azure signing helper for Setup and
+3. `python tools/stage_release.py`
+4. Inno Setup build; Inno invokes the same Azure signing helper for Setup and
    the generated uninstaller
-6. Verify the final Setup.exe
-7. `python tools/make_release_zip.py`
-8. Print SHA-256 hashes for the Setup.exe and ZIP
+5. Verify the final Setup.exe
+6. `python tools/make_release_zip.py`
+7. Print SHA-256 hashes for the Setup.exe and ZIP
+
+`tools/validate.py` is intentionally not a default release gate. It reads the
+user's live IL-2 installation and current career databases, so results can
+depend on the installed career data rather than only on the source tree. Run it
+explicitly when desired:
+
+    .\tools\build_release.ps1 -RunValidation
+
+A validation failure still aborts the release when `-RunValidation` is used.
 
 The helper `tools/sign_artifact.ps1` auto-selects the newest x64 Windows SDK
 SignTool, uses the Artifact Signing client dlib installed under LocalAppData,
