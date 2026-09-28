@@ -111,6 +111,22 @@
     color: var(--ink-muted);
     white-space: nowrap;
 }
+/* Six across stops fitting somewhere under 1200px and the longest label -
+   ARMAMENTS - is clipped by its own cell. Below that the strip lets the
+   labels breathe rather than cutting them: the tracking goes first,
+   because it costs nothing, then the type size. */
+@media (max-width: 1200px) {
+    .stat-strip { gap: 0.3rem; }
+    .stat-label { letter-spacing: 0; font-size: 0.72rem; }
+    .stat-value { font-size: 1.15rem; }
+}
+/* Narrower still and even that is not enough for ARMAMENTS at six across,
+   so the labels are allowed to break. Two short lines under a figure read
+   perfectly well; a word with its tail cut off does not. */
+@media (max-width: 1150px) {
+    .stat-strip { gap: 0.2rem; }
+    .stat-label { white-space: normal; overflow-wrap: anywhere; font-size: 0.68rem; }
+}
 
 .breakdown {
     display: grid;

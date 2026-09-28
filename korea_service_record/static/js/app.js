@@ -593,8 +593,29 @@
             const shortFit = sizeFor(short);
             if (shortFit > fit) { text = short; fit = shortFit; }
         }
+        // A name too long even for the initial form used to be set at a
+        // 7px floor and then clipped by the plate's overflow, so it was cut
+        // off mid-word with nothing to show for it. Engrave what the brass
+        // holds and end it in an ellipsis, which is at least honest about
+        // having been shortened.
+        if (fit < least) {
+            span.style.fontSize = least + "px";
+            span.textContent = text;
+            if (span.scrollWidth > room) {
+                let lo = 0, hi = text.length;
+                while (lo < hi) {                     // longest prefix that fits
+                    const mid = Math.ceil((lo + hi) / 2);
+                    span.textContent = text.slice(0, mid).trimEnd() + "…";
+                    if (span.scrollWidth <= room) { lo = mid; } else { hi = mid - 1; }
+                }
+                span.textContent = text.slice(0, lo).trimEnd() + "…";
+            }
+            // The plate's title attribute is the rank translation, which is
+            // a deliberate feature - not somewhere to put the name.
+            return;
+        }
         span.textContent = text;
-        span.style.fontSize = Math.max(7, fit) + "px";
+        span.style.fontSize = fit + "px";
     }
 
     async function openShadowbox() {
