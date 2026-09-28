@@ -106,7 +106,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_c6": "6 · Black",
         "fl_num": "Flight {n}",
         "fl_commander": "Commander Flight",
-        "fl_squadron": "{n} Squadron",
+        # Only ever used past the third, where the game supplies no name:
+        # "Squadron 4" rather than an ordinal we would have to inflect.
+        "fl_squadron": "Squadron {n}",
         "fl_alert": "alert",
         "fl_empty": "— empty —",
         "fl_propose": "Propose a seating",
@@ -831,11 +833,17 @@ def line_up_shape(country: int, seats: int, t: Dict[str, str],
     Squadron, 14-19 the six men of the 2nd it had at the time. That the 3rd
     Squadron is 26-37 follows by extension and has not been seen occupied.
 
-    The squadrons are stacked rather than set side by side. Side by side is
-    what the game does, and it is why the game cannot show them: ten columns
-    do not fit, there is no horizontal scrollbar, and the 3rd Squadron is
-    simply unreachable. Stacked, the board is three columns wide and reads
-    the way the unit is organised.
+    The squadrons are laid out two to a row, under the commander pair:
+
+        Commander Flight
+        1st Squadron          2nd Squadron
+        3rd Squadron          (4th, if a unit ever has one)
+
+    Six columns, the same width as the American board the window is already
+    sized for, and half the height of one squadron per row. What it is not
+    is the game's arrangement - all of them side by side, which needs ten
+    columns, has no horizontal scrollbar, and leaves the 3rd Squadron
+    unreachable.
     """
     game = game or {}
     flight_word = game.get("carFlightNum") or t.get("fl_num") or "Flight $[value]"
@@ -866,7 +874,8 @@ def line_up_shape(country: int, seats: int, t: Dict[str, str],
     squadrons = max(3, -(-(max(0, seats - 2)) // 12))
     for s in range(squadrons):
         for f in range(3):
-            groups.append(Group(flight_label(f + 1), 2 + s * 12 + f * 4, 4, s + 1, f,
+            groups.append(Group(flight_label(f + 1), 2 + s * 12 + f * 4, 4,
+                                1 + s // 2, (s % 2) * 3 + f,
                                 squadron_label(s + 1) if f == 0 else ""))
     return groups
 
@@ -2288,9 +2297,11 @@ class App(tk.Tk):
             # flights. The name spans the row because a column headed
             # "Flight 1" means nothing until you know whose flight it is.
             if g.row_label:
+                # Spans its own squadron's three columns, not the whole row -
+                # there are two squadrons side by side on it.
                 tk.Label(board, text=g.row_label, background=self.PANEL,
                          foreground=self.ACCENT, font=("Georgia", 11, "bold"),
-                         anchor="w", pady=2).grid(row=g.row * 2, column=0,
+                         anchor="w", pady=2).grid(row=g.row * 2, column=g.col,
                                                   columnspan=3, sticky="w", padx=4)
             col = tk.Frame(board, background=self.PANEL)
             col.grid(row=g.row * 2 + 1, column=g.col, padx=2, pady=(0, 6), sticky="n")
