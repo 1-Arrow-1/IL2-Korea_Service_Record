@@ -6,7 +6,9 @@ param(
         "C:\CodeSigning\metadata.json"
     }),
 
-    [switch]$SkipValidation,
+    # tools/validate.py uses the user's live IL-2 installation and career data.
+    # It is useful diagnostically, but is not a reproducible release gate.
+    [switch]$RunValidation,
 
     # Uploads the finished signed Setup.exe and ZIP to the already-existing
     # GitHub release v<version>. It does not create or push a tag.
@@ -82,18 +84,18 @@ try {
     Write-Host "IL-2 Korea Service Record v$version - signed release build" -ForegroundColor Cyan
     Write-Host "Artifact Signing metadata: $MetadataPath"
 
-    if (-not $SkipValidation) {
+    if ($RunValidation) {
         Write-Host ""
-        Write-Host "[1/8] Validate repository" -ForegroundColor Cyan
+        Write-Host "[optional] Validate against live IL-2 career data" -ForegroundColor Cyan
         & python "tools\validate.py"
-        Assert-NativeSuccess "Repository validation"
+        Assert-NativeSuccess "Live-game validation"
     } else {
         Write-Host ""
-        Write-Host "[1/8] Repository validation skipped" -ForegroundColor Yellow
+        Write-Host "[optional] Live-game validation not requested" -ForegroundColor DarkGray
     }
 
     Write-Host ""
-    Write-Host "[2/8] Build PyInstaller application" -ForegroundColor Cyan
+    Write-Host "[1/7] Build PyInstaller application" -ForegroundColor Cyan
     & python -m PyInstaller "korea_service_record.spec" --noconfirm
     Assert-NativeSuccess "PyInstaller build"
 
@@ -104,17 +106,17 @@ try {
     }
 
     Write-Host ""
-    Write-Host "[3/8] Sign and verify application executables" -ForegroundColor Cyan
+    Write-Host "[2/7] Sign and verify application executables" -ForegroundColor Cyan
     & $signScript -File $trackerExe -MetadataPath $MetadataPath
     & $signScript -File $helperExe -MetadataPath $MetadataPath
 
     Write-Host ""
-    Write-Host "[4/8] Stage installer payload" -ForegroundColor Cyan
+    Write-Host "[3/7] Stage installer payload" -ForegroundColor Cyan
     & python "tools\stage_release.py"
     Assert-NativeSuccess "Release staging"
 
     Write-Host ""
-    Write-Host "[5/8] Build and sign Inno Setup installer + uninstaller" -ForegroundColor Cyan
+    Write-Host "[4/7] Build and sign Inno Setup installer + uninstaller" -ForegroundColor Cyan
 
     $innoSignCommand =
         'azureartifacts=powershell.exe -NoProfile -ExecutionPolicy Bypass -File $q' +
@@ -131,11 +133,11 @@ try {
     }
 
     Write-Host ""
-    Write-Host "[6/8] Verify final installer" -ForegroundColor Cyan
+    Write-Host "[5/7] Verify final installer" -ForegroundColor Cyan
     & $signScript -File $setupExe -VerifyOnly
 
     Write-Host ""
-    Write-Host "[7/8] Build release ZIP" -ForegroundColor Cyan
+    Write-Host "[6/7] Build release ZIP" -ForegroundColor Cyan
     & python "tools\make_release_zip.py"
     Assert-NativeSuccess "Release ZIP creation"
 
@@ -144,7 +146,7 @@ try {
     }
 
     Write-Host ""
-    Write-Host "[8/8] Release hashes" -ForegroundColor Cyan
+    Write-Host "[7/7] Release hashes" -ForegroundColor Cyan
     $setupHash = (Get-FileHash -LiteralPath $setupExe -Algorithm SHA256).Hash.ToLowerInvariant()
     $zipHash = (Get-FileHash -LiteralPath $zipFile -Algorithm SHA256).Hash.ToLowerInvariant()
     Write-Host "  $setupHash  $([IO.Path]::GetFileName($setupExe))"
