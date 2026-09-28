@@ -36,8 +36,7 @@
     "sorties": "Sorties",
     "sorties_value": "{total} ({good} réussies)",
     "flight_time": "Temps de vol",
-    "award_points": "Points de décoration",
-    "document": "État de service"
+    "award_points": "Points de décoration"
   },
   "pilot": {
     "heading": "Informations sur le pilote",

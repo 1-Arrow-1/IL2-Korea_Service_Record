@@ -1504,13 +1504,6 @@
             logbook.hidden = false;
             // The war diary is the squadron's, not one pilot's, so it takes
             // no pilot id - the same page whoever the record belongs to.
-            // The heading's small right-hand box is a form number in the
-            // original: it names the form, not the man. The honest
-            // equivalent here is the air force that issued the record.
-            const SERVICES = {601: "USAF", 602: "USN", 603: "USMC",
-                              501: "VVS", 502: "PLAAF", 503: "KPAF"};
-            el("d-service").textContent =
-                SERVICES[(d.player && d.player.country) || 0] || "";
             const diary = el("d-diary");
             diary.href = "/diary?career=" + encodeURIComponent(careerId);
             diary.title = T("diary.open_hint");
