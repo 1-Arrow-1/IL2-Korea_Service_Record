@@ -1356,12 +1356,15 @@ class Career:
         squadron is 24 seats in six flights of four; an eastern regiment is
         a commander pair and three squadrons of twelve, 38 in all.
 
-        Most eastern careers will show the upper seats empty: the game caps
-        the number of pilots it keeps active at 24 and benches the rest, so
-        a regiment is normally under strength against its own establishment.
-        That is a staffing policy, not the size of the line-up - proved by
-        assigning men into the 3rd Squadron in game, where the slots written
-        were 26, 27 and 28.
+        Most eastern careers show the upper seats empty. A mature 48/48
+        regiment was found holding 24 men in seats 0-23 with seven fit
+        pilots benched, which suggests the game keeps a target strength
+        rather than filling the establishment - but that is inference from
+        one career, not something proven.
+
+        What *is* proven is that the seats exist: assigning men into the 3rd
+        Squadron in game wrote slots 26, 27 and 28, exactly where this
+        mapping puts it.
 
         Rather than encode either establishment, or trust squadrons.cfg
         (whose pilotsCap of 48 matches neither seat count), the chart takes

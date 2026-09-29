@@ -38,6 +38,17 @@ LIKELY = "likely"
 UNKNOWN = "unknown"
 
 
+# Types 13, 19 and 32 were documented from Manuel Rivera's career, which was
+# deleted in September 2026. Their notes below cite exact row values, but the
+# rows can no longer be inspected: across the six careers held now - four
+# eastern, one American, one borrowed from a forum user with 84 missions and
+# three changes of commander - not one of the three appears. Promotions in
+# particular are recorded as `award` rows with category 1, so a type-19 event
+# may simply not be emitted in Korea. Treat all three as historical evidence
+# rather than something re-checkable.
+PROVEN_ON_A_CAREER_SINCE_DELETED = (13, 19, 32)
+
+
 class EventType(NamedTuple):
     code: int
     key: str
