@@ -41,6 +41,16 @@ up, instead of the list clearing and telling you nothing.
 Boosters are deliberately absent. A decoration never moves them — only a promotion does.
 
 
+A FRONT DOOR
+
+The career list used to be a heading and a row of cards. It now opens on a Mustang,
+and the setup program carries the same picture on its welcome page instead of the
+installer toolkit's stock blue panel.
+
+Nothing else changed visually. The record, the diary and the display case are paper,
+and a glossy render has no business printed on them.
+
+
 TWO SMALLER FIXES
 
   * A very long pilot name is no longer cut off mid-word on the display case's brass.
@@ -60,10 +70,10 @@ DOWNLOAD
     https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v1.8.1
 
 Installer  IL2_Korea_Service_Record_Setup_v1.8.1.exe
-           SHA-256  a947bd9fc08b0dc9d5d7bf387e1990080b14623d267034be2440ca4f09f8ed6d
+           SHA-256  07962df8b2972e81934b920a472b1680a5b5e8b7e9f72dd1aff709c29f60b560
 
 Zip        IL-2.Korea.Service.Record.v1.8.1.zip
-           SHA-256  4bbd0bb72cbfe9d5c8738caf7f06c0d8dc63f1339b0f606cf2f2463255a89f2c
+           SHA-256  9a47ef1a87c078cc834a25185b562ba636064e588d0103878718b75b663c660d
 
 (GitHub writes the zip's name with dots where I put spaces. It is the same file.)
 
