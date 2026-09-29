@@ -35,7 +35,7 @@ import struct
 from pathlib import Path
 from typing import Iterator, NamedTuple, Optional
 
-from .crypto import decrypt_ecb, derive_key, path_hash
+from .crypto import SCHEMES, decrypt_ecb, path_hash
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +69,9 @@ class GtpArchive:
                              f"(magic {self.magic!r})")
         self.encrypted = self.magic == b"S16E!"
         self.count = struct.unpack_from("<Q", head, 0x30)[0]
+        # Which key scheme this archive uses, worked out on first read.
+        self._derive = None
+        self.scheme = None
 
     def close(self) -> None:
         if not self._fh.closed:
@@ -148,13 +151,54 @@ class GtpArchive:
         if not self.encrypted:
             return raw
 
-        key = derive_key(path_hash(entry.vpath.lower()))
+        if self._derive is None:
+            self._resolve_scheme()
+        key = self._derive(path_hash(entry.vpath.lower()))
         whole = len(raw) // 16 * 16
         out = decrypt_ecb(raw, key)
         if whole < entry.size:
             self._fh.seek(entry.offset + STRMFILE_HEADER + whole)
             out += decrypt_ecb(self._fh.read(16), key)[:entry.size - whole]
         return out
+
+    # Files whose first bytes are known, so a decryption can be judged
+    # right or wrong without knowing the content.
+    _PROBES = ((".json", (b"{", b"[")), (".xaml", (b"<",)),
+               (".dds", (b"DDS ",)), (".txt", None))
+
+    def _resolve_scheme(self) -> None:
+        """
+        Decide which key scheme this archive uses.
+
+        The player's game may be either build and the tracker has no say in
+        which, so it decrypts one entry of a known shape and looks at the
+        result. A wrong key yields noise, which no prefix test survives.
+        Falls back to the newest scheme if nothing suitable is found, so a
+        future archive of unknown shape still gets the current guess.
+        """
+        probe = expect = None
+        for suffix, heads in self._PROBES:
+            if heads is None:
+                continue
+            for entry in self.entries():
+                if entry.vpath.lower().endswith(suffix) and entry.size >= 16:
+                    probe, expect = entry, heads
+                    break
+            if probe is not None:
+                break
+
+        for name, derive in SCHEMES:
+            if probe is None:
+                break
+            self._fh.seek(probe.offset + STRMFILE_HEADER)
+            head = decrypt_ecb(self._fh.read(16),
+                               derive(path_hash(probe.vpath.lower())))
+            if any(head.lstrip(b"\xef\xbb\xbf \t\r\n").startswith(h)
+                   for h in expect):
+                self.scheme, self._derive = name, derive
+                return
+
+        self.scheme, self._derive = SCHEMES[0]
 
     def extract(self, vpath: str) -> Optional[bytes]:
         entry = self.find(vpath)

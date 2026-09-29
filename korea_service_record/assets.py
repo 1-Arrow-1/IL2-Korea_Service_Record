@@ -47,6 +47,7 @@ class AssetResolver:
         self.game_dir = Path(game_dir)
         self.cache_dir = Path(cache_dir) if cache_dir else default_cache_dir()
         self._archives: Optional[List[Path]] = None
+        self._archive_mtime: Optional[float] = None
 
     # -- locations ---------------------------------------------------------
 
@@ -55,6 +56,32 @@ class AssetResolver:
 
     def _cache_path(self, vpath: str) -> Path:
         return self.cache_dir / vpath.lstrip("/")
+
+    def _newest_archive_mtime(self) -> float:
+        """
+        When the game's archives were last written.
+
+        A game update rewrites every ``.gtp``, so anything extracted before
+        that is out of date. Without this the cache is answered from
+        whatever was current the first time a string was asked for: after
+        the 2026-09-29 update the mission list here was eighteen days old
+        and still missing the two types that update added.
+        """
+        if self._archive_mtime is None:
+            newest = 0.0
+            for path in self._archive_paths():
+                try:
+                    newest = max(newest, path.stat().st_mtime)
+                except OSError:
+                    pass
+            self._archive_mtime = newest
+        return self._archive_mtime
+
+    def _cache_is_fresh(self, cached: Path) -> bool:
+        try:
+            return cached.stat().st_mtime >= self._newest_archive_mtime()
+        except OSError:
+            return False
 
     def _archive_paths(self) -> List[Path]:
         if self._archives is None:
@@ -105,7 +132,7 @@ class AssetResolver:
                 logger.warning("Cannot read loose asset %s: %s", loose, exc)
 
         cached = self._cache_path(vpath)
-        if use_cache and cached.is_file():
+        if use_cache and cached.is_file() and self._cache_is_fresh(cached):
             try:
                 return cached.read_bytes()
             except OSError as exc:

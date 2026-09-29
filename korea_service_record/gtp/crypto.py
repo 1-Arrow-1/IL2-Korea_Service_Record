@@ -1,5 +1,5 @@
 """
-AES-192-ECB and the gtpack key schedule.
+AES-ECB and the gtpack key schedules, old and new.
 
 Lifted verbatim from ``il2k_extract.py`` (the standalone extractor written for
 this game's archives) so the two cannot drift apart. Decryption only; no
@@ -7,6 +7,15 @@ third-party modules, so every line is auditable.
 
 The key for a file is derived from its own virtual path — lowercase, forward
 slashes, leading '/'. See ``archive.py`` for the container layout.
+
+There are two schemes. Steam build 25605106 (2026-09-29) moved the archives
+from AES-192 to AES-256: both mixing multipliers gained one, the finaliser
+is seeded with 0xC7E13EDC, a rotate appeared, and the key became eight
+independently mixed words instead of four bytes in a repeating pattern.
+
+Both are kept, because the player's game may be either build and the
+tracker has no say in which. ``archive.py`` decides per archive by trying
+one and looking at what comes out.
 """
 
 import struct  # noqa: F401  (kept so the lifted region needs no edits)
@@ -53,8 +62,9 @@ def _mul(a, b):
 
 
 def _expand_key(key):
-    """AES-192: Nk=6, Nr=12 -> 52 words."""
-    nk, nr = 6, 12
+    """Nk from the key length: 24 bytes -> AES-192, 32 -> AES-256."""
+    nk = len(key) // 4
+    nr = nk + 6
     w = [list(key[4 * i:4 * i + 4]) for i in range(nk)]
     for i in range(nk, 4 * (nr + 1)):
         t = list(w[i - 1])
@@ -62,8 +72,10 @@ def _expand_key(key):
             t = t[1:] + t[:1]                                   # RotWord
             t = [SBOX[b] for b in t]                            # SubWord
             t[0] ^= RCON[i // nk - 1]
+        elif nk == 8 and i % nk == 4:                           # AES-256 only
+            t = [SBOX[b] for b in t]
         w.append([w[i - nk][j] ^ t[j] for j in range(4)])
-    return w
+    return w, nr
 
 
 def _add_round_key(s, w, rnd):
@@ -72,10 +84,10 @@ def _add_round_key(s, w, rnd):
             s[r + 4 * c] ^= w[4 * rnd + c][r]
 
 
-def decrypt_block(block, w):
+def decrypt_block(block, w, nr=12):
     s = list(block)
-    _add_round_key(s, w, 12)
-    for rnd in range(11, -1, -1):
+    _add_round_key(s, w, nr)
+    for rnd in range(nr - 1, -1, -1):
         # InvShiftRows
         for r in range(1, 4):
             row = [s[r + 4 * c] for c in range(4)]
@@ -100,7 +112,7 @@ def decrypt_block(block, w):
 #   2. pycryptodome, if the user happens to have it
 #   3. the pure-Python code above - correct but ~34 KB/s, fine for a few files
 class _CNG:
-    """AES-192-ECB through Windows' own crypto library. No install needed."""
+    """AES-ECB through Windows' own crypto library. No install needed."""
 
     def __init__(self):
         import ctypes
@@ -159,8 +171,9 @@ def decrypt_ecb(data, key):
         return impl.decrypt(data, key)
     if kind == "pycryptodome":
         return impl.new(key, impl.MODE_ECB).decrypt(data[:n])
-    w = _expand_key(key)
-    return b"".join(decrypt_block(data[i:i + 16], w) for i in range(0, n, 16))
+    w, nr = _expand_key(key)
+    return b"".join(decrypt_block(data[i:i + 16], w, nr)
+                    for i in range(0, n, 16))
 
 
 # ------------------------------------------------------------ key schedule --
@@ -187,3 +200,37 @@ def derive_key(h):
     d = (z ^ (z >> 24)) & 0xFF
     return bytes([a, b, b, a, a, b, b, a, a, b, b, a,
                   c, d, d, c, c, d, d, c, c, d, d, c])
+
+
+# -- the scheme from Steam build 25605106 (2026-09-29) onwards --------------
+# Read off common.dll at 0x0445c2; the cipher init below it passes 0x100 key
+# bits. Note both multipliers are the old constants plus one.
+_MUL1_V2 = 0x49A312C1
+_MUL2_V2 = 0x10D0143B
+_SEED_V2 = 0xC7E13EDC
+_GOLDEN = 0x61C88647
+
+
+def _fin_v2(v):
+    t = (v ^ (v >> 16)) & M
+    c = (t * _MUL1_V2) & M
+    t = (c ^ (c >> 15)) & M
+    c = (t * _MUL2_V2) & M
+    return (c ^ (c >> 16)) & M
+
+
+def derive_key_v2(h):
+    """32-byte AES-256 key. Eight mixed words, not four repeated bytes."""
+    base = _fin_v2((h ^ _SEED_V2) & M)
+    rotated = (base ^ 0xA5A5A5A5) & M
+    seed_b = ((rotated >> 16) | (rotated << 16)) & M
+    out = bytearray()
+    for i in range(8):
+        w = (seed_b - (i + 1) * _GOLDEN) & M
+        w = (w ^ base ^ 0xDEADBEEF) & M
+        out += _fin_v2(w).to_bytes(4, "little")
+    return bytes(out)
+
+
+#: Newest first — ``archive.py`` tries them in this order.
+SCHEMES = (("aes256", derive_key_v2), ("aes192", derive_key))
