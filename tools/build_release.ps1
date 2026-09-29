@@ -171,8 +171,15 @@ try {
             Would "commit the version bump"
         } else {
             & git add -- $iss $zipPy
-            & git commit -q -m "Version $Version"
-            Assert-NativeSuccess "Version commit"
+            # Nothing staged means the tree already carried this version -
+            # a rerun after a failed publish, not a problem.
+            $staged = & git diff --cached --name-only
+            if ($staged) {
+                & git commit -q -m "Version $Version"
+                Assert-NativeSuccess "Version commit"
+            } else {
+                Write-Host "  already at $Version, nothing to commit" -ForegroundColor DarkGray
+            }
             Write-Host "  committed"
         }
     }
@@ -281,8 +288,15 @@ try {
 
     # Refuse to take away a file someone already has. The checksum they were
     # given is in a forum post; replacing the bytes makes it a lie.
-    $existingJson = & $gh release view $tag --repo $slug --json assets 2>$null
-    if ($LASTEXITCODE -eq 0) {
+    # "release not found" on stderr is the answer to a question, not a
+    # failure - but under $ErrorActionPreference = "Stop" PowerShell turns a
+    # native command's stderr into a terminating error regardless of its exit
+    # code, so the probe has to be made with that relaxed.
+    $ErrorActionPreference = "Continue"
+    $existingJson = & $gh release view $tag --repo $slug --json assets 2>&1
+    $probe = $LASTEXITCODE
+    $ErrorActionPreference = "Stop"
+    if ($probe -eq 0) {
         $existing = ($existingJson -join "" | ConvertFrom-Json).assets
         $taken = ($existing | Measure-Object -Property downloadCount -Sum).Sum
         if (-not $taken) { $taken = 0 }
@@ -318,8 +332,11 @@ try {
     Assert-NativeSuccess "git push tag"
     Write-Host "  tagged $tag at $head"
 
+    $ErrorActionPreference = "Continue"
     & $gh release view $tag --repo $slug *> $null
-    if ($LASTEXITCODE -ne 0) {
+    $probe = $LASTEXITCODE
+    $ErrorActionPreference = "Stop"
+    if ($probe -ne 0) {
         & $gh release create $tag --repo $slug --title $tag --generate-notes
         Assert-NativeSuccess "GitHub release create"
         Write-Host "  release created"
