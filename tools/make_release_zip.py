@@ -84,12 +84,16 @@ NOTES
     and the medals in them are untouched either way.
   * Verifying game files in Steam removes loose mod files. If your medals
     stop appearing after a game update, run setup again.
-  * The public release installer and application executables are Authenticode
+  * The setup program and both executables it installs are Authenticode
     signed with Microsoft Azure Artifact Signing. In Windows Explorer,
     right-click the setup program -> Properties -> Digital Signatures to
-    verify the publisher and signature. Windows SmartScreen reputation is a
-    separate service and can still warn on a new or low-volume release.
-    You can also verify the exact download against the SHA-256 checksum below.
+    verify the publisher. SmartScreen reputation is a separate service and
+    can still warn on a new or low-volume release.
+  * If a scanner still flags it - "Trojan:Script/Wacatac" or similar - that
+    is a machine-learning heuristic reacting to a PyInstaller program, a
+    well-known false positive; the same heuristic flags PyInstaller's own
+    source download. The program is Python and Flask in a folder. Verify what
+    you have against the checksum below, or upload it to virustotal.com.
 
     SHA-256 of IL2_Korea_Service_Record_Setup_v{VERSION}.exe:
     {{sha256}}

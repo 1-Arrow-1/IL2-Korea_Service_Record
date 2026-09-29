@@ -141,15 +141,20 @@ SHA-256 of the setup program in its README.
 
 ## Code signing policy
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate
-by [SignPath Foundation](https://signpath.org).
+The setup program and both executables it installs are Authenticode signed
+with Microsoft Azure Artifact Signing. Right-click the setup program,
+Properties, Digital Signatures to see the publisher.
 
-- Committers and reviewers: Alexander Bleiholder (repository owner).
-- Approvers: Alexander Bleiholder.
-- Release builds are produced by the GitHub Actions workflow in
-  `.github/workflows/build.yml` from a tagged commit of this repository, and
-  only those builds are submitted for signing. Nothing built outside that
-  workflow is signed.
+- Committers, reviewers and approvers: Alexander Bleiholder (repository owner).
+- Release builds are produced locally from a tagged commit with
+  `tools/build_release.ps1`, which builds, signs and verifies in one pass and
+  aborts if any signature or verification fails.
+- The GitHub Actions workflow in `.github/workflows/build.yml` builds the tree
+  on a clean runner to prove it compiles. Its output is unsigned and is never
+  published: the runner installs PyInstaller from PyPI and so uses the stock
+  bootloader, while the released build uses a locally rebuilt one.
+- SmartScreen reputation is a separate service from signing and can still warn
+  on a new or low-volume release.
 
 ## Privacy policy
 

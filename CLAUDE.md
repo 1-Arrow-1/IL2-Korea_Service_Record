@@ -84,7 +84,7 @@ read as a hostname and renders an error page silently.
 
 Public releases are built **locally** and Authenticode-signed with Microsoft
 Azure Artifact Signing. The signing metadata stays outside the repository
-(default: `C:\\CodeSigning\\metadata.json`). Before a release, sign in with the
+(default: `C:\CodeSigning\metadata.json`). Before a release, sign in with the
 Azure CLI using the identity that has the **Artifact Signing Certificate
 Profile Signer** role:
 
@@ -93,6 +93,7 @@ Profile Signer** role:
 
 The script is fail-closed for the reproducible build/sign/package chain:
 
+0. `tools/validate.py` unless `-SkipValidation`
 1. PyInstaller build
 2. Azure-sign and verify **both** `IL2_Korea_Service_Record.exe` and
    `IL2_Korea_Career_Helper.exe`
@@ -102,15 +103,15 @@ The script is fail-closed for the reproducible build/sign/package chain:
 5. Verify the final Setup.exe
 6. `python tools/make_release_zip.py`
 7. Print SHA-256 hashes for the Setup.exe and ZIP
+8. Scan both artifacts with Microsoft Defender, and abort on a detection
 
-`tools/validate.py` is intentionally not a default release gate. It reads the
-user's live IL-2 installation and current career databases, so results can
-depend on the installed career data rather than only on the source tree. Run it
-explicitly when desired:
+`tools/validate.py` runs first and gates the release. It does read the live
+installation, and its career fixtures depend on which careers exist - but the
+rest is the source tree, and its locale checks are the only guard against
+shipping a key that reaches the reader as `KEY!LOCALIZE!`. Skip it only
+deliberately:
 
-    .\tools\build_release.ps1 -RunValidation
-
-A validation failure still aborts the release when `-RunValidation` is used.
+    .\tools\build_release.ps1 -SkipValidation
 
 The helper `tools/sign_artifact.ps1` auto-selects the newest x64 Windows SDK
 SignTool, uses the Artifact Signing client dlib installed under LocalAppData,
@@ -120,7 +121,7 @@ failure aborts the release.
 
 The Azure metadata file may be overridden without changing the repo:
 
-    .\tools\build_release.ps1 -MetadataPath "D:\\secure\\metadata.json"
+    .\tools\build_release.ps1 -MetadataPath "D:\secure\metadata.json"
 
 The expected metadata shape is:
 
@@ -159,6 +160,10 @@ or upload the already-built signed assets directly:
     gh release upload v1.8.0 "installer/Output/IL2_Korea_Service_Record_Setup_v1.8.0.exe" ^
                              "installer/Output/IL-2 Korea Service Record v1.8.0.zip" --clobber
 
+`--clobber` replaces an asset that is already there, and GitHub's download
+counter for it restarts at zero. Once a release has been posted, ship a new
+version rather than replacing its assets.
+
 The ZIP contains the **signed Setup.exe** plus its README. The Setup.exe in turn
 contains the already-signed tracker and Career Helper, and its generated
 uninstaller is signed by Inno Setup during compilation.
@@ -186,8 +191,8 @@ and the four `run*.exe` copied over
 `site-packages/PyInstaller/bootloader/Windows-64bit-intel/` (stock copies in
 `stock-backup/` beside them). Any `pip install --upgrade pyinstaller` will
 put the stock ones back — rebuild from the matching tag before the next
-release if that happens (sources: `C:\\Users\\bleih\\pyi-build\\src`, a sparse
+release if that happens (sources: `C:\Users\bleih\pyi-build\src`, a sparse
 checkout of `bootloader/` + `PyInstaller/_shared_with_waf.py`; the full
 checkout carries the flagged binaries). The zip's README prints the setup
-exe's SHA-256; scan `installer\\Output` with `MpCmdRun -Scan -ScanType 3`
-before uploading.
+exe's SHA-256, and `build_release.ps1` scans `installer\Output` with
+`MpCmdRun -Scan -ScanType 3` as its last step.

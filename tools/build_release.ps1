@@ -6,9 +6,13 @@ param(
         "C:\CodeSigning\metadata.json"
     }),
 
-    # tools/validate.py uses the user's live IL-2 installation and career data.
-    # It is useful diagnostically, but is not a reproducible release gate.
-    [switch]$RunValidation,
+    # tools/validate.py does read the live installation, and its career
+    # fixtures do depend on which careers exist - but most of what it checks
+    # is the source tree, and its locale checks are the project's only guard
+    # against shipping a key that reaches the user as "KEY!LOCALIZE!". It
+    # exits non-zero on failure, so it gates the release by default. Opting
+    # out is deliberate; opting in was too easy to forget.
+    [switch]$SkipValidation,
 
     # Uploads the finished signed Setup.exe and ZIP to the already-existing
     # GitHub release v<version>. It does not create or push a tag.
@@ -84,18 +88,18 @@ try {
     Write-Host "IL-2 Korea Service Record v$version - signed release build" -ForegroundColor Cyan
     Write-Host "Artifact Signing metadata: $MetadataPath"
 
-    if ($RunValidation) {
+    if ($SkipValidation) {
         Write-Host ""
-        Write-Host "[optional] Validate against live IL-2 career data" -ForegroundColor Cyan
-        & python "tools\validate.py"
-        Assert-NativeSuccess "Live-game validation"
+        Write-Host "[0/8] Validation skipped at your request" -ForegroundColor Yellow
     } else {
         Write-Host ""
-        Write-Host "[optional] Live-game validation not requested" -ForegroundColor DarkGray
+        Write-Host "[0/8] Validate locales, awards and career data" -ForegroundColor Cyan
+        & python "toolsalidate.py"
+        Assert-NativeSuccess "Validation"
     }
 
     Write-Host ""
-    Write-Host "[1/7] Build PyInstaller application" -ForegroundColor Cyan
+    Write-Host "[1/8] Build PyInstaller application" -ForegroundColor Cyan
     & python -m PyInstaller "korea_service_record.spec" --noconfirm
     Assert-NativeSuccess "PyInstaller build"
 
@@ -106,17 +110,17 @@ try {
     }
 
     Write-Host ""
-    Write-Host "[2/7] Sign and verify application executables" -ForegroundColor Cyan
+    Write-Host "[2/8] Sign and verify application executables" -ForegroundColor Cyan
     & $signScript -File $trackerExe -MetadataPath $MetadataPath
     & $signScript -File $helperExe -MetadataPath $MetadataPath
 
     Write-Host ""
-    Write-Host "[3/7] Stage installer payload" -ForegroundColor Cyan
+    Write-Host "[3/8] Stage installer payload" -ForegroundColor Cyan
     & python "tools\stage_release.py"
     Assert-NativeSuccess "Release staging"
 
     Write-Host ""
-    Write-Host "[4/7] Build and sign Inno Setup installer + uninstaller" -ForegroundColor Cyan
+    Write-Host "[4/8] Build and sign Inno Setup installer + uninstaller" -ForegroundColor Cyan
 
     $innoSignCommand =
         'azureartifacts=powershell.exe -NoProfile -ExecutionPolicy Bypass -File $q' +
@@ -133,11 +137,11 @@ try {
     }
 
     Write-Host ""
-    Write-Host "[5/7] Verify final installer" -ForegroundColor Cyan
+    Write-Host "[5/8] Verify final installer" -ForegroundColor Cyan
     & $signScript -File $setupExe -VerifyOnly
 
     Write-Host ""
-    Write-Host "[6/7] Build release ZIP" -ForegroundColor Cyan
+    Write-Host "[6/8] Build release ZIP" -ForegroundColor Cyan
     & python "tools\make_release_zip.py"
     Assert-NativeSuccess "Release ZIP creation"
 
@@ -146,11 +150,28 @@ try {
     }
 
     Write-Host ""
-    Write-Host "[7/7] Release hashes" -ForegroundColor Cyan
+    Write-Host "[7/8] Release hashes" -ForegroundColor Cyan
     $setupHash = (Get-FileHash -LiteralPath $setupExe -Algorithm SHA256).Hash.ToLowerInvariant()
     $zipHash = (Get-FileHash -LiteralPath $zipFile -Algorithm SHA256).Hash.ToLowerInvariant()
     Write-Host "  $setupHash  $([IO.Path]::GetFileName($setupExe))"
     Write-Host "  $zipHash  $([IO.Path]::GetFileName($zipFile))"
+
+    Write-Host ""
+    Write-Host "[8/8] Scan the release artifacts with Microsoft Defender" -ForegroundColor Cyan
+    $mpCmdRun = Join-Path $env:ProgramFiles "Windows Defender\MpCmdRun.exe"
+    if (Test-Path -LiteralPath $mpCmdRun -PathType Leaf) {
+        foreach ($artifact in @($setupExe, $zipFile)) {
+            # -DisableRemediation so a detection is reported rather than the
+            # file being quarantined out from under the release.
+            & $mpCmdRun -Scan -ScanType 3 -File $artifact -DisableRemediation |
+                Select-Object -Last 1
+            if ($LASTEXITCODE -ne 0) {
+                throw "Defender reported a detection in: $artifact"
+            }
+        }
+    } else {
+        Write-Host "  MpCmdRun.exe not found - scan the artifacts before uploading." -ForegroundColor Yellow
+    }
 
     if ($UploadRelease) {
         if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
