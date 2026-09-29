@@ -27,7 +27,8 @@
     "air": "Air",
     "ground": "Ground",
     "awards": "Awards",
-    "empty_hint": "Start a career in IL-2 Korea, then reload this page."
+    "empty_hint": "Start a career in IL-2 Korea, then reload this page.",
+    "lede": "Every career IL-2 Korea has on this machine, read from the game's own files. Nothing here is written back."
   },
   "record": {
     "loading": "Opening service record…",

@@ -27,7 +27,8 @@
     "air": "Luft",
     "ground": "Boden",
     "awards": "Auszeichnungen",
-    "empty_hint": "Starten Sie eine Karriere in IL-2 Korea und laden Sie diese Seite neu."
+    "empty_hint": "Starten Sie eine Karriere in IL-2 Korea und laden Sie diese Seite neu.",
+    "lede": "Jede Laufbahn, die IL-2 Korea auf diesem Rechner führt, gelesen aus den Dateien des Spiels. Es wird nichts zurückgeschrieben."
   },
   "record": {
     "loading": "Dienstakte wird geöffnet …",

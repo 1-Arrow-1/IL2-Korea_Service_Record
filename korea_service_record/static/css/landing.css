@@ -2,6 +2,37 @@
  * Landing page — one card per career database found in data/Career.
  */
 
+/* The front door. The rest of the application is paper - forms, a bound
+   diary, a file - and a photographic render would fight that. Here there is
+   no paper yet, so the aeroplane can be itself. */
+.landing-hero {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end; gap: 1rem;
+    margin-bottom: 1.6rem; border-bottom: 1px solid var(--border-soft);
+}
+/* Centred against the aeroplane rather than on the baseline: the render
+   is tall, and bottom-aligning the words left a hand's width of nothing
+   above them. */
+.landing-hero-text { align-self: center; padding-bottom: .6rem; }
+.landing-hero .section-title { margin: 0; }
+.landing-lede {
+    margin: .45rem 0 0; max-width: 34rem;
+    color: var(--ink-muted); font-size: .95rem; font-style: italic;
+}
+/* Sized off the viewport so it stays a header rather than becoming the
+   page, and capped so it cannot dwarf the cards on a wide monitor. */
+.landing-plane {
+    display: block; width: min(34vw, 460px); height: auto;
+    margin-bottom: -.35rem;
+    filter: drop-shadow(0 10px 14px rgba(31, 20, 10, .28));
+}
+/* Below this the cards are a single column and the aeroplane would take
+   the screen before the careers did. */
+@media (max-width: 1100px) {
+    .landing-hero { grid-template-columns: 1fr; }
+    .landing-plane { display: none; }
+}
+
 .careers-list {
     display: grid;
     /* Wide enough for the longest label set. German runs half again the

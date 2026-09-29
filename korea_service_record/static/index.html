@@ -44,7 +44,18 @@
 
             <!-- ============ Landing ============ -->
             <section id="landing-page" class="page">
-                <h2 class="section-title" data-i18n="landing.heading">Careers</h2>
+                <!-- The front door. Everything past this point is paper, so
+                     the photograph lives here and nowhere else: a glossy
+                     three-quarter render printed into a service record would
+                     fight the document it sits on. -->
+                <div class="landing-hero">
+                    <div class="landing-hero-text">
+                        <h2 class="section-title" data-i18n="landing.heading">Careers</h2>
+                        <p class="landing-lede" data-i18n="landing.lede"></p>
+                    </div>
+                    <img class="landing-plane" src="/static/images/p51_hero.png?v=__ASSET_VERSION__"
+                         alt="" aria-hidden="true">
+                </div>
 
                 <div id="careers-loading" class="state-block">
                     <div class="spinner"></div>

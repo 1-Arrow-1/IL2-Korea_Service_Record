@@ -27,7 +27,8 @@
     "air": "Aire",
     "ground": "Tierra",
     "awards": "Condecoraciones",
-    "empty_hint": "Empiece una carrera en IL-2 Corea y vuelva a cargar esta página."
+    "empty_hint": "Empiece una carrera en IL-2 Corea y vuelva a cargar esta página.",
+    "lede": "Todas las carreras que IL-2 Korea tiene en este equipo, leídas de los archivos del propio juego. Aquí no se escribe nada."
   },
   "record": {
     "loading": "Abriendo la hoja de servicios…",

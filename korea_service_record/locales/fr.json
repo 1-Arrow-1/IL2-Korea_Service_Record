@@ -27,7 +27,8 @@
     "air": "Air",
     "ground": "Sol",
     "awards": "Décorations",
-    "empty_hint": "Commencez une carrière dans IL-2 Corée, puis rechargez cette page."
+    "empty_hint": "Commencez une carrière dans IL-2 Corée, puis rechargez cette page.",
+    "lede": "Toutes les carrières qu’IL-2 Korea conserve sur cette machine, lues dans les fichiers du jeu. Rien n’y est réécrit."
   },
   "record": {
     "loading": "Ouverture de l'état de service…",
