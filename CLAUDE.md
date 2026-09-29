@@ -164,6 +164,15 @@ or upload the already-built signed assets directly:
 counter for it restarts at zero. Once a release has been posted, ship a new
 version rather than replacing its assets.
 
+**Take the checksums from the run that uploaded.** `-UploadRelease` runs the
+whole chain again, and an Authenticode signature carries a timestamp, so every
+build produces different bytes and a different hash. Hashes noted from an
+earlier run are stale the moment the upload run rebuilds. Verify against what
+GitHub serves before posting them:
+
+    gh release download v1.2.3 -D some\empty\dir
+
+
 The ZIP contains the **signed Setup.exe** plus its README. The Setup.exe in turn
 contains the already-signed tracker and Career Helper, and its generated
 uninstaller is signed by Inno Setup during compilation.

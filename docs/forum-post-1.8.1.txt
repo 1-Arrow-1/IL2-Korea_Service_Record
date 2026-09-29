@@ -1,0 +1,75 @@
+IL-2 Korea Service Record 1.8.1 — signed, and the Award points tab shows its work
+
+
+Gentlemen,
+
+A small release, but one thing in it matters more than its size.
+
+
+IT IS SIGNED NOW
+
+The setup program, the tracker and the Career Helper are all Authenticode signed.
+Right-click the setup program, Properties, Digital Signatures, and it will tell you
+who made it.
+
+This is why: a user found that Windows Smart App Control refused to start the Career
+Helper at all, because nothing in the release was signed. He turned Smart App Control
+off to get past it — and Windows will not let you turn that back on again without
+reinstalling, which is a poor thing to have to spend on a hobby tool. That should not
+happen to anyone else now.
+
+SmartScreen is a separate thing from signing and works on reputation, so a brand-new
+release can still raise a warning until enough people have run it. It will settle.
+
+
+THE AWARD POINTS TAB SHOWS WHAT IT CHANGED
+
+Presenting a batch of awards raises the pilots' attributes, and until now the list
+simply emptied and left you to guess what had moved.
+
+The tab now carries three attributes — skill, discipline and courage — each as a pair
+of columns: what the man stood at before, and what he stands at after.
+
+    Pilot              Award                     Skill  after   Discipline  after   Courage  after
+    Hayden Burkhart    Pilot's Badge                1     ↑ 3        1       ↑ 2        2       2
+    Erik Greiert       Air Medal and Three Oak…     4       4        5         5        3     ↑ 5
+
+The right-hand column of each pair is blank until you press Present. Then the rows stay
+on screen with both sides filled in and an arrow against everything that actually went
+up, instead of the list clearing and telling you nothing.
+
+Boosters are deliberately absent. A decoration never moves them — only a promotion does.
+
+
+TWO SMALLER FIXES
+
+  * A very long pilot name is no longer cut off mid-word on the display case's brass.
+    It shrinks to fit, and where even that will not do it ends in an ellipsis, so you
+    can see that something was shortened rather than wondering.
+  * In a narrow window the combat results strip clipped the word ARMAMENTS. It now
+    tightens, and then wraps, rather than cutting the label short.
+
+
+THE MOD
+
+Unchanged from 1.7.0, byte for byte. Nothing to merge or redo.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v1.8.1
+
+Installer  IL2_Korea_Service_Record_Setup_v1.8.1.exe
+           SHA-256  a947bd9fc08b0dc9d5d7bf387e1990080b14623d267034be2440ca4f09f8ed6d
+
+Zip        IL-2.Korea.Service.Record.v1.8.1.zip
+           SHA-256  4bbd0bb72cbfe9d5c8738caf7f06c0d8dc63f1339b0f606cf2f2463255a89f2c
+
+(GitHub writes the zip's name with dots where I put spaces. It is the same file.)
+
+The project lives at https://github.com/1-Arrow-1/IL2-Korea_Service_Record — the source,
+the issue tracker, and every release. If it has been useful to you, a star there costs
+you nothing and helps more than you would think.
+
+As ever: if something does not match what you see in your own career, say so and I will
+go and look.
