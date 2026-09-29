@@ -81,10 +81,11 @@ It now reads the establishment from your own career file and draws the whole thi
 Six columns, and the tab scrolls, so the bench and the buttons stay reachable. Every
 part is named the way the game names it, in your own language.
 
-Worth saying plainly: the game's own Combat Units screen cannot show you the 3rd
-Squadron at all. It lays the regiment out sideways, runs out of width, and has no
-horizontal scrollbar. That is not something the tracker introduced and it is not
-something you were doing wrong.
+CORRECTION (28 September): an earlier version of this post said the game could not
+show you the 3rd Squadron at all. That was wrong - the Combat Units screen does
+scroll sideways to reach it. What is true is that the game keeps at most 24 pilots
+active and benches the rest, so an eastern regiment normally sits well under its own
+establishment and those far squadrons are usually empty. My apologies for the error.
 
 My thanks to Swoose, who reported that his 57th ShAP had 38 positions and asked whether
 the chart could hold them. It could not, and chasing that turned up three further

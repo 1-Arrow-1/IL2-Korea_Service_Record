@@ -891,10 +891,9 @@ def line_up_shape(country: int, seats: int, t: Dict[str, str],
         3rd Squadron          (4th, if a unit ever has one)
 
     Six columns, the same width as the American board the window is already
-    sized for, and half the height of one squadron per row. What it is not
-    is the game's arrangement - all of them side by side, which needs ten
-    columns, has no horizontal scrollbar, and leaves the 3rd Squadron
-    unreachable.
+    sized for, and half the height of one squadron per row. The game sets
+    all of its squadrons side by side and scrolls horizontally to reach
+    them; two rows shows the whole regiment without scrolling sideways.
     """
     game = game or {}
     flight_word = game.get("carFlightNum") or t.get("fl_num") or "Flight $[value]"
@@ -1354,10 +1353,15 @@ class Career:
         How many seats this squadron's line-up has, read from its own data.
 
         Not a constant, because the establishments differ. An American
-        squadron is 24 seats in six flights of four. An eastern regiment is
-        a commander pair and three squadrons of twelve - 38 - which the
-        game's own Combat Units screen cannot even scroll to: there is no
-        horizontal scrollbar and the 3rd Squadron is simply unreachable.
+        squadron is 24 seats in six flights of four; an eastern regiment is
+        a commander pair and three squadrons of twelve, 38 in all.
+
+        Most eastern careers will show the upper seats empty: the game caps
+        the number of pilots it keeps active at 24 and benches the rest, so
+        a regiment is normally under strength against its own establishment.
+        That is a staffing policy, not the size of the line-up - proved by
+        assigning men into the 3rd Squadron in game, where the slots written
+        were 26, 27 and 28.
 
         Rather than encode either establishment, or trust squadrons.cfg
         (whose pilotsCap of 48 matches neither seat count), the chart takes
@@ -1369,8 +1373,7 @@ class Career:
         regiment is a commander pair and squadrons of twelve, so its seat
         count is 2 + 12n and never 40. Floored at the full establishment -
         24 in the west, 38 in the east - so a fresh career shows the empty
-        seats the game shows, including the 3rd Squadron the game itself
-        cannot scroll to.
+        seats the game shows, including an empty 3rd Squadron.
         """
         with self._open() as con:
             hi = con.execute(
@@ -2426,11 +2429,10 @@ class App(tk.Tk):
         The line-up, laid out the way its air force organises it.
 
         An American squadron is six flights of four in one row. An eastern
-        regiment is a commander pair and three squadrons of twelve, stacked
-        one squadron to a row - three columns wide instead of ten. Side by
-        side is what the game does and it is why the game cannot show them:
-        there is no horizontal scrollbar and the 3rd Squadron is out of
-        reach.
+        regiment is a commander pair and three squadrons of twelve, two
+        squadrons to a row - six columns instead of ten. The game sets all
+        of them side by side and scrolls sideways to reach the far ones;
+        two rows needs no sideways scrolling.
 
         Rebuilt whenever a career with a different shape is chosen, which
         is why the cards are cleared here rather than kept.
