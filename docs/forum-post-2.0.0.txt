@@ -1,0 +1,138 @@
+IL-2 Korea Service Record 2.0.0 — and a warning about the 29 September game update
+
+
+Gentlemen,
+
+Read the first section even if you never touch the tracker. It concerns your
+career files.
+
+
+THE GAME UPDATE IS THROWING AWAY YOUR SORTIES
+
+Since the 29 September update, IL-2 Korea does not save the record of the
+individual flights in a career. The mission is saved. Your awards are saved.
+Your sortie counter goes up. But the detailed flight records underneath —
+who flew, for how long, what they hit — are discarded before they reach the
+career file.
+
+Nothing looks wrong in game. You fly, you debrief, you collect a medal, the
+numbers move. It is silent.
+
+You can check it in ten seconds. Open
+
+    ...\IL2Series\data\_career.log
+
+and search for "escapedJail". If you find lines like
+
+    [SQL ERROR] sqlSave; 1; table sortie has no column named escapedJail
+
+then that is it — one line per pilot per mission. Those are your sorties
+failing to save.
+
+It affects everyone on this build, including careers started after it. It is
+not something about your installation, and it is not caused by any mod. I
+traced it to a single mistaken column name in one of the game's own database
+statements and reported it to the developers with a reproduction. It is a
+small mistake with a small fix, so I hope it comes back quickly.
+
+Until it does: do not fly a career you care about. The missions already
+affected cannot be recovered — the data was never written. Your career file
+is not corrupted and nothing else is at risk: awards, promotions, the roster,
+aircraft and operations are all fine.
+
+
+SO THE RECORD NOW TELLS YOU
+
+Several of you reported the tracker as broken, which was fair — a flight
+record with holes in it and hours that disagree with the game looks exactly
+like a broken tracker.
+
+Open a career the game has damaged and the record now says so at the top, in
+plain words, with the number of affected missions and the date they start
+from. It will not blame itself for the game's mistake, and it will not blame
+the game when the fault is its own: a mission you have not flown yet is not
+counted.
+
+
+2.0.0 READS THE NEW BUILD AT ALL
+
+This is why the version number jumps.
+
+The update changed how the game stores its text and artwork, and 1.8.1 simply
+cannot read any of it on the current build. Award names, rank names, mission
+names — all of it would come back blank or as raw codes. 2.0.0 reads both the
+old and the new format and works out which your installation has, so it runs
+correctly whether or not you have updated.
+
+While fixing that I found a second, older fault: the tracker kept its own
+copy of the game's text and never noticed when the game changed it. On this
+machine it was serving names that were eighteen days stale. It now refreshes
+whenever the game is patched — which also means the two new mission types,
+Strategic Object Cover and Enemy Harbour Attack, appear by name rather than
+as a number.
+
+
+OPERATIONS
+
+The squadron statistics now show how many operations the unit has seen
+through and how many it won:
+
+    OPERATIONS    8 (5 successful)
+
+Be warned that this is harsher than it looks. An operation your squadron flew
+nothing in still counts against the total — that is the game's own scoring,
+not mine, and it is why a good unit can sit at five from eight.
+
+The war diary now says which way each one went, instead of closing every
+operation with the same line. And eastern careers no longer print "EB" in
+front of every operation name, which was my mistake: it means Eastern Bloc.
+
+
+THE PAGES HAVE BEEN DRESSED
+
+Alex has been drawing.
+
+The front door now shows a different aircraft each time you open it — six of
+them, from the Mustang to the MiG-15 — standing on a faint briefing table.
+The service record sits on a restricted navigation chart, the war diary on an
+operations map, and the flight record on a flight line with a Mustang and its
+ground crew. All of them are turned well down and none of them print.
+
+The flight record is also signed now, in a period hand, above the line where
+the typed name sits. Russian and Chinese pilots get a signature in their own
+script rather than a block of sans-serif.
+
+If the chart behind the service record is not to your taste there is a small
+switch beside the language picker to turn it off. It is remembered.
+
+
+THE MOD
+
+Unchanged. The 29 September update altered several award conditions on the
+game's side and I am working through what that means for the mod, which will
+follow separately once I have tested it rather than guessed.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.0.0
+
+Installer  IL2_Korea_Service_Record_Setup_v2.0.0.exe
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Zip        IL-2.Korea.Service.Record.v2.0.0.zip
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+(GitHub writes the zip's name with dots where I put spaces. It is the same
+file.)
+
+Everything is Authenticode signed, as it has been since 1.8.1. SmartScreen
+works on reputation rather than signatures, so a brand-new release can still
+raise a warning until enough people have run it.
+
+The project lives at https://github.com/1-Arrow-1/IL2-Korea_Service_Record — the
+source, the issue tracker, and every release. If it has been useful to you, a
+star there costs you nothing and helps more than you would think.
+
+As ever: if something does not match what you see in your own career, say so
+and I will go and look. That is how the sortie problem above was found.
