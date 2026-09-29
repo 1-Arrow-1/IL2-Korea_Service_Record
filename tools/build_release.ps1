@@ -94,7 +94,7 @@ try {
     } else {
         Write-Host ""
         Write-Host "[0/8] Validate locales, awards and career data" -ForegroundColor Cyan
-        & python "toolsalidate.py"
+        & python "tools\validate.py"
         Assert-NativeSuccess "Validation"
     }
 
