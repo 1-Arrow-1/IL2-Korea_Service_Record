@@ -132,6 +132,7 @@ from .attributes import PilotAttributes
 from .database import CareerFile, KoreaCareerDatabase, find_careers
 from .events import describe, is_award_event
 from .killstats import ROLLUP_KEYS, KillStats
+from .operations import Operations
 from .missionresult import MissionResult, _number
 
 logger = logging.getLogger(__name__)
@@ -1623,6 +1624,29 @@ class CareerAggregator:
             return data
 
     @staticmethod
+    def _sortie_loss(db) -> Dict[str, Any]:
+        """
+        Missions the game finished but never wrote the sorties for.
+
+        Steam build 25605106 (2026-09-29) ships an INSERT for the sortie
+        table that names eighteen columns and supplies seventeen values, so
+        SQLite rejects every one. The mission, the awards and the pilots'
+        own counters are all written normally - only the per-sortie record
+        is thrown away, which makes it look as though this application has
+        lost them.
+
+        A mission still in state 0 has simply not been flown yet, so its
+        having no sorties means nothing; anything the game has closed and
+        left empty is the fault above.
+        """
+        row = db.query_one(
+            "SELECT COUNT(*) AS n, MIN(date) AS first FROM mission m "
+            "WHERE m.isDeleted=0 AND m.state<>0 AND NOT EXISTS ("
+            "  SELECT 1 FROM sortie s WHERE s.missionId=m.id AND s.isDeleted=0)")
+        missions = int(row["n"] or 0) if row else 0
+        return {"missions": missions, "since": (row["first"] if row else None) or ""}
+
+    @staticmethod
     def _squadron_plane(db) -> str:
         """
         The squadron's current aircraft, as the game's own plane key.
@@ -2619,6 +2643,14 @@ class CareerAggregator:
                 "current_date": career["currentDate"],
                 "award_points": squad["awardPoints"] if squad else 0,
                 "efficiency": squad["efficiency"] if squad else None,
+                # Operations the squadron saw through, and how many it won.
+                # A running one is not recorded until it ends, and an
+                # operation it never flew still counts - see operations.py.
+                "operations": Operations(
+                    squad["operations"] if squad else None).as_dict(),
+                # Sorties the game finished but failed to save. Reported so
+                # the reader blames the right thing - see _sortie_loss.
+                "sortie_loss": self._sortie_loss(db),
                 # squadrons.xaml keys emblems by the squadron's configId
                 "squadron_key": str(squad["configId"]) if squad else "",
                 # What the squadron actually flies, for the header artwork.

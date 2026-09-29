@@ -315,6 +315,19 @@
     let currentRack = null;
     // The pilot the record is showing, for the panels that open over it.
     let currentPlayer = null;
+    // The chart behind the service record. A preference about looking, so
+    // it lives in this browser and never touches the career file. Applied
+    // before the page is shown, or the backdrop would flash in and out on
+    // every navigation for someone who has turned it off.
+    let chartOn = true;
+    try { chartOn = localStorage.getItem("detail_chart") !== "off"; } catch (err) { /* private window */ }
+    function applyChart() {
+        const page = el("detail-page");
+        if (page) { page.classList.toggle("no-chart", !chartOn); }
+        const box = el("chart-toggle");
+        if (box) { box.checked = chartOn; }
+    }
+
     // Service dress (ribbons) or full dress (the medals); remembered per
     // browser, as a convenience only.
     let dress = "service";
@@ -1576,6 +1589,30 @@
                 icon("squadron", d.squadron_key, 84, "squadron-emblem strip", d.squadron) +
                 statStrip(d.squadron_totals);
             renderAircraft(d.aircraft);
+            // The game build of 2026-09-29 does not write sortie rows. Say
+            // so plainly: without this the record simply looks wrong, and
+            // this application gets the blame for the gap.
+            const loss = d.sortie_loss || {missions: 0};
+            const lossEl = el("d-sortie-loss");
+            lossEl.hidden = !loss.missions;
+            lossEl.innerHTML = !loss.missions ? "" :
+                '<strong>' + esc(T("record.loss_title")) + "</strong> " +
+                esc(T("record.loss_body", {n: fmtNum(loss.missions), date: loss.since}));
+            // Operations the squadron saw through, and how many it won.
+            // Hidden before the first one closes, rather than showing a
+            // squadron that has fought a month its record as "0 (0
+            // successful)".
+            const ops = d.operations || {total: 0, successful: 0};
+            const opsEl = el("d-squadron-ops");
+            opsEl.hidden = !ops.total;
+            opsEl.title = ops.total ? T("roster.operations_hint") : "";
+            opsEl.innerHTML = !ops.total ? "" :
+                '<span class="citation-label">' + esc(T("roster.operations")) +
+                "</span>" + '<span class="unit-value">' +
+                esc(T("roster.operations_value",
+                      {total: fmtNum(ops.total),
+                       successful: fmtNum(ops.successful)})) +
+                "</span>";
             // Decorations to the unit itself. Hidden entirely when there are
             // none: an empty "Unit Citations" heading would be a promise.
             const citations = d.citations || [];
@@ -1683,6 +1720,7 @@
                 : "";
 
             fillPicker(el("career-lang-select"), d.language_override || "", true);
+            applyChart();
             i18n.apply(el("detail-page"));
             show(el("detail-loading"), false);
             show(el("detail-body"));
@@ -2280,6 +2318,11 @@
     });
     el("career-lang-select").addEventListener("change", (event) => {
         changeCareerLanguage(event.target.value);
+    });
+    el("chart-toggle").addEventListener("change", (event) => {
+        chartOn = event.target.checked;
+        try { localStorage.setItem("detail_chart", chartOn ? "on" : "off"); } catch (err) { /* not persisted */ }
+        applyChart();
     });
 
     window.addEventListener("hashchange", route);

@@ -2,6 +2,51 @@
  * Landing page — one card per career database found in data/Career.
  */
 
+/* The room the desk is in. A briefing table, drawn as a duotone in the
+   document's own ink and desk colours rather than laid over them as a
+   photograph, and then turned almost all the way down - it should register
+   as something the eye finds after the careers, not before them.
+
+   Fixed rather than scrolled, so it stays put behind the cards the way the
+   paper grain does. z-index -1 puts it behind every sibling's content while
+   still sitting above the body's own background; the page itself paints no
+   background of its own, so nothing hides it. The tint and the flattening
+   are baked into the file, which leaves opacity as the only thing to turn
+   here - and opacity alone is cheap to composite while the list scrolls,
+   where a CSS filter on a fixed element would repaint the lot. */
+/* z-index:0 as well as position, so this is a stacking context of its own.
+   With only position:relative the -1 below escapes to the root context and
+   paints beneath body's opaque background, where no amount of opacity will
+   ever show it. */
+#landing-page { position: relative; z-index: 0; }
+#landing-page::before {
+    content: "";
+    position: fixed; z-index: -1; pointer-events: none;
+    left: 0; right: 0; bottom: 0;
+    /* Scaled by height, not fitted inside the box: "contain" would shrink
+       the whole picture to fit and leave it stranded in the middle of a
+       wide window. At "auto 100%" the height is what is asked for and the
+       width follows it, so the table runs off both edges and is cut by the
+       window rather than floating in it.
+
+       At 56vw the picture is exactly as wide as the window, so 60vw runs
+       it off both edges; 80vh stops it swallowing a short window, and
+       whichever is smaller wins. No absolute cap on top of those two: a
+       pixel limit only bites on the large screens that have the room, and
+       it was what kept this stranded in the middle of one. */
+    height: min(60vw, 80vh);
+    background: url("../images/briefing_hero.png") no-repeat center bottom;
+    background-size: auto 100%;
+    /* The one number worth turning. .1 is a whisper, .18 reads as a
+       picture; this sits between and leaves the careers in front. */
+    opacity: .14;
+}
+/* Narrow windows have no room to spare and the cards are already a single
+   column; a scene behind them would only be in the way. */
+@media (max-width: 1100px) {
+    #landing-page::before { display: none; }
+}
+
 /* The front door. The rest of the application is paper - forms, a bound
    diary, a file - and a photographic render would fight that. Here there is
    no paper yet, so the aeroplane can be itself. */
@@ -22,7 +67,15 @@
 /* Sized off the viewport so it stays a header rather than becoming the
    page, and capped so it cannot dwarf the cards on a wide monitor. */
 .landing-plane {
-    display: block; width: min(34vw, 460px); height: auto;
+    display: block; width: min(34vw, 460px);
+    /* A fixed box, not height:auto. The aeroplane is drawn at random from
+       six types whose proportions run from the Mustang's 1.82 to the
+       Il-10's 2.32, and a height that followed the picture would make the
+       whole header jump by a finger's width between one reload and the
+       next. The ratio here is the Mustang's own, so that one is unchanged;
+       the rest are limited by the width and rest on the same line. */
+    height: min(18.65vw, 252px);
+    object-fit: contain; object-position: center bottom;
     margin-bottom: -.35rem;
     filter: drop-shadow(0 10px 14px rgba(31, 20, 10, .28));
 }

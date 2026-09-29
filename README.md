@@ -174,3 +174,8 @@ auto-update.
 The source code is licensed under the [MIT License](LICENSE). The awards
 mod's texture atlases and locale files contain material derived from IL-2
 Sturmovik: Korea, which is not covered by that licence — see [NOTICE](NOTICE).
+
+The flight record is signed in **Mrs Saint Delafield** by Alejandro Paul
+(Sudtipos), used under the SIL Open Font Licence 1.1. The font and its
+licence are bundled at
+`korea_service_record/static/fonts/`.

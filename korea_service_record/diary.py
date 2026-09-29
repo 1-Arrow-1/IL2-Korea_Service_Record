@@ -64,6 +64,15 @@ UNREPEATABLE = {"plane_lost", "pilot_kia", "pilot_missing", "wounded",
 # because it puts an aeroplane back on the line.
 PHASED = {"medical", "plane_repair", "operation", "transfer"}
 
+# event type 33, ipar2 on the closing row - the game's own
+# carEventOperationSuccess / Failure / Missed. career/operations.py reads the
+# same three codes out of the squadron's tally.
+OPERATION_END = {
+    1: "operation_end_success",
+    2: "operation_end_failure",
+    3: "operation_end",
+}
+
 
 def _who(names: Dict[int, str], pilot_id: Optional[int]) -> str:
     """A pilot's name, or empty for the squadron-wide rows (pilotId -1)."""
@@ -187,9 +196,15 @@ class DiaryBuilder:
                     repairs_begun += 1
             elif key == "operation":
                 name = self._operation(r["tpar1"])
-                out.append(_entry(
-                    "operation_end" if phase == 1 else "operation_begin",
-                    ("Ended: " if phase == 1 else "Begun: ") + name, name=name))
+                if phase != 1:
+                    out.append(_entry("operation_begin", "Begun: " + name,
+                                      name=name))
+                else:
+                    # ipar2 says how it went, and the game names all three
+                    # outcomes itself. Rendering them alike would throw away
+                    # the only verdict a squadron gets on a week's work.
+                    kind = OPERATION_END.get(r["ipar2"], "operation_end")
+                    out.append(_entry(kind, "Ended: " + name, name=name))
             elif key == "pilot_kia":
                 out.append(_entry("pilot_kia", f"{who} killed in action", who=who))
             elif key == "pilot_missing":
@@ -279,14 +294,22 @@ class DiaryBuilder:
     @staticmethod
     def _operation(raw: Optional[str]) -> str:
         """
-        The operation's name as the game stores it, minus its file prefix.
+        The operation's name as the game stores it, minus its side prefix.
 
-        Every row observed begins "WB " - a workbench or world-builder tag,
-        not part of the name - so "WB Operation Rugged" is shown as
-        "Operation Rugged". Anything without the prefix is left alone.
+        "WB" and "EB" are Western Bloc and Eastern Bloc, not a build tag:
+        scg/2/operations.cfg defines each historical operation twice, an odd
+        id for the west listing countries 601/602/603 and the even id after
+        it for the east listing 501/502/503. So "WB Operation Rugged" and
+        "EB Countering Operation Rugged" are the same week from either side.
+
+        Only the prefix goes - the east's "Countering ..." is part of the
+        name. Anything without a prefix is left alone.
         """
         name = (raw or "").strip()
-        return name[3:].strip() if name.startswith("WB ") else name
+        for prefix in ("WB ", "EB "):
+            if name.startswith(prefix):
+                return name[len(prefix):].strip()
+        return name
 
     @staticmethod
     def _airfield(raw: Optional[str]) -> str:

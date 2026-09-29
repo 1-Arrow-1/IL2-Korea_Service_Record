@@ -14,7 +14,29 @@
  * quality the page is for.
  */
 
-.diary-page { background: var(--desk); padding: 1rem 1rem 3rem; }
+/* The operations map the diary was kept beside - plotted routes, target
+   photographs pinned at the corners, a coffee ring. Unlike the briefing
+   table and the flight line it is not a cut-out laid along the bottom but
+   a whole sheet, so it fills the window and the book sits open on top of
+   it. It is also already a period document in the page's own colours, so
+   it is not redrawn as a duotone; it only carries a little less colour
+   than it came with, and it stands far stronger than the other two,
+   because a pale map at their opacity would vanish into the desk.
+
+   position/z-index on the body for the same reason as the other pages:
+   it paints an opaque background of its own, and without a stacking
+   context here the -1 would slide underneath it. */
+.diary-page { background: var(--desk); padding: 1rem 1rem 3rem; position: relative; z-index: 0; }
+.diary-page::before {
+    content: "";
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: url("../images/opsmap_hero.jpg") no-repeat center / cover;
+    /* Far stronger than the .14 the other two carry, and deliberately: the
+       book is opaque and covers it, so the only thing this competes with
+       is the desk. At .55 the map reads as a stain; at .8 it reads as a
+       map. */
+    opacity: .8;
+}
 .diary-bar {
     display: flex; align-items: center; gap: 1rem;
     max-width: 52rem; margin: 0 auto 1rem;
@@ -146,6 +168,14 @@
 }
 .wd-band.ending { border-color: var(--border-soft); background: none; }
 .wd-band.ending span { color: var(--ink-muted); letter-spacing: .16em; }
+/* How it ended. Kept to the weight of the rule rather than a colour: this
+   is a paper page, and a red line across it would read as an error. A
+   successful operation closes on the accent, a failed one on a doubled
+   rule, the way a ledger underscores a total it wants you to look at. */
+.wd-band.ending.won { border-bottom-color: var(--accent); }
+.wd-band.ending.won span { color: var(--accent-dark); }
+.wd-band.ending.lost { border-bottom-style: double; border-bottom-width: 3px; }
+.wd-band.ending.lost span { color: var(--ink-strong); }
 .wd-days > .wd-band:first-child { margin-top: 0; }
 
 /* -- the day's flying -------------------------------------------------- */
@@ -217,6 +247,8 @@
 
 @media print {
     .diary-page { background: #fff; padding: 0; }
+    /* The book is the document. The map behind it is for the screen. */
+    .diary-page::before { display: none !important; }
     #wd-sheet { box-shadow: none; max-width: none; }
     .wd-day, .wd-band { break-inside: avoid; }
 }

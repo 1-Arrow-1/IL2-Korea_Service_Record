@@ -96,11 +96,27 @@ if (-not (Test-Path -LiteralPath $dlib -PathType Leaf)) {
     throw "Azure.CodeSigning.Dlib.dll was not found at '$dlib'. Install Microsoft.Azure.ArtifactSigningClientTools."
 }
 
-if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
+# Inno spawns this helper in a fresh Windows PowerShell of its own, and a shell
+# started before the CLI was installed carries a PATH without it, so fall back
+# to where the installer puts it rather than failing mid-compile.
+$az = $null
+$azCommand = Get-Command az -ErrorAction SilentlyContinue
+if ($azCommand) { $az = $azCommand.Source }
+if (-not $az) {
+    foreach ($candidate in @(
+            (Join-Path $env:ProgramFiles "Microsoft SDKs\Azure\CLI2\wbin\az.cmd"),
+            (Join-Path ([Environment]::GetEnvironmentVariable("ProgramFiles(x86)")) "Microsoft SDKs\Azure\CLI2\wbin\az.cmd"))) {
+        if ($candidate -and (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+            $az = $candidate
+            break
+        }
+    }
+}
+if (-not $az) {
     throw "Azure CLI ('az') was not found. Install Microsoft.AzureCLI and run 'az login'."
 }
 
-& az account show --output none
+& $az account show --output none
 if ($LASTEXITCODE -ne 0) {
     throw "Azure CLI is not authenticated. Run 'az login' with the account that has the Artifact Signing Certificate Profile Signer role."
 }

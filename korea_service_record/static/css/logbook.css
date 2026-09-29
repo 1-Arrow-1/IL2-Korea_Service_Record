@@ -7,7 +7,32 @@
  * like, and print landscape one sheet to a page.
  */
 
-.logbook-page { background: var(--desk); padding: 1rem 1rem 3rem; }
+/* The flight line the record was written on: a Mustang on the PSP with
+   its ground crew, drawn as a duotone in the page's own ink and desk
+   colours - the same treatment as the briefing table on the front door,
+   and turned down just as far.
+
+   position/z-index on the body as well, not just the pseudo-element: the
+   body paints an opaque background of its own, and without a stacking
+   context here the -1 below would slide underneath it and never be seen
+   at any opacity. */
+.logbook-page { background: var(--desk); padding: 1rem 1rem 3rem; position: relative; z-index: 0; }
+.logbook-page::before {
+    content: "";
+    position: fixed; z-index: -1; pointer-events: none;
+    left: 0; right: 0; bottom: 0;
+    /* 56vw is where the picture becomes as wide as the window, so 60vw
+       runs it off both edges; 80vh keeps it out of a short one. */
+    height: min(60vw, 80vh);
+    background: url("../images/flightline_hero.png") no-repeat center bottom;
+    background-size: auto 100%;
+    opacity: .14;
+}
+/* The sheet is the point of this page. Below this it is already scrolling
+   sideways to fit, and a photograph behind it would only be in the way. */
+@media (max-width: 900px) {
+    .logbook-page::before { display: none; }
+}
 .logbook-bar { display: flex; align-items: center; gap: 1rem; max-width: 1180px; margin: 0 auto 1rem; }
 .logbook-bar .lb-note { flex: 1; font-size: 0.84rem; color: var(--ink-muted); font-style: italic; }
 .lb-pager { display: flex; align-items: center; gap: 0.5rem; }
@@ -45,7 +70,20 @@
 .form-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin-top: 1rem;
     font-family: Arial, Helvetica, sans-serif; font-size: 0.72rem; color: #4a3a24; }
 .form-foot .signature { display: flex; flex-direction: column; align-items: center; font-family: 'Courier New', monospace; font-size: 0.82rem; color: #1f140a; }
-.form-foot .signature .line { display: block; width: 260px; border-bottom: 1px solid #1f140a; height: 1.6rem; margin-bottom: 0.2rem; }
+/* The rule grows to whatever is signed over it. A Cyrillic name runs half
+   again as long as an English one - "Фрол Архипенко" is 321px where "Alex
+   Bleiholder" is 169 - and a fixed 260px rule left the signature hanging
+   off both ends of its own line. */
+.form-foot .signature .line { display: block; width: 100%; min-width: 260px; border-bottom: 1px solid #1f140a; height: 0.35rem; margin-bottom: 0.2rem; }
+/* The block drops below the certification line it answers, the way the
+   signature block on the real form sits under the sentence rather than
+   beside it. The foot gains the same amount back so nothing runs off the
+   sheet. */
+/* ...but not without limit, or a long name would crowd the certification
+   sentence on one side and the sheet number on the other. Past this the
+   signature overruns its rule, which is what a real one does anyway. */
+.form-foot .signature { position: relative; top: 0.9rem; max-width: 360px; }
+.form-foot { padding-bottom: 0.9rem; }
 .form-foot .page { white-space: nowrap; }
 
 /* The Soviet book: a ruled page rather than a printed form. */
@@ -58,10 +96,51 @@
 .sheet.sov .form-table th, .sheet.dprk .form-table th { background: transparent; font-style: italic; }
 .sheet.sov .form-foot .signature, .sheet.dprk .form-foot .signature { font-family: 'Georgia', serif; }
 
+/* The signature itself.
+
+   Mrs Saint Delafield, a copperplate script - the hand a man trained
+   before the war would have signed with, and the reason for a bundled
+   font rather than the generic "cursive": that resolves to Comic Sans on
+   most of Windows, which would undo the whole form. Declared after the
+   Soviet and Korean overrides above, which set Georgia on the whole
+   signature block and would otherwise take this with them.
+
+   Ink, not print: the form is brown-black, the name is written over it in
+   blue-black, sitting on the rule and tilted a little off true, because
+   nobody signs square to the line. */
+@font-face {
+    font-family: 'Signature';
+    src: url('../fonts/MrsSaintDelafield-Regular.woff') format('woff');
+    font-weight: normal; font-style: normal; font-display: swap;
+}
+.form-foot .signature .sig-hand,
+.sheet.sov .form-foot .signature .sig-hand,
+.sheet.dprk .form-foot .signature .sig-hand {
+    /* Latin comes from the bundled face. Anything it does not carry is
+       picked up per glyph by the rest of the stack, which is why the
+       fallbacks are handwriting faces too and not just "cursive": Cyrillic
+       lands in Segoe Script, which ships with every Windows; Chinese in
+       KaiTi and Korean in Gungsuh, the brush-written styles that come with
+       those language packs. Without them CJK falls through to a UI sans
+       and the signature reads as typing. */
+    font-family: 'Signature', 'Segoe Script', 'Lucida Handwriting',
+                 'KaiTi', 'SimKai', 'STKaiti', 'DFKai-SB',
+                 'Gungsuh', 'GungsuhChe', cursive;
+    font-size: 2.1rem; line-height: 1; white-space: nowrap;
+    color: #2b3a63;
+    transform: rotate(-1.4deg);
+    margin-bottom: -0.55rem;
+    pointer-events: none;
+}
+
 @media print {
     @page { size: landscape; margin: 10mm; }
     .no-print { display: none !important; }
     .logbook-page { background: #fff; padding: 0; }
+    /* Never on paper. The form is the document; the photograph behind it
+       on screen is decoration, and printing it would only cost ink and
+       muddy the sheet. */
+    .logbook-page::before { display: none !important; }
     .sheet, .paged .sheet { display: block; box-shadow: none; max-width: none; margin: 0; page-break-after: always; break-after: page; padding: 0.4rem 0.2rem; }
     .sheet:last-child { page-break-after: auto; break-after: auto; }
 }

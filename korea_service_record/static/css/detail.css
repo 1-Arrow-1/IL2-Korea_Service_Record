@@ -2,6 +2,20 @@
  * Career detail — player card, awards, service record, squadron roster.
  */
 
+/* The game is losing data and the reader needs to know it is not this
+   page's doing. Loud enough to be read, quiet enough not to look like a
+   crash: an inked rule in the margin, not a browser alert. */
+.data-warning {
+    margin: 0 0 1.1rem;
+    padding: 0.6rem 0.9rem;
+    border-left: 3px solid #9d3b2f;
+    background: rgba(157, 59, 47, 0.06);
+    font-size: 0.86rem;
+    color: var(--ink-strong);
+}
+.data-warning strong { color: #9d3b2f; }
+.data-warning[hidden] { display: none; }
+
 .record-head {
     display: flex;
     align-items: flex-start;
@@ -12,6 +26,14 @@
     padding-bottom: 1rem;
     margin-bottom: 1.5rem;
     position: relative;
+    /* Its own blending group. Two things in this header multiply - the
+       aircraft and the classification stamp - and multiply reaches all the
+       way down through whatever is painted beneath, which since the chart
+       went in behind the page meant the coastline and the grid came up
+       through the aeroplane. Isolating the header keeps each of them
+       blending with what it is meant to blend with (the stamp with the
+       figures it is struck across) and leaves the chart out of it. */
+    isolation: isolate;
 }
 
 /* The squadron's Mustang, in the gap the name and the statistics leave.
@@ -821,6 +843,19 @@ table.roster tr.is-reserve .roster-photo { filter: saturate(0.6); opacity: 0.85;
     margin-bottom: 0.9rem;
     border-bottom: 1px solid var(--border-soft);
 }
+/* The unit's operations tally, sitting between its combat numbers and its
+   citations: a squadron-level fact, so it belongs with the squadron's other
+   squadron-level line rather than in the strip of six combat pictograms,
+   where it would be the one cell without an icon. */
+.unit-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding-bottom: 0.9rem;
+    margin-bottom: 0.9rem;
+}
+.unit-value { font-size: 0.9rem; color: var(--ink-strong); }
+
 .citation-label {
     font-size: 0.78rem;
     text-transform: uppercase;
@@ -1445,3 +1480,30 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     .sbox-panel { max-width: 98vw; }
     .sbox-title { font-size: 1rem; }
 }
+
+/* The chart the record was compiled against: a restricted navigation sheet
+   for Korea, its mission block still blank. Anchored to the top of the
+   window rather than centred, because everything drawn on it - the chart,
+   the compass rose, the form fields - is in the upper third, and a
+   centred cover would show nothing but the blank half of the page.
+
+   It can stand almost at full strength where the front door's briefing
+   table runs at .14: this is a pale document a shade off the desk itself,
+   and every panel on top of it is opaque. Held back from 1 only so it
+   settles into the desk rather than sitting on it.
+
+   position/z-index on the section for the same reason as every other page
+   here - see landing.css. It is scoped to #detail-page, so the landing,
+   which has a backdrop of its own, is untouched. */
+#detail-page { position: relative; z-index: 0; }
+/* Turned off from the switch beside the language picker. */
+#detail-page.no-chart::before { display: none; }
+#detail-page::before {
+    content: "";
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: url("../images/chart_hero.jpg") no-repeat center top / cover;
+    opacity: .9;
+    /* No mask. The artwork in this composition already begins low enough
+       to clear the header on its own, and a little of it bleeding up
+       behind the name is wanted rather than avoided - it is the top of a
+       sheet of paper, not a panel with a margin. */

@@ -82,18 +82,47 @@ read as a hostname and renders an error page silently.
 
 ## Release
 
-Public releases are built **locally** and Authenticode-signed with Microsoft
-Azure Artifact Signing. The signing metadata stays outside the repository
-(default: `C:\CodeSigning\metadata.json`). Before a release, sign in with the
-Azure CLI using the identity that has the **Artifact Signing Certificate
-Profile Signer** role:
+One command, from a clean tree, signed in to Azure with the identity holding the
+**Artifact Signing Certificate Profile Signer** role:
 
     az login
-    .\tools\build_release.ps1
+    .\tools\build_release.ps1 -Version 1.8.2 -Publish
 
-The script is fail-closed for the reproducible build/sign/package chain:
+That is the whole release. It bumps both version strings and commits them,
+validates, builds, signs, packages, scans, pushes main, tags the built commit,
+opens the GitHub release, uploads, **downloads the assets back and fails if the
+served bytes differ from the local build**, and writes those verified checksums
+into `docs/forum-post-<version>.txt`.
 
-0. `tools/validate.py` unless `-SkipValidation`
+The only thing left by hand is posting the forum text. There is no API for it.
+
+Useful variations:
+
+    .\tools\build_release.ps1                      # build and sign only, no publish
+    .\tools\build_release.ps1 -Version 1.8.2 -Publish -DryRun   # all but push/tag/upload
+    .\tools\build_release.ps1 -SkipValidation
+    .\tools\build_release.ps1 -MetadataPath "D:\secure\metadata.json"
+
+Without `-Version` it builds whatever the .iss already says; it refuses if the
+.iss and `make_release_zip.py` disagree, and it refuses to build a publish from
+a dirty working tree.
+
+### What it refuses to do
+
+* **Replace assets on a release that has downloads.** The checksum in a posted
+  forum message is a promise about specific bytes; swapping them makes it a lie.
+  Ship a new version instead. `-Force` overrides, and should not be needed.
+* **Call a release done without checking it.** Every build signs afresh, and an
+  Authenticode signature carries a timestamp, so no two builds are byte-identical
+  and hashes noted from an earlier run are stale. The script compares what GitHub
+  serves against what it built, and only those hashes reach the forum post.
+
+### The chain
+
+0. `tools/validate.py` unless `-SkipValidation`. It reads the live installation
+   and its career fixtures depend on which careers exist, but the rest is the
+   source tree, and its locale checks are the only guard against shipping a key
+   that reaches the reader as `KEY!LOCALIZE!`.
 1. PyInstaller build
 2. Azure-sign and verify **both** `IL2_Korea_Service_Record.exe` and
    `IL2_Korea_Career_Helper.exe`
@@ -102,28 +131,16 @@ The script is fail-closed for the reproducible build/sign/package chain:
    the generated uninstaller
 5. Verify the final Setup.exe
 6. `python tools/make_release_zip.py`
-7. Print SHA-256 hashes for the Setup.exe and ZIP
-8. Scan both artifacts with Microsoft Defender, and abort on a detection
+7. Scan both artifacts with Microsoft Defender, abort on a detection
+8. Publish, verify the served bytes, write the checksums
 
-`tools/validate.py` runs first and gates the release. It does read the live
-installation, and its career fixtures depend on which careers exist - but the
-rest is the source tree, and its locale checks are the only guard against
-shipping a key that reaches the reader as `KEY!LOCALIZE!`. Skip it only
-deliberately:
+`tools/sign_artifact.ps1` auto-selects the newest x64 Windows SDK SignTool, uses
+the Artifact Signing client dlib under LocalAppData, timestamps with Microsoft's
+timestamp service, and verifies every result with both SignTool and
+`Get-AuthenticodeSignature`. Any signing or verification failure aborts.
 
-    .\tools\build_release.ps1 -SkipValidation
-
-The helper `tools/sign_artifact.ps1` auto-selects the newest x64 Windows SDK
-SignTool, uses the Artifact Signing client dlib installed under LocalAppData,
-timestamps with Microsoft's timestamp service, and verifies every result with
-both SignTool and `Get-AuthenticodeSignature`. Any signing or verification
-failure aborts the release.
-
-The Azure metadata file may be overridden without changing the repo:
-
-    .\tools\build_release.ps1 -MetadataPath "D:\secure\metadata.json"
-
-The expected metadata shape is:
+The metadata file stays outside the repository (default
+`C:\CodeSigning\metadata.json`) and its shape is:
 
     {
       "Endpoint": "https://eus.codesigning.azure.net",
@@ -131,47 +148,13 @@ The expected metadata shape is:
       "CertificateProfileName": "IL2KoreaPublic"
     }
 
-Do **not** commit that local metadata file. It contains no private key, but it is
-machine/account configuration and does not belong in the source tree.
-
-Bump `MyAppVersion` in the .iss and `VERSION` in `make_release_zip.py`
-together.
-
-### GitHub release
+Do **not** commit it. It contains no private key, but it is machine/account
+configuration and does not belong in the source tree.
 
 `.github/workflows/build.yml` is intentionally an **unsigned clean-machine CI
-build**. It installs stock PyInstaller from PyPI, so it is useful for proving
-that the tree builds on a clean runner, not for producing the public binary.
-The workflow creates the release shell on a `v*` tag but uploads no public
-release assets.
-
-Normal release sequence:
-
-    .\tools\build_release.ps1
-    git push origin main
-    git push origin v1.8.0
-
-After the tag workflow has created the GitHub release, either run:
-
-    .\tools\build_release.ps1 -UploadRelease
-
-or upload the already-built signed assets directly:
-
-    gh release upload v1.8.0 "installer/Output/IL2_Korea_Service_Record_Setup_v1.8.0.exe" ^
-                             "installer/Output/IL-2 Korea Service Record v1.8.0.zip" --clobber
-
-`--clobber` replaces an asset that is already there, and GitHub's download
-counter for it restarts at zero. Once a release has been posted, ship a new
-version rather than replacing its assets.
-
-**Take the checksums from the run that uploaded.** `-UploadRelease` runs the
-whole chain again, and an Authenticode signature carries a timestamp, so every
-build produces different bytes and a different hash. Hashes noted from an
-earlier run are stale the moment the upload run rebuilds. Verify against what
-GitHub serves before posting them:
-
-    gh release download v1.2.3 -D some\empty\dir
-
+build**. It installs stock PyInstaller from PyPI, so it proves the tree builds on
+a clean runner; it never produces the public binary. It may create the release
+shell on a `v*` tag — the script tolerates a release that already exists.
 
 The ZIP contains the **signed Setup.exe** plus its README. The Setup.exe in turn
 contains the already-signed tracker and Career Helper, and its generated

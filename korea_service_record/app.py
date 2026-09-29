@@ -11,6 +11,7 @@ usual Steam library drives, so the exe can be double-clicked with no setup.
 
 import logging
 import os
+import random
 import time
 import zlib
 from pathlib import Path
@@ -141,10 +142,21 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         # would change the token on every restart and defeat caching entirely.
         return format(zlib.crc32("|".join(stamps).encode()), "08x")
 
+    # The eight types the game flies, by its own config stem, less the two
+    # nobody has drawn yet (f80c10, la11). Chosen per request rather than in
+    # the browser: the markup arrives with a real src, so there is no empty
+    # frame on first paint and no second file fetched to replace the first.
+    HERO_PLANES = ("f51d", "f84e", "f86a5", "il10", "mig15bis", "yak9p")
+
+    def hero_image() -> str:
+        """A different aeroplane each time the front door opens."""
+        return "%s_hero.png" % random.choice(HERO_PLANES)
+
     @app.route("/")
     def index():
         html = (Path(app.static_folder) / "index.html").read_text(encoding="utf-8")
         html = html.replace("__ASSET_VERSION__", asset_version())
+        html = html.replace("__HERO_IMAGE__", hero_image())
         # index.html itself must never be cached, or it would keep pointing at
         # the previous version token and defeat the whole mechanism.
         return Response(html, mimetype="text/html",

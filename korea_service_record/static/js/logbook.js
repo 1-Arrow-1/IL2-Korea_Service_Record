@@ -121,7 +121,8 @@
                 totals(TF("logbook.form.total_month"), mo.totals) + totals(TF("logbook.form.total_to_date"), mo.to_date) +
             "</tfoot></table>" +
             '<div class="form-foot"><span class="certify">' + esc(TF("logbook.form.certify")) + "</span>" +
-                '<span class="signature"><span class="line"></span>' + esc(data.pilot.name) + ", " + esc(grade) + "</span>" +
+                '<span class="signature"><span class="sig-hand">' + esc(data.pilot.name) + "</span>" +
+                    '<span class="line"></span>' + esc(data.pilot.name) + ", " + esc(grade) + "</span>" +
                 '<span class="page">' + esc(TF("logbook.form.page", {n: i + 1, of: data.months.length})) + "</span></div>" +
             "</section>";
     });

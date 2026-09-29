@@ -53,7 +53,7 @@
                         <h2 class="section-title" data-i18n="landing.heading">Careers</h2>
                         <p class="landing-lede" data-i18n="landing.lede"></p>
                     </div>
-                    <img class="landing-plane" src="/static/images/p51_hero.png?v=__ASSET_VERSION__"
+                    <img class="landing-plane" src="/static/images/__HERO_IMAGE__?v=__ASSET_VERSION__"
                          alt="" aria-hidden="true">
                 </div>
 
@@ -103,7 +103,19 @@
                     <!-- Per-career override: this record only, so a player can
                          read a foreign air force's paperwork in its own
                          language while the application stays in his. -->
+                    <!-- Shown only when the game has dropped sortie records.
+                         A warning about the game, not about this page. -->
+                    <div id="d-sortie-loss" class="data-warning" hidden></div>
+
                     <div class="record-tools">
+                        <!-- The chart behind the record is a matter of taste,
+                             so it can be turned off. Remembered in this
+                             browser only: it is a preference about looking,
+                             not something to write into the career. -->
+                        <label class="tool-switch" id="chart-switch" data-i18n-title="app.chart_hint">
+                            <input type="checkbox" id="chart-toggle" checked>
+                            <span data-i18n="app.chart">Chart background</span>
+                        </label>
                         <label class="lang-picker small">
                             <span data-i18n="app.detail_language">Detail page language</span>
                             <select id="career-lang-select"></select>
@@ -268,6 +280,7 @@
                     <section class="panel roster-panel">
                         <h3><span data-i18n="roster.heading">Squadron Statistics</span> <span id="d-roster-count" class="count"></span></h3>
                         <div id="d-squadron-strip" class="stat-strip"></div>
+                        <div id="d-squadron-ops" class="unit-line" hidden></div>
                         <div id="d-squadron-citations" class="citation-strip" hidden></div>
                         <div class="table-scroll">
                             <table class="roster" id="d-roster">

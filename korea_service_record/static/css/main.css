@@ -82,6 +82,12 @@ body {
     background: var(--paper-deep);
     border-bottom: 2px solid var(--border);
     box-shadow: var(--shadow-soft);
+    /* Above the pages. A page may lay a fixed backdrop across the whole
+       window behind its own content, and an unpositioned header paints
+       earlier than a positioned page - so without this the chart behind
+       the service record washes straight over the title and the buttons. */
+    position: relative;
+    z-index: 1;
 }
 
 .header-content {
@@ -106,6 +112,9 @@ body {
     padding: 1rem 0;
     font-size: 0.88rem;
     color: var(--ink-muted);
+    /* Same reason as the header above. */
+    position: relative;
+    z-index: 1;
 }
 
 .section-title {
@@ -260,6 +269,19 @@ body.lightbox-open { overflow: hidden; }
     justify-content: flex-end;
     margin: -0.75rem 0 1rem;
 }
+/* Sits beside the language picker and is deliberately quieter than it -
+   same small uppercase as the label next to it, no box, no accent, so it
+   reads as a note in the margin rather than a control demanding a
+   decision. */
+.record-tools { gap: 1.25rem; align-items: center; }
+.tool-switch {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink-muted); cursor: pointer;
+}
+.tool-switch input { accent-color: var(--accent-dark); margin: 0; cursor: pointer; }
+.tool-switch:hover { color: var(--ink-strong); }
+
 .lang-picker.small { font-size: 0.76rem; }
 .lang-picker.small select { font-size: 0.86rem; }
 

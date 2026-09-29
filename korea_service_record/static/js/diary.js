@@ -125,12 +125,16 @@
             name + '.png">' : "";
     }
 
+    // operation_begin, operation_end, and the two outcomes the game
+    // distinguishes when one closes.
+    const OPERATION = /^operation_(begin|end)(_success|_failure)?$/;
+
     function noteClass(n) {
         const key = n.key.replace(/^diary\./, "");
         if (["pilot_kia", "pilot_missing", "wounded", "plane_lost",
              "friendly_destroyed", "resources_destroyed"].includes(key)) { return "loss"; }
         if (["own_granted", "own_presented", "own_both"].includes(key)) { return "mine"; }
-        if (["operation_begin", "operation_end", "transfer_ordered", "transfer_done"].includes(key)) { return "op"; }
+        if (OPERATION.test(key) || ["transfer_ordered", "transfer_done"].includes(key)) { return "op"; }
         return "";
     }
 
@@ -159,11 +163,17 @@
     // because it is the only thing in the file that changes what the
     // squadron is for.
     function bandsOf(day) {
-        return day.notes.filter((n) => /operation_(begin|end)$/.test(n.key));
+        return day.notes.filter((n) => OPERATION.test(n.key.replace(/^diary\./, "")));
     }
     function band(n) {
-        const ending = /operation_end$/.test(n.key);
-        return '<li class="wd-band' + (ending ? " ending" : "") + '">' +
+        // An operation closes as a success, a failure, or neither - the game
+        // records which, so the band says which.
+        const key = n.key.replace(/^diary\./, "");
+        const ending = /^operation_end/.test(key);
+        const won = key === "operation_end_success";
+        const lost = key === "operation_end_failure";
+        return '<li class="wd-band' + (ending ? " ending" : "") +
+            (won ? " won" : "") + (lost ? " lost" : "") + '">' +
             '<span>' + esc(noteText(n)) + "</span></li>";
     }
 
