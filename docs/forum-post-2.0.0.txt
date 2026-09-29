@@ -121,7 +121,7 @@ Installer  IL2_Korea_Service_Record_Setup_v2.0.0.exe
            SHA-256  5998ce43690910f79a41faf64c6e39c2399bc8c83e816ac53eec8f0dbcf2d6e7
 
 Zip        IL-2.Korea.Service.Record.v2.0.0.zip
-           SHA-256  5998ce43690910f79a41faf64c6e39c2399bc8c83e816ac53eec8f0dbcf2d6e7
+           SHA-256  659daa02b157bc997af778a5a12105d5c95abc702d97b1ef874ad65b8fba3b3f
 
 (GitHub writes the zip's name with dots where I put spaces. It is the same
 file.)

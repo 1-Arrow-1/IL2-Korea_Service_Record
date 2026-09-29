@@ -372,8 +372,17 @@ try {
         $text = Get-Content -LiteralPath $post -Raw
         $hashes = [regex]::Matches($text, 'SHA-256\s+([0-9a-f]{64})')
         if ($hashes.Count -eq 2) {
-            $text = $text.Replace($hashes[0].Groups[1].Value, $setupHash)
-            $text = $text.Replace($hashes[1].Groups[1].Value, $zipHash)
+            # Splice by position, not by value. Replace() rewrites every
+            # occurrence, so two identical placeholders - a file written
+            # with 64 zeros twice, say - would both take the first hash and
+            # the second substitution would find nothing left to do. That
+            # shipped a forum post for 2.0.0 quoting the installer's
+            # checksum against the zip.
+            foreach ($i in 1, 0) {
+                $g = $hashes[$i].Groups[1]
+                $with = if ($i -eq 0) { $setupHash } else { $zipHash }
+                $text = $text.Remove($g.Index, $g.Length).Insert($g.Index, $with)
+            }
             Set-Content -LiteralPath $post -Value $text -NoNewline
             & git add -- $post
             & git commit -q -m "Forum post: checksums for $tag"
