@@ -54,6 +54,11 @@ UninstallDisplayName={#MyAppName}
 ; itself needs telling.
 UninstallDisplayIcon={app}\{#MyAppExeName}
 SetupIconFile=IL2_Korea_Service_Record.ico
+; The welcome and finish pages. Inno's stock blue panel said nothing
+; about what is being installed; this is the tracker's own paper with
+; the Mustang on it, at the three scales Windows may ask for.
+WizardImageFile=WizardImage.bmp,WizardImage@2x.bmp,WizardImage@3x.bmp
+WizardSmallImageFile=WizardSmallImage.bmp,WizardSmallImage@2x.bmp,WizardSmallImage@3x.bmp
 
 ; Release builds pass an Azure Artifact Signing command to ISCC as the
 ; "azureartifacts" Sign Tool. Development/CI builds omit AZURE_SIGNING and
