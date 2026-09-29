@@ -82,35 +82,104 @@ read as a hostname and renders an error page silently.
 
 ## Release
 
-    pyinstaller korea_service_record.spec --noconfirm
-    python tools/stage_release.py
-    iscc installer\IL2_Korea_Service_Record.iss
-    python tools/make_release_zip.py
-    git push origin main && git push origin v1.2.3
-    gh release upload v1.2.3 "installer/Output/IL2_Korea_Service_Record_Setup_v1.2.3.exe" ^
-                             "installer/Output/IL-2 Korea Service Record v1.2.3.zip" --clobber
+Public releases are built **locally** and Authenticode-signed with Microsoft
+Azure Artifact Signing. The signing metadata stays outside the repository
+(default: `C:\CodeSigning\metadata.json`). Before a release, sign in with the
+Azure CLI using the identity that has the **Artifact Signing Certificate
+Profile Signer** role:
+
+    az login
+    .\tools\build_release.ps1
+
+The script is fail-closed for the reproducible build/sign/package chain:
+
+0. `tools/validate.py` unless `-SkipValidation`
+1. PyInstaller build
+2. Azure-sign and verify **both** `IL2_Korea_Service_Record.exe` and
+   `IL2_Korea_Career_Helper.exe`
+3. `python tools/stage_release.py`
+4. Inno Setup build; Inno invokes the same Azure signing helper for Setup and
+   the generated uninstaller
+5. Verify the final Setup.exe
+6. `python tools/make_release_zip.py`
+7. Print SHA-256 hashes for the Setup.exe and ZIP
+8. Scan both artifacts with Microsoft Defender, and abort on a detection
+
+`tools/validate.py` runs first and gates the release. It does read the live
+installation, and its career fixtures depend on which careers exist - but the
+rest is the source tree, and its locale checks are the only guard against
+shipping a key that reaches the reader as `KEY!LOCALIZE!`. Skip it only
+deliberately:
+
+    .\tools\build_release.ps1 -SkipValidation
+
+The helper `tools/sign_artifact.ps1` auto-selects the newest x64 Windows SDK
+SignTool, uses the Artifact Signing client dlib installed under LocalAppData,
+timestamps with Microsoft's timestamp service, and verifies every result with
+both SignTool and `Get-AuthenticodeSignature`. Any signing or verification
+failure aborts the release.
+
+The Azure metadata file may be overridden without changing the repo:
+
+    .\tools\build_release.ps1 -MetadataPath "D:\secure\metadata.json"
+
+The expected metadata shape is:
+
+    {
+      "Endpoint": "https://eus.codesigning.azure.net",
+      "CodeSigningAccountName": "IL2KoreaSRSigning",
+      "CertificateProfileName": "IL2KoreaPublic"
+    }
+
+Do **not** commit that local metadata file. It contains no private key, but it is
+machine/account configuration and does not belong in the source tree.
 
 Bump `MyAppVersion` in the .iss and `VERSION` in `make_release_zip.py`
-together. The zip is the setup exe plus a README and nothing else.
+together.
 
-**The binaries are uploaded by hand, and that is deliberate.** Pushing the tag
-makes `build.yml` open the GitHub release with generated notes, but it uploads
-nothing: the runner installs PyInstaller from PyPI and therefore builds with
-the *stock* bootloader, the fingerprint Defender keys on. Until 2026-09-23 the
-workflow did upload, so v1.6.0 and v1.6.1 both served the runner's build while
-the forum post quoted the checksum of the local one - the checksum a reader was
-invited to verify. Check what the release actually serves before posting:
+### GitHub release
+
+`.github/workflows/build.yml` is intentionally an **unsigned clean-machine CI
+build**. It installs stock PyInstaller from PyPI, so it is useful for proving
+that the tree builds on a clean runner, not for producing the public binary.
+The workflow creates the release shell on a `v*` tag but uploads no public
+release assets.
+
+Normal release sequence:
+
+    .\tools\build_release.ps1
+    git push origin main
+    git push origin v1.8.0
+
+After the tag workflow has created the GitHub release, either run:
+
+    .\tools\build_release.ps1 -UploadRelease
+
+or upload the already-built signed assets directly:
+
+    gh release upload v1.8.0 "installer/Output/IL2_Korea_Service_Record_Setup_v1.8.0.exe" ^
+                             "installer/Output/IL-2 Korea Service Record v1.8.0.zip" --clobber
+
+`--clobber` replaces an asset that is already there, and GitHub's download
+counter for it restarts at zero. Once a release has been posted, ship a new
+version rather than replacing its assets.
+
+The ZIP contains the **signed Setup.exe** plus its README. The Setup.exe in turn
+contains the already-signed tracker and Career Helper, and its generated
+uninstaller is signed by Inno Setup during compilation.
+
+The public binaries still use the **locally rebuilt PyInstaller bootloader**,
+not the stock one. Defender previously flagged the stock prebuilt PyInstaller
+bootloader heuristically; keep the rebuilt bootloader procedure below intact.
+Any `pip install --upgrade pyinstaller` can replace those local bootloader
+files, so rebuild/copy the matching bootloader before the next release if
+needed.
+
+Before posting a release, verify what GitHub actually serves:
 
     python tools/ci.py releases 1
 
-and compare the digest it prints against `sha256sum` of the file you built.
-
-`stage_release.py` **without flags** copies `dist/` into
-`installer/payload/tracker`; `--refresh-mod` alone refreshes only the mod
-files, and Inno then packs whatever tracker build is already in the
-payload — 1.4.0 shipped a 1.3.0 tracker for ten minutes that way. Verify
-with `ls installer/payload/tracker/_internal/korea_service_record/locales/ranks`
-(or any file the release added) before compiling.
+and compare its digest with the hash printed by `build_release.ps1`.
 
 **The PyInstaller bootloader is a local rebuild, not the stock one.** A forum
 user's Defender flagged 1.3.0 as `Trojan:Script/Wacatac.C!ml` on download
@@ -125,5 +194,5 @@ put the stock ones back — rebuild from the matching tag before the next
 release if that happens (sources: `C:\Users\bleih\pyi-build\src`, a sparse
 checkout of `bootloader/` + `PyInstaller/_shared_with_waf.py`; the full
 checkout carries the flagged binaries). The zip's README prints the setup
-exe's SHA-256; scan `installer\Output` with `MpCmdRun -Scan -ScanType 3`
-before uploading.
+exe's SHA-256, and `build_release.ps1` scans `installer\Output` with
+`MpCmdRun -Scan -ScanType 3` as its last step.
