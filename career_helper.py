@@ -1146,6 +1146,16 @@ class Career:
         and the game offers them too. Each line carries the man's standing,
         and the killed and the missing come in unticked and in red, so
         presenting to them is a decision taken rather than one slipped past.
+
+        Decorations only. A promotion is an award row too - category 1,
+        one of the 6019xx pseudo-awards - and it sits pending exactly like
+        a medal, so it used to appear here and could be handed over with
+        everything else. That is wrong in every particular: presenting it
+        bumps a random skill, courage or discipline instead of raising the
+        rank, writes a type-20 event where the game writes type 19, spends
+        an award point, and never touches the booster the game lets the
+        player choose. The game grants promotions itself on the next day,
+        so nothing is lost by leaving them alone.
         """
         names = {}
         if game is not None:
@@ -1159,6 +1169,7 @@ class Career:
                           p.name, p.lastName, p.persLevel, p.state, p.slot
                    FROM award a JOIN pilot p ON p.id=a.pilotId
                    WHERE a.isPending=1 AND a.isDeleted=0 AND a.pilotId>0
+                     AND a.category<>1
                      AND p.isDeleted=0
                    ORDER BY p.lastName, p.name, a.earnedDate, a.id""").fetchall()
         return [{"id": r["id"], "type": r["type"], "cost": int(r["cost"] or 1),
@@ -1213,7 +1224,8 @@ class Career:
             points = int(con.execute("SELECT awardPoints FROM squadron").fetchone()[0] or 0)
             rows = con.execute(
                 f"""SELECT id, type, cost, pilotId, pilotRank, squadronId
-                    FROM award WHERE id IN ({marks}) AND isPending=1 AND isDeleted=0""",
+                    FROM award WHERE id IN ({marks}) AND isPending=1 AND isDeleted=0
+                      AND category<>1""",
                 ids).fetchall()
             need = sum(int(r["cost"] or 1) for r in rows)
             if need > points:
