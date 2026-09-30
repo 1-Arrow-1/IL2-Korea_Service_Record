@@ -1153,9 +1153,20 @@ class Career:
         everything else. That is wrong in every particular: presenting it
         bumps a random skill, courage or discipline instead of raising the
         rank, writes a type-20 event where the game writes type 19, spends
-        an award point, and never touches the booster the game lets the
-        player choose. The game grants promotions itself on the next day,
-        so nothing is lost by leaving them alone.
+        an award point, and never touches the booster.
+
+        The booster is the reason this belongs to the game and not here.
+        Its own Award and promotion screen says what each does:
+
+            "Awarding a medal will randomly improve one of the pilot's
+             skills"
+            "Select the pilot booster you wish to enhance"
+
+        A decoration rolls the attribute, which is what present_awards
+        below imitates; a promotion is a choice the player makes. Since
+        2026-09-29 both can be actioned on the day they are earned, so
+        there is nothing the game makes you wait for and nothing to be
+        gained by doing it here.
         """
         names = {}
         if game is not None:
