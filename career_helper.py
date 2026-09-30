@@ -1608,6 +1608,18 @@ class Career:
             con.execute(
                 "UPDATE event SET isDeleted=1 WHERE pilotId=? AND type IN (3, 4) AND isDeleted=0 "
                 "AND substr(date, 1, 10)=?", (pilot_id, (pilot["stateDate"] or "")[:10]))
+            # Reviving the player is not finished with the pilot row. The
+            # game decides whether to offer postpone / end career / assign a
+            # new commander from the CAREER row, so a revived commander is
+            # still gone as far as that screen is concerned: it reads
+            # state=1 and a resumeDate in the future - the day the squadron
+            # was to change hands. A healthy career is state=0 with no
+            # resumeDate. Harmless for an AI pilot, who is never the reason
+            # that flag was set.
+            career = con.execute("SELECT playerId, state FROM career").fetchone()
+            if career is not None and career["playerId"] == pilot_id and career["state"]:
+                con.execute("UPDATE career SET state=0, resumeDate='0000.00.00'")
+
             if sortie is not None:
                 if restore_plane:
                     con.execute("UPDATE sortie SET status=0, health=100, planeStatus=0, planeHealth=100 "
