@@ -1,0 +1,148 @@
+IL-2 Korea Service Record 2.1.0 — one medal per sortie
+
+
+Gentlemen,
+
+This one is mostly about the awards mod, and it changes how medals are given
+out in careers you are already flying, not only in new ones. If you use the
+mod, read the first two sections before you install.
+
+
+ONE MEDAL PER SORTIE
+
+Until now a single sortie could pay you several decorations at once. Shoot
+down two aircraft and you might collect a Silver Star and, in the same
+debrief, be walked up two or three rungs of the Air Medal — each rung
+awarded and then immediately retired by the one above it, so the only trace
+was a ribbon that had jumped three places while you watched.
+
+That is finished. The decorations are now ranked in the order of precedence
+the Air Force actually used — Medal of Honor, Distinguished Service Cross,
+Silver Star, Legion of Merit, Distinguished Flying Cross, Soldier's Medal,
+Bronze Star, Air Medal, Commendation — and a sortie pays the highest one it
+earns. The others wait their turn.
+
+So a four-kill sortie is a Distinguished Service Cross and nothing else. The
+Air Medal rung you also qualified for arrives on a later flight, which is how
+it should have read all along.
+
+The awards that are not decorations for the sortie — your wings, the Purple
+Heart, the Korean Service Medal, the unit citations — are untouched and still
+arrive whenever they are due.
+
+
+FIGHTER-BOMBER PILOTS NO LONGER HAVE TO BE LUCKY
+
+The Silver Star and the DSC have always needed the citation to be approved as
+well as earned: a 60 or 80 per cent roll on top of the kills. That is right
+for a fighter squadron, where meeting aircraft is the job. It is not right
+for a fighter-bomber squadron, and the game's own data says so plainly.
+
+I went through 418 sorties flown by the pilots of a Mustang fighter-bomber
+squadron. Exactly one of them produced two airborne kills. Not one produced
+three or more. The reason is in the mission tables: a Mustang fighter-bomber
+unit is given no interception work at all, while a Sabre wing flies a fifth
+of its missions as intercepts. The two are not doing the same job.
+
+So in a fighter-bomber squadron the roll is waived. The kill thresholds are
+unchanged — two or three for the Silver Star, four or five for the DSC — but
+a pilot who gets there is not then asked to win a lottery as well. Fighter
+squadrons roll exactly as before.
+
+This applies to every USAF fighter-bomber squadron in the game, and it keeps
+applying to a unit that later re-equips with Sabres. That is deliberate: the
+squadron is still a fighter-bomber squadron and you joined it as one.
+
+
+THE DISTINGUISHED FLYING CROSS MUST NOW BE FLOWN FOR
+
+In the stock game the DFC is handed out by the daily roster pass, on career
+totals, without reference to any particular flight. It is a valour award and
+it should be earned in the air, so all six rungs are now granted only by
+flying. The Medal of Honor, the DSC and the Silver Star already worked this
+way.
+
+The Bronze Star with the "V" device and the Soldier's Medal stay as they are,
+and that is not an oversight. The "V" is for valour on the ground and
+expressly not in the air, and the Soldier's Medal is for heroism with no
+enemy in it at all — a man pulled from a burning aircraft. The game models
+neither act, so neither condition can look for one.
+
+
+THE DISPLAY CASE AND THE RIBBON RACK
+
+Three things were quietly wrong.
+
+A pilot who had been awarded the Medal of Honor twice wore the plain ribbon:
+the rack was showing the first rung of each ladder instead of the highest, so
+the oak leaf cluster simply vanished. It now shows the highest award you
+hold, on every ladder.
+
+The awards list below it did the same in reverse — it listed every rung
+separately, so "Medal of Honor" and "Medal of Honor and One Oak Leaf Cluster"
+sat side by side. It now shows the highest, with the earlier ones folded
+underneath it where you can still see their dates.
+
+And the brass plate in the display case was engraving the rank in full and
+then running out of room for the man, which is the wrong way round. It now
+reads "2nd Lt. Meade Bennett" rather than "Second Lieutenant M. Be…". The
+rank is still in the language of the air force that issued the awards, and
+hovering it gives you the full rank in yours.
+
+
+THE CAREER HELPER
+
+Two fixes.
+
+Reviving a commander now works. It restored the pilot but left the career
+itself still flagged, so the game went on offering to postpone, end the
+career or assign a new commander every time you loaded it.
+
+And promotions no longer appear in the award points tab. They were sitting
+there looking like medals, and handing one over did all the wrong things at
+once — it raised a random skill instead of the rank, wrote the wrong kind of
+record, and spent an award point for nothing. A promotion belongs to the
+game, which lets you choose the attribute yourself. The helper now leaves it
+alone.
+
+
+STILL OUTSTANDING: THE 29 SEPTEMBER SORTIE PROBLEM
+
+The fault I described in 2.0.0 — the game discarding the detailed record of
+each flight — has been acknowledged by the developers and a fix is expected
+in the next game update. As far as I know it has not shipped yet. The check
+is still ten seconds:
+
+    ...\IL2Series\data\_career.log
+
+and search for "escapedJail". The tracker still warns you at the top of a
+career the game has damaged.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.1.0
+
+Installer  IL2_Korea_Service_Record_Setup_v2.1.0.exe
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Zip        IL-2.Korea.Service.Record.v2.1.0.zip
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+(GitHub writes the zip's name with dots where I put spaces. It is the same
+file.)
+
+The installer still offers the two promotion systems and ships one awards.cfg
+for each; everything above is in both.
+
+Everything is Authenticode signed. SmartScreen works on reputation rather
+than signatures, so a new release can still raise a warning until enough
+people have run it.
+
+The project lives at https://github.com/1-Arrow-1/IL2-Korea_Service_Record — the
+source, the issue tracker, and every release. If it has been useful to you, a
+star there costs you nothing and helps more than you would think.
+
+As ever: if something does not match what you see in your own career, say so
+and I will go and look. Two of the three display faults above were found that
+way.
