@@ -1173,8 +1173,25 @@ class CareerAggregator:
         """
         promotions, medals = [], []
         retired = [row for row in awards if row["isDeleted"]]
+        # A rung the engine forgot to retire is superseded all the same.
+        # AwardRemove is meant to delete the lower rung the moment a cluster
+        # is granted, but the game does not always apply it: a pilot given
+        # the Medal of Honor and then its oak leaf cluster was found holding
+        # 601026 and 601041 at once, both undeleted, and the page listed the
+        # medal twice. So a rung named in the AwardRemove of a higher rung
+        # the pilot ALSO holds is filed as history, exactly as a properly
+        # retired one would be.
+        standing = [row for row in awards
+                    if not row["isDeleted"] and row["category"] != 1]
+        outranked = set()
+        for row in standing:
+            outranked.update(self._superseded(row["type"]))
+        superseded = retired + [row for row in standing
+                                if row["type"] in outranked]
         for row in awards:
             if row["isDeleted"]:
+                continue
+            if row["category"] != 1 and row["type"] in outranked:
                 continue
             if row["category"] == 1:
                 rank_id = row["type"] - PROMOTION_BASE + 1
@@ -1193,7 +1210,7 @@ class CareerAggregator:
                      "name": self.award_name(old["type"]),
                      "earned": old["earnedDate"],
                      "received": old["receivedDate"]}
-                    for old in retired if old["type"] in below
+                    for old in superseded if old["type"] in below
                 ]
                 # Nearest rung first, so the list reads downwards into the past.
                 history.sort(key=lambda h: (h["earned"], h["type"]), reverse=True)

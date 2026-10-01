@@ -401,19 +401,62 @@ def _centred(cx: float, cy: float, w: float, h: float) -> tuple:
     return (cx - w / 2.0, cy - h / 2.0, w, h)
 
 
-def plate_text(rank: str, name: str) -> Dict[str, str]:
+# How a rank is engraved on brass. An engraver shortens the rank and leaves
+# the man's name alone - "2nd Lt. Meade Bennett", never "Second Lieutenant
+# M. Be...". Spelling the rank out was costing the name its letters.
+#
+# These are abbreviations, not translations. The plate carries the issuing
+# air force's own language and never the reader's, so there is one form per
+# rank per country and no locale file is involved. Only the long compound
+# ranks are shortened; Captain, Major and Colonel are already short enough
+# to engrave, and shortening them would look affected rather than correct.
+#
+# 502 and 503 are absent on purpose. The Chinese ranks are two characters
+# each and the Korean ones are romanised single words - Sojwa, Taejwa -
+# so there is nothing to shorten and a wrong guess would be worse than none.
+RANK_ABBR = {
+    601: {0: "2nd Lt.", 1: "1st Lt.", 2: "Captain", 3: "Major",
+          4: "Lt. Col.", 5: "Colonel", 6: "Brig. Gen.", 7: "Maj. Gen."},
+    # The Navy ladder is its own: a lieutenant junior grade is never "1st Lt."
+    602: {0: "Ensign", 1: "Lt. (j.g.)", 2: "Lieutenant", 3: "Lt. Cdr.",
+          4: "Commander", 5: "Captain", 6: "Rear Adm. (l.h.)",
+          7: "Rear Adm."},
+    # The Marines wear the Army ladder, as the game's own names show.
+    603: {0: "2nd Lt.", 1: "1st Lt.", 2: "Captain", 3: "Major",
+          4: "Lt. Col.", 5: "Colonel", 6: "Brig. Gen.", 7: "Maj. Gen."},
+    # Soviet practice shortens the compounds the same way: ст. лейтенант,
+    # ген.-майор. Подполковник is one word and is written out.
+    501: {1: "Ст. лейтенант", 6: "Ген.-майор", 7: "Ген.-лейтенант"},
+}
+
+
+def engraved_rank(country: Optional[int], rank_id: Optional[int],
+                  full: str) -> str:
+    """The rank as it goes on the brass, falling back to the full name."""
+    if country is None or rank_id is None:
+        return full
+    return RANK_ABBR.get(country, {}).get(rank_id) or full
+
+
+def plate_text(rank: str, name: str, country: Optional[int] = None,
+               rank_id: Optional[int] = None) -> Dict[str, str]:
     """
     The engraving, in full and abbreviated.
 
     Both go to the page because only the page knows how wide the text
     actually runs in the font it loaded. It measures the full form, and
     falls back to the initial when the plate cannot hold it.
+
+    The rank is shortened first and the name kept whole, so the initial is
+    now a last resort for a genuinely long name rather than the routine
+    outcome of a long rank.
     """
-    full = f"{rank} {name}".strip()
+    short_rank = engraved_rank(country, rank_id, rank)
+    full = f"{short_rank} {name}".strip()
     parts = name.split()
-    short = (f"{rank} {parts[0][0]}. {' '.join(parts[1:])}".strip()
+    short = (f"{short_rank} {parts[0][0]}. {' '.join(parts[1:])}".strip()
              if len(parts) > 1 and parts[0] else full)
-    return {"full": full, "short": short}
+    return {"full": full, "short": short, "rank_engraved": short_rank}
 
 
 def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[str],

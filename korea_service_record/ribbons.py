@@ -293,16 +293,42 @@ RIBBONS.update({
 PRECEDENCE: Dict[int, int] = {aid: i for i, aid in enumerate(RIBBONS)}
 
 
+def _rung(r: "Ribbon") -> int:
+    """How far up its ladder a rung sits, in bronze-device equivalents.
+
+    A silver device stands for five awards in both services - five bronze
+    oak leaf clusters become one silver, five gold stars one silver star -
+    so it is worth five here and the ordering comes out right whichever
+    ladder it is.
+    """
+    return (r.olc_bronze + r.star_bronze + r.star_gold
+            + 5 * (r.olc_silver + r.star_silver + r.star_silver_large))
+
+
 def rack(award_ids) -> List[int]:
-    """The ribbons a pilot wears, highest precedence first, one per ladder."""
+    """The ribbons a pilot wears, highest precedence first, one per ladder.
+
+    A ladder collapses to the HIGHEST rung held, not the first one seen.
+    The lower rungs normally vanish by themselves - every cluster carries
+    AwardRemove for the rung beneath it - but the game does not always
+    apply it: a pilot awarded the Medal of Honor and then its oak leaf
+    cluster was observed holding 601026 and 601041 at once, and the rack
+    showed him the plain ribbon, silently dropping the second award.
+    Sorting by precedence alone put the base rung first and it won.
+    """
     worn = sorted({a for a in award_ids if a in RIBBONS}, key=PRECEDENCE.get)
-    seen: set = set()
-    out = []
+    best: Dict[int, int] = {}
+    order: List[int] = []
     for aid in worn:
         base = RIBBONS[aid].base
-        if base in seen:
-            continue
-        seen.add(base)
+        if base not in best:
+            best[base] = aid
+            order.append(base)                  # ladders keep precedence order
+        elif _rung(RIBBONS[aid]) > _rung(RIBBONS[best[base]]):
+            best[base] = aid
+    out = []
+    for base in order:
+        aid = best[base]
         out += [aid] * RIBBONS[aid].repeat      # a repeat awarding is another bar
     return out
 

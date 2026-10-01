@@ -467,7 +467,8 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         data = shadowbox_art.layout(detail["ribbon_rack"], rank_id,
                                     detail.get("squadron_key"), agg.icons,
                                     country=country, rev=asset_version())
-        data["text"] = shadowbox_art.plate_text(rank, player.get("name") or "")
+        data["text"] = shadowbox_art.plate_text(rank, player.get("name") or "",
+                                                country=country, rank_id=rank_id)
         data["text"]["rank_reader"] = reader_rank
         data["text"]["rank"] = rank
         data["squadron"] = detail.get("squadron") or ""

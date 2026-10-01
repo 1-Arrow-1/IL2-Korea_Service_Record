@@ -665,11 +665,15 @@
         plate.style.height = box.plate.height + "%";
         plate.dataset.full = (box.text && box.text.full) || "";
         plate.dataset.short = (box.text && box.text.short) || "";
-        // The brass is engraved in the air force's own language. A reader
-        // who wants the rank in his hovers it.
-        const native = (box.text && box.text.rank) || "";
+        // The brass is engraved in the air force's own language, and the
+        // rank is shortened to leave room for the name. A reader who wants
+        // it in full, in his own language, hovers it - so the comparison is
+        // against what is actually cut into the plate, not against the full
+        // native rank. Otherwise an English reader looking at "2nd Lt." on
+        // a USAF plate would be offered no expansion at all.
+        const engraved = (box.text && (box.text.rank_engraved || box.text.rank)) || "";
         const mine = (box.text && box.text.rank_reader) || "";
-        if (mine && mine !== native) {
+        if (mine && mine !== engraved) {
             plate.setAttribute("title", T("shadowbox.rank_is", {rank: mine}));
         } else {
             plate.removeAttribute("title");
