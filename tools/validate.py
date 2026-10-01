@@ -403,10 +403,32 @@ def main(game_arg):
             check("every key the server emits exists in en.json",
                   sorted(asked - set(english)), [])
 
+        # The DSC stands for the five guarded ladders. Until 2026-09-30 this
+        # asserted the opposite - that it carried no guard - because the
+        # guard was believed dead anywhere below the Air Medal. It is not:
+        # noAwards means "nothing granted yet in this sortie", the engine
+        # walks the file by position, and the ladders were reordered into
+        # descending precedence so the guard now picks the highest award a
+        # sortie earns and suppresses the rest. Proven in game: four kills
+        # paid the DSC and nothing else.
         dsc = awards_cfg.get(601021)
         if dsc is not None:
-            check("601021 has no noAwards guard", "noAwards" in dsc.in_proc, False)
+            check("601021 is guarded by noAwards", "noAwards" in dsc.in_proc, True)
             check("601021 in_proc reachable", dsc.reachable_in_proc, True)
+
+        # The rollover sweep reads AwardByDef and ignores noAwards, so a
+        # ladder with a live AwardByDef climbs every rung it qualifies for
+        # in one 06:00 pass - which is how a pilot holding one bronze oak
+        # leaf cluster woke up wearing the silver one. Every rung of the
+        # five guarded ladders must therefore be sortie-only.
+        laddered = [601026, 601041, 601021, 601022, 601023, 601024, 601025,
+                    601018, 601019, 601020, 601050, 601051,
+                    601011, 601012, 601013, 601014, 601015, 601016,
+                    601002, 601003, 601004, 601005, 601006, 601007]
+        cascades = sorted(a for a in laddered
+                          if (d := awards_cfg.get(a)) is not None
+                          and d.by_def and d.by_def.strip() != "(RND<0)")
+        check("no guarded ladder can climb at the day rollover", cascades, [])
 
     print()
     if SKIPPED:
