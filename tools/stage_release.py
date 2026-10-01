@@ -26,6 +26,7 @@ edits were made in place and never mirrored back.
 """
 
 import argparse
+import re
 import shutil
 from pathlib import Path
 
@@ -160,22 +161,46 @@ def derive_stock_awards(extended: Path, out: Path) -> None:
     text = extended.read_bytes().decode("utf-8")
     newline = "\r\n" if "\r\n" in text else "\n"
 
-    # The promotion block runs from the file's first line to the first
-    # country section; the notes run from their own heading to the end.
+    # The promotion rungs sit at the END of the file, below every medal:
+    # evaluation walks the file by position, and anything above a
+    # (noAwards=1) award can shut it out, so the rungs are kept where
+    # nothing is left for them to block. The medals therefore run from the
+    # first country section to the promotion heading, and the notes run
+    # from their own heading to the end of the file.
     head = text.find("//// Eastern Bloc")
+    promo = text.find("//// Promotion - earned on service")
     notes = text.find("// Promotion, as modified")
-    if head < 0 or notes < 0:
+    if head < 0 or promo < 0 or notes < 0:
         raise SystemExit("awards.cfg no longer has the markers the stock "
                          "variant is cut at ('//// Eastern Bloc', "
+                         "'//// Promotion - earned on service', "
                          "'// Promotion, as modified')")
+    if not head < promo < notes:
+        raise SystemExit("awards.cfg markers are out of order - the medals, "
+                         "the promotion rungs and the promotion notes are no "
+                         "longer in that sequence")
     block = STOCK_PROMOTION_BLOCK.replace("\n", newline)
     tail = STOCK_PROMOTION_NOTES.replace("\n", newline)
-    result = block + text[head:notes] + tail
+    result = text[head:promo] + block + tail
 
-    # Nothing from the extended ladder may survive the swap.
-    for token in ("PCP", "601985", "601986", "ComplSorties>=25"):
-        if token in result[: result.find("//// Eastern Bloc")]:
-            raise SystemExit(f"stock variant still contains {token!r}")
+    # Nothing from the extended ladder may survive the swap. Match on the
+    # award declarations rather than bare numbers, and scope the criteria
+    # tokens to the block that was swapped in: PCP and ComplSorties are both
+    # named in the legend and used by medals, so looking for them across the
+    # whole file would fail on text that is supposed to be there.
+    for flag_rank in ("[Award=601985]", "[Award=601986]"):
+        if flag_rank in result:
+            raise SystemExit(f"stock variant still contains {flag_rank}")
+    # Only the award definitions, not the prose around them: both notes
+    # blocks discuss PCP by name, and so does the legend.
+    swapped = result[result.index("//// Promotion - the stock criteria"):]
+    rungs = "".join(re.findall(r"\[Award=\d+\].*?\[end\]", swapped, re.S))
+    for token in ("PCP", "ComplSorties"):
+        if token in rungs:
+            raise SystemExit(f"stock promotion block still uses {token!r}")
+    if rungs.count("[Award=") != 5:
+        raise SystemExit("stock promotion block should hold five rungs, "
+                         f"found {rungs.count('[Award=')}")
     out.write_bytes(result.encode("utf-8"))
 
 
