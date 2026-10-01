@@ -124,10 +124,10 @@ DOWNLOAD
     https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.1.0
 
 Installer  IL2_Korea_Service_Record_Setup_v2.1.0.exe
-           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+           SHA-256  6c0c6159621060354b34d0b2f86fab29868fe0a29093878a824977162ecbd283
 
 Zip        IL-2.Korea.Service.Record.v2.1.0.zip
-           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+           SHA-256  ea3bbb4cc40c93436ebf4723a4cc6b5bf842edd114e60f17c0ee033ecbee1039
 
 (GitHub writes the zip's name with dots where I put spaces. It is the same
 file.)
