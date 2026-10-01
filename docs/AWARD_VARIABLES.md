@@ -76,11 +76,24 @@ yet all but `OpSuccess` are set by a setter and work.
 
 ## Traps that are not about availability
 
-- **`noAwards` is a dead guard.** It means "nothing has been awarded yet
-  this sortie", and the loop clears it after any grant. The Air Medal is
-  cumulative and its cluster's `AwardRemove` deletes the base row, so the
-  engine re-grants it on nearly every sortie and clears the flag before
-  anything below it in the file is reached. Do not build on it.
+- **`noAwards` is a working guard** (corrected 2026-09-30; this entry
+  previously called it dead). It means "nothing has been awarded yet in
+  this pass": set to 1 when a pass starts, cleared by the first grant, so
+  one guarded award per pass. The earlier verdict was about file order, not
+  the mechanism - the cumulative Air Medal sat above the valour decorations
+  and cleared the flag before anything below it was reached. With the USAF
+  section reordered into descending precedence the guard is what makes the
+  ladders exclusive, and the file now depends on it.
+
+  Two limits, both found the hard way:
+
+  - *It does not stop a ladder at the day rollover.* That sweep walks the
+    award list repeatedly, so one grant per pass becomes as many passes as
+    the ladder needs. Four Air Medal rungs went in one 06:00 sweep with
+    every rung guarded.
+  - *The sweep reads `AwardInProc`.* Those rungs fired while `AwardByDef`
+    was `(RND<0)`. Killing `AwardByDef` does not keep an award out of the
+    roster sweep; writing it on a `*Sortie` variable does.
 - **In the roster sweeps the sortie is empty**, so every `*Sortie` variable
   is set — to zero. Per-sortie conditions belong in `AwardInProc` only.
 - **File order decides.** The first award whose condition passes takes the

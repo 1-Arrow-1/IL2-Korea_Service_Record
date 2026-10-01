@@ -15,7 +15,7 @@ failure and nothing in `_career.log`; the award simply never fires.
 | `RND` | A fresh random 0-1000 on every read. RND<600 is a 60 % chance | yes | yes |
 | `RNDsortie` | Random 0-1000, rolled once when the mission ends, so several awards can share one roll | no | yes |
 | `ExAw` | Holds award N. Only meaningful inside AwardRemove | yes | yes |
-| `noAwards` | Nothing has been awarded yet this sortie - but see the warning below | no | yes |
+| `noAwards` | Nothing has been awarded yet in this evaluation pass - a sortie is one pass, the day rollover is several. See below | no | yes |
 | **Rank, standing and person** | | | |
 | `RankID` | Rank, 0 = 2nd Lt upward. Not capped at 5, whatever the legend says | no | yes |
 | `PCP` | Career points: roughly score plus credit for rank, awards and command | no | yes |
@@ -76,10 +76,29 @@ failure and nothing in `_career.log`; the award simply never fires.
 
 ## Three things the columns cannot say
 
-- **`noAwards` is "yes" for a pilot but useless in practice.** It is set at
-  the start of each sortie and cleared after any grant, and the cumulative
-  Air Medal re-fires on nearly every sortie - clearing it before anything
-  lower in the file is reached. Do not build on it.
+- **`noAwards` works, and the file is now built on it** (corrected
+  2026-09-30; this entry previously said it was useless). It is set to 1 at
+  the start of an evaluation pass and cleared by the first grant, so at most
+  one guarded award is given per pass. What made it useless was not the
+  mechanism but the old file order: the cumulative Air Medal sat above the
+  valour decorations and re-fired on nearly every sortie, clearing the flag
+  before anything below it was reached. Reordering the USAF section into
+  descending precedence - Medal of Honor, DSC, Silver Star, DFC, Air Medal -
+  put the highest decoration first and made the guard do what it says.
+  Confirmed in game: a four-kill sortie paid the DSC and nothing else, with
+  the Air Medal rung it also qualified for suppressed until the next sortie.
+- **But a guard cannot stop a cumulative ladder at the day rollover.** The
+  06:00 sweep walks the award list *repeatedly*, so the guard limits each
+  pass to one grant and the sweep simply runs more passes: a pilot holding
+  one Air Medal cluster, whose career total justified the silver one, took
+  four rungs in a single sweep with every rung guarded. Spacing the
+  thresholds is the only thing that controls how far a ladder climbs.
+- **The sweep reads `AwardInProc`, not only `AwardByDef`.** Those four rungs
+  fired while their `AwardByDef` was `(RND<0)`, which can never be true. So
+  setting `AwardByDef` dead does not keep an award out of the roster sweep.
+  What does is keying it on a `*Sortie` variable, which is zero there - that
+  is why the Medal of Honor, the DSC and the Silver Star, all written on
+  `AirObjSortie`, can only ever be earned by flying.
 - **The `*Sortie` variables are "yes" only in `AwardInProc`.** The roster
   sweeps that evaluate `AwardByDef` hand the evaluator an empty sortie, so
   those variables are set - to zero. Per-sortie tests belong in
