@@ -38,6 +38,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt pystray==0.19.5 pyinstaller==6.17.0
 
+      - name: Unit tests (no game needed)
+        run: |
+          pip install pytest
+          python -m pytest -q
+
       - name: Build the tracker (PyInstaller)
         run: pyinstaller korea_service_record.spec --noconfirm
 

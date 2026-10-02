@@ -327,13 +327,15 @@ def test_restore_rolls_back_entirely_when_the_file_is_locked(napalm_career, game
                                        "record is saved; a failed save loses the originals")
 def test_originals_survive_a_failed_record_save(napalm_career, game_dir, monkeypatch):
     c = napalm_career
+    real_save = napalmfix.save
 
     def boom(*a, **k):
         raise OSError("disk full")
     monkeypatch.setattr(napalmfix, "save", boom)
     with pytest.raises(OSError):
         napalmfix.auto_sync(c.path, game_dir)
-    monkeypatch.undo()
+    # Only save goes back: undo() would also lift the tmp record folder.
+    monkeypatch.setattr(napalmfix, "save", real_save)
     # The file was corrected, but no record of the original values exists.
     napalmfix.restore(c.path)
     assert c.sortie_kills(2) == S2_RAW

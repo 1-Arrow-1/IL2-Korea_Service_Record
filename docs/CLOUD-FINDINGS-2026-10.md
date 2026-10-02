@@ -266,3 +266,5 @@ finding is fixed: M1, M2 and both halves of M3.
   Behaviour does not change.
 - Added `tests/` and `pytest.ini`, which sets `testpaths = tests` and `pythonpath = .`.
   No runtime file changes, and nothing user-visible, so there is nothing to translate.
+- `.github/workflows/build.yml`: a "Unit tests" step installs pytest and runs
+  `python -m pytest -q` before the PyInstaller build.
