@@ -71,3 +71,25 @@ IF YOU WANT TO UNDO IT
 Every write is backed up first to
 %LOCALAPPDATA%\IL2KoreaTracker\backups, next to a record of every original
 value. Nothing is lost.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.2.0
+
+Installer  IL2_Korea_Service_Record_Setup_v2.2.0.exe
+           SHA-256  8b8fdba92d090e58cba8e399af9be1554eb6ad4e88d4d2a664b4e294092561b1
+
+Zip        IL-2.Korea.Service.Record.v2.2.0.zip
+           SHA-256  b8b32c6664b7801f2afa6d33ce927c60823832a3afb8db0541b49cbb3ade2337
+
+Everything is Authenticode signed. SmartScreen works on reputation rather
+than signatures, so a new release can still raise a warning until enough
+people have run it.
+
+The project lives at https://github.com/1-Arrow-1/IL2-Korea_Service_Record — the
+source, the issue tracker, and every release. If it has been useful to you,
+don't forget to give me a star.
+
+As ever: if something does not match what you see in your own career, say so
+and I will go and look.
