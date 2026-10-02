@@ -106,6 +106,60 @@ class KoreaCareerDatabase:
         self._corr_sortie: Dict[int, Dict[str, Any]] = {}
         self._corr_pilot_delta: Dict[int, float] = {}
         self._corr_total: float = 0.0
+        # Napalm re-kill correction (see killfix.py): sortie, pilot and squadron
+        # rows come back with killStats rebuilt from the kill rows, the stored
+        # value kept as _killStats_raw for award progress. Computed on first use.
+        self._kill_table = None
+        self._kill_cuts: Optional[Dict[str, Any]] = None
+
+    def set_kill_categories(self, table) -> None:
+        self._kill_table = table
+        self._kill_cuts = None
+
+    def _cuts(self) -> Dict[str, Any]:
+        """Per-sortie inflation, and its sums per pilot and for the squadron."""
+        if self._kill_cuts is not None:
+            return self._kill_cuts
+        from collections import Counter
+        from .killfix import reductions
+        by_sortie: Dict[int, Counter] = {}
+        by_pilot: Dict[int, Counter] = {}
+        total: Counter = Counter()
+        names: Dict[tuple, List[str]] = {}
+        for row in self.query(
+                "SELECT missionId, pilotId, tpar1 FROM event WHERE type=0 AND isDeleted=0"):
+            names.setdefault((row["missionId"], row["pilotId"]), []).append(row["tpar1"] or "")
+        for row in self.query(
+                "SELECT id, missionId, pilotId, killStats FROM sortie WHERE isDeleted=0"):
+            cut = reductions(row["killStats"], names.get((row["missionId"], row["pilotId"]), []),
+                             self._kill_table)
+            if cut:
+                by_sortie[row["id"]] = cut
+                by_pilot.setdefault(row["pilotId"], Counter()).update(cut)
+                total.update(cut)
+        self._kill_cuts = {"sortie": by_sortie, "pilot": by_pilot, "total": total}
+        return self._kill_cuts
+
+    def kill_stats(self, sortie_id: int, raw: Optional[str]) -> Optional[str]:
+        """One sortie's killStats with the re-kills removed - for callers that
+        read the sortie table with their own SQL."""
+        if self._kill_table is None:
+            return raw
+        from .killfix import subtract
+        return subtract(raw, self._cuts()["sortie"].get(sortie_id))
+
+    def _fix_kills(self, d: Dict[str, Any], kind: str) -> None:
+        from .killfix import subtract
+        cuts = self._cuts()
+        if kind == "sortie":
+            cut = cuts["sortie"].get(d.get("id"))
+        elif kind == "pilot":
+            cut = cuts["pilot"].get(d.get("id"))
+        else:
+            cut = cuts["total"]
+        if cut and "killStats" in d:
+            d["_killStats_raw"] = d["killStats"]
+            d["killStats"] = subtract(d["killStats"], cut)
 
     def set_corrections(self, data: Optional[Dict[str, Any]]) -> None:
         self._corr = data if data and data.get("missions") else None
@@ -124,14 +178,20 @@ class KoreaCareerDatabase:
                 self._corr_total += delta
 
     def _corrected(self, rows, kind: str):
-        """Return rows as-is, or as dicts with the correction applied."""
-        if self._corr is None:
+        """Return rows as-is, or as dicts with the corrections applied."""
+        kills = self._kill_table is not None and kind in ("sortie", "pilot", "squadron")
+        if self._corr is None and not kills:
             return rows
         from .. import corrections
-        missions = self._corr["missions"]
+        missions = self._corr["missions"] if self._corr is not None else {}
         out = []
         for row in rows:
             d = dict(row)
+            if kills:
+                self._fix_kills(d, kind)
+            if self._corr is None:
+                out.append(d)
+                continue
             if kind == "sortie":
                 c = self._corr_sortie.get(d["id"])
                 if c:

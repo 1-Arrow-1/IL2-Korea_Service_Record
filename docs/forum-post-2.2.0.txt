@@ -1,0 +1,73 @@
+IL-2 Korea Service Record 2.2.0 — napalm, lost sorties, tail codes
+
+
+Gentlemen,
+
+This release deals with two game bugs that have been quietly bending career
+records since the 29 September update, and it is the first version that
+writes corrections into your career file. Read the first two sections before
+you install.
+
+
+NAPALM COUNTS THE SAME TARGET OVER AND OVER
+
+Napalm burning on an airfield's buildings, tents, ammunition stores and parked
+aircraft books the same destroyed object again every two seconds for as long
+as the fire burns - about three minutes. One part, one fire: 90 kills. Several
+fires on one part: 270, 450, 900. A napalm drop on a lone AA gun counts once,
+correctly; it is the airfield block groups that go wrong.
+
+In my own career one sortie destroyed 13 objects and was credited with 867.
+Those kills go straight into your kill totals, your score and your PCP, and
+from there into every award that counts ground targets. The hotfix 1.004b
+does not change it - I tested it this evening. It is reported to the
+developers.
+
+What 2.2.0 does about it:
+
+- The Service Record shows the real kill counts everywhere: combat results,
+  the mission report, best sorties, airframes, squadron totals. It rebuilds
+  them from the game's own record of every destroyed object, which is not
+  affected.
+- When it opens a career, it writes the corrected kill totals and PCP back
+  into the career file, so the awards and promotions read honest numbers
+  from your next mission on. It touches nothing unless something is
+  inflated, and it takes a backup first, every time.
+- The awards mod no longer pays a ground-kill award or a promotion in the
+  debrief of a sortie with napalm-sized numbers (60 buildings or 60 ground
+  targets). No honest sortie in six careers came near that; the inflated
+  ones start at 83. If you qualify for real, it arrives on your next flight.
+
+Your score is left as the game has it.
+
+
+THE MISSIONS THE GAME FORGOT
+
+Between the 29 September update and the hotfix 1.004b of 2 October, the game
+saved no sortie details at all. The missions were there, the awards and
+totals moved, but the debriefings stayed empty. Install 1.004b and it stops -
+and the patch script I handed out is no longer needed; please do not run it
+again.
+
+The missions you already lost come back. The game kept the full debrief of
+every mission, and 2.2.0 rebuilds the missing sortie rows from it the first
+time it opens the career. I checked the method against 701 sorties that were
+saved normally: every field matched on every one.
+
+Hector (hjbb1975) worked out the same thing independently and recovered 96
+sorties of his own. Thank you, Hector.
+
+
+ALSO
+
+- Tail codes: the F-86 shows FU-174 instead of BN-174, and F-84E codes decode
+  at all. Both fixes are Hector's.
+- Promotions: the PCP needed above Captain is lower - 250, 400, 650, 1000 and
+  1500 - set after the napalm points came out of everyone's PCP.
+
+
+IF YOU WANT TO UNDO IT
+
+Every write is backed up first to
+%LOCALAPPDATA%\IL2KoreaTracker\backups, next to a record of every original
+value. Nothing is lost.

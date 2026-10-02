@@ -395,6 +395,21 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             auto_sync(Path(meta.path), agg.game_dir)
         except Exception:                    # noqa: BLE001 - never break the page over this
             logger.exception("Automatic flight-time correction failed for %s", career_id)
+        # Sorties the 29 Sep build never saved (recovery.py), restored from the
+        # debrief - before the napalm run, so it sees and corrects them too.
+        try:
+            from . import recovery
+            recovery.auto_sync(Path(meta.path))
+        except Exception:                    # noqa: BLE001
+            logger.exception("Automatic sortie recovery failed for %s", career_id)
+        # The napalm re-kills (napalmfix.py), always and without asking: kill
+        # totals and PCP corrected after each new mission, so the awards and
+        # promotions read real figures. Writes only when something differs.
+        try:
+            from . import napalmfix
+            napalmfix.auto_sync(Path(meta.path), agg.game_dir)
+        except Exception:                    # noqa: BLE001
+            logger.exception("Automatic napalm correction failed for %s", career_id)
 
     @app.route("/api/career/<path:career_id>")
     def api_career(career_id: str):

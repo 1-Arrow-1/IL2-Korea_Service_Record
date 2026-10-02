@@ -375,7 +375,11 @@ def pilot_variables(pilot, career, squadron=None) -> Dict[str, float]:
     """
     from .career.killstats import KillStats
 
-    kills = KillStats(pilot["killStats"] if "killStats" in pilot.keys() else "")
+    # The game's own counter, napalm re-kills included: awards fire on it, so
+    # a prediction made on the corrected figure would be wrong (killfix.py).
+    keys = pilot.keys()
+    kills = KillStats(pilot["_killStats_raw"] if "_killStats_raw" in keys
+                      else pilot["killStats"] if "killStats" in keys else "")
     now = career["currentDate"] if career is not None else ""
     # CareerDays counts from the *career's* start, not the pilot's own.
     # LeRoy Pound settles it: he joined on 1951.04.12 and received the UN
@@ -416,7 +420,9 @@ def squadron_variables(squadron, career, country: int) -> Dict[str, float]:
     """
     from .career.killstats import KillStats
 
-    kills = KillStats(squadron["killStats"] if squadron is not None else "")
+    kills = KillStats("" if squadron is None else
+                      squadron["_killStats_raw"] if "_killStats_raw" in squadron.keys()
+                      else squadron["killStats"])
     now = career["currentDate"] if career is not None else ""
     days = _days(career["startDate"] if career is not None else "", now)
     return {

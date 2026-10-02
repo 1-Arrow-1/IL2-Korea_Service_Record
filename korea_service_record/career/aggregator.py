@@ -131,6 +131,7 @@ from ..worldobjects import WorldObjectIndex, normalise as normalise_object
 from .attributes import PilotAttributes
 from .database import CareerFile, KoreaCareerDatabase, find_careers
 from .events import describe, is_award_event
+from .killfix import KillCategories
 from .killstats import ROLLUP_KEYS, KillStats
 from .operations import Operations
 from .missionresult import MissionResult, _number
@@ -221,16 +222,22 @@ def _tail_code(raw: Optional[str], plane_key: str) -> str:
     letters, _, digits = text.partition("_")
     if not digits:
         return text
+    # The F-84E carries a third segment (":D_\"\"*_7"); only the second is the
+    # number, or its digits never decode and the raw glyphs show.
+    digits = digits.split("_", 1)[0]
     # The player's own aircraft can carry a code typed in the hangar; its
     # letters arrive as plain letters and its digits one glyph block up
     # (chr(43)..chr(52)), so the base is whichever block the digits sit in.
     codes = [ord(ch) for ch in digits]
     base = 33 if all(33 <= o <= 42 for o in codes) else 43 if all(43 <= o <= 52 for o in codes) else None
     number = "".join(str(o - base) for o in codes) if base else digits
-    if letters.isalpha():
+    # Letters count as typed only beside typed digits. The F-86's font glyphs
+    # are "BN", which pass isalpha() and showed as BN-174 instead of FU-174.
+    # Both fixes from Hector (hjbb1975), 2026-10-02.
+    if base == 43 and letters.isalpha():
         prefix = letters
     else:
-        prefix = BUZZ_PREFIX.get(plane_key.lower(), "")
+        prefix = BUZZ_PREFIX.get(plane_key.lower(), letters if letters.isalpha() else "")
     return f"{prefix}-{number}" if prefix else number
 
 # Promotion pseudo-awards 601980..601984 confer rank 1..5.
@@ -423,6 +430,9 @@ class CareerAggregator:
         self.tiles = MapTiles(self.resolver)
         self.overlay = Overlay(self.resolver, lang)
         self.icons = IconLibrary(self.resolver)
+        # The game's object -> kill category table, for removing the napalm
+        # re-kills from every kill figure (killfix.py). None leaves them in.
+        self.kill_categories = KillCategories.from_resolver(self.resolver)
         self.ribbons = ribbons.RibbonRenderer(self.resolver.cache_dir)
         self.medals = medal_art.MedalRenderer(self.resolver.cache_dir, self.ribbons, self.icons)
         self.flightlogs = FlightLogIndex(self.game_dir)
@@ -622,6 +632,8 @@ class CareerAggregator:
         """A career file, with the flight-time corrections attached when the
         user has switched them on and the helper has computed any."""
         db = KoreaCareerDatabase(meta.path)
+        if self.kill_categories is not None:
+            db.set_kill_categories(self.kill_categories)
         data = corrections.load(Path(meta.path).stem)
         # Once the credited hours are in the file, the clock must follow or the
         # record shows a hybrid - so an applied career is always re-timed,
@@ -1323,9 +1335,7 @@ class CareerAggregator:
         best_points_mission = None
 
         missions = {m["id"]: m for m in db.missions()}
-        for sortie in db.query(
-                """SELECT missionId, killStats FROM sortie
-                   WHERE pilotId = ? AND isDeleted = 0""", (player["id"],)):
+        for sortie in db.sorties(player["id"]):
             kills = KillStats(sortie["killStats"])
             if kills.airborne > best_air:
                 best_air, best_air_mission = kills.airborne, sortie["missionId"]
@@ -1759,7 +1769,7 @@ class CareerAggregator:
         # slots - and the tail number is the face of it.
         by_plane: Dict[int, List] = {}
         for s in db.query(
-                """SELECT s.planeId, s.pilotId, s.killStats, s.planeStatus, s.date,
+                """SELECT s.id, s.planeId, s.pilotId, s.killStats, s.planeStatus, s.date,
                           p.name, p.lastName, p.country, p.rankId
                    FROM sortie s JOIN pilot p ON p.id = s.pilotId
                    WHERE s.isDeleted = 0 ORDER BY s.id"""):
@@ -1785,7 +1795,7 @@ class CareerAggregator:
             air = ground = 0
             pilots = Counter()
             for s in flights:
-                ks = KillStats(s["killStats"])
+                ks = KillStats(db.kill_stats(s["id"], s["killStats"]))
                 air += ks.airborne
                 ground += ks.ground_targets
                 pilots[s["pilotId"]] += 1
