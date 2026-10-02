@@ -128,7 +128,6 @@ def _rank_on(con: sqlite3.Connection, pilot_id: int, date: str) -> int:
 
 
 def _fate(con, m, pilot_id, plane_id, player, group, result) -> Dict[str, int]:
-    from .career.missionresult import _unquote
     events = {}
     for typ, ipar2 in con.execute("""SELECT type, ipar2 FROM event WHERE missionId = ? AND pilotId = ?
                                      AND type IN (2, 3, 4, 5, 36) AND isDeleted = 0""",
