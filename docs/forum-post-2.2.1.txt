@@ -1,0 +1,55 @@
+IL-2 Korea Service Record 2.2.1 — undo that works, fewer backups
+
+
+Gentlemen,
+
+A small release that fixes three things in 2.2.0's career-file corrections.
+If you are on 2.2.0, please update.
+
+
+UNDO NOW WORKS AS DESCRIBED
+
+The 2.2.0 post said you could undo the napalm and lost-sortie corrections by
+copying a backup from %LOCALAPPDATA%\IL2KoreaTracker\backups over your career
+file. In 2.2.0 the tracker then corrected the file again the next time it
+opened it. In 2.2.1 it notices that a backup has been put back and leaves the
+career exactly as you restored it, for good.
+
+
+NO MORE BACKUP PILE-UP WHILE YOU FLY
+
+2.2.0 could make a new backup every time it looked at a career it could not
+write to - for example while the game had the file open - and only the last
+twelve are kept, so a long evening could push out the oldest one. 2.2.1 only
+takes a backup at the moment it actually writes, and only after it has the
+file to itself. Simply opening a career makes no backup and takes no lock.
+
+
+SAFER IF SOMETHING GOES WRONG HALFWAY
+
+The record of your career's original values is now saved before the career
+file is changed, never after, so an interrupted write can no longer lose it.
+
+
+FOR THE CURIOUS
+
+The fixes came out of a code review and 81 new automated tests. The napalm
+bug itself is still in the game as of hotfix 1.004b; the correction stays.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.2.1
+
+Installer  IL2_Korea_Service_Record_Setup_v2.2.1.exe
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Zip        IL-2.Korea.Service.Record.v2.2.1.zip
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Everything is Authenticode signed. SmartScreen works on reputation rather
+than signatures, so a new release can still raise a warning until enough
+people have run it.
+
+The project lives at https://github.com/1-Arrow-1/IL2-Korea_Service_Record — the
+source, the issue tracker, and every release.

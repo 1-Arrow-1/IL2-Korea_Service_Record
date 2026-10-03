@@ -135,8 +135,10 @@ def test_second_run_changes_nothing(napalm_career, game_dir, tmp_path):
 def test_game_writing_its_own_values_back_is_corrected_again(napalm_career, game_dir):
     c = napalm_career
     napalmfix.auto_sync(c.path, game_dir)
-    # The game writes its in-memory (inflated) rows back over the file.
-    c.run("UPDATE sortie SET killStats = ? WHERE id = 2", (S2_RAW,))
+    # The game writes its in-memory (inflated) totals back over the file. It
+    # never rewrites an old sortie row: on the 12th FBS career, after 84
+    # corrected sorties, a new mission and a day rollover, the next run had
+    # only the 4 new sorties to write (2026-10-02).
     c.run("UPDATE pilot SET killStats = ?, pcp = 150 WHERE id = 1", (P1_TOTAL,))
     c.run("UPDATE squadron SET killStats = ?", (SQ_TOTAL,))
 
@@ -258,8 +260,6 @@ def test_write_lock_leaves_the_file_alone(napalm_career, game_dir, held):
     assert not napalmfix.path_for(_name(napalm_career)).exists()
 
 
-@pytest.mark.xfail(strict=True, reason="Finding M2: a backup is taken on every attempt "
-                                       "that then fails on the lock, rotating out older backups")
 def test_failed_attempt_on_a_locked_file_takes_no_backup(napalm_career, game_dir, held, tmp_path):
     held("IMMEDIATE")
     napalmfix.auto_sync(napalm_career.path, game_dir)
@@ -323,8 +323,6 @@ def test_restore_rolls_back_entirely_when_the_file_is_locked(napalm_career, game
     assert napalmfix.load(_name(c))["auto"] is True
 
 
-@pytest.mark.xfail(strict=True, reason="Finding M3: the career file is committed before the "
-                                       "record is saved; a failed save loses the originals")
 def test_originals_survive_a_failed_record_save(napalm_career, game_dir, monkeypatch):
     c = napalm_career
     real_save = napalmfix.save
@@ -341,8 +339,6 @@ def test_originals_survive_a_failed_record_save(napalm_career, game_dir, monkeyp
     assert c.sortie_kills(2) == S2_RAW
 
 
-@pytest.mark.xfail(strict=True, reason="Finding M3: restore() commits before saving auto=False; "
-                                       "a failed save lets the next read re-apply the correction")
 def test_restore_sticks_even_if_the_record_save_fails(napalm_career, game_dir, monkeypatch):
     c = napalm_career
     napalmfix.auto_sync(c.path, game_dir)
@@ -354,7 +350,12 @@ def test_restore_sticks_even_if_the_record_save_fails(napalm_career, game_dir, m
     with pytest.raises(OSError):
         napalmfix.restore(c.path)
     monkeypatch.setattr(napalmfix, "save", real_save)
-    napalmfix.auto_sync(c.path, game_dir)
+    # The record is saved before the commit, so a failed save aborts the
+    # whole restore: the file keeps the corrected values, the record keeps
+    # auto on, and nothing is half undone. The player can simply retry.
+    assert c.sortie_kills(2) == S2_FIXED
+    assert napalmfix.load(_name(c))["auto"] is True
+    napalmfix.restore(c.path)
     assert c.sortie_kills(2) == S2_RAW
 
 
@@ -364,3 +365,19 @@ def test_unreadable_record_is_treated_as_none(napalm_career, game_dir, tmp_path)
     p.write_text("{not json", encoding="utf-8")
     assert napalmfix.load(_name(napalm_career)) is None
     assert napalmfix.restore(napalm_career.path) == {"sorties": 0, "pilots": 0, "squadron": 0}
+
+
+# -- H1: a backup put back over the career file ------------------------------------
+
+def test_backup_put_back_switches_the_correction_off(napalm_career, game_dir):
+    c = napalm_career
+    raw_before = c.path.read_bytes()
+    napalmfix.auto_sync(c.path, game_dir)
+    assert c.sortie_kills(2) == S2_FIXED
+    # The player copies the pre-correction file back, as the forum post says.
+    c.path.write_bytes(raw_before)
+    assert napalmfix.auto_sync(c.path, game_dir) is None
+    assert c.sortie_kills(2) == S2_RAW               # left as the player put it
+    assert napalmfix.load(_name(c))["auto"] is False
+    assert napalmfix.auto_sync(c.path, game_dir) is None
+    assert c.sortie_kills(2) == S2_RAW

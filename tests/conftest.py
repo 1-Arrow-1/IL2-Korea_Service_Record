@@ -94,9 +94,12 @@ def game_dir(tmp_path, monkeypatch) -> Path:
 
 @pytest.fixture(autouse=True)
 def tracker_folders(tmp_path, monkeypatch):
-    """Records and backups go to tmp, never to the real LOCALAPPDATA."""
+    """Records, backups and the asset cache go to tmp, never to the real
+    LOCALAPPDATA - on a machine with the game, the real cache holds the
+    world-object tables, and a test meant to run without them would find them."""
     monkeypatch.setattr(corrections, "FOLDER", tmp_path / "corrections")
     monkeypatch.setattr(corrections, "BACKUPS", tmp_path / "backups")
+    monkeypatch.setenv("KOREA_TRACKER_CACHE", str(tmp_path / "cache" / "assets"))
     return tmp_path
 
 

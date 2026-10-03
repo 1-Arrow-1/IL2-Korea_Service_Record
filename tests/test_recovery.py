@@ -197,8 +197,6 @@ def test_restore_without_a_record(lost_career):
 
 # -- known gaps (findings) ------------------------------------------------------
 
-@pytest.mark.xfail(strict=True, reason="Finding M1: a mission that rebuilds to no rows stays "
-                                       "'lost', so every read backs up and re-applies")
 def test_mission_rebuilding_to_nothing_is_not_retried_forever(career, tmp_path):
     career.pilot(1, "", is_player=1)
     # A debrief with a players header but no rows: rebuild() returns [].
@@ -206,3 +204,22 @@ def test_mission_rebuilding_to_nothing_is_not_retried_forever(career, tmp_path):
     for _ in range(3):
         recovery.auto_sync(career.path)
     assert len(list((tmp_path / "backups").glob("*.career-backup"))) <= 1
+
+
+def test_backup_put_back_switches_recovery_off_and_returns_the_offsets(lost_career):
+    c = lost_career
+    napalmfix.save(_name(c), {**napalmfix._empty(_name(c)), "auto": True,
+                              "pilots": {"1": {"Building": 90, "MilitaryFacility": 90}},
+                              "gaps": {"1": 20.0},
+                              "squadron": {"Building": 90, "MilitaryFacility": 90}})
+    before = c.path.read_bytes()
+    recovery.auto_sync(c.path)
+    assert c.all("SELECT id FROM sortie WHERE missionId = 3") != []
+    # The player puts the pre-recovery file back.
+    c.path.write_bytes(before)
+    assert recovery.auto_sync(c.path) is None
+    assert c.all("SELECT id FROM sortie WHERE missionId = 3") == []     # not redone
+    assert recovery.load(_name(c))["auto"] is False
+    napalm = napalmfix.load(_name(c))
+    assert napalm["pilots"]["1"] == {"Building": 90, "MilitaryFacility": 90}
+    assert napalm["squadron"] == {"Building": 90, "MilitaryFacility": 90}

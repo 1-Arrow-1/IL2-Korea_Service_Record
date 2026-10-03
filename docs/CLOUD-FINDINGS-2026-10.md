@@ -268,3 +268,31 @@ finding is fixed: M1, M2 and both halves of M3.
   No runtime file changes, and nothing user-visible, so there is nothing to translate.
 - `.github/workflows/build.yml`: a "Unit tests" step installs pytest and runs
   `python -m pytest -q` before the PyInstaller build.
+
+## Resolution (local session, 2026-10-02, branch fix/2.2.1)
+
+- **H1 fixed.** Both modules detect a backup put back over the career file and
+  switch themselves off instead of redoing the correction: napalmfix when a
+  sortie it rewrote holds its recorded original again, recovery when rows it
+  inserted are gone (it then also returns those kills to the napalm offsets).
+  Basis: the game writes a sortie row once and never again - on the 12th FBS
+  career, after 84 corrected sorties, a new mission and a day rollover, the
+  next run had only the 4 new sorties to write (answers Q1 for sortie rows;
+  the game does rewrite pilot and squadron totals, which stays handled).
+  Verified on a copy of the real career with the real pre-correction backup:
+  both switched off, PCP stayed at the backup's 1120.75, later reads write
+  nothing. The forum post's undo now works as written.
+- **M1 fixed.** plan() leaves out missions that rebuild to no rows.
+- **M2 fixed.** Every check plans read-only first; the write lock is taken only
+  when something differs, the plan is redone inside it, and the backup is
+  copied while the lock is held. Q2 answered: the career files use
+  journal_mode=delete (no WAL), so that copy is consistent. A normal read takes
+  no lock and makes no backup.
+- **M3 fixed.** Records are saved before the commit; recovery puts both records
+  back if the commit fails. A failed save now aborts a restore entirely.
+- **L9** utcnow replaced. **L8** gone (planning happens inside the lock).
+- Test fixes: the asset cache is redirected for every test (the
+  no-game test found the real cache on a machine with the game); the
+  game-overwrite test no longer rewrites an old sortie row, which the game does
+  not do. New tests for H1 in both modules. 81 passed, no xfail.
+- Open: L1, L3-L7 and the remaining Q items, unchanged.

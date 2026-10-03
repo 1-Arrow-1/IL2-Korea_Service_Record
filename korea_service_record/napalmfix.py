@@ -237,15 +237,39 @@ def _pending(p: Dict[str, Any]) -> bool:
 
 # -- writing ----------------------------------------------------------------------
 
-def apply(db_path: Path, game_dir: Path) -> Dict[str, Any]:
-    """Write the plan in one transaction. The caller backs up first."""
+def _rolled_back(p: Dict[str, Any], data: Dict[str, Any]) -> bool:
+    """
+    A sortie this module rewrote holds its original value again. The game
+    writes a sortie row once and never touches it afterwards, so only a
+    backup put back over the career file does that - the player undoing the
+    correction, which must then be left alone rather than redone.
+    """
+    return any(str(s["id"]) in data.get("sorties", {}) and s["now"] == s["orig"]
+               for s in p["sorties"])
+
+
+def apply(db_path: Path, game_dir: Path, backup: bool = False) -> Dict[str, Any]:
+    """
+    Write the plan in one transaction. The write lock is taken first and the
+    plan made again inside it, so nothing the game commits in between is
+    missed; with ``backup`` the file is copied while that lock is held, which
+    is consistent (the career files use a rollback journal, not WAL) and
+    happens only when there is something to write. The record is saved before
+    the commit: a record without the write only means the next run writes
+    again, while a write without its record would lose the originals.
+    """
     name = Path(db_path).stem
     data = load(name) or _empty(name)
-    p = plan(db_path, game_dir, data)
     counts = {"sorties": 0, "pilots": 0, "squadron": 0}
     con = sqlite3.connect(f"file:{Path(db_path).as_posix()}?mode=rw", uri=True, timeout=1.0)
     try:
         con.execute("BEGIN IMMEDIATE")
+        p = plan(db_path, game_dir, data)
+        if not _pending(p) or _rolled_back(p, data):
+            con.rollback()
+            return counts
+        if backup:
+            corrections.backup(Path(db_path))
         for s in p["sorties"]:
             data["sorties"].setdefault(str(s["id"]), s["orig"])
             con.execute("UPDATE sortie SET killStats = ? WHERE id = ?", (s["target"], s["id"]))
@@ -259,12 +283,12 @@ def apply(db_path: Path, game_dir: Path) -> Dict[str, Any]:
         if sq and sq["now"] != sq["target"]:
             con.execute("UPDATE squadron SET killStats = ? WHERE id = ?", (sq["target"], sq["id"]))
             counts["squadron"] = 1
+        data["auto"] = True
+        data["applied_at"] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        save(name, data)
         con.commit()
     finally:
         con.close()
-    data["auto"] = True
-    data["applied_at"] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    save(name, data)
     return counts
 
 
@@ -305,20 +329,25 @@ def restore(db_path: Path) -> Dict[str, int]:
                 con.execute("UPDATE squadron SET killStats = ? WHERE id = ?",
                             (_render(row["killStats"], total), row["id"]))
                 counts["squadron"] = 1
+        # Saved before the commit: if the commit then fails, the automatic run
+        # stays off and the player can simply try again - never the reverse,
+        # a restore that the next read silently undoes.
+        data["auto"] = False
+        data.pop("applied_at", None)
+        save(name, data)
         con.commit()
     finally:
         con.close()
-    data["auto"] = False
-    data.pop("applied_at", None)
-    save(name, data)
     return counts
 
 
 def auto_sync(db_path: Path, game_dir: Path) -> Optional[Dict[str, int]]:
     """
-    Called whenever the tracker reads a career. Writes, backup first, only when
-    a value differs from its corrected figure; a career without napalm kills is
-    never written and gets no record. A file the game holds is left for later.
+    Called whenever the tracker reads a career. Plans read-only first and takes
+    the write lock only when a value differs - the game must never meet our
+    lock on an ordinary poll. A career without napalm kills is never written
+    and gets no record; a file the game holds is left for later; a career put
+    back from a backup is left alone for good (see ``_rolled_back``).
     """
     name = Path(db_path).stem
     data = load(name) or _empty(name)
@@ -329,13 +358,18 @@ def auto_sync(db_path: Path, game_dir: Path) -> Optional[Dict[str, int]]:
     except sqlite3.Error as exc:
         logger.info("Napalm correction: %s not readable now (%s)", name, exc)
         return None
+    if _rolled_back(p, data):
+        data["auto"] = False
+        save(name, data)
+        logger.info("Napalm correction: %s was put back from a backup - switched off", name)
+        return None
     if not _pending(p):
         return None
     try:
-        corrections.backup(Path(db_path))
-        counts = apply(db_path, game_dir)
+        counts = apply(db_path, game_dir, backup=True)
     except sqlite3.OperationalError as exc:
         logger.info("Napalm correction: %s is in use, will retry (%s)", name, exc)
         return None
-    logger.info("Napalm correction on %s: %s", name, counts)
-    return counts
+    if any(counts.values()):
+        logger.info("Napalm correction on %s: %s", name, counts)
+    return counts if any(counts.values()) else None
