@@ -142,3 +142,16 @@ def test_subtract_with_no_cut_returns_the_same_string():
     raw = "Building=2&MilitaryFacility=2"
     assert subtract(raw, Counter()) is raw
     assert subtract(raw, None) is raw
+
+
+def test_reshaped_tables_turn_the_correction_off(tmp_path, monkeypatch):
+    """L5: a game update reshaping either file must not crash the tracker."""
+    from korea_service_record.assets import AssetResolver
+    folder = tmp_path / "g" / "data" / "nsdata" / "assets" / "worldobjects"
+    folder.mkdir(parents=True)
+    monkeypatch.setenv("KOREA_TRACKER_CACHE", str(tmp_path / "cache"))
+    (folder / "statobjects.json").write_text('{"killX": {"objects": ["a"]}}', encoding="utf-8")
+    for bad in ('[1, 2]', '{"internal": [1, 2]}', '{"internal": {"killBuilding": "abc"}}'):
+        (folder / "statreporting.json").write_text(bad, encoding="utf-8")
+        table = KillCategories.from_resolver(AssetResolver(tmp_path / "g"))
+        assert table is None or isinstance(table.rollup_of, dict)

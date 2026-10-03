@@ -296,3 +296,24 @@ finding is fixed: M1, M2 and both halves of M3.
   game-overwrite test no longer rewrites an old sortie row, which the game does
   not do. New tests for H1 in both modules. 81 passed, no xfail.
 - Open: L1, L3-L7 and the remaining Q items, unchanged.
+
+## Remaining items (local session, 2026-10-02, on the real careers)
+
+- **Q3 / L1:** no career has a sortie row with isDeleted set - the game never
+  deletes sorties. L1 cannot occur in practice; left as is.
+- **Q4 / Q5:** recovery found only the five escapedJail missions (12th FBS 37-39,
+  336th FIS 1 and -1), all created on 2026-09-29 before the patch; none rebuilds
+  to zero rows. L3: a slot/debrief count mismatch is now logged as a warning
+  (never seen in 701 sorties).
+- **Q6:** after the corrections the game processed a mission and a day rollover
+  on the corrected file with 0 errors in _career.log; no Key=0 pairs remain.
+- **Q7 / L7:** on mission 65 the replay gives 45 kill points + 1 success = 46,
+  the game added 47 - the pot remainder (L7). The PCP excess subtracts two
+  replays from the same start, so its error stays about one point.
+- **Q8 / L6:** sortie rows carry both Railroad and Raildoad. Harmless: only
+  airfield categories are ever inflated, rail is never cut.
+- **Q10:** 173 of 174 kill-row names (aircraft included) are in statobjects.json;
+  the one miss is a blank name.
+- **L5 fixed:** a reshaped statobjects/statreporting.json turns the correction
+  off with a warning instead of crashing the tracker. Test added (82 pass).
+- **L4** (duplicate keys) not seen in game data; left as is.

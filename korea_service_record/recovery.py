@@ -185,7 +185,13 @@ def rebuild(con: sqlite3.Connection, m: sqlite3.Row) -> List[Dict[str, Any]]:
     ai = sorted((p for p in players if p.get("personageId", "").startswith(AI_ID_PREFIX)),
                 key=lambda p: p["personageId"])
     pairs = [(slots[0], human[0], 1)] if human and slots else []
-    pairs += [(s, p, 0) for s, p in zip(slots[1:] if human else slots, ai)]
+    rest = slots[1:] if human else slots
+    if len(rest) != len(ai):
+        # Never seen in the 701 verified sorties; if it happens, the pairing
+        # below is unproven, so say so rather than drop rows silently.
+        logger.warning("Sortie recovery: mission %s has %d slots for %d AI debrief rows",
+                       m["id"], len(rest), len(ai))
+    pairs += [(s, p, 0) for s, p in zip(rest, ai)]
     flags = {pid: ipar1 for pid, ipar1 in con.execute(
         "SELECT pilotId, ipar1 FROM event WHERE type = 35 AND missionId = ? AND isDeleted = 0", (m["id"],))}
     rows = []

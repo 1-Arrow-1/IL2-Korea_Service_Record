@@ -82,19 +82,27 @@ class KillCategories:
             logger.info("Kill correction off: %s or %s not found",
                         STAT_OBJECTS, STAT_REPORTING)
             return None
+        # A game update could reshape either file. Anything unexpected turns
+        # the correction off rather than taking the tracker down with it.
+        objects_doc = loads_lenient(objects_text)
+        reporting_doc = loads_lenient(reporting_text)
+        internal = reporting_doc.get("internal") if isinstance(reporting_doc, dict) else None
+        if not isinstance(objects_doc, dict) or not isinstance(internal, dict):
+            logger.warning("Kill correction off: %s or %s has an unexpected shape",
+                           STAT_OBJECTS, STAT_REPORTING)
+            return None
         objects: Dict[str, str] = {}
-        for category, body in loads_lenient(objects_text).items():
-            if not isinstance(body, dict):
-                continue
-            for name in body.get("objects", []):
-                objects[str(name).lower()] = _bare(category)
+        for category, body in objects_doc.items():
+            names = body.get("objects") if isinstance(body, dict) else None
+            if isinstance(names, list):
+                for name in names:
+                    objects[str(name).lower()] = _bare(category)
         rollup_of: Dict[str, str] = {}
-        internal = loads_lenient(reporting_text).get("internal", {})
         for group, members in internal.items():
             rollup = _ROLLUP_OF_GROUP.get(group)
-            if rollup:
+            if rollup and isinstance(members, list):
                 for member in members:
-                    rollup_of[_bare(member)] = rollup
+                    rollup_of[_bare(str(member))] = rollup
         if not objects:
             return None
         return cls(objects, rollup_of)
