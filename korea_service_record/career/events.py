@@ -245,6 +245,24 @@ EVENT_TYPES: Dict[int, EventType] = {
                   "ipar1 = 0 begin / 1 end, tpar1 = operation name. Every "
                   "name observed carries a 'WB ' prefix - a builder tag, not "
                   "part of the name."),
+
+    # New in the 29 Sep 2026 build. Named on 2026-10-02 from 21 cases in two
+    # careers, against each sortie's own fate and its debrief row.
+    35: EventType(35, "aircraft_report", "Aircraft report", CONFIRMED,
+                  "Written exactly when sortie.eventFlags is non-zero, with "
+                  "ipar1 = eventFlags, 21 of 21. A bit set, not a fate: 2 = "
+                  "the pilot bailed out (all 4 cases have ejectStatus 1 in "
+                  "the debrief and a lost aircraft); 4 = the aircraft came "
+                  "back damaged (16 of 17 have the debrief's planeStatus 1 "
+                  "and landed; the other was damaged and then killed its "
+                  "pilot). A pilot killed outright in a crash gets no flag "
+                  "and no type 35 (Alex Bleiholder, mission 64)."),
+    36: EventType(36, "evading", "Evading behind enemy lines", LIKELY,
+                  "The pilot is down behind the lines and walking back: "
+                  "written with sortie.status 1, 2 of 2, and status 1 is the "
+                  "state the Career Helper already reads as evading. A "
+                  "bail-out that ended in capture (type 4) or straight back "
+                  "has none. Likely rather than confirmed: two cases only."),
 }
 
 # Casualty rows the game writes twice. Maurice Dillard's F-51D on

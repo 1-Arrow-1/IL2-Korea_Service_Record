@@ -1243,6 +1243,10 @@ class CareerAggregator:
             info = describe(row["type"])
             if info.key == "kill" or is_award_event(row["type"]):
                 continue
+            if row["type"] in (35, 36):
+                # Aircraft report (bailed out / damaged) and evading: named in
+                # events.py, but not a pilot's history - left out on purpose.
+                continue
             entry = {"date": row["date"][:10], "kind": info.key,
                      "label": info.label, "confidence": info.confidence}
             # A key only where a translation exists: an unmapped event code
