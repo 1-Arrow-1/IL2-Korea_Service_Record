@@ -536,6 +536,8 @@
     "own_granted": "您获得了{award}",
     "own_both": "您获得并被授予{award}",
     "own_presented": "您被授予{award}",
+    "own_promoted": "您被晋升为{rank}",
+    "own_promotion_granted": "您获得了晋升为{rank}的资格",
     "open_hint": "中队的战时日志，逐日记载",
     "transfer_ordered": "中队奉命转场至 {field}",
     "transfer_done": "中队现驻 {field}",

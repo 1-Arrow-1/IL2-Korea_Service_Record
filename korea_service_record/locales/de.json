@@ -544,6 +544,8 @@
     "own_granted": "Sie haben sich {award} verdient",
     "own_both": "Sie haben sich {award} verdient und erhalten",
     "own_presented": "Ihnen wurde {award} verliehen",
+    "own_promoted": "Sie wurden zum {rank} befördert",
+    "own_promotion_granted": "Sie haben sich die Beförderung zum {rank} verdient",
     "open_hint": "Das Kriegstagebuch der Staffel, Tag für Tag",
     "transfer_ordered": "Die Staffel erhält Befehl zur Verlegung nach {field}",
     "transfer_done": "Die Staffel liegt jetzt in {field}",

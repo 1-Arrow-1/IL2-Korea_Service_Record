@@ -89,7 +89,8 @@
         const parts = {
             who: n.who || "", n: n.count == null ? 0 : n.count,
             name: n.name || "", what: n.what || "", field: n.field || "",
-            award: n.award || "", value: n.value == null ? "" : num(n.value),
+            award: n.award || "", rank: n.rank || "",
+            value: n.value == null ? "" : num(n.value),
             health: n.health == null ? "" : num(n.health),
             names: nameList(n.names || []),
         };
@@ -133,7 +134,8 @@
         const key = n.key.replace(/^diary\./, "");
         if (["pilot_kia", "pilot_missing", "wounded", "plane_lost",
              "friendly_destroyed", "resources_destroyed"].includes(key)) { return "loss"; }
-        if (["own_granted", "own_presented", "own_both"].includes(key)) { return "mine"; }
+        if (["own_granted", "own_presented", "own_both", "own_promoted",
+             "own_promotion_granted"].includes(key)) { return "mine"; }
         if (OPERATION.test(key) || ["transfer_ordered", "transfer_done"].includes(key)) { return "op"; }
         return "";
     }

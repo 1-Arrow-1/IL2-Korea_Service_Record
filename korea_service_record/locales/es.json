@@ -544,6 +544,8 @@
     "own_granted": "Usted obtuvo {award}",
     "own_both": "Usted obtuvo y recibió {award}",
     "own_presented": "Le fue entregada {award}",
+    "own_promoted": "Fue ascendido al grado de {rank}",
+    "own_promotion_granted": "Obtuvo el ascenso al grado de {rank}",
     "open_hint": "El diario de guerra del escuadrón, día a día",
     "transfer_ordered": "Se ordena al escuadrón trasladarse a {field}",
     "transfer_done": "El escuadrón tiene ahora su base en {field}",

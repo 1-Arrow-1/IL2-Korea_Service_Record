@@ -544,6 +544,8 @@
     "own_granted": "You earned the {award}",
     "own_both": "You earned and were presented with the {award}",
     "own_presented": "You were presented with the {award}",
+    "own_promoted": "You were promoted to {rank}",
+    "own_promotion_granted": "You earned promotion to {rank}",
     "open_hint": "The squadron's war diary, day by day",
     "transfer_ordered": "The squadron is ordered to move to {field}",
     "transfer_done": "The squadron is now based at {field}",

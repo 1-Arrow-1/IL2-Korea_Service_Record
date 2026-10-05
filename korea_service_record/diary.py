@@ -155,7 +155,7 @@ class DiaryBuilder:
         """
         out: List[Dict[str, Any]] = []
         arrivals: List[str] = []
-        mine: Dict[int, set] = {}
+        mine: Dict[Tuple[str, int], Dict[int, Any]] = {}
         delivered = 0
         repairs_begun = 0
         repairs_done = 0
@@ -183,7 +183,7 @@ class DiaryBuilder:
                 if r["pilotId"] == self.player_id:
                     # The reader's own thread through the diary. ipar2 is
                     # the award type; ipar1 is the row in the award table.
-                    mine.setdefault(r["ipar2"], set()).add(action)
+                    mine.setdefault((key, r["ipar2"]), {})[action] = r
                 continue
             if key == "reported":
                 arrivals.append(who)
@@ -269,11 +269,33 @@ class DiaryBuilder:
             out.append(_entry("plane_repaired",
                               f"{repairs_done} aircraft back on the line",
                               count=repairs_done))
-        # His own decorations last, one line each. The game commonly grants
-        # and presents the same medal on the same day - there were three
-        # such pairs in the reference career - and two lines saying so is
+        # His own decorations and promotions last, one line each. The game
+        # commonly grants and presents the same medal on the same day - there
+        # were three such pairs in the reference career - and two lines saying so is
         # one event reported twice.
-        for award_id, actions in mine.items():
+        for (event_kind, award_id), action_rows in mine.items():
+            actions = set(action_rows)
+            if event_kind == "promotion":
+                # A promotion's presented row carries the new rank. A lone
+                # granted row carries the old one because the promotion has
+                # been earned but has not yet taken effect.
+                promoted = PRESENTED in action_rows
+                row = action_rows[PRESENTED if promoted else GRANTED]
+                try:
+                    rank_id = int(row["rankId"]) + (0 if promoted else 1)
+                except (KeyError, TypeError, ValueError):
+                    # The award id is a safe fallback for older or imported
+                    # event rows without rankId: 601980 promotes to rank 1.
+                    rank_id = award_id - 601980 + 1
+                country = (int(self.player["country"]) if self.player
+                           else int(str(award_id)[:3]))
+                rank = self.agg.locale.rank_name(country, rank_id)
+                key = "own_promoted" if promoted else "own_promotion_granted"
+                label = (f"You were promoted to {rank}" if promoted
+                         else f"You earned promotion to {rank}")
+                out.append(_entry(key, label, rank=rank))
+                continue
+
             both = {GRANTED, PRESENTED} <= actions
             name = self.agg.award_name(award_id)
             key = ("own_both" if both
