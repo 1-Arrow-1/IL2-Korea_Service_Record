@@ -97,10 +97,10 @@ DOWNLOAD
     https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.2.2
 
 Installer  IL2_Korea_Service_Record_Setup_v2.2.2.exe
-           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+           SHA-256  e3d207ca27c4fbbadee8bedc64b97cb50717733b5be42c5b3f99edfa9ceac4bf
 
 Zip        IL-2.Korea.Service.Record.v2.2.2.zip
-           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+           SHA-256  ef89a98bda3977bc895584eaa006dbfeb7bec8c7655ffecb4ac2fab05cc3c701
 
 Everything is Authenticode signed. SmartScreen works on reputation rather
 than signatures, so a new release can still raise a warning until enough
