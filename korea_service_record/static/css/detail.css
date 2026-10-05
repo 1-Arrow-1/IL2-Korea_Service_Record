@@ -342,9 +342,9 @@ table.roster td.award-cell { white-space: normal; }
    and only a row of five closes up: spacing (4M - M)/4 = 3M/4, a quarter
    of a medal's overlap. */
 .tunic[data-coat="usmc"] .medal-row.n5 .medal + .medal { margin-left: -6.25%; }
-/* The Air Force mounts three medals to a row like the Navy, but with its
-   own overlap once a row runs wider: a third of a medal at four, a half at
-   five, which is the 50% the regulation calls the limit. */
+/* The Air Force normally mounts three medals to a row. A deep rack uses four
+   or five without exceeding four rows. When overlap is needed, spread the
+   complete row across the 31.7%-wide breast pocket. */
 /* The Air Force rack read small, so in full dress its medals are drawn at
    25.81% of the container rather than 25%. Shortening the ribbon instead
    does nothing for this: the coat sizes a medal by its width, so a shorter
@@ -352,9 +352,9 @@ table.roster td.award-cell { white-space: normal; }
    put through that medal - a third of one at four to a row, a half at
    five - and the row pull is the base 0.484 of its 54.62% height. */
 .tunic[data-coat="usaf"].full .medal { width: 25.81%; }
-.tunic[data-coat="usaf"] .medal-row.n4 .medal + .medal { margin-left: -8.603%; }
-.tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -12.905%; }
-.tunic[data-coat="usaf"].full .medal-row + .medal-row { margin-top: -26.43%; }
+.tunic[data-coat="usaf"] .medal-row.n4 .medal + .medal { margin-left: -4.049%; }
+.tunic[data-coat="usaf"] .medal-row.n5 .medal + .medal { margin-left: -9.490%; }
+.tunic[data-coat="usaf"].full .medal-row + .medal-row { margin-top: -32.5%; }
 .tunic[data-coat="usmc"] .medal-row + .medal-row { margin-top: -27.35%; }
 /* 58.19% of the container tall at the larger size, less the 48.3% of it the
    next row shows. */
@@ -382,6 +382,35 @@ table.roster td.award-cell { white-space: normal; }
    this photograph - measured with the rack hidden, because with it drawn
    the flap's own top is the one thing the rack covers. */
 .tunic[data-coat="usaf"]:not(.full) .tunic-right { width: 27.84%; bottom: 53.9%; }
+/* On the large three-wide rack, align its short two-ribbon top row with the
+   outboard (viewer-right) edge so it clears the lapel without moving the
+   complete rows away from the pocket centreline. */
+.tunic[data-coat="usaf"]:not(.full).outboard-short-row .ribbon-row:first-child {
+    justify-content: flex-end;
+    transform: translateX(-2.42%);
+}
+/* Four ribbon bars keep the same physical width as a three-wide rack. The
+   mount grows by one bar instead of shrinking every ribbon by a quarter.
+   Its base remains centred on the pocket; only rows threatened by the lapel
+   step outboard, toward the wearer's left (the viewer's right). */
+.tunic[data-coat="usaf"]:not(.full).four-ribbon .tunic-right {
+    left: 76.65%; width: 37.12%; bottom: 52.8%;
+}
+.tunic[data-coat="usaf"]:not(.full).four-ribbon .ribbon-group.four .ribbon-row .ribbon {
+    width: 26%; margin: -0.9% -1.08%;
+}
+/* The tan lapel is steepest beside the upper rows. Stagger those rows
+   progressively outboard while the lower three retain the pocket centreline.
+   The images keep their normal size; only the top row closes its joins enough
+   to remain inside the coat at the far edge. */
+.tunic[data-coat="usaf"]:not(.full).four-ribbon .ribbon-row:first-child {
+    transform: translateX(18%);
+}
+.tunic[data-coat="usaf"]:not(.full).four-ribbon .ribbon-row:nth-child(2) {
+    transform: translateX(9%);
+}
+.tunic[data-coat="usaf"]:not(.full).four-ribbon
+    .ribbon-row:first-child .ribbon + .ribbon { margin-left: -3%; }
 /* The larger medals make the rack about 13% of its own width taller, and it
    hangs from its bottom edge, so it grew up into the aviator badge. Hung
    that much lower - 5.4% of the coat's height - to clear it again. */
@@ -479,7 +508,7 @@ table.roster td.award-cell { white-space: normal; }
 .sov-breast { position: absolute; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; }
 /* The mount tops sit a shade (1.5%) above the flap edge, the pendants
    hanging over the pocket: the pendant bottoms are 18.2% below it. */
-.tunic[data-coat="sov"] .sov-breast { bottom: 49.3%; transform: translateX(26%); }
+.tunic[data-coat="sov"] .sov-breast { bottom: 40.5%; transform: translateX(26%); }
 /* The star sits about a centimetre above the row below it. */
 .tunic[data-coat="sov"] .tunic-hero { margin: 0 0 1.2%; }
 .tunic[data-coat="sov"] .medal-group, .tunic[data-coat="sov"] .sov-breast .ribbon-group { width: 100%; }
@@ -495,7 +524,7 @@ table.roster td.award-cell { white-space: normal; }
 /* Service dress, by the 1943 rules: bars are pinned over the pocket flap,
    never on it - the bottom row just above the flap edge on both breasts,
    further rows above it, the star a centimetre over the top row. */
-.tunic[data-coat="sov"]:not(.full) .sov-breast { bottom: 67.85%; }
+.tunic[data-coat="sov"]:not(.full) .sov-breast { bottom: 69.0%; }
 /* The right breast: one stack centred over the pocket, built up from the
    flap - the orders (or their bars) at the bottom, the class badge 8-10 mm
    above them, the wound stripes 8-10 mm above the badge, side by side with
@@ -511,7 +540,7 @@ table.roster td.award-cell { white-space: normal; }
 .sov-bars .ribbon-row { flex-direction: row-reverse; }
 /* The orders overlap the flap edge by a few percent; the bars sit over it. */
 .tunic[data-coat="sov"] .sov-right { bottom: 64.5%; transform: translateX(-26%); }
-.tunic[data-coat="sov"]:not(.full) .sov-right { bottom: 67.85%; }
+.tunic[data-coat="sov"]:not(.full) .sov-right { bottom: 69.0%; }
 .tunic[data-coat="sov"] .sov-bars .ribbon-row .ribbon.sov { width: 34%; margin: -1.48% -1.48%; }
 
 /* The DPRK coat: KPA tunic, photograph 1122x984, lit flat: no perspective.
@@ -1465,7 +1494,7 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
    plate's own height in script, because the plate is a percentage of a box
    whose width is whatever the viewport allows. */
 .sbox-plate-text {
-    position: absolute; display: flex;
+    position: absolute; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     overflow: hidden; line-height: 1;
     font-family: "Times New Roman", Georgia, serif;
@@ -1473,6 +1502,10 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
     color: #4a3410; text-shadow: 0 1px 0 rgba(255, 244, 214, .45);
     white-space: nowrap;
 }
+.sbox-plate-name,
+.sbox-plate-squadron { display: block; flex: 0 0 auto; }
+.sbox-plate-name { line-height: .95; }
+.sbox-plate-squadron { line-height: .95; }
 
 .sbox-caption { margin: 0; font-size: .82rem; color: var(--ink-muted, #6b5a3f); }
 

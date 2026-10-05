@@ -39,6 +39,10 @@ MOD_ASSETS = REPO / "installer" / "mod" / "assets"
 # UserData settings and the .bak files left by earlier edits.
 MOD_FILES = {
     "awards.cfg": "scg/2",
+    # These two career views used the fixed SmallPhotos atlas. Loading the
+    # pilot DDS directly lets loose/custom portraits render there as well.
+    "career.rdict.xaml": "nsdata/controls/career",
+    "eventsnotificationcontrol.xaml": "nsdata/controls/career/events",
     "awards.xaml": "nsdata/assets/images",
     "awards6xx.dds": "nsdata/assets/images",
     "awards6xx2.dds": "nsdata/assets/images",
@@ -257,8 +261,10 @@ def write_manifest() -> None:
         lines.append(f"<IL-2 Korea>\\data\\{where.replace('/', chr(92))}\\")
         lines.extend(f"    {n}" for n in names)
         lines.append("")
-    (MOD_ASSETS.parent / "README.txt").write_text(
-        "\r\n".join(lines), encoding="utf-8")
+    # write_text() performs newline translation on Windows, which turns an
+    # explicit CRLF separator into CRCRLF. Write bytes to preserve CRLF.
+    (MOD_ASSETS.parent / "README.txt").write_bytes(
+        "\r\n".join(lines).encode("utf-8"))
 
 
 def stage_tracker() -> int:

@@ -36,15 +36,17 @@ logger = logging.getLogger(__name__)
 
 # Bumped whenever a constant below moves, so a cached layout is not drawn
 # against a frame it was not measured for.
-REVISION = 8
+REVISION = 14
 
 # The frame photograph. Every number below is in its pixel space.
-FRAME = (2050, 1860)
+FRAME = (2700, 1968)
+SOV_FRAME = (2700, 2400)
+DPRK_FRAME = (2050, 1860)
 
 # The glass goes on last, over everything. It is stored pre-scaled to the
 # size it is placed at, so it only needs an offset; x is not zero because
 # the reflection is cropped tighter on the left than the frame is.
-GLASS_AT = (53, 0)
+GLASS_AT = (0, 0)
 
 # The velvet's horizontal middle, and the one axis everything in the case is
 # hung on. Not FRAME[0] / 2: the moulding is a shade wider on the right, and
@@ -53,12 +55,15 @@ GLASS_AT = (53, 0)
 # its own measured x - the reference box was laid out by hand and its badge
 # and citation bars ended up 24px right of its seal, patch and plate, which
 # is invisible on their own and obvious once they are stacked.
-CENTRE_X = 1022
+CENTRE_X = 1350
+DPRK_CENTRE_X = 1022
 
-# Medals hang in rows of up to seven. A pilot of the 601st can reach
-# fourteen ladders in all - sixteen in awards.cfg less the two that are unit
-# citations - so two rows is the whole wall and no third row is possible.
+# Medals still hang in two rows. The original 14-award rack uses seven in
+# each; World War II service adds up to five pieces, so larger racks widen
+# progressively to nine or ten rather than opening a third row over the
+# emblems and nameplate.
 MEDAL_PER_ROW = 7
+MEDAL_MAX_PER_ROW = 10
 MEDAL_GAP = 14
 
 # Where the top of the ribbon sits for each row. The medals themselves end
@@ -70,9 +75,9 @@ MEDAL_ROW_TOP = (132, 655)
 # The lower shelf: the Air Force seal, the aviator badge and the squadron
 # patch. Each is centred on its own point rather than sharing a baseline -
 # the badge rides higher because the citation bars are pinned beneath it.
-SEAL_AT = (443, 1313)
-BADGE_AT = (CENTRE_X, 1226)
-PATCH_AT = (1602, 1325)
+SEAL_AT = (CENTRE_X - 675, 1353)
+BADGE_AT = (CENTRE_X, 1340)
+PATCH_AT = (CENTRE_X + 675, 1365)
 
 # The aviator badge is mounted slightly over its atlas size. It is a small
 # piece of art beside two 290px discs and reads as an afterthought at 1:1.
@@ -88,17 +93,17 @@ BADGE_SCALE = 1.05
 # reference box.
 CITATION_SCALE = 0.5
 CITATION_GAP = 64
-CITATION_Y = 1427
+CITATION_Y = 1520
 
 # The brass plate, given as the ink itself rather than the canvas - the art
 # carries a wide transparent margin and placing the canvas would put the
 # plate somewhere else entirely.
-PLATE = (CENTRE_X - 739 / 2.0, 1547, 739, 142)
+PLATE = (CENTRE_X - 739 / 2.0, 1647, 739, 142)
 
 # Rank devices butt against the plate at this distance, at their own size,
 # centred on the plate. The widest device in the set is the Major General
 # star cluster at 394px, which still clears the moulding on both sides.
-RANK_GAP = 68
+RANK_GAP = 150
 
 # The Air Force seal is furniture, not an award, and has no atlas tile.
 SEAL_SIZE = (295, 294)
@@ -111,7 +116,8 @@ DRAWN_NECK = (601026, 601041)
 # A row is scaled down if it will not fit between the mouldings. It only
 # bites on a full row of unusually wide tiles, but a medal drawn over the
 # frame is worse than one drawn a few per cent small.
-INTERIOR = (140, 1905)
+INTERIOR = (140, 2560)
+DPRK_INTERIOR = (140, 1905)
 
 # How the ribbon top is found in a piece of art: the band is the widest the
 # art gets in its top quarter, and the ribbon starts at the first row that
@@ -146,28 +152,30 @@ RANK_SIZE = {0: (64, 166), 1: (65, 165), 2: (168, 167), 3: (173, 188),
 # 150, thirty pixels under the moulding, which read as squeezed; the row and
 # the one below it both come down so the case can breathe.
 SOV_ROW1_LINE = 195
-SOV_STAR_GAP = 92            # the air either side of the Gold Star
-SOV_GAP = 9                  # between neighbours, measured ink to ink
-SOV_ROW2_Y = 798             # the screw-back orders' middle
+SOV_STAR_GAP = 125           # the air either side of the Gold Star
+SOV_GAP = 48                 # between neighbours, measured ink to ink
+SOV_WWII_LINE = 730          # the lower-precedence WWII medal row
+SOV_WWII_GAP = 70            # the taller case leaves room to separate them
+SOV_ROW2_Y = 1370            # the screw-back orders' middle
 # The screw-backs are spaced centre to centre, not packed edge to edge.
 # Packing three unequal orders - 290, 269 and 271 wide - centres the row but
 # leaves the middle one ten pixels off the axis, which shows against the
 # Gold Star and the badge sitting on it.
-SOV_ROW2_PITCH = 421
+SOV_ROW2_PITCH = 470
 # The middle of this row is on the case's axis, not on where the reference
 # box happened to put it: that was laid out by hand and sat three pixels
 # left, which shows the moment two pieces are stacked. The arms and the
 # squadron sit the same distance out on either side.
 SOV_SIDE = 581
-SOV_ARMS_AT = (CENTRE_X - SOV_SIDE, 1196)
-SOV_BADGE_AT = (CENTRE_X, 1100)
-SOV_PROP_AT = (CENTRE_X, 1290)
-SOV_PATCH_AT = (CENTRE_X + SOV_SIDE, 1193)
+SOV_ARMS_AT = (CENTRE_X - SOV_SIDE, 1768)
+SOV_BADGE_AT = (CENTRE_X, 1672)
+SOV_PROP_AT = (CENTRE_X, 1862)
+SOV_PATCH_AT = (CENTRE_X + SOV_SIDE, 1765)
 # The plate sits higher than the Air Force's: the shoulder boards are 194
 # tall against a rank device's 166, and at the Air Force's height they would
 # come within twenty pixels of the moulding.
-SOV_PLATE = (655, 1497, 738, 141)
-SOV_BOARD_Y = 1570
+SOV_PLATE = (CENTRE_X - 738 / 2.0, 2037, 738, 141)
+SOV_BOARD_Y = 2110
 SOV_BOARD_GAP = 46
 
 # North Korea, measured the same way off its own reference box. The same
@@ -179,10 +187,12 @@ DPRK_ROW1_PITCH = 406
 DPRK_ROW2_Y = 770
 DPRK_ROW2_PITCH = 412
 DPRK_SIDE = 500
-DPRK_BADGE_AT = (CENTRE_X, 1087)
-DPRK_ROUNDEL_AT = (CENTRE_X, 1263)
+DPRK_BADGE_AT = (DPRK_CENTRE_X, 1087)
+DPRK_ROUNDEL_AT = (DPRK_CENTRE_X, 1263)
 DPRK_ARMS_Y = 1157
 DPRK_PATCH_Y = 1161
+DPRK_PLATE = (DPRK_CENTRE_X - 738 / 2.0, 1497, 738, 141)
+DPRK_BOARD_Y = 1570
 
 
 class Case(NamedTuple):
@@ -199,6 +209,14 @@ class Case(NamedTuple):
     extra: Tuple[str, Tuple[int, int]]       # the second drawn emblem
     patch_y: int
     rank_prefix: str
+    frame: Tuple[int, int]
+    frame_src: str
+    glass_src: str
+    wwii_line: Optional[int]
+    plate: Tuple[float, float, float, float]
+    board_y: int
+    centre_x: int
+    interior: Tuple[int, int]
 
 
 CASES = {
@@ -206,15 +224,22 @@ CASES = {
               SOV_SIDE, SOV_BADGE_AT,
               ("USSR_coat_of_arms.png", SOV_ARMS_AT),
               ("VVS_winged_propeller.png", SOV_PROP_AT),
-              SOV_PATCH_AT[1], "501"),
+              SOV_PATCH_AT[1], "501", SOV_FRAME,
+              "/static/images/shadowbox/501/USSR_Korea_shadowbox.jpg",
+              "/static/images/shadowbox/501/USSR_Korea_shadowbox_glass.png",
+              SOV_WWII_LINE, SOV_PLATE, SOV_BOARD_Y, CENTRE_X, INTERIOR),
     503: Case("503", DPRK_ROW1_LINE, DPRK_ROW1_PITCH, 0, DPRK_ROW2_Y, DPRK_ROW2_PITCH,
               DPRK_SIDE, DPRK_BADGE_AT,
-              ("North_Korea_coat_of_arms.png", (CENTRE_X - DPRK_SIDE, DPRK_ARMS_Y)),
+              ("North_Korea_coat_of_arms.png", (DPRK_CENTRE_X - DPRK_SIDE, DPRK_ARMS_Y)),
               ("North_Korea_roundel.png", DPRK_ROUNDEL_AT),
-              DPRK_PATCH_Y, "503"),
+              DPRK_PATCH_Y, "503", DPRK_FRAME,
+              "/static/images/shadowbox/503/North_Korea_shadowbox.jpg",
+              "/static/images/shadowbox/503/North_Korea_shadowbox_glass.png",
+              None, DPRK_PLATE, DPRK_BOARD_Y, DPRK_CENTRE_X, DPRK_INTERIOR),
 }
 
-# Furniture is shared. Every case is the same photographed box.
+# Small furniture such as the brass nameplate remains shared even though each
+# air force now has its own frame and glass photograph.
 FURNITURE = "601"
 
 # Only these two air forces are furnished. The Navy, the Marines and the
@@ -292,17 +317,24 @@ def _tile(icons, kind: str, ident: str) -> Optional[Tuple[str, int, int, int]]:
     return (f"/api/icon/{kind}/{ident}",) + _TILES[key]
 
 
-def _art(icons, award_id: int) -> Optional[Tuple[str, int, int, int]]:
+def _art(icons, award_id: int, renderer=None) -> Optional[Tuple[str, int, int, int]]:
     """
     The source and measurements for one award's full-size art.
 
-    Everything comes from the game's own atlas, at the size the atlas draws
-    it, so the case shows the same medals the game does. The neck orders are
-    the exception and are read from the files drawn for them.
+    US breast medals use the same loose base and device compositor as the
+    full-dress tunic. Soviet-pattern awards, badges and ribbon-only unit
+    citations continue to use the game's atlas. The neck orders retain their
+    dedicated loose art because they hang from a full neck ribbon.
     """
+    composed = (renderer is not None and award_id in medal_art.ribbons.RIBBONS and
+                medal_art.ribbons.RIBBONS[award_id].base in medal_art.DRAWN)
     if award_id in _GEOMETRY:
-        src, = (f"/static/images/shadowbox/601/{award_id}.png",) if award_id in DRAWN_NECK \
-            else (f"/api/icon/award/{award_id}",)
+        if award_id in DRAWN_NECK:
+            src = f"/static/images/shadowbox/601/{award_id}.png"
+        elif composed:
+            src = f"/api/medal/{award_id}"
+        else:
+            src = f"/api/icon/award/{award_id}"
         return (src,) + _GEOMETRY[award_id]
     if award_id in DRAWN_NECK:
         path = (Path(__file__).resolve().parent / "static" / "images" /
@@ -310,6 +342,11 @@ def _art(icons, award_id: int) -> Optional[Tuple[str, int, int, int]]:
         if not path.is_file():
             return None
         data, src = path.read_bytes(), f"/static/images/shadowbox/601/{award_id}.png"
+    elif composed:
+        data = renderer.png(award_id)
+        if data is None:
+            return None
+        src = f"/api/medal/{award_id}"
     else:
         data = icons.png("award", str(award_id))
         if data is None:
@@ -330,12 +367,13 @@ def available(country: Optional[int]) -> bool:
     return country in COUNTRIES
 
 
-def _pct(x: float, y: float, w: float, h: float) -> Dict[str, float]:
+def _pct(x: float, y: float, w: float, h: float,
+         frame: Tuple[int, int] = FRAME) -> Dict[str, float]:
     """One placement, as percentages of the frame."""
-    return {"left": round(100.0 * x / FRAME[0], 4),
-            "top": round(100.0 * y / FRAME[1], 4),
-            "width": round(100.0 * w / FRAME[0], 4),
-            "height": round(100.0 * h / FRAME[1], 4)}
+    return {"left": round(100.0 * x / frame[0], 4),
+            "top": round(100.0 * y / frame[1], 4),
+            "width": round(100.0 * w / frame[0], 4),
+            "height": round(100.0 * h / frame[1], 4)}
 
 
 def _row_tops(rows: int) -> List[float]:
@@ -359,10 +397,16 @@ def _row_sizes(count: int) -> List[int]:
     ``medals.rows`` puts the short row on top, which is how a rack is worn
     and how the reference box is arranged.
     """
-    return medal_art.rows(count, MEDAL_PER_ROW) if count else []
+    if not count:
+        return []
+    per_row = (MEDAL_PER_ROW if count <= 2 * MEDAL_PER_ROW
+               else min(MEDAL_MAX_PER_ROW, (count + 1) // 2))
+    return medal_art.rows(count, per_row)
 
 
-def _place_row(art: Sequence[Tuple[int, int, int]], line: float) -> List[tuple]:
+def _place_row(art: Sequence[Tuple[int, int, int]], line: float,
+               medal_gap: float = MEDAL_GAP, centre_x: int = CENTRE_X,
+               interior: Tuple[int, int] = INTERIOR) -> List[tuple]:
     """
     Lay a row of medals out around ``CENTRE_X``, hung from a common ribbon.
 
@@ -373,11 +417,11 @@ def _place_row(art: Sequence[Tuple[int, int, int]], line: float) -> List[tuple]:
     line in a row of medals that reads as straight.
     """
     widths = [w for w, _, _ in art]
-    total = sum(widths) + MEDAL_GAP * (len(widths) - 1)
-    room = INTERIOR[1] - INTERIOR[0]
+    total = sum(widths) + medal_gap * (len(widths) - 1)
+    room = interior[1] - interior[0]
     scale = min(1.0, room / total) if total else 1.0
-    gap = MEDAL_GAP * scale
-    x = CENTRE_X - total * scale / 2.0
+    gap = medal_gap * scale
+    x = centre_x - total * scale / 2.0
     out = []
     for w, h, ribbon in art:
         out.append((x, line - ribbon * scale, w * scale, h * scale))
@@ -460,7 +504,7 @@ def plate_text(rank: str, name: str, country: Optional[int] = None,
 
 
 def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[str],
-           icons, country: int = 601, rev: int = 0) -> Dict[str, Any]:
+           icons, country: int = 601, rev: int = 0, medal_renderer=None) -> Dict[str, Any]:
     """
     Every piece in the box, in the order it should be drawn.
 
@@ -470,25 +514,33 @@ def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[
     reader the medals and badges are sliced from.
     """
     case = CASES.get(country)
-    items, plate = (_eastern(rack, rank_id, squadron_key, icons, rev, case)
-                    if case else _usaf(rack, rank_id, squadron_key, icons, rev))
+    items, plate = (_eastern(rack, rank_id, squadron_key, icons, rev, case,
+                              medal_renderer)
+                    if case else _usaf(rack, rank_id, squadron_key, icons, rev,
+                                       medal_renderer))
+    frame = case.frame if case else FRAME
+    frame_src = (case.frame_src if case else
+                 f"/static/images/shadowbox/{FURNITURE}/USAF_Korea_shadowbox_frame.jpg")
+    glass_src = (case.glass_src if case else
+                 f"/static/images/shadowbox/{FURNITURE}/glass.png")
     return {
         "rev": REVISION,
-        "frame": f"/static/images/shadowbox/{FURNITURE}/frame.png?v={rev}",
-        "glass": {"src": f"/static/images/shadowbox/{FURNITURE}/glass.png?v={rev}",
-                  **_pct(GLASS_AT[0], GLASS_AT[1], 1970, 1482)},
-        "aspect": round(FRAME[0] / FRAME[1], 6),
+        "frame": f"{frame_src}?v={rev}",
+        "glass": {"src": f"{glass_src}?v={rev}",
+                  **_pct(GLASS_AT[0], GLASS_AT[1], *frame, frame=frame)},
+        "aspect": round(frame[0] / frame[1], 6),
         # The frame's own pixel size. The page lays the case out in
         # percentages and does not need it, but an exported picture should
         # be cut at the size the artwork was drawn at, not at whatever the
         # window happened to be.
-        "size": list(FRAME),
+        "size": list(frame),
         "items": items,
-        "plate": _pct(*plate),
+        "plate": _pct(*plate, frame=frame),
     }
 
 
-def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
+def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case",
+             medal_renderer=None):
     """
     A Soviet-pattern case: suspended awards, then the orders worn without a
     ribbon, then the arms, the pilot's badge and his squadron, over the
@@ -500,15 +552,17 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
     SOV_ROW1_LINE, SOV_ROW2_Y = case.row1_line, case.row2_y
     SOV_ROW2_PITCH, SOV_STAR_GAP = case.row2_pitch, case.star_gap
     SOV_BADGE_AT = case.badge_at
-    SOV_PATCH_AT = (CENTRE_X + case.side, case.patch_y)
+    centre_x = case.centre_x
+    SOV_PATCH_AT = (centre_x + case.side, case.patch_y)
     items: List[Dict[str, Any]] = []
 
     def add(src, box, name="", cls=""):
         x, y, w, h = box
-        items.append({"src": src, "name": name, "cls": cls, **_pct(x, y, w, h)})
+        items.append({"src": src, "name": name, "cls": cls,
+                      **_pct(x, y, w, h, frame=case.frame)})
 
     def art_of(award_id, name=""):
-        got = _art(icons, award_id)
+        got = _art(icons, award_id, medal_renderer)
         return None if got is None else (got, name)
 
     # --- row one: what hangs from a ribbon ------------------------------
@@ -519,6 +573,10 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
     # group, the row simply splits around the star.
     bar = [m["type"] for m in rack.get("medals") or []]
     names = {m["type"]: m.get("name") or "" for m in rack.get("medals") or []}
+    wwii = ([award_id for award_id in bar if award_id in medal_art.SOVIET_WWII]
+            if case.wwii_line is not None else [])
+    if wwii:
+        bar = [award_id for award_id in bar if award_id not in medal_art.SOVIET_WWII]
     repeats = _repeat_group(bar)
     if repeats:
         # placed outward from the star, so the first awarding ends up
@@ -535,13 +593,13 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
         (src, w, h, ribbon), nm = star
         sl, sr, st = _SPANS.get(src, (0, w - 1, 0))
         add(f"{src}?v={rev}",
-            (CENTRE_X - (sl + sr) / 2.0, SOV_ROW1_LINE - st, w, h),
+            (centre_x - (sl + sr) / 2.0, SOV_ROW1_LINE - st, w, h),
             nm, "sbox-medal")
         # Either a fixed centre-to-centre pitch, or packed outward from the
         # hero by the art's own edges where the case gives no pitch.
         step = case.row1_pitch
-        x = (CENTRE_X - step if step
-             else CENTRE_X - (sr - sl + 1) / 2.0 - SOV_STAR_GAP)
+        x = (centre_x - step if step
+             else centre_x - (sr - sl + 1) / 2.0 - SOV_STAR_GAP)
         for a in left:
             got = art_of(a, names.get(a, ""))
             if not got:
@@ -551,8 +609,8 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
             place = x - (il + ir) / 2.0 if step else x - ir - 1
             add(f"{s}?v={rev}", (place, SOV_ROW1_LINE - it, aw, ah), nm, "sbox-medal")
             x -= step if step else (ir - il + 1) + SOV_GAP
-        x = (CENTRE_X + step if step
-             else CENTRE_X + (sr - sl + 1) / 2.0 + SOV_STAR_GAP)
+        x = (centre_x + step if step
+             else centre_x + (sr - sl + 1) / 2.0 + SOV_STAR_GAP)
         for a in right:
             got = art_of(a, names.get(a, ""))
             if not got:
@@ -565,15 +623,30 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
     else:
         row = [art_of(a, names.get(a, "")) for a in bar]
         row = [r for r in row if r]
-        boxes = _place_row([(w, h, rb) for (_, w, h, rb), _ in row], SOV_ROW1_LINE)
+        boxes = _place_row([(w, h, rb) for (_, w, h, rb), _ in row],
+                           SOV_ROW1_LINE, centre_x=centre_x,
+                           interior=case.interior)
         for ((s, *_), nm), box in zip(row, boxes):
             add(f"{s}?v={rev}", box, nm, "sbox-medal")
+
+    # The lower-precedence WWII campaign and victory medals form their own
+    # centred row in the taller Soviet case.  This preserves the established
+    # Hero/order arrangement above and keeps every pentagonal mount at the
+    # same physical size.
+    if wwii:
+        row = [art_of(a, names.get(a, "")) for a in wwii]
+        row = [r for r in row if r]
+        boxes = _place_row([(w, h, rb) for (_, w, h, rb), _ in row],
+                           case.wwii_line, SOV_WWII_GAP, centre_x,
+                           case.interior)
+        for ((s, *_), nm), box in zip(row, boxes):
+            add(f"{s}?v={rev}", box, nm, "sbox-medal sbox-wwii-medal")
 
     # --- row two: the screw-backs, in precedence -------------------------
     pinned = [art_of(m["type"], m.get("name") or "") for m in rack.get("pinned") or []]
     pinned = [p for p in pinned if p]
     if pinned:
-        first = CENTRE_X - SOV_ROW2_PITCH * (len(pinned) - 1) / 2.0
+        first = centre_x - SOV_ROW2_PITCH * (len(pinned) - 1) / 2.0
         for i, ((s, w, h, _), nm) in enumerate(pinned):
             add(f"{s}?v={rev}",
                 _centred_ink(s, first + i * SOV_ROW2_PITCH, SOV_ROW2_Y, w, h),
@@ -608,9 +681,9 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
         add(f"{s}?v={rev}", _centred_ink(s, *SOV_PATCH_AT, w, h), "", "sbox-patch")
 
     # --- the plate and the shoulder boards -------------------------------
-    px, py, pw, ph = SOV_PLATE
+    px, py, pw, ph = case.plate
     add(f"/static/images/shadowbox/{FURNITURE}/nameplate.png?v={rev}",
-        _plate_box(SOV_PLATE), "", "sbox-plate")
+        _plate_box(case.plate), "", "sbox-plate")
 
     board = (_tile(icons, "rank", f"{case.rank_prefix}{rank_id}")
              if rank_id is not None else None)
@@ -622,9 +695,9 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
         # at the standard gap it would run through the moulding. The gap
         # closes instead, the same amount on both sides, so the pair stays
         # symmetrical and inside the cloth whatever the rank.
-        room = min(px - INTERIOR[0], INTERIOR[1] - (px + pw))
+        room = min(px - case.interior[0], case.interior[1] - (px + pw))
         gap = max(0.0, min(float(SOV_BOARD_GAP), room - ink))
-        y = SOV_BOARD_Y - h / 2.0
+        y = case.board_y - h / 2.0
         add(f"{s}?v={rev}", (px - gap - ink - il, y, w, h), "",
             "sbox-board sbox-board-left")
         # The right board is this tile mirrored in the stylesheet, so its ink
@@ -632,7 +705,7 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case"):
         add(f"{s}?v={rev}", (px + pw + gap - (w - 1 - ir), y, w, h), "",
             "sbox-board sbox-board-right")
 
-    return items, SOV_PLATE
+    return items, case.plate
 
 
 def _repeat_group(bar: Sequence[int]) -> List[int]:
@@ -654,7 +727,7 @@ def _repeat_group(bar: Sequence[int]) -> List[int]:
 
 
 def _usaf(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[str],
-          icons, rev: int):
+          icons, rev: int, medal_renderer=None):
     items: List[Dict[str, Any]] = []
 
     def add(src: str, box: tuple, name: str = "", cls: str = "") -> None:
@@ -669,14 +742,14 @@ def _usaf(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[s
 
     worn: List[Dict[str, Any]] = []
     for award_id, name in wanted:
-        art = _art(icons, award_id)
+        art = _art(icons, award_id, medal_renderer)
         if art is None:
             continue
         src, w, h, ribbon = art
         worn.append({"name": name, "src": f"{src}?v={rev}", "art": (w, h, ribbon)})
 
-    # A pilot cannot hold more than two rows' worth, but a preview rack can
-    # ask for anything; anything past the second row is dropped rather than
+    # The case has two rows. A malformed preview can still ask for more than
+    # twenty pieces; anything beyond the second row is dropped rather than
     # drawn over the seal.
     sizes = _row_sizes(len(worn))[:len(MEDAL_ROW_TOP)]
     tops = _row_tops(len(sizes))

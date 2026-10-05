@@ -1,0 +1,114 @@
+IL-2 Korea Service Record 2.2.2 — your own pilot photograph
+
+
+Gentlemen,
+
+This release adds something rather more personal than another table of
+figures: your own photograph can now follow your pilot through the career
+screens. It also brings the Second World War service described in the game's
+biographies into the Service Record, gives all three nations their own rebuilt
+display cases, and fixes one remaining problem in the napalm correction.
+
+
+YOUR OWN PILOT PHOTOGRAPH
+
+The Career Helper has a new Custom pilot photo page. Give it an ordinary JPG
+or PNG and it will:
+
+- remove the background locally on your own computer;
+- place you on the same photographic background as the game's portraits;
+- let you drag and zoom the portrait and clean up its edge;
+- adjust exposure, contrast and saturation;
+- add an optional sepia treatment at any strength; and
+- make the BC7 DDS texture the game expects and attach it only to the pilot in
+  the selected career.
+
+No Photoshop and no DDS exporter are required. The background-removal model
+and texture converter are included, and the photograph is never uploaded
+anywhere.
+
+The game normally uses fixed sheets of small portraits on some pages. The mod
+now makes those pages read the pilot's DDS directly, so the custom picture
+appears in the formation sheet and event pages as well as the large, medium
+and small portrait views.
+
+Applying or restoring a picture takes a career backup first. Restore original
+photo puts back the exact portrait path the career had before. Close IL-2
+Korea before either operation, as you would before any Career Helper change.
+
+
+THE WAR BEFORE KOREA
+
+Many of the selectable American and Soviet biographies describe combat in the
+Second World War, but the Korean career begins with none of that service on
+the uniform. The Service Record can now derive the campaign decorations that
+the biography itself supports.
+
+For American pilots these include the American Defense Service Medal, the
+Asiatic-Pacific and European-African-Middle Eastern Campaign Medals with the
+campaign stars supported by named operations, and the World War II Victory
+Medal. Soviet pilots may receive the medals for the Defense of Leningrad or
+Stalingrad and Victory over Germany or Japan where their biographies say so.
+
+They appear in the ribbon rack, on full dress and in the display case, including
+careers already in progress. They are shown as prior service, without inventing
+Korean War award dates or inserting tracker-only rows into the career file or
+the game's own awards screen.
+
+
+NEW DISPLAY CASES
+
+The USAF, Soviet and North Korean records now each use their own frame and
+glass. The wider American and Soviet cases make room for the prior-service
+medals without shrinking them into a pile; the North Korean case uses its own
+smaller proportions instead of borrowing the American furniture.
+
+The brass plate now carries the squadron beneath the pilot's rank and name.
+Crowded ribbon and medal groups have been rebalanced, and Save picture writes
+a full-resolution JPEG. On a typical case that reduces the saved picture from
+about 7.1 MB to 0.9 MB without changing its dimensions.
+
+
+NAPALM CORRECTION
+
+The automatic correction no longer pins an affected pilot's PCP to one
+lifetime value. It keeps an incremental checkpoint and applies only the new
+napalm excess, so a manual PCP adjustment remains in place. It still handles
+the game's later writeback of the uncorrected value, and Undo preserves any
+manual offset made after the first correction.
+
+The correction also fails closed if a future game update changes the shape of
+the kill-category data, and sortie recovery now logs an unexpected formation
+mismatch instead of silently dropping rows.
+
+
+ALSO
+
+- Aircraft-report and evading event records introduced by the September game
+  update are now identified. They are deliberately kept out of Other
+  Incidences because they describe aircraft state and temporary evasion, not
+  separate events in a pilot's service history.
+- Custom photographs work in all known career portrait views without editing
+  the game's fixed small-photo atlases.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.2.2
+
+Installer  IL2_Korea_Service_Record_Setup_v2.2.2.exe
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Zip        IL-2.Korea.Service.Record.v2.2.2.zip
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Everything is Authenticode signed. SmartScreen works on reputation rather
+than signatures, so a new release can still raise a warning until enough
+people have run it.
+
+The project lives at https://github.com/1-Arrow-1/IL2-Korea_Service_Record — the
+source, the issue tracker, and every release. If it has been useful to you,
+don't forget to give me a star.
+
+As ever: if something does not match what you see in your own career, say so
+and I will go and look.

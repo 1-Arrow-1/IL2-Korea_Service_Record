@@ -198,6 +198,13 @@ Source: "mod\assets\awards.cfg"; DestDir: "{code:GetIL2Dir}\data\scg\2"; \
 Source: "mod\assets\awards.stock.cfg"; DestDir: "{code:GetIL2Dir}\data\scg\2"; DestName: "awards.cfg"; \
     Components: mod\stock; Flags: ignoreversion uninsremovereadonly
 
+; Career views load pilot DDS files directly so custom portraits do not need
+; entries in the game's fixed SmallPhotos atlas.
+Source: "mod\assets\career.rdict.xaml"; DestDir: "{code:GetIL2Dir}\data\nsdata\controls\career"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
+Source: "mod\assets\eventsnotificationcontrol.xaml"; DestDir: "{code:GetIL2Dir}\data\nsdata\controls\career\events"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
+
 Source: "mod\assets\awards.xaml"; DestDir: "{code:GetIL2Dir}\data\nsdata\assets\images"; \
     Components: mod; Flags: ignoreversion uninsremovereadonly
 Source: "mod\assets\awards6xx.dds"; DestDir: "{code:GetIL2Dir}\data\nsdata\assets\images"; \

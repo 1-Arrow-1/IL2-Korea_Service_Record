@@ -116,6 +116,10 @@ def test_apply_writes_sorties_totals_and_pcp(napalm_career, game_dir, tmp_path):
     assert record["sorties"] == {"2": S2_RAW, "3": S3_RAW}
     assert record["pilots"]["1"]["Building"] == 2 and record["pilots"]["1"]["Aircraft"] == 0
     assert record["gaps"] == {"1": 50.0, "2": 0.0}
+    assert record["pcp_state"] == {
+        "1": {"score": 100.0, "pcp": 111.0, "excess": 39},
+        "2": {"score": 30.0, "pcp": 12.0, "excess": 18},
+    }
     assert record["squadron"]["MilitaryFacility"] == 5     # 3 + pilot 1's 2
     assert len(_backups(tmp_path)) == 1
 
@@ -130,6 +134,96 @@ def test_second_run_changes_nothing(napalm_career, game_dir, tmp_path):
     assert c.path.read_bytes() == after_first
     assert napalmfix.path_for(_name(c)).read_text(encoding="utf-8") == record_first
     assert len(_backups(tmp_path)) == 1
+
+
+def test_manual_pcp_change_becomes_the_new_checkpoint(napalm_career, game_dir, tmp_path):
+    c = napalm_career
+    napalmfix.auto_sync(c.path, game_dir)
+    c.run("UPDATE pilot SET pcp = 200 WHERE id = 1")
+
+    # No new sortie or score: this is an independent edit, not another
+    # napalm correction. It is recorded without touching or backing up the DB.
+    assert napalmfix.auto_sync(c.path, game_dir) is None
+    assert c.pilot_row(1)[1] == 200.0
+    assert napalmfix.load(_name(c))["pcp_state"]["1"] == {
+        "score": 100.0, "pcp": 200.0, "excess": 39,
+    }
+    assert len(_backups(tmp_path)) == 1
+
+
+def test_manual_checkpoint_survives_game_raw_writeback(napalm_career, game_dir):
+    c = napalm_career
+    napalmfix.auto_sync(c.path, game_dir)
+    c.run("UPDATE pilot SET pcp = 200 WHERE id = 1")
+    napalmfix.auto_sync(c.path, game_dir)
+
+    # An ordinary mission follows while the game still holds its raw lifetime
+    # PCP. The raw 151 must not erase the accepted +89 manual adjustment.
+    c.mission(3)
+    c.sortie(3, 1, "Aircraft=1&LightFighter=1", sid=4)
+    c.kills(3, 1, "mig15bis")
+    c.run("UPDATE pilot SET killStats = ?, score = 101, pcp = 151 WHERE id = 1",
+          ("Aircraft=48&Building=182&LightFighter=3&MilitaryFacility=182&StaticPlane=45",))
+
+    napalmfix.auto_sync(c.path, game_dir)
+    assert c.pilot_row(1)[1:] == (201.0, 101)
+
+
+def test_new_napalm_delta_is_applied_to_manual_checkpoint(napalm_career, game_dir):
+    c = napalm_career
+    napalmfix.auto_sync(c.path, game_dir)
+    c.run("UPDATE pilot SET pcp = 200 WHERE id = 1")
+    napalmfix.auto_sync(c.path, game_dir)
+
+    # The game gives 18 raw building points on a new inflated sortie. The
+    # incremental correction removes those 18 from 218 and returns to the
+    # accepted manual baseline, rather than rebuilding from score + old gap.
+    c.mission(3)
+    c.sortie(3, 1, S3_RAW, sid=4)
+    c.kills(3, 1, "Mil_boxes_02")
+    c.run("UPDATE pilot SET score = 118, pcp = 218 WHERE id = 1")
+
+    napalmfix.auto_sync(c.path, game_dir)
+    assert c.pilot_row(1)[1:] == (200.0, 118)
+    assert napalmfix.load(_name(c))["pcp_state"]["1"]["excess"] == 57
+
+
+def test_later_clean_sortie_can_release_a_carried_point(career, game_dir):
+    c = career
+    c.squadron("Building=5&MilitaryFacility=5")
+    c.pilot(1, "Building=5&MilitaryFacility=5", score=1, pcp=1.0, is_player=1)
+    c.mission(1)
+    c.sortie(1, 1, "Building=5&MilitaryFacility=5", sid=1)
+    c.kills(1, 1, "Mil_boxes_02")
+    napalmfix.auto_sync(c.path, game_dir)
+    assert c.pilot_row(1)[1] == 0.0
+
+    # Four honest kills complete the corrected 1+4 group of five. Raw and
+    # corrected cumulative point totals are now both one, so excess falls
+    # from one to zero even though this sortie itself is clean.
+    c.mission(2)
+    c.sortie(2, 1, "Building=4&MilitaryFacility=4", sid=2)
+    c.kills(2, 1, *("Mil_boxes_02",) * 4)
+    c.run("UPDATE pilot SET killStats = 'Building=5&MilitaryFacility=5' WHERE id = 1")
+    napalmfix.auto_sync(c.path, game_dir)
+    assert c.pilot_row(1)[1:] == (1.0, 1)
+    assert napalmfix.load(_name(c))["pcp_state"]["1"]["excess"] == 0
+
+
+def test_format_one_record_migrates_without_losing_manual_pcp(napalm_career, game_dir):
+    c = napalm_career
+    napalmfix.auto_sync(c.path, game_dir)
+    record = napalmfix.load(_name(c))
+    record["format"] = 1
+    record.pop("pcp_state")
+    napalmfix.save(_name(c), record)
+    c.run("UPDATE pilot SET pcp = 200 WHERE id = 1")
+
+    assert napalmfix.auto_sync(c.path, game_dir) is None
+    migrated = napalmfix.load(_name(c))
+    assert migrated["format"] == 2
+    assert migrated["pcp_state"]["1"]["pcp"] == 200.0
+    assert c.pilot_row(1)[1] == 200.0
 
 
 def test_game_writing_its_own_values_back_is_corrected_again(napalm_career, game_dir):
@@ -311,6 +405,16 @@ def test_restore_after_the_game_added_a_mission(napalm_career, game_dir):
     napalmfix.restore(c.path)
     assert c.pilot_row(1) == ("Aircraft=48&Building=182&LightFighter=3&MilitaryFacility=182&StaticPlane=45",
                               151.0, 101)
+
+
+def test_restore_preserves_a_manual_pcp_adjustment(napalm_career, game_dir):
+    c = napalm_career
+    napalmfix.auto_sync(c.path, game_dir)
+    c.run("UPDATE pilot SET pcp = 200 WHERE id = 1")
+    napalmfix.auto_sync(c.path, game_dir)
+
+    napalmfix.restore(c.path)
+    assert c.pilot_row(1)[1] == 239.0       # manual 200 + the 39 returned raw points
 
 
 def test_restore_rolls_back_entirely_when_the_file_is_locked(napalm_career, game_dir, held):

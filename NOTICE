@@ -25,17 +25,27 @@ solely so that the mod can be installed into a legitimately owned copy of
 the game. They are not licensed for any other use. If the rights holder
 objects to their presence in this repository, they will be removed.
 
-The application itself ships no game content: at runtime it reads the
-artwork, names and descriptions it displays from the user's own
-installation.
+The Service Record reads the game artwork, names and descriptions it displays
+from the user's own installation. The Custom Pilot Photo editor includes one
+512x512 game-style portrait background supplied for this mod at
+``korea_service_record/static/images/custom_pilot_photo_background.jpg``;
+the same game-content restrictions stated above apply to that file.
 
 Bundled third-party software
 ----------------------------
   * Leaflet 1.9.4 (korea_service_record/static/vendor/leaflet)
     Copyright (c) 2010-2023 Volodymyr Agafonkin, BSD 2-Clause License —
     see the LICENSE file in that folder.
+  * Microsoft DirectXTex texconv (vendor/directxtex), MIT License — used by
+    the Career Helper to encode custom pilot portraits as BC7 DDS textures;
+    see vendor/directxtex/LICENSE.txt.
+  * U-2-Net lightweight portrait-segmentation model
+    (korea_service_record/models/u2netp.onnx), Apache License 2.0 — see
+    korea_service_record/models/U-2-Net-LICENSE.txt.
+  * Microsoft ONNX Runtime, MIT License — see licenses/onnxruntime/LICENSE.txt
+    and licenses/onnxruntime/ThirdPartyNotices.txt in the packaged application.
 
 Runtime dependencies (installed from PyPI, licences per package): Flask
-(BSD-3-Clause), Pillow (MIT-CMU), pystray (LGPL-3.0). The Windows build is
-produced with PyInstaller (GPL with bootloader exception) and packaged with
-Inno Setup (Inno Setup License).
+(BSD-3-Clause), Pillow (MIT-CMU), pystray (LGPL-3.0), ONNX Runtime (MIT).
+The Windows build is produced with PyInstaller (GPL with bootloader exception)
+and packaged with Inno Setup (Inno Setup License).

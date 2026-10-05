@@ -1,0 +1,1046 @@
+﻿<UserControl x:Class="WPFDesign.Controls.Career.Events.EventsNotificationControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:app="clr-namespace:WPFDesign"
+             xmlns:career="clr-namespace:WPFDesign.Controls.Career"
+             xmlns:com="clr-namespace:WPFDesign.Controls.Common"
+             xmlns:events="clr-namespace:WPFDesign.Controls.Career.Events"
+             xmlns:mmenu="clr-namespace:WPFDesign.Controls.MainMenu"
+             xmlns:noesis="clr-namespace:NoesisGUIExtensions;assembly=Noesis.GUI.Extensions"
+             d:DesignWidth="1920" d:DesignHeight="1080">
+	<UserControl.Resources>
+
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/WPFDesign;component/Assets/Images/Ranks.xaml"/>
+				<ResourceDictionary Source="/WPFDesign;component/Assets/Images/Awards.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+
+			<app:BindingProxy x:Key="Root" Data="{Binding}"/>
+
+			<Style x:Key="Style.FlatButton.Purchase.Confirm" TargetType="com:FlatButton" BasedOn="{StaticResource Style.FlatButton.Career.ImproveQual}">
+				<Setter Property="Foreground" Value="{StaticResource Brush.Hover_White}"/>
+				<Setter Property="Background" Value="{StaticResource Brush.Deep_Purple}"/>
+			</Style>
+
+			<Style x:Key="Style.ListBox.Carousel" TargetType="com:ListBoxEx" BasedOn="{StaticResource Style.ListBox.Carousel.Base}">
+				<Setter Property="Visibility" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=events:EventsNotificationControl}, Path=DataContext.Events.Count, Converter={StaticResource GreaterToVis}, ConverterParameter=1}"/>
+				<Setter Property="app:ItemStyle.Normal">
+					<Setter.Value>
+						<Style TargetType="Border">
+							<Setter Property="app:Brushes.Background" Value="{StaticResource Brush.Light_Gray}"/>
+						</Style>
+					</Setter.Value>
+				</Setter>
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=events:EventsNotificationControl}, Path=DataContext.IsNewDay}" Value="True">
+						<Setter Property="app:ItemStyle.Normal">
+							<Setter.Value>
+								<Style TargetType="Border">
+									<Setter Property="app:Brushes.Background" Value="{StaticResource Brush.Dark_Olive_Drab}"/>
+								</Style>
+							</Setter.Value>
+						</Setter>
+					</DataTrigger>
+				</Style.Triggers>
+			</Style>
+
+			<Style x:Key="Style.ARM_Title_Small_1_Adaptive_Color" TargetType="TextBlock" BasedOn="{StaticResource Style.ARM_Title_Small_1}">
+				<Setter Property="Foreground" Value="{StaticResource Brush.Dark_Olive_Drab}"/>
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=events:EventsNotificationControl}, Path=DataContext.IsNewDay}" Value="True">
+						<Setter Property="Foreground" Value="{StaticResource Brush.Light_Gray}"/>
+					</DataTrigger>
+				</Style.Triggers>
+			</Style>
+
+			<Style x:Key="Style.HeaderedContentControl.Event" TargetType="HeaderedContentControl">
+				<Setter Property="BorderBrush" Value="{StaticResource Brush.Light_Gray}"/>
+				<Setter Property="Background" Value="{StaticResource Brush.Olive_Drab}"/>
+				<Setter Property="Foreground" Value="{StaticResource Brush.Lite_Olive_Drab}"/>
+				<Setter Property="MinHeight" Value="100"/>
+				<Setter Property="VerticalAlignment" Value="Center"/>
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="HeaderedContentControl">
+							<StackPanel Orientation="Vertical">
+								<Grid Width="900">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="*"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="*"/>
+									</Grid.ColumnDefinitions>
+									<Border Grid.Column="0"
+									        Height="2"
+									        Background="{TemplateBinding BorderBrush}"/>
+									<TextBlock Grid.Column="1"
+									           MaxWidth="890"
+									           Margin="20,0"
+									           Foreground="{TemplateBinding Background}"
+									           TextAlignment="Center"
+									           TextWrapping="Wrap"
+									           Style="{StaticResource Style.ARM_Top_Headline}"
+									           d:Text="Header"
+									           app:Text.RichText="{TemplateBinding Header}"/>
+
+									<Border Grid.Column="2"
+									        Height="2"
+									        Background="{TemplateBinding BorderBrush}"/>
+								</Grid>
+								<Decorator Height="10"/>
+								<TextBlock HorizontalAlignment="Center"
+								           Foreground="{TemplateBinding Foreground}"
+								           TextAlignment="Center"
+								           TextWrapping="Wrap"
+								           Style="{StaticResource Style.ARM_Title_2}"
+								           d:Text="Text"
+								           app:Text.RichText="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content}"/>
+							</StackPanel>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=events:EventsNotificationControl}, Path=DataContext.IsNewDay}" Value="True">
+						<Setter Property="BorderBrush" Value="{StaticResource Brush.Dark_Olive_Drab}"/>
+						<Setter Property="Background" Value="{StaticResource Brush.Insignia_White}"/>
+						<Setter Property="Foreground" Value="{StaticResource Brush.Light_Gray}"/>
+					</DataTrigger>
+				</Style.Triggers>
+			</Style>
+
+			<Style x:Key="Style.ToggleButton.Career.ImproveQualEvents" TargetType="com:ToggleButtonEx" BasedOn="{StaticResource Style.ToggleButton.Career.ImproveQual}">
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding DataContext.IsPromoteSkillActive, RelativeSource={RelativeSource AncestorType=events:EventsNotificationControl}}" Value="True">
+						<Setter Property="Focusable" Value="False"/>
+					</DataTrigger>
+
+					<MultiTrigger>
+						<MultiTrigger.Conditions>
+							<Condition Property="IsEnabled" Value="False"/>
+							<Condition Property="IsChecked" Value="True"/>
+						</MultiTrigger.Conditions>
+						<Setter Property="Foreground" Value="{Binding CheckedForeground, RelativeSource={RelativeSource Self}}"/>
+						<Setter Property="Background" Value="{Binding CheckedBackground, RelativeSource={RelativeSource Self}}"/>
+					</MultiTrigger>
+				</Style.Triggers>
+			</Style>
+
+			<Style x:Key="Style.HeaderedContentControl.EventWithoutPicture" TargetType="HeaderedContentControl" BasedOn="{StaticResource Style.HeaderedContentControl.Event}">
+				<Setter Property="Margin" Value="0,0,0,20"/>
+			</Style>
+
+			<Style x:Key="Style.HeaderContentControl.CommonEventLayout" TargetType="HeaderedContentControl" BasedOn="{StaticResource {x:Type HeaderedContentControl}}">
+				<Setter Property="Content" Value="{Binding Text}"/>
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="HeaderedContentControl">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="*"/>
+									<RowDefinition Height="Auto"/>
+								</Grid.RowDefinitions>
+								<Decorator Grid.Row="0" VerticalAlignment="Top">
+									<events:EventNotificationImage Path="{TemplateBinding Tag}"
+									                               Grid.Row="0"
+									                               Height="480"
+									                               VerticalAlignment="Center"
+									                               Param1="{Binding Data.PlayerCoalition, Source={StaticResource Root}}"
+									                               Param2="{Binding Data.PlayerPlaneId, Source={StaticResource Root}}"/>
+								</Decorator>
+								<Decorator Grid.Row="1"
+								           MinHeight="160"
+								           VerticalAlignment="Center">
+									<HeaderedContentControl VerticalAlignment="Top"
+									                        Style="{StaticResource Style.HeaderedContentControl.Event}"
+									                        Header="{TemplateBinding Header}"
+									                        d:Header="d:Header"
+									                        Content="{TemplateBinding Content}"/>
+								</Decorator>
+							</Grid>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
+
+			<ControlTemplate x:Key="ControlTemplate.NewDay">
+				<Grid>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="178"/>
+					</Grid.RowDefinitions>
+
+					<Grid Grid.Row="0"
+					      Height="470"
+					      VerticalAlignment="Center">
+
+						<Grid HorizontalAlignment="Center">
+							<app:BoxShadow Opacity="0.5"
+							               BlurRadius="34" Direction="-45"
+							               ShadowDepth="30"
+							               Color="Black"/>
+
+							<Image Source="{StaticResource Career.calendar_empty}"/>
+						</Grid>
+
+						<StackPanel Width="260"
+						            VerticalAlignment="Center"
+						            Orientation="Vertical">
+							<TextBlock Height="36"
+							           HorizontalAlignment="Center"
+							           Foreground="{app:BrushOffset {StaticResource NoiseBrush.Dune}}"
+							           Style="{StaticResource Style.ARM_Top_Headline}">
+								<TextBlock.Text>
+									<app:Localize Binding="{Binding DateTime.Date.Month}">
+										<app:Localize.Switch>
+											<app:Case When="1" Then="calM1"/>
+											<app:Case When="2" Then="calM2"/>
+											<app:Case When="3" Then="calM3"/>
+											<app:Case When="4" Then="calM4"/>
+											<app:Case When="5" Then="calM5"/>
+											<app:Case When="6" Then="calM6"/>
+											<app:Case When="7" Then="calM7"/>
+											<app:Case When="8" Then="calM8"/>
+											<app:Case When="9" Then="calM9"/>
+											<app:Case When="10" Then="calM10"/>
+											<app:Case When="11" Then="calM11"/>
+											<app:Case When="12" Then="calM12"/>
+										</app:Localize.Switch>
+									</app:Localize>
+								</TextBlock.Text>
+							</TextBlock>
+							<TextBlock Height="220"
+							           HorizontalAlignment="Center"
+							           VerticalAlignment="Center"
+							           Foreground="{app:BrushOffset {StaticResource NoiseBrush.Dune}}"
+							           FontFamily="{StaticResource Font.Geologica}"
+							           FontWeight="Medium"
+							           FontSize="200"
+							           Text="{Binding DateTime.Date.Day}"/>
+							<TextBlock Height="22"
+							           HorizontalAlignment="Center"
+							           Foreground="{app:BrushOffset {StaticResource NoiseBrush.Dune}}"
+							           Style="{StaticResource Style.ARM_Subtitle}">
+								<TextBlock.Text>
+									<app:Localize Binding="{Binding DateTime.Date.DayOfWeek}">
+										<app:Localize.Switch>
+											<app:Case When="1" Then="calD1"/>
+											<app:Case When="2" Then="calD2"/>
+											<app:Case When="3" Then="calD3"/>
+											<app:Case When="4" Then="calD4"/>
+											<app:Case When="5" Then="calD5"/>
+											<app:Case When="6" Then="calD6"/>
+											<app:Case When="7" Then="calD7"/>
+										</app:Localize.Switch>
+									</app:Localize>
+								</TextBlock.Text>
+							</TextBlock>
+						</StackPanel>
+					</Grid>
+
+					<HeaderedContentControl Grid.Row="1"
+					                        VerticalAlignment="Bottom"
+					                        Style="{StaticResource Style.HeaderedContentControl.Event}"
+					                        Header="{app:Localize carEventHeaderNewDay}"
+					                        Content="{Binding DateTime.Date}"/>
+
+				</Grid>
+
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.SkipDay">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderSkipDay}"
+				                        Tag="CareerEvents/SkipDay/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.Newspaper">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{Binding HeaderText}"
+				                        Tag="CareerEvents/Newspaper/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.OperationStart">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderOperationStart}"
+				                        Tag="CareerEvents/OperationStart/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.OperationFinish">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderOperationFinish}"
+				                        Tag="CareerEvents/OperationFinish/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.CommanderAward">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="538"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="115"/>
+					</Grid.RowDefinitions>
+					<Viewbox Width="512" Height="512">
+						<Image Source="{Binding Image, Converter={StaticResource Images.Awards}}"
+						       Grid.Row="0"
+						       Width="512" Height="512"
+						       Stretch="None"
+						       d:Source="/Assets/Images/Awards/6xx/602002.png">
+							<Image.RenderTransform>
+								<TransformGroup>
+									<TranslateTransform Y="30"/>
+								</TransformGroup>
+							</Image.RenderTransform>
+						</Image>
+					</Viewbox>
+					<HeaderedContentControl Grid.Row="2"
+					                        Style="{StaticResource Style.HeaderedContentControl.Event}"
+					                        Header="{app:Localize carEventHeaderCommanderAward}"
+					                        Content="{Binding Text}"/>
+				</Grid>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.CommanderRank">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="400"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="80"/>
+						<RowDefinition Height="65"/>
+						<RowDefinition Height="17"/>
+					</Grid.RowDefinitions>
+
+					<Image Source="{Binding Image, Converter={StaticResource Images.Ranks}}"
+					       Grid.Row="0"
+					       Width="479" Height="310"
+					       Stretch="Uniform"
+					       d:Source="/Assets/Images/Ranks/502/1.png">
+						<Image.RenderTransform>
+							<TransformGroup>
+								<TranslateTransform Y="85"/>
+							</TransformGroup>
+						</Image.RenderTransform>
+					</Image>
+
+					<HeaderedContentControl Grid.Row="2"
+					                        MinHeight="80"
+					                        Style="{StaticResource Style.HeaderedContentControl.Event}"
+					                        Header="{app:Localize carEventHeaderCommanderRank}"
+					                        d:Header="Test header"
+					                        Content="{Binding Text}"/>
+
+					<Grid Grid.Row="3" HorizontalAlignment="Center">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="20"/>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="20"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+
+						<TextBlock Grid.Column="0" Grid.ColumnSpan="5"
+						           HorizontalAlignment="Center"
+						           VerticalAlignment="Bottom"
+						           Margin="5,0,0,43"
+						           Foreground="{StaticResource Brush.Lite_Olive_Drab}"
+						           FontWeight="SemiBold"
+						           FontSize="14"
+						           Style="{StaticResource Style.CAREER_Names_SemiBold}"
+						           Text="{app:Localize carAwards_Commander_Promote_Hint}"
+						           d:Text="carAwards_Commander_Promote_Hint"/>
+
+						<com:ToggleButtonEx Grid.Column="0"
+						                    VerticalAlignment="Bottom"
+						                    Margin="0,0,0,0"
+						                    app:Focus.OnShow="SetFocus"
+						                    Style="{StaticResource Style.ToggleButton.Career.ImproveQualEvents}"
+						                    IsEnabled="{Binding DataContext.IsPromoteSkillEnabled, RelativeSource={RelativeSource AncestorType=events:EventsNotificationControl}}"
+						                    IsChecked="{Binding DataContext.IsPromoteSkillActive, RelativeSource={RelativeSource AncestorType=events:EventsNotificationControl}}"
+						                    Content="{app:Localize carPilotCharacteristics_Skill}"
+						                    d:Content="Skill"
+						                    Tag="{StaticResource Icon.PilotDossier.Stats.Skill}"/>
+
+						<com:ToggleButtonEx Grid.Column="2"
+						                    VerticalAlignment="Bottom"
+						                    Margin="0,0,0,0"
+						                    Style="{StaticResource Style.ToggleButton.Career.ImproveQualEvents}"
+						                    d:IsChecked="True" d:IsHoverActive="True"
+						                    IsEnabled="{Binding DataContext.IsPromoteDisciplineEnabled, RelativeSource={RelativeSource AncestorType=events:EventsNotificationControl}}"
+						                    IsChecked="{Binding DataContext.IsPromoteDisciplineActive, RelativeSource={RelativeSource AncestorType=events:EventsNotificationControl}}"
+						                    Content="{app:Localize carPilotCharacteristics_Discipline}"
+						                    d:Content="Skill"
+						                    Tag="{StaticResource Icon.PilotDossier.Stats.Discipline}"/>
+
+						<com:ToggleButtonEx Grid.Column="4"
+						                    VerticalAlignment="Bottom"
+						                    Margin="0,0,0,0"
+						                    Style="{StaticResource Style.ToggleButton.Career.ImproveQualEvents}"
+						                    IsEnabled="{Binding DataContext.IsPromoteCourageEnabled, RelativeSource={RelativeSource AncestorType=events:EventsNotificationControl}}"
+						                    IsChecked="{Binding DataContext.IsPromoteCourageActive, RelativeSource={RelativeSource AncestorType=events:EventsNotificationControl}}"
+						                    Content="{app:Localize carPilotCharacteristics_Courage}"
+						                    d:Content="Skill Skill Skill Skill"
+						                    Tag="{StaticResource Icon.PilotDossier.Stats.Courage}"/>
+					</Grid>
+
+				</Grid>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PilotAward">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.Event}"
+				                        Header="{app:Localize carEventHeaderPilotAward, Compile={app:Mapping Key=name, Binding={Binding Data}}}"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PilotsGroupAward">
+				<StackPanel Grid.Row="0"
+				            VerticalAlignment="Center">
+					<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.Event}"
+					                        Header="{app:Localize carEventHeaderPilotsGroupAward}"/>
+
+					<ItemsControl MaxHeight="200"
+					              Focusable="False"
+					              ItemsSource="{Binding Data}"
+					              d:ItemsSource="{d:SampleData ItemCount=18}">
+
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel HorizontalAlignment="Center"
+								           Orientation="Vertical"
+								           ItemHeight="Auto" ItemWidth="Auto"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<TextBlock HorizontalAlignment="Stretch"
+								           Margin="10,0,10,0"
+								           Foreground="{StaticResource Brush.Light_Gray}"
+								           TextWrapping="NoWrap"
+								           Style="{StaticResource Style.ARM_Title_Small_1}"
+								           Text="{Binding}"
+								           d:Text="МУРАШКИН АЛЕКСАНДР"/>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</StackPanel>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PilotRank">
+				<HeaderedContentControl MinHeight="80"
+				                        Style="{StaticResource Style.HeaderedContentControl.Event}"
+				                        Header="{app:Localize carEventHeaderPilotRank, Compile={app:Mapping Key=name, Binding={Binding Data}}}"
+				                        d:Header="Test header"
+				                        Content="{Binding Text}"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.CommanderTemplate">
+				<Grid Margin="0,24,0,0">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="512"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+
+					<Grid Grid.Row="0"
+					      Width="426" Height="512">
+						<Border CornerRadius="6">
+							<Border.Background>
+								<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+									<GradientStop Offset="0" Color="{StaticResource Color.Insignia_White}"/>
+									<GradientStop Offset="1" Color="#B9B09C"/>
+								</LinearGradientBrush>
+							</Border.Background>
+						</Border>
+
+						<Viewbox Grid.Row="0"
+						         HorizontalAlignment="Center"
+						         Margin="30"
+						         Stretch="UniformToFill">
+							<Image Source="{Binding Image, Converter={StaticResource UriFormat}, ConverterParameter='{}/Assets/PilotPhotos/{0}.dds'}" d:Source="/Assets/Images/SmallPhotos/usa50e/48.png"/>
+						</Viewbox>
+
+						<Control Width="258" Height="258"
+						         HorizontalAlignment="Right"
+						         VerticalAlignment="Bottom"
+						         Margin="0,0,-1,-1"
+						         Template="{StaticResource Vector.LostRibbon}"
+						         Visibility="{Binding Type, Converter={StaticResource EqualsToVis}, ConverterParameter={x:Static app:NotificationType.CommanderKIA}}"/>
+
+						<Grid.Effect>
+							<DropShadowEffect Opacity="0.5"
+							                  BlurRadius="15" Direction="315"/>
+						</Grid.Effect>
+					</Grid>
+
+					<StackPanel Grid.Row="1"
+					            VerticalAlignment="Center"
+					            Margin="0,33,0,0">
+						<HeaderedContentControl MinHeight="70"
+						                        Margin="0,9,0,0"
+						                        Style="{StaticResource Style.HeaderedContentControl.Event}"
+						                        Header="{Binding HeaderText}"
+						                        Content="{Binding Text}"/>
+
+						<TextBlock HorizontalAlignment="Center"
+						           VerticalAlignment="Bottom"
+						           Margin="0,12,0,0"
+						           Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=events:EventsNotificationControl}, Path=DataContext.IsNewDay, Converter={app:IfTrue {StaticResource Brush.Light_Gray}, Else={StaticResource Brush.Dark_Olive_Drab}}, FallbackValue={StaticResource Brush.Light_Gray}}"
+						           FontSize="24"
+						           TextAlignment="Center"
+						           TextWrapping="Wrap"
+						           Text="{app:Localize Binding={Binding Data}}"
+						           d:Text="БУДЕТ НАЗНАЧЕН НОВЫЙ КОМАНДИР">
+							<TextBlock.Style>
+								<Style TargetType="TextBlock" BasedOn="{StaticResource Style.ARM_Title_Small_1_Adaptive_Color}">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="">
+											<Setter Property="Visibility" Value="Collapsed"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</TextBlock.Style>
+						</TextBlock>
+					</StackPanel>
+				</Grid>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.SupplyFuel">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderSupplyFuel}"
+				                        Tag="CareerEvents/SupplyFuel/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.SupplyAmmo">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderSupplyAmmo}"
+				                        Tag="CareerEvents/SupplyAmmo/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.SupplyEquipment">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderSupplyEquipment}"
+				                        Tag="CareerEvents/SupplyEquipment/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PlaneCommonTemplate">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="440"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+					<Viewbox Grid.Row="0" Margin="0,40,0,40">
+						<!-- Source="/Assets/WorldObjects/Planes/MiG15bis/preview.png" -->
+						<Image Source="{Binding DataContext.PlanePreview, RelativeSource={RelativeSource AncestorType=events:EventsNotificationControl}}" d:Source="/Assets/Images/Awards/6xx/601001.png">
+							<Image.RenderTransform>
+								<TransformGroup>
+									<TranslateTransform Y="-50"/>
+								</TransformGroup>
+							</Image.RenderTransform>
+						</Image>
+					</Viewbox>
+					<StackPanel Grid.Row="1">
+						<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.Event}"
+						                        Header="{Binding HeaderText}"
+						                        Content="{Binding Text}"/>
+
+						<ItemsControl MinHeight="200"
+						              VerticalAlignment="Center"
+						              Margin="0,-3,0,0"
+						              Focusable="False"
+						              ItemsSource="{Binding Planes}"
+						              d:ItemsSource="{d:SampleData ItemCount=15}">
+
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<WrapPanel HorizontalAlignment="Center"
+									           VerticalAlignment="Center"
+									           Orientation="Horizontal"
+									           ItemHeight="Auto" ItemWidth="Auto"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Grid Width="80" Height="90">
+										<Control Width="50" Height="50"
+										         VerticalAlignment="Top"
+										         app:Brushes.Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=events:EventsNotificationControl}, Path=DataContext.IsNewDay, Converter={app:IfTrue {StaticResource Brush.Dark_Grey}, Else={StaticResource Brush.Dark_Olive_Drab}}, FallbackValue={StaticResource Brush.Dark_Grey}}"
+										         app:Brushes.Geometry="{Binding IconName, Converter={StaticResource Geometry.PlaneIconsConverter}, FallbackValue={StaticResource Geometry.PlaneIcon_MIG15}}"
+										         Template="{StaticResource Vector.Career_PlaneIcon}"/>
+
+										<TextBlock HorizontalAlignment="Center"
+										           VerticalAlignment="Bottom"
+										           Margin="0,0,0,6"
+										           Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=events:EventsNotificationControl}, Path=DataContext.IsNewDay, Converter={app:IfTrue {StaticResource Brush.Light_Gray}, Else={StaticResource Brush.Dark_Olive_Drab}}, FallbackValue={StaticResource Brush.Light_Gray}}"
+										           FontSize="14"
+										           TextWrapping="NoWrap"
+										           Style="{StaticResource Style.CAREER_Names_SemiBold}"
+										           Text="{Binding TacticalCodes.CodeString}"
+										           d:Text="FU 170109"/>
+									</Grid>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+
+					</StackPanel>
+				</Grid>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PlaneCommonTemplateOvercount">
+				<StackPanel VerticalAlignment="Center">
+					<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.Event}"
+					                        Header="{Binding HeaderText}"
+					                        Content="{Binding Text}"/>
+
+					<ItemsControl MinHeight="200"
+					              VerticalAlignment="Center"
+					              Margin="80,-3,80,0"
+					              Focusable="False"
+					              ItemsSource="{Binding Planes}"
+					              d:ItemsSource="{d:SampleData ItemCount=11}">
+
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel HorizontalAlignment="Center"
+								           VerticalAlignment="Center"
+								           Orientation="Horizontal"
+								           ItemHeight="Auto" ItemWidth="Auto"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Grid Width="80" Height="90">
+									<Control Width="50" Height="50"
+									         VerticalAlignment="Top"
+									         app:Brushes.Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=events:EventsNotificationControl}, Path=DataContext.IsNewDay, Converter={app:IfTrue {StaticResource Brush.Dark_Grey}, Else={StaticResource Brush.Dark_Olive_Drab}}, FallbackValue={StaticResource Brush.Dark_Grey}}"
+									         app:Brushes.Geometry="{Binding IconName, Converter={StaticResource Geometry.PlaneIconsConverter}, FallbackValue={StaticResource Geometry.PlaneIcon_MIG15}}"
+									         Template="{StaticResource Vector.Career_PlaneIcon}"/>
+
+									<TextBlock HorizontalAlignment="Center"
+									           VerticalAlignment="Bottom"
+									           Margin="0,0,0,6"
+									           Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=events:EventsNotificationControl}, Path=DataContext.IsNewDay, Converter={app:IfTrue {StaticResource Brush.Light_Gray}, Else={StaticResource Brush.Dark_Olive_Drab}}, FallbackValue={StaticResource Brush.Light_Gray}}"
+									           FontSize="14"
+									           TextWrapping="NoWrap"
+									           Style="{StaticResource Style.CAREER_Names_SemiBold}"
+									           Text="{Binding TacticalCodes.CodeString}"
+									           d:Text="FU 170109"/>
+								</Grid>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+
+				</StackPanel>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.NewPlaneType">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.EventWithoutPicture}"
+				                        Header="{app:Localize carEventHeaderNewPlaneType}"
+				                        d:Header="d:Header"
+				                        Content="{Binding Text}"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PilotVacationReturn">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.EventWithoutPicture}"
+				                        Header="{app:Localize carEventHeaderPilotVacationReturn}"
+				                        d:Header="d:СОБЫТИЕ БЕЗ КАРТИНКИ"
+				                        Content="{Binding Text}"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PlaneReturn">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.EventWithoutPicture}"
+				                        Header="{app:Localize carEventHeaderPlaneReturn}"
+				                        d:Header="d:СОБЫТИЕ БЕЗ КАРТИНКИ"
+				                        Content="{Binding Text}"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PilotHospitalReturn">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.EventWithoutPicture}"
+				                        Header="{app:Localize carEventHeaderPilotHospitalReturn}"
+				                        d:Header="d:СОБЫТИЕ БЕЗ КАРТИНКИ"
+				                        Content="{Binding Text}"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PilotsCommonTemplate">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+
+					<ItemsControl Grid.Row="0"
+					              MinHeight="441"
+					              VerticalAlignment="Center"
+					              Margin="10,10,10,0"
+					              Focusable="False"
+					              ItemsSource="{Binding Pilots}"
+					              d:ItemsSource="{d:SampleData ItemCount=6}">
+
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel HorizontalAlignment="Center"
+								           VerticalAlignment="Center"
+								           Orientation="Horizontal"
+								           ItemHeight="Auto" ItemWidth="Auto"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Grid Width="140" Height="168"
+								      Margin="9">
+									<Border CornerRadius="4">
+										<Border.Background>
+											<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+												<GradientStop Offset="0" Color="{StaticResource Color.Insignia_White}"/>
+												<GradientStop Offset="1" Color="#B9B09C"/>
+											</LinearGradientBrush>
+										</Border.Background>
+									</Border>
+
+									<Viewbox Grid.Row="0"
+									         HorizontalAlignment="Center"
+									         Margin="10"
+									         Stretch="UniformToFill">
+										<Image Source="{Binding Photo, Converter={StaticResource UriFormat}, ConverterParameter='{}/Assets/PilotPhotos/{0}.dds'}" d:Source="/Assets/Images/SmallPhotos/usa50e/48.png"/>
+									</Viewbox>
+									<Grid.Effect>
+										<DropShadowEffect Opacity="0.5"
+										                  BlurRadius="10" Direction="315"/>
+									</Grid.Effect>
+								</Grid>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+
+					<DockPanel Grid.Row="1">
+						<HeaderedContentControl DockPanel.Dock="Top"
+						                        Style="{StaticResource Style.HeaderedContentControl.Event}"
+						                        Header="{Binding HeaderText}"
+						                        Content="{Binding Text}"/>
+						<Grid Margin="0,0,0,25">
+							<ItemsControl Focusable="False"
+							              ItemsSource="{Binding Pilots}"
+							              d:ItemsSource="{d:SampleData ItemCount=6}">
+
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<WrapPanel MaxHeight="110"
+										           HorizontalAlignment="Center"
+										           VerticalAlignment="Center"
+										           Orientation="Vertical"
+										           ItemWidth="Auto"/>
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<TextBlock HorizontalAlignment="Stretch"
+										           Margin="18,2,18,2"
+										           TextWrapping="NoWrap"
+										           Style="{StaticResource Style.ARM_Title_Small_1_Adaptive_Color}">
+											<Run Text="{Binding FirstName}"/> <Run Text="{Binding LastName}"/>
+										</TextBlock>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</Grid>
+
+					</DockPanel>
+				</Grid>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.PilotsCommonTemplateOvercount">
+				<DockPanel Grid.Row="1" VerticalAlignment="Center">
+					<HeaderedContentControl DockPanel.Dock="Top"
+					                        Style="{StaticResource Style.HeaderedContentControl.Event}"
+					                        Header="{Binding HeaderText}"
+					                        Content="{Binding Text}"/>
+					<Grid Margin="0,0,0,25">
+						<ItemsControl Focusable="False"
+						              ItemsSource="{Binding Pilots}"
+						              d:ItemsSource="{d:SampleData ItemCount=22}">
+
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<UniformGrid HorizontalAlignment="Center"
+									             VerticalAlignment="Center"
+									             Columns="2"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<TextBlock HorizontalAlignment="Stretch"
+									           Margin="18,2,18,2"
+									           TextWrapping="NoWrap"
+									           Style="{StaticResource Style.ARM_Title_Small_1_Adaptive_Color}">
+										<Run Text="{Binding FirstName}"/> <Run Text="{Binding LastName}"/>
+									</TextBlock>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</Grid>
+
+				</DockPanel>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.SupplyPilotFailed">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderSupplyPilotFailed}"
+				                        Tag="CareerEvents/SupplyPilotFail/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.SupplyPlaneFailed">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderSupplyPlaneFailed}"
+				                        Tag="CareerEvents/SupplyPlaneFail/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.SupplyFuelFailed">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderSupplyFuelFailed}"
+				                        Tag="CareerEvents/SupplyFuelFail/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.SupplyEquipmentFailed">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderSupplyEquipmentFailed}"
+				                        Tag="CareerEvents/SupplyEquipmentFail/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.SupplyAmmoFailed">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderSupplyAmmoFailed}"
+				                        Tag="CareerEvents/SupplyAmmoFail/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.ResourceFuelDestroyed">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventResourcesDestroyed_Short}"
+				                        Tag="CareerEvents/SupplyFuelFail/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.ResourceEquipmentDestroyed">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventResourcesDestroyed_Short}"
+				                        Tag="CareerEvents/SupplyEquipmentFail/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.ResourceAmmoDestroyed">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventResourcesDestroyed_Short}"
+				                        Tag="CareerEvents/SupplyAmmoFail/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.TransferStart">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderTransferStart}"
+				                        Tag="CareerEvents/TransferStart/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.TransferFinish">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderTransferFinish}"
+				                        Tag="CareerEvents/TransferFinish/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.WarEnd">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderWarEnd}"
+				                        Tag="CareerEvents/WarEnd/"/>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="ControlTemplate.FinishPhase">
+				<HeaderedContentControl Style="{StaticResource Style.HeaderContentControl.CommonEventLayout}"
+				                        Header="{app:Localize carEventHeaderFinishPhase}"
+				                        Content="{app:Localize carEventTextFinishPhase}"
+				                        Tag="CareerEvents/FinishPhase/"/>
+			</ControlTemplate>
+
+
+			<Style x:Key="Style.ContentControl.Event" TargetType="Control">
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.NewDay}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.NewDay}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SkipDay}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.SkipDay}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.OperationStart}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.OperationStart}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.OperationFinish}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.OperationFinish}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.CommanderAward}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.CommanderAward}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.CommanderRank}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.CommanderRank}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotAward}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotAward}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotsGroupAward}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotsGroupAward}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotRank}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotRank}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.CommanderAssign}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.CommanderTemplate}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.CommanderKIA}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.CommanderTemplate}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyPilot}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotsCommonTemplate}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyPilotOvercount}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotsCommonTemplateOvercount}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyPlane}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PlaneCommonTemplate}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyPlaneOvercount}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PlaneCommonTemplateOvercount}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyFuel}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.SupplyFuel}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyAmmo}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.SupplyAmmo}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyEquipment}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.SupplyEquipment}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.NewPlaneType}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.NewPlaneType}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotVacationReturn}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotVacationReturn}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyPilotFailed}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.SupplyPilotFailed}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyPlaneFailed}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.SupplyPlaneFailed}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyFuelFailed}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.SupplyFuelFailed}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyEquipmentFailed}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.SupplyEquipmentFailed}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.SupplyAmmoFailed}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.SupplyAmmoFailed}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.ResourceFuelDestroyed}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.ResourceFuelDestroyed}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.ResourceEquipmentDestroyed}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.ResourceEquipmentDestroyed}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.ResourceAmmoDestroyed}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.ResourceAmmoDestroyed}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PlaneReturn}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PlaneReturn}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotHospitalReturn}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotHospitalReturn}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.TransferStart}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.TransferStart}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.TransferFinish}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.TransferFinish}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.Newspaper}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.Newspaper}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.WarEnd}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.WarEnd}"/>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.FinishPhase}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.FinishPhase}"/>
+					</DataTrigger>
+				</Style.Triggers>
+
+			</Style>
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<DockPanel>
+		<HeaderedContentControl DockPanel.Dock="Top"
+		                        Style="{StaticResource Style.HeaderedContentControl.Social.Header}"
+		                        Header="{app:Localize carScreenHeader}"
+		                        d:Header="Pilot Career"/>
+		<com:RibbonDockPanel DockPanel.Dock="Bottom" Style="{StaticResource Style.Ribbon_ScreenFooter}">
+			<com:FlatButton DockPanel.Dock="Left"
+			                InputAction="gui_cancel"
+			                Command="{Binding Close}"
+			                Content="{app:Localize cmBack}"/>
+		</com:RibbonDockPanel>
+
+
+		<Grid>
+			<Border Background="Black"
+			        Opacity="0.8"
+			        Visibility="{Binding IsNewDay, Converter={StaticResource IsFalseToVis}}"
+			        d:Visibility="Collapsed"/>
+
+			<Border Visibility="{Binding IsNewDay, Converter={StaticResource BoolToVis}}" d:Visibility="Visible">
+				<Border.Background>
+					<ImageBrush ImageSource="{StaticResource Menu.wood}"/>
+				</Border.Background>
+			</Border>
+
+			<app:BoxShadow Width="1000"
+			               Opacity="0.6"
+			               BlurRadius="100" Direction="0"
+			               Color="Black"/>
+
+			<Border Width="1000"
+			        Padding="20,20,20,40"
+			        Background="{Binding IsNewDay, Converter={app:IfTrue {StaticResource Brush.BG_solidgreen}, Else={StaticResource Brush.BG_paper}}}"
+			        d:Background="{StaticResource Brush.BG_solidgreen}">
+				<!--<Border.Effect>
+					<DropShadowEffect Opacity="0.6"
+					                  BlurRadius="100" Direction="0"
+					                  Color="Black"/>
+				</Border.Effect>-->
+				<Grid>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="100"/>
+					</Grid.RowDefinitions>
+
+					<Control Grid.Row="0"
+					         Style="{StaticResource Style.ContentControl.Event}"
+					         DataContext="{Binding SelectedItem}"
+					         d:Template="{StaticResource ControlTemplate.CommanderTemplate}"/>
+
+					<StackPanel Grid.Row="1" VerticalAlignment="Bottom">
+						<com:ListBoxEx Margin="0,0,0,24"
+						               Style="{StaticResource Style.ListBox.Carousel}"
+						               ItemsSource="{Binding Events}"
+						               d:ItemsSource="{d:SampleData ItemCount=4}"
+						               SelectedItem="{Binding SelectedItem}"/>
+
+						<com:FlatButton Height="42"
+						                MinWidth="180"
+						                HorizontalAlignment="Center"
+						                VerticalAlignment="Bottom"
+						                app:Focus.OnLoad="SetFocus"
+						                Style="{StaticResource Style.ButtonM}"
+						                ImageDock="Left" InputAction="gui_accept"
+						                Command="{Binding Next}"
+						                Content="{app:Localize cmNext}"
+						                d:Content="app:LocalizecmNext"/>
+					</StackPanel>
+
+				</Grid>
+			</Border>
+
+		</Grid>
+
+	</DockPanel>
+</UserControl>

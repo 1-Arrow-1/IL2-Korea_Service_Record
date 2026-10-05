@@ -37,7 +37,7 @@ from ..geo import (MapTiles, Overlay, WAYPOINT_TAKEOFF, WAYPOINT_LANDING,
                    parse_point, parse_route)
 from ..icons import IconLibrary
 from ..diary import DiaryBuilder
-from .. import citations, corrections, ribbons
+from .. import citations, corrections, ribbons, wwii_awards
 from .. import medals as medal_art
 
 # KOREA_PREVIEW_RACK=all|navy|usmc|sov|dprk: every ladder of that country at its top
@@ -46,12 +46,14 @@ from .. import medals as medal_art
 # comma-separated, for any other set.
 PREVIEW_RACK = {
     "all": (601041, 601025, 601052, 601051, 601017, 601016, 601063, 601062,
-            601007, 601057, 601030, 601053, 601038, 601039, 601040),
+            601007, 601057, 601030, 601064, 601068, 601075, 601076,
+            601053, 601038, 601039, 601040),
     "navy": (602038, 602026, 602031, 602043, 602017, 602016, 602053, 602052,
              602007, 602037, 602030, 601053, 601038, 601039, 602001),
     "usmc": (602038, 602026, 602031, 602043, 602017, 602016, 602053, 602052,
              602007, 602037, 602030, 601053, 601038, 601039, 602001),
-    "sov": (501022, 501024, 501020, 501014, 501012, 501006, 501002, 501004, 501049, 501038),
+    "sov": (501022, 501024, 501020, 501014, 501012, 501006, 501002, 501004,
+            501050, 501051, 501052, 501053, 501054, 501049, 501038),
     "dprk": (503007, 503006, 503005, 503004, 503003, 503002, 503008, 503001),
 }
 
@@ -461,6 +463,9 @@ class CareerAggregator:
         return self.objects.describe(attacker)["name"]
 
     def award_name(self, award_id: int) -> str:
+        prior = wwii_awards.name(award_id, self.lang)
+        if prior:
+            return prior
         defn = self.awards_cfg.get(award_id)
         return self.locale.award_name(award_id, defn.name if defn else "")
 
@@ -1093,8 +1098,9 @@ class CareerAggregator:
         badges = ((602001,) if country_code in ("602", "603") else
                   (601040, 601027, 601001))
         badge = next((b for b in badges if b in held), None)
-        # Full dress: the awards themselves. US medals four to a row on the
-        # bar with the Medal of Honor at the collar; Soviet-pattern orders
+        # Full dress: the awards themselves. USAF medals normally three to a
+        # row, overlapping up to five when needed to stay within four rows,
+        # with the Medal of Honor at the collar; Soviet-pattern orders
         # and medals on their mounts, five to a row, the screw-back orders
         # pinned to the right breast and the Hero's star above everything.
         held = {m["type"] for m in medals if not m["pending"]}
@@ -2645,6 +2651,17 @@ class CareerAggregator:
             kill_events = db.events(pid, types=[0])
             player_awards = db.awards(pid, include_removed=True)
             groups = self._promotions_and_awards(player_awards, player['country'])
+            described = _pilot_description(player["description"])
+            # The selectable biography is the only surviving evidence of the
+            # pilot's service before Korea.  These medals belong on what he
+            # wears, but are not Korean-career award events and therefore do
+            # not enter the dated awards list above.
+            prior_awards = [
+                {"type": award_id, "name": self.award_name(award_id),
+                 "pending": False, "history": []}
+                for award_id in wwii_awards.for_career_description(
+                    player["description"], player["country"])
+            ]
 
             # The rank on the earliest sortie is where the career began.
             starting_rank_id = sorties[0]["rankId"] if sorties else player["rankId"]
@@ -2698,7 +2715,7 @@ class CareerAggregator:
                 "promotions": groups["promotions"],
                 "awards": groups["awards"],
                 "ribbon_rack": self._ribbon_rack(
-                    groups["awards"], awards_by_pilot.get(-1, []),
+                    groups["awards"] + prior_awards, awards_by_pilot.get(-1, []),
                     player["country"], player["rankId"]),
                 "corrections_applied": corrections.is_applied(corrections.load(Path(meta.path).stem)),
                 "incidences": self._incidences(db.events(pid), aircraft_flown),

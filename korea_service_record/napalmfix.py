@@ -20,17 +20,20 @@ differs, with a backup first:
   original sorties, taken once before anything is written: it holds what the
   sortie rows do not, such as the two sorties the escapedJail bug never saved
   in the 12th FBS career;
-* ``pilot.pcp`` to ``score + gap - excess``. The game adds the same points to
-  score and PCP (FUN_18006b690), so ``gap = pcp - score`` is fixed for life
-  (46 of 46 pilots); the excess is the points formula replayed over the
-  original sorties minus the same replay over the corrected ones. The score
-  itself stays the game's.
+* ``pilot.pcp`` by the change in excess points since the preceding correction.
+  A per-pilot checkpoint in the correction record holds the last score,
+  accepted PCP and cumulative excess. This preserves a later manual PCP edit
+  while a chronological replay still honours the game's vehicle/building/
+  railway point remainders across sorties. The score itself stays the game's.
 
-Every target is recomputed from scratch, never from the value in the file, so
-nothing is ever taken off twice and a value the game writes back from memory
-is simply corrected again on the next read. The record of original sortie
-values, offsets and gaps lives beside the flight-time record; ``restore()``
-puts the game's own values back and stops the automatic run for that career.
+Kill-stat targets are recomputed from scratch, never from the value in the
+file, so nothing is ever taken off twice. PCP normally starts from the value in
+the file and applies only the newly changed excess. If the value is exactly the
+game's raw lifetime value, the checkpoint identifies an in-memory game
+writeback and restores the accepted/manual baseline instead. The record of
+original sortie values, offsets, gaps and PCP checkpoints lives beside the
+flight-time record; ``restore()`` puts the game's own values back and stops the
+automatic run for that career.
 
 What it cannot do: the debrief of the napalm sortie itself is evaluated by the
 game before the tracker sees it. awards.cfg guards that debrief with
@@ -48,7 +51,7 @@ from . import corrections
 
 logger = logging.getLogger(__name__)
 
-FORMAT = 1
+FORMAT = 2
 
 # PCP is written %.2f.
 _EPS = 0.005
@@ -80,7 +83,7 @@ def save(career_name: str, data: Dict[str, Any]) -> Path:
 
 def _empty(name: str) -> Dict[str, Any]:
     return {"format": FORMAT, "career": name, "sorties": {}, "pilots": {},
-            "squadron": None, "gaps": {}}
+            "squadron": None, "gaps": {}, "pcp_state": {}}
 
 
 # -- killStats strings, keys exactly as stored --------------------------------
@@ -146,9 +149,16 @@ def plan(db_path: Path, game_dir: Path, data: Dict[str, Any]) -> Dict[str, Any]:
     from .career.killfix import KillCategories, reductions, subtract
 
     table = KillCategories.from_resolver(AssetResolver(Path(game_dir)))
-    out: Dict[str, Any] = {"sorties": [], "pilots": [], "squadron": None}
+    out: Dict[str, Any] = {"sorties": [], "pilots": [], "squadron": None,
+                           "record_dirty": False}
     if table is None:
         return out
+    if data.get("format") != FORMAT:
+        data["format"] = FORMAT
+        out["record_dirty"] = True
+    if "pcp_state" not in data:
+        data["pcp_state"] = {}
+        out["record_dirty"] = True
     con = sqlite3.connect(f"file:{Path(db_path).as_posix()}?mode=ro", uri=True)
     con.row_factory = sqlite3.Row
     try:
@@ -187,24 +197,65 @@ def plan(db_path: Path, game_dir: Path, data: Dict[str, Any]) -> Dict[str, Any]:
 
     for pid, ids in by_pilot.items():
         p = pilots.get(pid)
-        if p is None or (str(pid) not in data["pilots"] and not affected(ids)):
+        key = str(pid)
+        first_correction = key not in data["pilots"]
+        if p is None or (first_correction and not affected(ids)):
             continue
         sum_orig: Dict[str, int] = {}
         sum_corr: Dict[str, int] = {}
         for i in ids:
             _add(sum_orig, orig_of[i])
             _add(sum_corr, corr_of[i])
-        if str(pid) not in data["pilots"]:
+        if first_correction:
             # Taken once, while the file still holds the game's own totals.
             stored = _parse(p["killStats"])
-            data["pilots"][str(pid)] = {k: stored.get(k, 0) - sum_orig.get(k, 0)
-                                        for k in set(stored) | set(sum_orig)}
-            data["gaps"].setdefault(str(pid), float(p["pcp"] or 0) - float(p["score"] or 0))
-        offset = data["pilots"][str(pid)]
+            data["pilots"][key] = {k: stored.get(k, 0) - sum_orig.get(k, 0)
+                                    for k in set(stored) | set(sum_orig)}
+            data["gaps"].setdefault(key, float(p["pcp"] or 0) - float(p["score"] or 0))
+            out["record_dirty"] = True
+        offset = data["pilots"][key]
         target_kills = _render(p["killStats"], {k: offset.get(k, 0) + sum_corr.get(k, 0)
                                                 for k in set(offset) | set(sum_corr)})
         excess = points([orig_of[i] for i in ids]) - points([corr_of[i] for i in ids])
-        target_pcp = round(float(p["score"] or 0) + float(data["gaps"][str(pid)]) - excess, 2)
+        score = float(p["score"] or 0)
+        current_pcp = float(p["pcp"] or 0)
+        raw_pcp = round(score + float(data["gaps"][key]), 2)
+        lifetime_target = round(raw_pcp - excess, 2)
+        state = data["pcp_state"].get(key)
+        if first_correction:
+            # The first run has no accepted checkpoint yet. Remove every
+            # historical excess point once, exactly as the original scheme did.
+            target_pcp = lifetime_target
+        elif state is None:
+            # FORMAT 1 migration. A raw value is the game's in-memory copy and
+            # still needs the lifetime correction; a corrected or independently
+            # edited value becomes the first accepted checkpoint.
+            target_pcp = lifetime_target if (
+                abs(current_pcp - raw_pcp) <= _EPS
+                and abs(current_pcp - lifetime_target) > _EPS
+            ) else round(current_pcp, 2)
+        else:
+            previous_score = float(state.get("score", score))
+            previous_pcp = float(state.get("pcp", current_pcp))
+            previous_excess = int(state.get("excess", excess))
+            expected_from_checkpoint = round(previous_pcp + score - previous_score, 2)
+            delta_excess = excess - previous_excess
+
+            # A direct manual edit is any value other than the two values the
+            # game can naturally produce: checkpoint + score delta, or its raw
+            # lifetime PCP. Preserve it. When the game writes the raw value
+            # back from memory, continue from the checkpoint instead.
+            if (abs(current_pcp - raw_pcp) <= _EPS
+                    and abs(current_pcp - expected_from_checkpoint) > _EPS):
+                base_pcp = expected_from_checkpoint
+            else:
+                base_pcp = current_pcp
+            target_pcp = round(base_pcp - delta_excess, 2)
+
+        checkpoint = {"score": score, "pcp": target_pcp, "excess": excess}
+        if data["pcp_state"].get(key) != checkpoint:
+            data["pcp_state"][key] = checkpoint
+            out["record_dirty"] = True
         out["pilots"].append({
             "id": pid, "name": f"{p['name']} {p['lastName']}".strip(),
             "is_player": bool(p["isPlayer"]),
@@ -220,6 +271,7 @@ def plan(db_path: Path, game_dir: Path, data: Dict[str, Any]) -> Dict[str, Any]:
             stored = _parse(squadron["killStats"])
             data["squadron"] = {k: stored.get(k, 0) - sum_orig.get(k, 0)
                                 for k in set(stored) | set(sum_orig)}
+            out["record_dirty"] = True
         offset = data["squadron"]
         out["squadron"] = {"id": squadron["id"], "now": squadron["killStats"],
                            "target": _render(squadron["killStats"],
@@ -266,6 +318,8 @@ def apply(db_path: Path, game_dir: Path, backup: bool = False) -> Dict[str, Any]
         con.execute("BEGIN IMMEDIATE")
         p = plan(db_path, game_dir, data)
         if not _pending(p) or _rolled_back(p, data):
+            if p.get("record_dirty"):
+                save(name, data)
             con.rollback()
             return counts
         if backup:
@@ -309,14 +363,25 @@ def restore(db_path: Path) -> Dict[str, int]:
         sorties = con.execute(
             "SELECT id, pilotId, killStats FROM sortie WHERE isDeleted = 0").fetchall()
         for pid, offset in data.get("pilots", {}).items():
-            row = con.execute("SELECT killStats, score FROM pilot WHERE id = ?", (int(pid),)).fetchone()
+            row = con.execute(
+                "SELECT killStats, score, pcp FROM pilot WHERE id = ?", (int(pid),)
+            ).fetchone()
             if row is None:
                 continue
             total = dict(offset)
             for s in sorties:
                 if s["pilotId"] == int(pid):
                     _add(total, s["killStats"])
-            pcp = round(float(row["score"] or 0) + float(data["gaps"].get(pid, 0)), 2)
+            current_pcp = float(row["pcp"] or 0)
+            state = data.get("pcp_state", {}).get(pid)
+            if state is not None:
+                raw_pcp = round(float(row["score"] or 0) + float(data["gaps"].get(pid, 0)), 2)
+                if abs(current_pcp - raw_pcp) <= _EPS:
+                    pcp = current_pcp
+                else:
+                    pcp = round(current_pcp + int(state.get("excess", 0)), 2)
+            else:
+                pcp = round(float(row["score"] or 0) + float(data["gaps"].get(pid, 0)), 2)
             con.execute("UPDATE pilot SET killStats = ?, pcp = ? WHERE id = ?",
                         (_render(row["killStats"], total), pcp, int(pid)))
             counts["pilots"] += 1
@@ -364,6 +429,8 @@ def auto_sync(db_path: Path, game_dir: Path) -> Optional[Dict[str, int]]:
         logger.info("Napalm correction: %s was put back from a backup - switched off", name)
         return None
     if not _pending(p):
+        if p.get("record_dirty"):
+            save(name, data)
         return None
     try:
         counts = apply(db_path, game_dir, backup=True)

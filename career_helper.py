@@ -42,8 +42,10 @@ from datetime import datetime, timedelta
 import sys
 import tkinter as tk
 from pathlib import Path
-from tkinter import messagebox, ttk
+from tkinter import filedialog, messagebox, ttk
 from typing import Any, Dict, List, NamedTuple, Optional
+
+from PIL import Image, ImageTk
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -54,6 +56,7 @@ from korea_service_record.assets import default_cache_dir      # noqa: E402
 from korea_service_record import corrections                   # noqa: E402
 from korea_service_record.assets import AssetResolver           # noqa: E402
 from korea_service_record.gamedata import loads_lenient         # noqa: E402
+import custom_pilot_photo as pilot_photo                         # noqa: E402
 
 BACKUPS = default_cache_dir().parent / "backups"
 # The squadron's seats. 24 of them, which is what Career.SEATS has always
@@ -128,6 +131,30 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Reserve pool",
         "fl_none": "This career has no line-up to show.",
         "fl_moved": "{n} moved",
+        "tab_photo": "Custom pilot photo",
+        "photo_intro": "Choose a JPG or PNG. The helper removes the background locally, places you on the game's portrait background and creates the DDS used by this career. Close IL-2 Korea before applying or restoring.",
+        "photo_current": "Current portrait: {path}",
+        "photo_none": "No photo selected",
+        "photo_choose": "Choose photo…",
+        "photo_remove": "Remove background automatically",
+        "photo_working": "Removing the background…",
+        "photo_ready": "Drag the portrait to position it, then adjust zoom and edge cleanup.",
+        "photo_drag": "Drag the preview to position the portrait.",
+        "photo_zoom": "Zoom",
+        "photo_edge": "Edge cleanup",
+        "photo_exposure": "Exposure",
+        "photo_contrast": "Contrast",
+        "photo_saturation": "Saturation",
+        "photo_sepia": "Sepia filter",
+        "photo_sepia_strength": "Sepia strength",
+        "photo_adjust_reset": "Reset adjustments",
+        "photo_reset": "Reset position",
+        "photo_apply": "Apply to this career",
+        "photo_restore": "Restore original photo",
+        "photo_applied": "Custom photo applied to {name}. DDS: {path}. Backup: {backup}",
+        "photo_restored": "Original photo restored for {name}. Backup: {backup}",
+        "photo_no_restore": "There is no original-photo record for this career.",
+        "photo_filetypes": "Image files",
         "fl_legend": "The three numbers are the pilot's own skills / discipline / courage, as his panel shows them. ↑ is his boosters. AI is how the generated mission rates him in the air: his skill, but capped at 4 - so a pilot at 5 flies no better than one at 4, and a wound costs him a level.",
         "col_name": "Pilot", "col_state": "Fate", "col_date": "Lost on", "col_can": "Revivable",
         "kia": "killed in action", "mia": "missing in action",
@@ -249,6 +276,30 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Reserve",
         "fl_none": "Diese Laufbahn hat keine Staffelaufstellung.",
         "fl_moved": "{n} versetzt",
+        "tab_photo": "Eigenes Pilotenfoto",
+        "photo_intro": "Wählen Sie ein JPG oder PNG. Der Helfer entfernt den Hintergrund lokal, setzt Sie vor den Porträthintergrund des Spiels und erstellt die DDS-Datei für diese Laufbahn. Schließen Sie IL-2 Korea vor dem Übernehmen oder Wiederherstellen.",
+        "photo_current": "Aktuelles Porträt: {path}",
+        "photo_none": "Kein Foto ausgewählt",
+        "photo_choose": "Foto auswählen…",
+        "photo_remove": "Hintergrund automatisch entfernen",
+        "photo_working": "Hintergrund wird entfernt…",
+        "photo_ready": "Ziehen Sie das Porträt an die gewünschte Stelle und passen Sie Zoom und Kantenbereinigung an.",
+        "photo_drag": "Ziehen Sie das Porträt in der Vorschau an die gewünschte Stelle.",
+        "photo_zoom": "Zoom",
+        "photo_edge": "Kanten bereinigen",
+        "photo_exposure": "Belichtung",
+        "photo_contrast": "Kontrast",
+        "photo_saturation": "Sättigung",
+        "photo_sepia": "Sepiafilter",
+        "photo_sepia_strength": "Sepia-Stärke",
+        "photo_adjust_reset": "Anpassungen zurücksetzen",
+        "photo_reset": "Position zurücksetzen",
+        "photo_apply": "Für diese Laufbahn übernehmen",
+        "photo_restore": "Originalfoto wiederherstellen",
+        "photo_applied": "Eigenes Foto für {name} übernommen. DDS: {path}. Sicherung: {backup}",
+        "photo_restored": "Originalfoto für {name} wiederhergestellt. Sicherung: {backup}",
+        "photo_no_restore": "Für diese Laufbahn ist kein Originalfoto gespeichert.",
+        "photo_filetypes": "Bilddateien",
         "fl_legend": "Die drei Zahlen sind die eigenen Werte des Piloten – Fähigkeiten / Disziplin / Mut – so wie sie sein Blatt zeigt. ↑ sind seine Boni. KI ist die Einstufung, die der erzeugte Einsatz ihm in der Luft gibt: seine Fähigkeiten, aber bei 4 gedeckelt – ein Pilot mit 5 fliegt also nicht besser als einer mit 4, und eine Verwundung kostet ihn eine Stufe.",
         "col_name": "Pilot", "col_state": "Schicksal", "col_date": "Verloren am", "col_can": "Zurückholbar",
         "kia": "gefallen", "mia": "vermisst",
@@ -370,6 +421,30 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Reserva",
         "fl_none": "Esta carrera no tiene formación que mostrar.",
         "fl_moved": "{n} movidos",
+        "tab_photo": "Foto de piloto personalizada",
+        "photo_intro": "Elija un JPG o PNG. La herramienta elimina el fondo localmente, coloca el retrato sobre el fondo del juego y crea el DDS para esta carrera. Cierre IL-2 Korea antes de aplicar o restaurar.",
+        "photo_current": "Retrato actual: {path}",
+        "photo_none": "Ninguna foto seleccionada",
+        "photo_choose": "Elegir foto…",
+        "photo_remove": "Eliminar el fondo automáticamente",
+        "photo_working": "Eliminando el fondo…",
+        "photo_ready": "Arrastre el retrato para colocarlo y ajuste el zoom y la limpieza de bordes.",
+        "photo_drag": "Arrastre la vista previa para colocar el retrato.",
+        "photo_zoom": "Zoom",
+        "photo_edge": "Limpieza de bordes",
+        "photo_exposure": "Exposición",
+        "photo_contrast": "Contraste",
+        "photo_saturation": "Saturación",
+        "photo_sepia": "Filtro sepia",
+        "photo_sepia_strength": "Intensidad sepia",
+        "photo_adjust_reset": "Restablecer ajustes",
+        "photo_reset": "Restablecer posición",
+        "photo_apply": "Aplicar a esta carrera",
+        "photo_restore": "Restaurar foto original",
+        "photo_applied": "Foto personalizada aplicada a {name}. DDS: {path}. Copia de seguridad: {backup}",
+        "photo_restored": "Foto original restaurada para {name}. Copia de seguridad: {backup}",
+        "photo_no_restore": "No hay un registro de la foto original para esta carrera.",
+        "photo_filetypes": "Archivos de imagen",
         "fl_legend": "Los tres números son las aptitudes propias del piloto: habilidad / disciplina / valor, tal como aparecen en su ficha. ↑ son sus bonificaciones. IA es la categoría que la misión generada le asigna en vuelo: su habilidad, pero limitada a 4, de modo que un piloto de 5 no vuela mejor que uno de 4, y una herida le cuesta un nivel.",
         "col_name": "Piloto", "col_state": "Suerte", "col_date": "Perdido el", "col_can": "Recuperable",
         "kia": "muerto en combate", "mia": "desaparecido en combate",
@@ -491,6 +566,30 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Réserve",
         "fl_none": "Cette carrière n’a aucune formation à afficher.",
         "fl_moved": "{n} déplacés",
+        "tab_photo": "Photo de pilote personnalisée",
+        "photo_intro": "Choisissez un JPG ou PNG. L’utilitaire supprime le fond localement, place le portrait sur le fond du jeu et crée le DDS de cette carrière. Fermez IL-2 Korea avant d’appliquer ou de restaurer.",
+        "photo_current": "Portrait actuel : {path}",
+        "photo_none": "Aucune photo sélectionnée",
+        "photo_choose": "Choisir une photo…",
+        "photo_remove": "Supprimer automatiquement le fond",
+        "photo_working": "Suppression du fond…",
+        "photo_ready": "Faites glisser le portrait, puis ajustez le zoom et le nettoyage des contours.",
+        "photo_drag": "Faites glisser l’aperçu pour placer le portrait.",
+        "photo_zoom": "Zoom",
+        "photo_edge": "Nettoyage des contours",
+        "photo_exposure": "Exposition",
+        "photo_contrast": "Contraste",
+        "photo_saturation": "Saturation",
+        "photo_sepia": "Filtre sépia",
+        "photo_sepia_strength": "Intensité du sépia",
+        "photo_adjust_reset": "Réinitialiser les réglages",
+        "photo_reset": "Réinitialiser la position",
+        "photo_apply": "Appliquer à cette carrière",
+        "photo_restore": "Restaurer la photo d’origine",
+        "photo_applied": "Photo personnalisée appliquée à {name}. DDS : {path}. Sauvegarde : {backup}",
+        "photo_restored": "Photo d’origine restaurée pour {name}. Sauvegarde : {backup}",
+        "photo_no_restore": "Aucune photo d’origine n’est enregistrée pour cette carrière.",
+        "photo_filetypes": "Fichiers image",
         "fl_legend": "Les trois nombres sont les qualités propres du pilote — compétence / discipline / courage — telles que sa fiche les affiche. ↑ ce sont ses bonus. IA est le niveau que la mission générée lui donne en vol : sa compétence, mais plafonnée à 4, si bien qu’un pilote à 5 ne vole pas mieux qu’un pilote à 4, et une blessure lui coûte un niveau.",
         "col_name": "Pilote", "col_state": "Sort", "col_date": "Perdu le", "col_can": "Récupérable",
         "kia": "mort au combat", "mia": "porté disparu",
@@ -612,6 +711,30 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "Резерв",
         "fl_none": "В этой карьере нет строевого состава.",
         "fl_moved": "переставлено: {n}",
+        "tab_photo": "Собственное фото лётчика",
+        "photo_intro": "Выберите JPG или PNG. Помощник локально удалит фон, поместит портрет на фон игры и создаст DDS для этой карьеры. Перед применением или восстановлением закройте IL-2 Korea.",
+        "photo_current": "Текущий портрет: {path}",
+        "photo_none": "Фото не выбрано",
+        "photo_choose": "Выбрать фото…",
+        "photo_remove": "Автоматически удалить фон",
+        "photo_working": "Фон удаляется…",
+        "photo_ready": "Перетащите портрет на нужное место, затем настройте масштаб и очистку краёв.",
+        "photo_drag": "Перетащите портрет в окне просмотра.",
+        "photo_zoom": "Масштаб",
+        "photo_edge": "Очистка краёв",
+        "photo_exposure": "Экспозиция",
+        "photo_contrast": "Контраст",
+        "photo_saturation": "Насыщенность",
+        "photo_sepia": "Фильтр «Сепия»",
+        "photo_sepia_strength": "Интенсивность сепии",
+        "photo_adjust_reset": "Сбросить настройки",
+        "photo_reset": "Сбросить положение",
+        "photo_apply": "Применить к этой карьере",
+        "photo_restore": "Вернуть исходное фото",
+        "photo_applied": "Собственное фото применено для {name}. DDS: {path}. Резервная копия: {backup}",
+        "photo_restored": "Исходное фото восстановлено для {name}. Резервная копия: {backup}",
+        "photo_no_restore": "Для этой карьеры нет записи об исходном фото.",
+        "photo_filetypes": "Файлы изображений",
         "fl_legend": "Три числа — собственные качества лётчика: мастерство / дисциплина / смелость, в том же порядке, что и в его карточке. ↑ — его надбавки. ИИ — оценка, которую сгенерированный вылет даёт ему в воздухе: его мастерство, но не выше 4 — так что лётчик с 5 летает не лучше, чем с 4, а ранение стоит ему одной ступени.",
         "col_name": "Лётчик", "col_state": "Судьба", "col_date": "Потерян", "col_can": "Можно вернуть",
         "kia": "погиб", "mia": "пропал без вести",
@@ -733,6 +856,30 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "fl_bench": "预备队",
         "fl_none": "该生涯没有可显示的编队。",
         "fl_moved": "已移动 {n} 人",
+        "tab_photo": "自定义飞行员照片",
+        "photo_intro": "选择 JPG 或 PNG。助手会在本机移除背景，将人物放到游戏肖像背景上，并为此生涯创建 DDS。应用或恢复前请关闭 IL-2 Korea。",
+        "photo_current": "当前肖像：{path}",
+        "photo_none": "尚未选择照片",
+        "photo_choose": "选择照片…",
+        "photo_remove": "自动移除背景",
+        "photo_working": "正在移除背景…",
+        "photo_ready": "拖动肖像调整位置，然后调整缩放和边缘清理。",
+        "photo_drag": "拖动预览中的肖像以调整位置。",
+        "photo_zoom": "缩放",
+        "photo_edge": "边缘清理",
+        "photo_exposure": "曝光",
+        "photo_contrast": "对比度",
+        "photo_saturation": "饱和度",
+        "photo_sepia": "棕褐色滤镜",
+        "photo_sepia_strength": "棕褐色强度",
+        "photo_adjust_reset": "重置调整",
+        "photo_reset": "重置位置",
+        "photo_apply": "应用到此生涯",
+        "photo_restore": "恢复原始照片",
+        "photo_applied": "已为 {name} 应用自定义照片。DDS：{path}。备份：{backup}",
+        "photo_restored": "已为 {name} 恢复原始照片。备份：{backup}",
+        "photo_no_restore": "此生涯没有原始照片记录。",
+        "photo_filetypes": "图像文件",
         "fl_legend": "三个数字是飞行员自身的技能 / 纪律 / 勇气，与他的面板显示一致。↑ 是他的加成。AI 是生成的任务对他空中表现的评级：取决于技能，但上限为 4 —— 所以技能 5 的飞行员并不比 4 的飞得好，而负伤会降一级。",
         "col_name": "飞行员", "col_state": "结局", "col_date": "损失日期", "col_can": "可复活",
         "kia": "阵亡", "mia": "失踪",
@@ -1425,6 +1572,36 @@ class Career:
             ).fetchone()
         return row[0] if row else 601
 
+    def player_portrait(self) -> Dict[str, Any]:
+        """The current player only, including the path the game renders."""
+        with self._open() as con:
+            row = con.execute(
+                """SELECT id, name, lastName, personageId, avatarPath
+                   FROM pilot WHERE id=(SELECT playerId FROM career)"""
+            ).fetchone()
+        if row is None:
+            raise ValueError("the career has no current player")
+        return {
+            "id": row["id"],
+            "name": f"{row['name']} {row['lastName']}".strip(),
+            "personage_id": row["personageId"],
+            "avatar_path": row["avatarPath"] or "",
+        }
+
+    def set_player_portrait(self, avatar_path: str) -> Path:
+        """Point the current player's portrait at a loose DDS, after backup."""
+        backup = self.backup()
+        with self._open(write=True) as con:
+            con.execute("BEGIN IMMEDIATE")
+            changed = con.execute(
+                "UPDATE pilot SET avatarPath=? WHERE id=(SELECT playerId FROM career)",
+                (avatar_path,),
+            ).rowcount
+            if changed != 1:
+                raise ValueError("the career has no current player")
+            con.commit()
+        return backup
+
     PILOT_COLS = """SELECT id, slot, name, lastName, persLevel, leadLevel,
                            health, state, isPlayer, sorties FROM pilot
                     WHERE isDeleted=0"""
@@ -2048,6 +2225,137 @@ class App(tk.Tk):
         self.pend_var = tk.StringVar()
         ttk.Label(prow, textvariable=self.pend_var).pack(side="left", padx=8)
 
+        # -- custom pilot photo tab
+        photo = ttk.Frame(nb)
+        nb.add(photo, text=self.t["tab_photo"])
+        ttk.Label(photo, text=self.t["photo_intro"], wraplength=1080,
+                  foreground="#444").pack(anchor="w", padx=8, pady=(8, 6))
+        photo_body = ttk.Frame(photo)
+        photo_body.pack(fill="both", expand=True, padx=8, pady=(0, 8))
+
+        self.photo_canvas = tk.Canvas(
+            photo_body, width=pilot_photo.PORTRAIT_SIZE,
+            height=pilot_photo.PORTRAIT_SIZE, highlightthickness=1,
+            highlightbackground=self.BORDER, background=self.PAPER,
+        )
+        self.photo_canvas.pack(side="left", anchor="n")
+        self.photo_canvas.bind("<ButtonPress-1>", self._photo_drag_start)
+        self.photo_canvas.bind("<B1-Motion>", self._photo_drag_move)
+
+        photo_controls = ttk.Frame(photo_body)
+        photo_controls.pack(side="left", fill="both", expand=True, padx=(18, 4))
+        self.photo_current_var = tk.StringVar(value=self.t["photo_current"].format(path="—"))
+        ttk.Label(photo_controls, textvariable=self.photo_current_var,
+                  wraplength=470).pack(anchor="w", pady=(2, 10))
+        self.photo_file_var = tk.StringVar(value=self.t["photo_none"])
+        ttk.Label(photo_controls, textvariable=self.photo_file_var,
+                  wraplength=470, foreground=self.INK_MUTED).pack(anchor="w", pady=(0, 8))
+        ttk.Button(photo_controls, text=self.t["photo_choose"],
+                   command=self._choose_photo).pack(anchor="w")
+        self.photo_remove_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(photo_controls, text=self.t["photo_remove"],
+                        variable=self.photo_remove_var).pack(anchor="w", pady=(8, 14))
+
+        ttk.Label(photo_controls, text=self.t["photo_zoom"]).pack(anchor="w")
+        self.photo_zoom_var = tk.DoubleVar(value=1.0)
+        ttk.Scale(photo_controls, from_=0.45, to=2.5,
+                  variable=self.photo_zoom_var,
+                  command=lambda _value: self._render_photo()).pack(fill="x", pady=(0, 10))
+        edge_head = ttk.Frame(photo_controls)
+        edge_head.pack(fill="x")
+        ttk.Label(edge_head, text=self.t["photo_edge"]).pack(side="left")
+        self.photo_cleanup_readout = tk.StringVar(value="1 px")
+        ttk.Label(edge_head, textvariable=self.photo_cleanup_readout,
+                  foreground=self.INK_MUTED).pack(side="right")
+        self.photo_cleanup_var = tk.DoubleVar(value=1.0)
+        ttk.Scale(photo_controls, from_=0, to=12,
+                  variable=self.photo_cleanup_var,
+                  command=self._photo_cleanup_changed).pack(fill="x", pady=(0, 10))
+
+        exposure_head = ttk.Frame(photo_controls)
+        exposure_head.pack(fill="x")
+        ttk.Label(exposure_head, text=self.t["photo_exposure"]).pack(side="left")
+        self.photo_exposure_readout = tk.StringVar(value="0.0 EV")
+        ttk.Label(exposure_head, textvariable=self.photo_exposure_readout,
+                  foreground=self.INK_MUTED).pack(side="right")
+        self.photo_exposure_var = tk.DoubleVar(value=0.0)
+        ttk.Scale(photo_controls, from_=-2, to=2,
+                  variable=self.photo_exposure_var,
+                  command=self._photo_exposure_changed).pack(fill="x", pady=(0, 8))
+
+        contrast_head = ttk.Frame(photo_controls)
+        contrast_head.pack(fill="x")
+        ttk.Label(contrast_head, text=self.t["photo_contrast"]).pack(side="left")
+        self.photo_contrast_readout = tk.StringVar(value="0")
+        ttk.Label(contrast_head, textvariable=self.photo_contrast_readout,
+                  foreground=self.INK_MUTED).pack(side="right")
+        self.photo_contrast_var = tk.DoubleVar(value=0.0)
+        ttk.Scale(photo_controls, from_=-100, to=100,
+                  variable=self.photo_contrast_var,
+                  command=self._photo_contrast_changed).pack(fill="x", pady=(0, 8))
+
+        saturation_head = ttk.Frame(photo_controls)
+        saturation_head.pack(fill="x")
+        ttk.Label(saturation_head, text=self.t["photo_saturation"]).pack(side="left")
+        self.photo_saturation_readout = tk.StringVar(value="0")
+        ttk.Label(saturation_head, textvariable=self.photo_saturation_readout,
+                  foreground=self.INK_MUTED).pack(side="right")
+        self.photo_saturation_var = tk.DoubleVar(value=0.0)
+        ttk.Scale(photo_controls, from_=-100, to=100,
+                  variable=self.photo_saturation_var,
+                  command=self._photo_saturation_changed).pack(fill="x", pady=(0, 8))
+
+        self.photo_sepia_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(photo_controls, text=self.t["photo_sepia"],
+                        variable=self.photo_sepia_var,
+                        command=self._photo_sepia_toggled).pack(anchor="w")
+        sepia_head = ttk.Frame(photo_controls)
+        sepia_head.pack(fill="x")
+        ttk.Label(sepia_head, text=self.t["photo_sepia_strength"]).pack(side="left")
+        self.photo_sepia_readout = tk.StringVar(value="60%")
+        ttk.Label(sepia_head, textvariable=self.photo_sepia_readout,
+                  foreground=self.INK_MUTED).pack(side="right")
+        self.photo_sepia_strength_var = tk.DoubleVar(value=60.0)
+        self.photo_sepia_scale = ttk.Scale(
+            photo_controls, from_=0, to=100,
+            variable=self.photo_sepia_strength_var,
+            command=self._photo_sepia_changed, state="disabled",
+        )
+        self.photo_sepia_scale.pack(fill="x", pady=(0, 8))
+        ttk.Button(photo_controls, text=self.t["photo_adjust_reset"],
+                   command=self._reset_photo_adjustments).pack(anchor="w", pady=(0, 8))
+        ttk.Button(photo_controls, text=self.t["photo_reset"],
+                   command=self._reset_photo_position).pack(anchor="w")
+        ttk.Label(photo_controls, text=self.t["photo_drag"], wraplength=470,
+                  foreground=self.INK_MUTED).pack(anchor="w", pady=(8, 20))
+
+        actions = ttk.Frame(photo_controls)
+        actions.pack(fill="x")
+        self.photo_apply_btn = ttk.Button(
+            actions, text=self.t["photo_apply"], command=self._apply_photo,
+            state="disabled")
+        self.photo_apply_btn.pack(side="left")
+        self.photo_restore_btn = ttk.Button(
+            actions, text=self.t["photo_restore"], command=self._restore_photo,
+            state="disabled")
+        self.photo_restore_btn.pack(side="left", padx=8)
+
+        self.photo_source: Optional[Image.Image] = None
+        self.photo_background: Optional[Image.Image] = None
+        self.photo_preview: Optional[Image.Image] = None
+        self.photo_tk: Optional[ImageTk.PhotoImage] = None
+        self.photo_center = [pilot_photo.PORTRAIT_SIZE / 2,
+                             pilot_photo.PORTRAIT_SIZE / 2]
+        self.photo_drag_at: Optional[tuple[int, int]] = None
+        try:
+            with Image.open(pilot_photo.background_path()) as source_background:
+                self.photo_background = source_background.convert("RGB")
+        except OSError:
+            self.photo_background = Image.new(
+                "RGB", (pilot_photo.PORTRAIT_SIZE, pilot_photo.PORTRAIT_SIZE),
+                self.PAPER)
+        self._render_photo()
+
         # -- flights tab
         fl = ttk.Frame(nb)
         nb.add(fl, text=self.t["tab_flights"])
@@ -2197,7 +2505,208 @@ class App(tk.Tk):
         self._update_buttons()
         self._fill_times()
         self._fill_pending()
+        self._fill_photo()
         self._fill_flights()
+
+    # -- custom pilot photo --------------------------------------------------
+
+    def _fill_photo(self) -> None:
+        if self.career is None:
+            self.photo_current_var.set(self.t["photo_current"].format(path="—"))
+            self.photo_restore_btn["state"] = "disabled"
+            return
+        try:
+            player = self.career.player_portrait()
+        except (sqlite3.Error, ValueError) as exc:
+            self.photo_current_var.set(self.t["failed"].format(error=exc))
+            self.photo_restore_btn["state"] = "disabled"
+            return
+        self.photo_current_var.set(
+            self.t["photo_current"].format(path=player["avatar_path"] or "—"))
+        state = pilot_photo.load_state(self.career.path)
+        can_restore = bool(state and state.get("pilot_id") == player["id"] and
+                           "original_avatar_path" in state)
+        self.photo_restore_btn["state"] = "normal" if can_restore else "disabled"
+
+    def _render_photo(self) -> None:
+        if not hasattr(self, "photo_canvas") or self.photo_background is None:
+            return
+        if self.photo_source is None:
+            image = self.photo_background.resize(
+                (pilot_photo.PORTRAIT_SIZE, pilot_photo.PORTRAIT_SIZE),
+                Image.Resampling.LANCZOS)
+        else:
+            image = pilot_photo.compose_portrait(
+                self.photo_source, self.photo_background,
+                zoom=self.photo_zoom_var.get(),
+                center_x=self.photo_center[0], center_y=self.photo_center[1],
+                cleanup=self.photo_cleanup_var.get(),
+                exposure=self.photo_exposure_var.get(),
+                contrast=self.photo_contrast_var.get(),
+                saturation=self.photo_saturation_var.get(),
+                sepia_strength=(self.photo_sepia_strength_var.get() / 100
+                                if self.photo_sepia_var.get() else 0),
+            )
+        self.photo_preview = image
+        self.photo_tk = ImageTk.PhotoImage(image)
+        self.photo_canvas.delete("all")
+        self.photo_canvas.create_image(0, 0, image=self.photo_tk, anchor="nw")
+
+    def _reset_photo_position(self) -> None:
+        self.photo_center[:] = [pilot_photo.PORTRAIT_SIZE / 2,
+                                pilot_photo.PORTRAIT_SIZE / 2]
+        self.photo_zoom_var.set(1.0)
+        self._render_photo()
+
+    def _reset_photo_adjustments(self) -> None:
+        self.photo_cleanup_var.set(1.0)
+        self.photo_cleanup_readout.set("1 px")
+        self.photo_exposure_var.set(0.0)
+        self.photo_exposure_readout.set("0.0 EV")
+        self.photo_contrast_var.set(0.0)
+        self.photo_contrast_readout.set("0")
+        self.photo_saturation_var.set(0.0)
+        self.photo_saturation_readout.set("0")
+        self.photo_sepia_var.set(False)
+        self.photo_sepia_strength_var.set(60.0)
+        self.photo_sepia_readout.set("60%")
+        self.photo_sepia_scale["state"] = "disabled"
+        self._render_photo()
+
+    def _photo_cleanup_changed(self, value: str) -> None:
+        pixels = round(float(value))
+        self.photo_cleanup_readout.set(f"{pixels} px")
+        self._render_photo()
+
+    def _photo_exposure_changed(self, value: str) -> None:
+        exposure = round(float(value), 1)
+        self.photo_exposure_readout.set(f"{exposure:+.1f} EV" if exposure else "0.0 EV")
+        self._render_photo()
+
+    def _photo_contrast_changed(self, value: str) -> None:
+        contrast = round(float(value))
+        self.photo_contrast_readout.set(f"{contrast:+d}" if contrast else "0")
+        self._render_photo()
+
+    def _photo_saturation_changed(self, value: str) -> None:
+        saturation = round(float(value))
+        self.photo_saturation_readout.set(f"{saturation:+d}" if saturation else "0")
+        self._render_photo()
+
+    def _photo_sepia_toggled(self) -> None:
+        self.photo_sepia_scale["state"] = (
+            "normal" if self.photo_sepia_var.get() else "disabled"
+        )
+        self._render_photo()
+
+    def _photo_sepia_changed(self, value: str) -> None:
+        self.photo_sepia_readout.set(f"{round(float(value))}%")
+        self._render_photo()
+
+    def _photo_drag_start(self, event) -> None:
+        self.photo_drag_at = (event.x, event.y)
+
+    def _photo_drag_move(self, event) -> None:
+        if self.photo_source is None or self.photo_drag_at is None:
+            return
+        old_x, old_y = self.photo_drag_at
+        self.photo_center[0] += event.x - old_x
+        self.photo_center[1] += event.y - old_y
+        self.photo_drag_at = (event.x, event.y)
+        self._render_photo()
+
+    def _choose_photo(self) -> None:
+        chosen = filedialog.askopenfilename(
+            parent=self, title=self.t["photo_choose"],
+            filetypes=[(self.t["photo_filetypes"], "*.jpg *.jpeg *.png *.webp *.bmp"),
+                       ("PNG", "*.png"), ("JPEG", "*.jpg *.jpeg")],
+        )
+        if not chosen:
+            return
+        try:
+            source = pilot_photo.load_photo(Path(chosen))
+            if self.photo_remove_var.get() and not pilot_photo.has_useful_alpha(source):
+                self.status.set(self.t["photo_working"])
+                self.configure(cursor="wait")
+                self.update_idletasks()
+                source = pilot_photo.remove_background(source)
+        except Exception as exc:          # noqa: BLE001 - presented in the UI
+            messagebox.showerror(self.t["title"], self.t["failed"].format(error=exc))
+            return
+        finally:
+            self.configure(cursor="")
+        self.photo_source = source
+        self.photo_file_var.set(str(chosen))
+        self.photo_apply_btn["state"] = "normal"
+        self._reset_photo_position()
+        self._reset_photo_adjustments()
+        self.status.set(self.t["photo_ready"])
+
+    def _apply_photo(self) -> None:
+        if self.career is None or self.photo_source is None or self.photo_background is None:
+            return
+        game = find_game_dir()
+        if game is None:
+            self.status.set(self.t["no_game"])
+            return
+        try:
+            player = self.career.player_portrait()
+            avatar = pilot_photo.custom_avatar_path(self.career.path, player["id"])
+            destination = pilot_photo.portrait_destination(game, avatar)
+            composed = pilot_photo.compose_portrait(
+                self.photo_source, self.photo_background,
+                zoom=self.photo_zoom_var.get(),
+                center_x=self.photo_center[0], center_y=self.photo_center[1],
+                cleanup=self.photo_cleanup_var.get(),
+                exposure=self.photo_exposure_var.get(),
+                contrast=self.photo_contrast_var.get(),
+                saturation=self.photo_saturation_var.get(),
+                sepia_strength=(self.photo_sepia_strength_var.get() / 100
+                                if self.photo_sepia_var.get() else 0),
+            )
+            pilot_photo.convert_to_dds(composed, destination)
+            state = pilot_photo.load_state(self.career.path)
+            if not state or state.get("pilot_id") != player["id"]:
+                state = {
+                    "career": str(self.career.path),
+                    "pilot_id": player["id"],
+                    "original_avatar_path": player["avatar_path"],
+                }
+            state["custom_avatar_path"] = avatar
+            pilot_photo.save_state(self.career.path, state)
+            backup = self.career.set_player_portrait(avatar)
+        except sqlite3.OperationalError:
+            messagebox.showerror(self.t["title"], self.t["locked"])
+            return
+        except Exception as exc:          # noqa: BLE001 - presented in the UI
+            messagebox.showerror(self.t["title"], self.t["failed"].format(error=exc))
+            return
+        self.status.set(self.t["photo_applied"].format(
+            name=player["name"], path=destination, backup=backup))
+        self._fill_photo()
+
+    def _restore_photo(self) -> None:
+        if self.career is None:
+            return
+        state = pilot_photo.load_state(self.career.path)
+        try:
+            player = self.career.player_portrait()
+            if not state or state.get("pilot_id") != player["id"] or \
+                    "original_avatar_path" not in state:
+                self.status.set(self.t["photo_no_restore"])
+                self._fill_photo()
+                return
+            backup = self.career.set_player_portrait(state["original_avatar_path"])
+        except sqlite3.OperationalError:
+            messagebox.showerror(self.t["title"], self.t["locked"])
+            return
+        except Exception as exc:          # noqa: BLE001 - presented in the UI
+            messagebox.showerror(self.t["title"], self.t["failed"].format(error=exc))
+            return
+        pilot_photo.clear_state(self.career.path)
+        self.status.set(self.t["photo_restored"].format(
+            name=player["name"], backup=backup))
+        self._fill_photo()
 
     def _selected(self) -> Optional[Dict]:
         sel = self.tree.selection()
@@ -2786,6 +3295,23 @@ def mod_installed(game: Optional[Path]) -> bool:
 
 
 def main() -> int:
+    # Build/diagnostic probe: exercise the same bundled model, background and
+    # texconv executable that the UI uses, without touching a career. The
+    # windowed executable has no console, so success is the validated DDS at
+    # the requested output path.
+    if "--photo-self-test" in sys.argv:
+        at = sys.argv.index("--photo-self-test")
+        try:
+            source = pilot_photo.load_photo(Path(sys.argv[at + 1]))
+            if not pilot_photo.has_useful_alpha(source):
+                source = pilot_photo.remove_background(source)
+            with Image.open(pilot_photo.background_path()) as background:
+                composed = pilot_photo.compose_portrait(source, background)
+            pilot_photo.convert_to_dds(composed, Path(sys.argv[at + 2]))
+            return 0
+        except Exception:                 # windowed diagnostic reports by exit status
+            return 4
+
     # Meant to be opened from the Service Record, and only where the awards
     # mod is installed: award points buy decorations the mod adds, revival
     # and re-timing belong with it. Neither check is a lock - both are a

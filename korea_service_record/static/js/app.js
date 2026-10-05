@@ -431,6 +431,9 @@
         const tunic = el("tunic");
         tunic.dataset.coat = coat;
         tunic.classList.toggle("full", full);
+        tunic.classList.toggle("four-ribbon", !full && rack.ribbon_per_row === 4);
+        tunic.classList.toggle("outboard-short-row",
+            !full && coat === "usaf" && rack.rows && rack.rows[0] === 2);
         // Full-size medals belong to Blue Dress "A" on a Marine, so full
         // dress swaps the photograph and the shoulder boards with it.
         const dressCoat = full && rack.dress_coat;
@@ -579,20 +582,32 @@
         // percentage of a box whose width is whatever the viewport gives,
         // so this runs on open and on resize rather than being a fixed pt.
         const holder = el("sbox-plate-text");
-        const span = holder.firstElementChild;
-        if (!span || !holder.offsetHeight) { return; }
+        const nameLine = holder.querySelector(".sbox-plate-name");
+        const squadronLine = holder.querySelector(".sbox-plate-squadron");
+        if (!nameLine || !squadronLine || !holder.offsetHeight) { return; }
         // The engraving field is the brass between the two screws, which sit
         // at about 7% and 93% inside the plate's raised border.
         const room = holder.clientWidth * 0.77;
-        const want = holder.offsetHeight * 0.42;    // the size it is cut at
-        const least = holder.offsetHeight * 0.30;   // and the smallest worth reading
+        const squadron = holder.dataset.squadron || "";
+        squadronLine.textContent = squadron;
+        squadronLine.hidden = !squadron;
+        // Two lines occupy about two thirds of the plate, leaving a small,
+        // even margin above and below and a visible breath between them.
+        // With no squadron, keep the original single-line proportions.
+        const want = holder.offsetHeight * (squadron ? 0.34 : 0.42);
+        const least = holder.offsetHeight * (squadron ? 0.24 : 0.30);
+        holder.style.rowGap = (squadron ? holder.offsetHeight * 0.05 : 0) + "px";
 
         // Measure a candidate at the preferred size and say what size, if
         // any, would make it fit the field.
         const sizeFor = (text) => {
-            span.textContent = text;
-            span.style.fontSize = want + "px";
-            return span.scrollWidth <= room ? want : want * room / span.scrollWidth;
+            nameLine.textContent = text;
+            nameLine.style.fontSize = want + "px";
+            squadronLine.style.fontSize = want * 0.75 + "px";
+            const nameScale = nameLine.scrollWidth > room ? room / nameLine.scrollWidth : 1;
+            const squadronScale = squadron && squadronLine.scrollWidth > room
+                ? room / squadronLine.scrollWidth : 1;
+            return want * Math.min(nameScale, squadronScale);
         };
 
         // A man's name goes on his plate in full wherever the brass can hold
@@ -612,23 +627,30 @@
         // holds and end it in an ellipsis, which is at least honest about
         // having been shortened.
         if (fit < least) {
-            span.style.fontSize = least + "px";
-            span.textContent = text;
-            if (span.scrollWidth > room) {
-                let lo = 0, hi = text.length;
-                while (lo < hi) {                     // longest prefix that fits
-                    const mid = Math.ceil((lo + hi) / 2);
-                    span.textContent = text.slice(0, mid).trimEnd() + "…";
-                    if (span.scrollWidth <= room) { lo = mid; } else { hi = mid - 1; }
-                }
-                span.textContent = text.slice(0, lo).trimEnd() + "…";
+            fit = least;
+        }
+        nameLine.style.fontSize = fit + "px";
+        squadronLine.style.fontSize = fit * 0.75 + "px";
+
+        const fitText = (line, value) => {
+            line.textContent = value;
+            if (line.scrollWidth <= room) { return; }
+            let lo = 0, hi = value.length;
+            while (lo < hi) {                         // longest prefix that fits
+                const mid = Math.ceil((lo + hi) / 2);
+                line.textContent = value.slice(0, mid).trimEnd() + "…";
+                if (line.scrollWidth <= room) { lo = mid; } else { hi = mid - 1; }
             }
+            line.textContent = value.slice(0, lo).trimEnd() + "…";
+        };
+        fitText(nameLine, text);
+        if (squadron) { fitText(squadronLine, squadron); }
+
+        if (fit <= least) {
             // The plate's title attribute is the rank translation, which is
             // a deliberate feature - not somewhere to put the name.
             return;
         }
-        span.textContent = text;
-        span.style.fontSize = fit + "px";
     }
 
     async function openShadowbox() {
@@ -665,6 +687,7 @@
         plate.style.height = box.plate.height + "%";
         plate.dataset.full = (box.text && box.text.full) || "";
         plate.dataset.short = (box.text && box.text.short) || "";
+        plate.dataset.squadron = box.squadron || "";
         // The brass is engraved in the air force's own language, and the
         // rank is shortened to leave room for the name. A reader who wants
         // it in full, in his own language, hovers it - so the comparison is
@@ -752,21 +775,27 @@
         const p = box.plate;
         const px = p.left / 100 * W, py = p.top / 100 * H;
         const pw = p.width / 100 * W, ph = p.height / 100 * H;
-        const text = (el("sbox-plate-text").firstElementChild.textContent || "").trim();
-        if (text) {
-            const room = pw * 0.77;
-            let size = ph * 0.42;
-            ctx.font = "600 " + size + 'px "Times New Roman", Georgia, serif';
-            const run = ctx.measureText(text).width;
-            if (run > room) {
-                size = size * room / run;
-                ctx.font = "600 " + size + 'px "Times New Roman", Georgia, serif';
+        const holder = el("sbox-plate-text");
+        const holderRect = holder.getBoundingClientRect();
+        const scale = holderRect.height ? ph / holderRect.height : 1;
+        ctx.fillStyle = "#4a3410";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        holder.querySelectorAll("span:not([hidden])").forEach((line) => {
+            const text = (line.textContent || "").trim();
+            if (!text) { return; }
+            const style = getComputedStyle(line);
+            const lineRect = line.getBoundingClientRect();
+            const size = parseFloat(style.fontSize) * scale;
+            ctx.font = style.fontWeight + " " + size + 'px "Times New Roman", Georgia, serif';
+            if ("letterSpacing" in ctx) {
+                ctx.letterSpacing = parseFloat(style.letterSpacing) * scale + "px";
             }
-            ctx.fillStyle = "#4a3410";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(text, px + pw / 2, py + ph / 2);
-        }
+            const x = px + (lineRect.left + lineRect.width / 2 - holderRect.left) * scale;
+            const y = py + (lineRect.top + lineRect.height / 2 - holderRect.top) * scale;
+            ctx.fillText(text, x, y);
+        });
+        if ("letterSpacing" in ctx) { ctx.letterSpacing = "0px"; }
         const glass = images[images.length - 1];
         if (glass) {
             const g = box.glass;
@@ -781,12 +810,16 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = name + ".png";
+            a.download = name + ".jpg";
             a.click();
             // Revoked on the next tick: Firefox needs the URL to survive the
             // click, and leaving it costs the tab the whole bitmap.
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }, "image/png");
+        // The frame, cloth and glass are photographs and the finished canvas
+        // is fully opaque. Lossless PNG spent about 7 MB preserving texture
+        // noise that cannot be seen; a high-quality JPEG keeps the full
+        // 2050x1860 image and fine medal detail at a fraction of that size.
+        }, "image/jpeg", 0.90);
     }
 
     function closeShadowbox() {

@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 ART = Path(__file__).resolve().parent / "static" / "images" / "ribbons"
 # Bump whenever the composition or the art changes: it goes into the image
 # URLs, so browsers that were told to cache a ribbon for a year re-fetch it.
-REVISION = 22
+REVISION = 24
 # US bars are 1 3/8 x 3/8 inch (11:3); Soviet-pattern bars (USSR, DPRK) are
 # 24 x 8 mm (3:1). Each sits centred on a canvas 20 px bigger all round, so a
 # unit citation's frame can overhang without changing the grid.
@@ -191,6 +191,20 @@ def _navy_ladder(base: int, ids: List[int], silver_at: Optional[int] = None,
     return out
 
 
+def _campaign_ladder(base: int, ids: List[int]) -> Dict[int, Ribbon]:
+    """US campaign medal: ids[0] plain, then bronze-star equivalents.
+
+    Five bronze service stars are replaced by one silver; a sixth campaign
+    credit is shown by one silver and one bronze star.
+    """
+    return {
+        aid: Ribbon(base,
+                    star_silver=credits // 5,
+                    star_bronze=credits % 5)
+        for credits, aid in enumerate(ids)
+    }
+
+
 # Award id -> what is worn. Listed in order of precedence, highest first;
 # PRECEDENCE below is derived from this order, so keep it that way.
 RIBBONS: Dict[int, Ribbon] = {}
@@ -214,6 +228,10 @@ RIBBONS.update(_ladder(601002, [601002, 601003, 601004, 601005, 601006, 601007],
                        silver_at=601007))                                           # Air Medal
 RIBBONS.update(_ladder(601054, [601054, 601055, 601056, 601057]))                   # Commendation
 RIBBONS.update(_ladder(601028, [601028, 601029, 601030]))                           # Purple Heart
+RIBBONS[601064] = Ribbon(601064)                                                    # American Defense
+RIBBONS.update(_campaign_ladder(601065, [601065, 601066, 601067, 601068]))          # Asiatic-Pacific
+RIBBONS.update(_campaign_ladder(601069, list(range(601069, 601076))))               # EAME
+RIBBONS[601076] = Ribbon(601076)                                                    # World War II Victory
 
 # Navy / Marine Corps personal and unit awards. Shared medals use the same
 # base art as their USAF counterparts but carry naval 5/16-inch award stars.
@@ -274,6 +292,11 @@ RIBBONS.update({
     501006: Ribbon(501006),                       # Red Star
     501002: Ribbon(501002),                       # Medal for Courage
     501004: Ribbon(501004),                       # Medal for Battle Merit
+    501050: Ribbon(501050),                       # Defense of Leningrad
+    501051: Ribbon(501051),                       # Defense of Moscow
+    501052: Ribbon(501052),                       # Defense of Stalingrad
+    501053: Ribbon(501053),                       # Victory over Germany
+    501054: Ribbon(501054),                       # Victory over Japan
 })
 
 # DPRK, Soviet-pattern bars. The two orders exist in two classes whose bars
@@ -342,11 +365,10 @@ def rows(count: int, per_row: int = 3) -> List[int]:
 
 
 # Three to a row is everyone's default, and never more than four. The Navy
-# holds to three whatever the count; the Air Force and the Marine Corps
-# widen once three would stack higher than they allow - the Air Force
-# sooner, the Marines only on a really deep rack. See docs/NAVY_RACK.md
-# and docs/ARMY_USAF_RACK.md.
-MAX_ROWS_AT_THREE = {"usaf": 5, "usmc": 6}
+# and Air Force hold to three whatever the count. The Marine Corps alone
+# widens a very deep rack to four. See docs/NAVY_RACK.md and
+# docs/ARMY_USAF_RACK.md.
+MAX_ROWS_AT_THREE = {"usmc": 6}
 
 
 def per_row_for(coat: Optional[str], count: int) -> int:

@@ -481,7 +481,8 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             reader_rank = aggregator_for(reader).locale.rank_name(country, rank_id)
         data = shadowbox_art.layout(detail["ribbon_rack"], rank_id,
                                     detail.get("squadron_key"), agg.icons,
-                                    country=country, rev=asset_version())
+                                    country=country, rev=asset_version(),
+                                    medal_renderer=agg.medals)
         data["text"] = shadowbox_art.plate_text(rank, player.get("name") or "",
                                                 country=country, rank_id=rank_id)
         data["text"]["rank_reader"] = reader_rank

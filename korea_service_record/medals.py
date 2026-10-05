@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 ART = Path(__file__).resolve().parent / "static" / "images" / "medals"
 # Bump whenever the composition or the art changes; it is part of the URLs.
-REVISION = 27
+REVISION = 29
 
 # --- US: drawn art -----------------------------------------------------------
 # Every base medal is drawn 224 px wide - the drape is 1 3/8 inch, the same
@@ -68,8 +68,14 @@ DRAWN = {int(p.stem) for p in ART.glob("[0-9]*.png") if p.stem.isdigit()}
 # perspective in them) are already at coat scale, 1:1.
 COAT_PX = {"sov": 1086, "dprk": 1122}
 TILE_SCALE = 0.42
+# Loose Soviet mounted-medal art uses one full-resolution canvas.  It is
+# reduced to the atlas pieces' physical scale on the coat, while the
+# shadowbox keeps enough source resolution for its larger display.
+SOVIET_MOUNT_CANVAS = (232, 458)
+SOVIET_WWII = {501050, 501051, 501052, 501053, 501054}
 # Orders and medals on a pentagonal ribbon mount: the left breast.
 MOUNTED = {501024, 501016, 501018, 501020, 501002, 501004,      # USSR
+           *SOVIET_WWII,
            503002, 503008}                                       # DPRK
 # Screw-back orders, pinned without a ribbon to the right breast.
 PINNED = {501014, 501012, 501006,                                # Suvorov, Nevsky, Red Star
@@ -131,6 +137,9 @@ def width_pct(icons, award_id: int, coat: str) -> Optional[float]:
         return None
     own = ART / f"{award_id}.png"
     if own.is_file():
+        if award_id in SOVIET_WWII:
+            return round(SOVIET_MOUNT_CANVAS[0] * TILE_SCALE /
+                         COAT_PX[coat] * 100, 3)
         from PIL import Image
         with Image.open(own) as img:
             return round(img.width / COAT_PX[coat] * 100, 3)
@@ -182,12 +191,11 @@ NAVY_ROWS = {
 }
 
 
-# The Air Force mounts three full-size medals to a row (its own rule, not
-# the Navy table), going to four - overlapped, as its regulation allows -
-# once three would stack higher than this. Three rows is the limit that
-# keeps the rack on the breast instead of climbing to the shoulder seam.
+# The Air Force normally mounts three full-size medals to a row. A deep rack
+# may overlap four or five on a bar, but never opens a fifth row: six remains
+# two rows of three, 13-16 use four-wide bars, and 17-20 use five-wide bars.
 # Soviet-pattern coats keep five.
-MAX_MEDAL_ROWS_AT_THREE = 3
+MAX_USAF_MEDAL_ROWS = 4
 
 
 def rows_for(coat: Optional[str], count: int) -> List[int]:
@@ -196,7 +204,9 @@ def rows_for(coat: Optional[str], count: int) -> List[int]:
         return navy_rows(count)
     if coat in ("sov", "dprk"):
         return rows(count, 5)
-    per = 4 if -(-count // 3) > MAX_MEDAL_ROWS_AT_THREE else 3
+    per = 3
+    while per < 5 and -(-count // per) > MAX_USAF_MEDAL_ROWS:
+        per += 1
     return rows(count, per)
 
 
@@ -321,7 +331,9 @@ class MedalRenderer:
         if out.is_file():
             return out.read_bytes()
         own = ART / f"{award_id}.png"
-        if award_id in ATLAS and own.is_file():
+        if award_id in SOVIET_WWII and own.is_file():
+            data = self._soviet_mounted(own)
+        elif award_id in ATLAS and own.is_file():
             data = own.read_bytes()             # drawn for this coat: used as it is
         elif award_id in ATLAS:
             data = self.from_atlas(award_id)
@@ -334,6 +346,22 @@ class MedalRenderer:
             except OSError as exc:
                 logger.warning("Cannot cache medal %s: %s", award_id, exc)
         return data
+
+    @staticmethod
+    def _soviet_mounted(path: Path) -> bytes:
+        """Fit supplied Soviet mounted-medal art to its common canvas."""
+        from PIL import Image
+
+        with Image.open(path) as source:
+            image = source.convert("RGBA")
+        if image.size == SOVIET_MOUNT_CANVAS:
+            return path.read_bytes()
+        image.thumbnail(SOVIET_MOUNT_CANVAS, Image.Resampling.LANCZOS)
+        canvas = Image.new("RGBA", SOVIET_MOUNT_CANVAS, (0, 0, 0, 0))
+        canvas.alpha_composite(image, ((SOVIET_MOUNT_CANVAS[0] - image.width) // 2, 0))
+        out = io.BytesIO()
+        canvas.save(out, "PNG", optimize=True)
+        return out.getvalue()
 
     def from_atlas(self, award_id: int) -> Optional[bytes]:
         """A Soviet-pattern piece: the game's tile as it is - the page scales

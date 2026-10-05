@@ -36,9 +36,21 @@ datas = [
     # UI strings for the six languages. The game's own locale files are read
     # from the installation at runtime and are deliberately not bundled.
     (str(package / "locales"), "korea_service_record/locales"),
+    # Lightweight U-2-Net weights used only by the Career Helper's custom
+    # portrait editor. The adjacent Apache-2.0 license is bundled with them.
+    (str(package / "models"), "korea_service_record/models"),
     # The tray icon loads this at runtime. The copy Windows shows on the exe
     # itself is embedded separately, below.
     (str(base / "installer" / "IL2_Korea_Service_Record.ico"), "."),
+    (str(base / "vendor" / "directxtex" / "LICENSE.txt"),
+     "licenses/directxtex"),
+    (str(base / "vendor" / "onnxruntime"), "licenses/onnxruntime"),
+]
+
+binaries = [
+    # The helper calls this directly to produce the game's known-good
+    # 512x512 BC7_UNORM / three-mip DDS format.
+    (str(base / "vendor" / "directxtex" / "texconv.exe"), "."),
 ]
 
 hiddenimports = [
@@ -73,7 +85,7 @@ excludes = [
 a = Analysis(
     ["run.py"],
     pathex=[str(base)],
-    binaries=[],
+    binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,
     hookspath=[],
@@ -91,7 +103,11 @@ helper = Analysis(
     pathex=[str(base)],
     binaries=[],
     datas=[],
-    hiddenimports=hiddenimports,
+    hiddenimports=hiddenimports + [
+        "PIL.ImageTk",
+        "onnxruntime",
+        "onnxruntime.capi._pybind_state",
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
