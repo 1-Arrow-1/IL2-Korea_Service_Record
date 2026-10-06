@@ -909,6 +909,10 @@ table.roster tr.is-reserve .roster-photo { filter: saturate(0.6); opacity: 0.85;
     gap: 0.7rem;
     align-items: center;
 }
+/* The game's baked black shadow is removed from the art (icons.py); this one
+   suits the paper: soft, warm and falling down and a little to the right. */
+.award-icon { filter: drop-shadow(0 1px 1px rgba(30, 20, 8, 0.40))
+                      drop-shadow(3px 6px 6px rgba(30, 20, 8, 0.38)); }
 .award-list .award-icon { max-height: var(--award-emblem-h); max-width: 92px; display: block; margin: 0 auto; }
 .award-list li.has-history { grid-template-columns: 96px minmax(0, 1fr) 28px; }
 .award-list .history-toggle {

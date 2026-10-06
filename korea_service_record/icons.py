@@ -37,6 +37,29 @@ SHEETS = {
     "squadron": ("squadrons.xaml", ""),
 }
 
+# The game's award art carries a soft black shadow baked into the atlas,
+# drawn for its dark interface. On the record's light paper it reads as a
+# grey smudge, so it is taken out and the page adds its own (.award-icon).
+# The shadow is the near-black, part-transparent pixels - 96% of a medal's
+# soft edge; the medal's own anti-aliased rim is coloured and stays.
+# Bump the version whenever this processing changes: it is part of every
+# cached slice's name and of the browser's URL token.
+AWARD_PROCESSING = "noshadow1"
+_SHADOW_MAX_RGB = 40
+_SHADOW_MAX_ALPHA = 250
+
+
+def strip_baked_shadow(tile):
+    """An RGBA award tile without the game's baked drop shadow."""
+    import numpy as np
+    from PIL import Image
+    px = np.asarray(tile.convert("RGBA")).copy()
+    alpha = px[..., 3]
+    shadow = (alpha > 0) & (alpha < _SHADOW_MAX_ALPHA) & \
+        (px[..., :3].max(axis=2) < _SHADOW_MAX_RGB)
+    px[shadow, 3] = 0
+    return Image.fromarray(px, "RGBA")
+
 _ATLAS_RE = re.compile(
     r'x:Key="(AtlasBitmap\.[\w]+)"[^/>]*?UriSource="([^"]+)"', re.S)
 _CROP_RE = re.compile(
@@ -108,6 +131,7 @@ class IconLibrary:
                     continue
                 for atlas in sorted({c.atlas for c in sheet.crops.values()}):
                     marks.append(self.resolver.fingerprint(f"{IMAGE_ROOT}/{atlas}"))
+            marks.append(AWARD_PROCESSING)
             self._art_version = hashlib.sha1("|".join(marks).encode()).hexdigest()[:8]
         return self._art_version
 
@@ -135,8 +159,9 @@ class IconLibrary:
         name was just <key>@<height>.png.
         """
         suffix = f"@{height}" if height else ""
+        processing = f"|{AWARD_PROCESSING}" if kind == "award" else ""
         stamp = hashlib.sha1(
-            f"{self.resolver.fingerprint(f'{IMAGE_ROOT}/{crop.atlas}')}|{crop.box}".encode()
+            f"{self.resolver.fingerprint(f'{IMAGE_ROOT}/{crop.atlas}')}|{crop.box}{processing}".encode()
         ).hexdigest()[:8]
         return self.resolver.cache_dir / "icons" / kind / f"{key}{suffix}.{stamp}.png"
 
@@ -190,6 +215,9 @@ class IconLibrary:
             return None
         try:
             tile = atlas.crop(crop.box)
+            if kind == "award":
+                # before any scaling, while shadow and rim are still apart
+                tile = strip_baked_shadow(tile)
             if height and tile.height > height:
                 from PIL import Image
                 width = max(1, round(tile.width * height / tile.height))

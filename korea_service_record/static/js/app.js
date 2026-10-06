@@ -95,6 +95,9 @@
         el("lb-image").src = "/api/icon/" + kind + "/" +
             encodeURIComponent(iconIdent(kind, ident)) + (artRev ? "?r=" + encodeURIComponent(artRev) : "");
         el("lb-image").alt = title || "";
+        // award art arrives without the game's baked shadow and takes the
+        // page's own (.award-icon); rank and squadron art are left as drawn
+        el("lb-image").classList.toggle("award-icon", kind === "award");
         show(box);
         document.body.classList.add("lightbox-open");
         try {
@@ -131,7 +134,9 @@
                     // The certificate the award came with, on its own page.
                     const link = document.createElement("a");
                     link.className = "nav-btn small certificate-link";
-                    link.target = "_blank"; link.rel = "noopener";
+                    // "opener", as for the Flight Record and War Diary: its
+                    // Service Record button returns here and closes the tab.
+                    link.target = "_blank"; link.rel = "opener";
                     link.href = "/certificate?career=" + encodeURIComponent(currentCareer) + "&pilot=" + encodeURIComponent(worn.pilot) +
                         "&award=" + encodeURIComponent(ident) + "&earned=" + encodeURIComponent(worn.earned || "");
                     link.textContent = T("awards.certificate");
