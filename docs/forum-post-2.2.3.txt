@@ -24,9 +24,6 @@ ALSO
 
 - New: the pilot biography. The story the game writes for your pilot is now
   laid out as a book on a desk, and you can leaf through it page by page.
-- A note on 2.2.0's napalm correction: the repeated kills come from any fire
-  on airfield buildings, not only napalm - a bomb that sets a fuel store
-  burning does it too. The correction already handles both.
 
 
 DOWNLOAD
