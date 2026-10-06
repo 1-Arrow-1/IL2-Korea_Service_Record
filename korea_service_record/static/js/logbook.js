@@ -14,6 +14,40 @@
 (async function () {
     "use strict";
 
+    // The GRADE box is narrow, so long rank names (the game's own, in all six
+    // of its languages) are abbreviated there; the signature line and the
+    // box's tooltip keep the full name.
+    const SHORT_RANKS = {
+        // English (the Spanish game names US and some Soviet ranks in English too)
+        "Second Lieutenant": "2nd Lt.", "First Lieutenant": "1st Lt.", "Senior Lieutenant": "Sr. Lt.",
+        "Lieutenant Colonel": "Lt. Colonel", "Lieutenant General": "Lt. General",
+        "Brigadier General": "Brig. General", "Major General": "Maj. General",
+        "Lieutenant Junior Grade": "Lt. (jg)", "Lieutenant Commander": "Lt. Commander",
+        "Rear Admiral (lower half)": "Rear Adm. (LH)", "Rear Admiral": "Rear Adm.",
+        // Spanish transliterations of Soviet ranks
+        "Starshy Leytenant": "St. Leytenant", "General-leytenant": "Gen.-leyt.",
+        "General-mayor": "Gen.-mayor", "Podpolkovnik": "Podpolk.",
+        // German
+        "Oberleutnant": "Oblt.", "Oberstleutnant": "Oberstlt.", "Generalmajor": "GenMaj.",
+        "Generalleutnant": "GenLt.", "Brigadegeneral": "BrigGen.",
+        "Leutnant zur See": "Lt. z. S.", "Oberleutnant zur See": "Oblt. z. S.",
+        "Kapitänleutnant": "KptLt.", "Korvettenkapitän": "KKpt.", "Fregattenkapitän": "FKpt.",
+        "Kapitän zur See": "Kpt. z. S.", "Flottillenadmiral": "FltlAdm.", "Konteradmiral": "KAdm.",
+        // French
+        "Sous-lieutenant": "S/Lt", "Lieutenant senior": "Lt senior", "Lieutenant-colonel": "Lt-colonel",
+        "Général-major": "Gal-major", "Général-lieutenant": "Gal-lt",
+        "Général de brigade": "Gal de brig.", "Général de division": "Gal de div.",
+        "Lieutenant de vaisseau junior": "Lt de vaiss. jr", "Lieutenant de vaisseau": "Lt de vaiss.",
+        "Capitaine de corvette": "Cne de corv.", "Capitaine de frégate": "Cne de frég.",
+        "Capitaine de vaisseau": "Cne de vaiss.", "Contre-amiral": "C.-amiral",
+        // Russian
+        "Второй лейтенант": "2-й лейтенант", "Первый лейтенант": "1-й лейтенант",
+        "Старший лейтенант": "Ст. лейтенант", "Младший лейтенант": "Мл. лейтенант",
+        "Подполковник": "Подполк.", "Генерал-майор": "Ген.-майор", "Генерал-лейтенант": "Ген.-лейт.",
+        "Бригадный генерал": "Бриг. генерал", "Лейтенант-коммандер": "Лейт.-комм.",
+        "Контр-адмирал": "Контр-адм.",
+    };
+
     const el = (id) => document.getElementById(id);
     const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
         ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
@@ -104,10 +138,10 @@
             : '<div class="form-title book"><span>' + esc(TF("logbook.form.title")) + "</span></div>";
         // The grade as it stood that month, from the month's last sortie -
         // a promotion in May must not rewrite April's sheet.
-        const grade = (mo.rows.length && mo.rows[mo.rows.length - 1].rank) || data.pilot.rank;
+        const grade = String((mo.rows.length && mo.rows[mo.rows.length - 1].rank) || data.pilot.rank || "").trim();
         const fields = [
             [TF("logbook.form.name"), data.form === "usaf" ? data.pilot.last + ", " + data.pilot.first : data.pilot.name],
-            [TF("logbook.form.grade"), grade],
+            [TF("logbook.form.grade"), SHORT_RANKS[grade] || grade, grade],
             [TF("logbook.form.organization"), data.organization],
             [TF("logbook.form.station"), mo.station],
             [TF("logbook.form.aircraft_type"), data.aircraft],
@@ -130,8 +164,9 @@
             '<td class="num">' + tenths(t.hours) + "</td><td class=\"num\">" + t.landings + "</td>" +
             "<td>" + esc(TF("logbook.form.summary", {sorties: t.sorties, air: t.air, ground: t.ground})) + "</td></tr>";
         return '<section class="sheet ' + esc(data.form) + '">' + head +
-            '<div class="form-head">' + fields.map(([k, v]) =>
-                '<div class="field"><span class="k">' + esc(k) + '</span><span class="v">' + esc(v) + "</span></div>").join("") + "</div>" +
+            '<div class="form-head">' + fields.map(([k, v, full]) =>
+                '<div class="field"><span class="k">' + esc(k) + '</span><span class="v"' +
+                (full && full !== v ? ' title="' + esc(full) + '"' : "") + ">" + esc(v) + "</span></div>").join("") + "</div>" +
             '<table class="form-table"><thead><tr>' +
                 "<th>" + esc(TF("logbook.form.date")) + "</th><th>" + esc(TF("logbook.form.type")) + "</th>" +
                 "<th>" + esc(TF("logbook.form.serial")) + "</th><th>" + esc(TF("logbook.form.mission")) + "</th>" +

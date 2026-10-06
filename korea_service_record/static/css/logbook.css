@@ -52,7 +52,7 @@
     font-family: Arial, Helvetica, sans-serif; font-weight: bold; letter-spacing: 0.12em; font-size: 1.05rem; }
 .form-title .form-no { font-size: 0.78rem; font-weight: normal; letter-spacing: 0.06em; }
 .form-title.book { justify-content: center; font-family: 'Georgia', serif; font-size: 1.3rem; letter-spacing: 0.2em; }
-.form-head { display: grid; grid-template-columns: 2fr 1fr 1.4fr 1.3fr 1fr 1.3fr; border: 1.5px solid #1f140a; margin-bottom: 0.8rem; }
+.form-head { display: grid; grid-template-columns: 1.8fr 1.3fr 1.3fr 1.2fr 1fr 1.2fr; border: 1.5px solid #1f140a; margin-bottom: 0.8rem; }
 .form-head .field { padding: 0.25rem 0.5rem 0.35rem; border-right: 1px solid #1f140a; display: flex; flex-direction: column; min-width: 0; }
 .form-head .field:last-child { border-right: 0; }
 .form-head .k { font-family: Arial, Helvetica, sans-serif; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: #4a3a24; }
