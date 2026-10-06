@@ -1954,7 +1954,7 @@
                         '<a class="nav-btn small" href="#career/' +
                             encodeURIComponent(careerId) + "/pilot/" + p.id +
                             '">Full record &rarr;</a> ' +
-                        '<a class="nav-btn small" target="_blank" rel="noopener" href="/logbook?career=' +
+                        '<a class="nav-btn small" target="_blank" rel="opener" href="/logbook?career=' +
                             encodeURIComponent(careerId) + "&pilot=" + p.id + '" title="' + esc(T("logbook.open_hint")) + '">' +
                             esc(T("logbook.open")) + "</a>" +
                     "</div>" +

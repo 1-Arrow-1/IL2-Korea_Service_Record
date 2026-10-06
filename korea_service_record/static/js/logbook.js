@@ -26,7 +26,28 @@
     const pageLang = (override && override.language) || settings.language || "en";
     await i18n.init(pageLang);
     i18n.apply(document.body);
-    el("lb-back").href = careerId ? "/#career/" + encodeURIComponent(careerId) : "/";
+    const back = el("lb-back");
+    back.href = careerId ? "/#career/" + encodeURIComponent(careerId) : "/";
+    back.addEventListener("click", (event) => {
+        // These pages are opened by the Service Record. Return to that tab
+        // and close this one instead of turning it into a duplicate copy.
+        const parent = window.opener;
+        if (!parent || parent.closed) { return; }
+        event.preventDefault();
+        const href = back.href;
+        try {
+            parent.location.href = href;
+            parent.focus();
+            window.close();
+            // A browser can refuse scripted closing under unusual window
+            // policies. Keep the ordinary link behavior as the fallback.
+            setTimeout(() => {
+                if (!window.closed) { window.location.href = href; }
+            }, 100);
+        } catch (_error) {
+            window.location.href = href;
+        }
+    });
     el("lb-print").addEventListener("click", () => window.print());
 
     if (!careerId) {
