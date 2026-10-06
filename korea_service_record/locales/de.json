@@ -482,6 +482,17 @@
     "print": "Drucken",
     "save_hint": "Die Vitrine als Bild in voller Größe speichern"
   },
+  "biography": {
+    "title": "Biografie",
+    "back": "Dienstakte",
+    "open": "Biografie",
+    "open_hint": "Die Biografie des Piloten aus dem Spiel lesen",
+    "previous": "Vorherige Seiten",
+    "next": "Nächste Seiten",
+    "pages": "Seiten {from}–{to} von {total}",
+    "failed": "Die Biografie konnte nicht gelesen werden.",
+    "not_found": "Für diesen Piloten wurde keine Biografie im Spiel gefunden."
+  },
   "diary": {
     "title": "Kriegstagebuch",
     "back": "Dienstakte",

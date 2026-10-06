@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500">
+  <rect width="2400" height="1500" fill="#252522"/>
+  <rect x="100" y="100" width="2200" height="1300" rx="45" fill="#57402d" stroke="#cfae68" stroke-width="8"/>
+  <rect x="170" y="145" width="998" height="1205" fill="#eee2c5" stroke="#8d744c" stroke-width="5"/>
+  <rect x="1232" y="145" width="998" height="1205" fill="#eee2c5" stroke="#8d744c" stroke-width="5"/>
+  <rect x="290" y="260" width="760" height="980" fill="#6ca0dc" fill-opacity="0.2" stroke="#205c9b" stroke-width="6" stroke-dasharray="24 14"/>
+  <rect x="1350" y="260" width="760" height="980" fill="#6ca0dc" fill-opacity="0.2" stroke="#205c9b" stroke-width="6" stroke-dasharray="24 14"/>
+  <rect x="1120" y="145" width="160" height="1205" fill="#a23b3b" fill-opacity="0.2" stroke="#8c2020" stroke-width="4"/>
+  <g font-family="Arial, sans-serif" text-anchor="middle">
+    <text x="670" y="230" font-size="38" fill="#173e67">LEFT TEXT SAFE AREA 760 × 980</text>
+    <text x="1730" y="230" font-size="38" fill="#173e67">RIGHT TEXT SAFE AREA 760 × 980</text>
+    <text x="1200" y="760" font-size="31" fill="#7c1515" transform="rotate(-90 1200 760)">GUTTER / SHADOW ONLY</text>
+    <text x="1200" y="70" font-size="38" fill="#f2dfb1">BIOGRAPHY BOOKLET — 2400 × 1500</text>
+  </g>
+</svg>

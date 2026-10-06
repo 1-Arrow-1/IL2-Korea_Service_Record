@@ -482,6 +482,17 @@
     "print": "Print",
     "save_hint": "Save the case as a picture, at full size"
   },
+  "biography": {
+    "title": "Biography",
+    "back": "Service Record",
+    "open": "Biography",
+    "open_hint": "Read the pilot's in-game biography",
+    "previous": "Previous pages",
+    "next": "Next pages",
+    "pages": "Pages {from}–{to} of {total}",
+    "failed": "The biography could not be read.",
+    "not_found": "No in-game biography was found for this pilot."
+  },
   "diary": {
     "title": "War Diary",
     "back": "Service Record",

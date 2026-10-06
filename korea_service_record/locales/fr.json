@@ -482,6 +482,17 @@
     "print": "Imprimer",
     "save_hint": "Enregistrer la vitrine en image, en pleine taille"
   },
+  "biography": {
+    "title": "Biographie",
+    "back": "État de service",
+    "open": "Biographie",
+    "open_hint": "Lire la biographie du pilote fournie par le jeu",
+    "previous": "Pages précédentes",
+    "next": "Pages suivantes",
+    "pages": "Pages {from}–{to} sur {total}",
+    "failed": "La biographie n’a pas pu être lue.",
+    "not_found": "Aucune biographie du jeu n’a été trouvée pour ce pilote."
+  },
   "diary": {
     "title": "Journal de marche",
     "back": "État de service",

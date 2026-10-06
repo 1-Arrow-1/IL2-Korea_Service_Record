@@ -162,6 +162,20 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         return Response(html, mimetype="text/html",
                         headers={"Cache-Control": "no-store"})
 
+    @app.route("/biography")
+    def biography_page():
+        """The player's in-game biography as a paged service booklet."""
+        html = (Path(app.static_folder) / "biography.html").read_text(
+            encoding="utf-8")
+        html = html.replace("__ASSET_VERSION__", asset_version())
+        artwork = (Path(app.static_folder) / "images" / "biography" /
+                   "open_book.png")
+        html = html.replace(
+            "__BIOGRAPHY_ARTWORK__",
+            "/static/images/biography/open_book.png" if artwork.is_file() else "")
+        return Response(html, mimetype="text/html",
+                        headers={"Cache-Control": "no-store"})
+
     @app.route("/logbook")
     def logbook_page():
         """The flight record on its own page, so it prints as the form."""
@@ -570,6 +584,18 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         html = (Path(app.static_folder) / "certificate.html").read_text(encoding="utf-8")
         html = html.replace("__ASSET_VERSION__", asset_version())
         return Response(html, mimetype="text/html", headers={"Cache-Control": "no-store"})
+
+    @app.route("/api/biography/<path:career_id>")
+    @app.route("/api/biography/<path:career_id>/<int:pilot_id>")
+    def api_biography(career_id: str, pilot_id: Optional[int] = None):
+        """The selected in-game biography, resolved in the career language."""
+        agg = aggregator(career_id)
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        data = agg.biography(career_id, pilot_id)
+        if data is None:
+            return jsonify({"error": "biography_not_found"}), 404
+        return jsonify(data)
 
     @app.route("/api/logbook/<path:career_id>")
     @app.route("/api/logbook/<path:career_id>/<int:pilot_id>")

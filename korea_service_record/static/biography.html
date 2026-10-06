@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biography</title>
+    <link rel="icon" href="/static/images/icon.png?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/main.css?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/biography.css?v=__ASSET_VERSION__">
+</head>
+<body class="biography-page">
+    <div class="biography-bar no-print">
+        <a id="bio-back" class="nav-btn" href="/">&larr; <span data-i18n="biography.back">Service Record</span></a>
+        <span id="bio-note" class="biography-note"></span>
+        <nav id="bio-pager" class="biography-pager" hidden>
+            <button id="bio-prev" class="nav-btn ghost" data-i18n-title="biography.previous">&larr;</button>
+            <span id="bio-pages"></span>
+            <button id="bio-next" class="nav-btn ghost" data-i18n-title="biography.next">&rarr;</button>
+        </nav>
+    </div>
+
+    <main class="biography-stage">
+        <section id="bio-book" class="bio-book loading" data-art="__BIOGRAPHY_ARTWORK__">
+            <div class="bio-cover" aria-hidden="true"></div>
+            <div class="bio-paper bio-paper-left" aria-hidden="true"></div>
+            <div class="bio-paper bio-paper-right" aria-hidden="true"></div>
+            <div class="bio-spine" aria-hidden="true"></div>
+            <div id="bio-viewport" class="bio-text-viewport">
+                <article id="bio-left-content" class="bio-page-content"></article>
+                <article id="bio-right-content" class="bio-page-content"></article>
+                <article id="bio-measure" class="bio-page-content bio-measure" aria-hidden="true"></article>
+            </div>
+            <span id="bio-page-left" class="bio-page-number bio-page-left"></span>
+            <span id="bio-page-right" class="bio-page-number bio-page-right"></span>
+        </section>
+    </main>
+    <p id="bio-state" class="state-message" hidden></p>
+
+<script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/biography.js?v=__ASSET_VERSION__"></script>
+</body>
+</html>

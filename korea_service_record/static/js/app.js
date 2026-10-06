@@ -1567,6 +1567,15 @@
             rackEl.setAttribute("aria-label", T("awards.ribbon_rack"));
             currentRack = d.ribbon_rack;
             currentPlayer = d.player || null;
+            const biography = el("d-biography");
+            if (d.player && d.player.biography_id) {
+                biography.href = "/biography?career=" + encodeURIComponent(careerId) +
+                    "&pilot=" + encodeURIComponent(d.player.id);
+                biography.title = T("biography.open_hint");
+                biography.hidden = false;
+            } else {
+                biography.hidden = true;
+            }
             // The flight record opens on its own page, ready to print.
             const logbook = el("d-logbook");
             logbook.href = "/logbook?career=" + encodeURIComponent(careerId) +

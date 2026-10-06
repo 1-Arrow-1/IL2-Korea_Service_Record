@@ -19,6 +19,7 @@ Everything here is derived, never stored. The decoding lives in the sibling
 modules (killstats, attributes, events) so this file stays about assembly.
 """
 
+import html
 import json
 import math
 import logging
@@ -295,6 +296,27 @@ def _pilot_description(raw: str) -> Dict[str, str]:
         if key:
             out[key] = value
     return out
+
+
+def _biography_paragraphs(raw: str) -> List[str]:
+    """The game's small HTML biography as safe, plain-text paragraphs."""
+    text = (raw or "").strip()
+    if not text:
+        return []
+    found = re.findall(r"<p(?:\s[^>]*)?>(.*?)</p>", text,
+                       flags=re.IGNORECASE | re.DOTALL)
+    pieces = found if found else re.split(r"(?:\r?\n){2,}", text)
+    paragraphs = []
+    for piece in pieces:
+        # Stock biographies contain only <p>, but a hand-written loose file
+        # may contain simple inline markup. The page receives text, never
+        # game-supplied HTML, so it cannot become executable browser content.
+        plain = re.sub(r"<br\s*/?>", " ", piece, flags=re.IGNORECASE)
+        plain = re.sub(r"<[^>]+>", "", plain)
+        plain = re.sub(r"\s+", " ", html.unescape(plain)).strip()
+        if plain:
+            paragraphs.append(plain)
+    return paragraphs
 
 
 def _humanise(key: str) -> str:
@@ -1625,6 +1647,53 @@ class CareerAggregator:
                 "missions_flown": self._missions_flown(sorties, {m["id"]: m for m in db.missions()}),
             })
             return summary
+
+    def biography(self, career_id: str,
+                  pilot_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+        """The selected player's in-game biography in this page's language."""
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            pilot = db.pilot(pilot_id) if pilot_id is not None else db.player()
+            if pilot is None:
+                return None
+            described = _pilot_description(pilot["description"])
+            biography_id = described.get("biographyId", "")
+            if not biography_id:
+                return None
+
+            vpath = ("nsdata/assets/characterbio/"
+                     f"bio.id={biography_id}.locale={self.lang}.txt")
+            raw = self.resolver.read_text(vpath)
+            source_language = self.lang
+            if not raw and self.lang != "eng":
+                source_language = "eng"
+                raw = self.resolver.read_text(
+                    "nsdata/assets/characterbio/"
+                    f"bio.id={biography_id}.locale=eng.txt")
+            paragraphs = _biography_paragraphs(raw or "")
+            if not paragraphs:
+                return None
+
+            sorties = db.sorties(pilot["id"])
+            starting_rank_id = (sorties[0]["rankId"] if sorties
+                                else pilot["rankId"])
+            return {
+                "career_id": career_id,
+                "biography_id": biography_id,
+                "source_language": source_language,
+                "paragraphs": paragraphs,
+                "pilot": {
+                    "id": pilot["id"],
+                    "name": f"{pilot['name']} {pilot['lastName']}".strip(),
+                    "first_name": pilot["name"],
+                    "last_name": pilot["lastName"],
+                    "birth_date": described.get("birthDate", ""),
+                    "starting_rank": self.locale.rank_name(
+                        pilot["country"], starting_rank_id),
+                },
+            }
 
     def diary(self, career_id: str) -> Optional[Dict[str, Any]]:
         """

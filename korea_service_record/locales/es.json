@@ -482,6 +482,17 @@
     "print": "Imprimir",
     "save_hint": "Guardar la vitrina como imagen, a tamaño completo"
   },
+  "biography": {
+    "title": "Biografía",
+    "back": "Hoja de Servicios",
+    "open": "Biografía",
+    "open_hint": "Leer la biografía del piloto incluida en el juego",
+    "previous": "Páginas anteriores",
+    "next": "Páginas siguientes",
+    "pages": "Páginas {from}–{to} de {total}",
+    "failed": "No se pudo leer la biografía.",
+    "not_found": "No se encontró una biografía del juego para este piloto."
+  },
   "diary": {
     "title": "Diario de guerra",
     "back": "Hoja de Servicios",
