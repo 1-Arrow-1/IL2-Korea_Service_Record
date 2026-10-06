@@ -504,7 +504,7 @@ def plate_text(rank: str, name: str, country: Optional[int] = None,
 
 
 def layout(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[str],
-           icons, country: int = 601, rev: int = 0, medal_renderer=None) -> Dict[str, Any]:
+           icons, country: int = 601, rev: str = "", medal_renderer=None) -> Dict[str, Any]:
     """
     Every piece in the box, in the order it should be drawn.
 
@@ -727,7 +727,7 @@ def _repeat_group(bar: Sequence[int]) -> List[int]:
 
 
 def _usaf(rack: Dict[str, Any], rank_id: Optional[int], squadron_key: Optional[str],
-          icons, rev: int, medal_renderer=None):
+          icons, rev: str, medal_renderer=None):
     items: List[Dict[str, Any]] = []
 
     def add(src: str, box: tuple, name: str = "", cls: str = "") -> None:

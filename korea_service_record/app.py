@@ -500,9 +500,14 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             # language the reader has chosen.
             reader = app.config["SETTINGS"].resolve(career_id)
             reader_rank = aggregator_for(reader).locale.rank_name(country, rank_id)
+        # The pieces' URL token moves with the page files, the composed US
+        # medals (medals.REVISION) and the atlas art, so a re-drawn medal
+        # reaches a browser that cached the old picture for a year.
+        from . import medals as medal_art
+        rev = f"{asset_version()}-{medal_art.REVISION}-{agg.icons.art_version()}"
         data = shadowbox_art.layout(detail["ribbon_rack"], rank_id,
                                     detail.get("squadron_key"), agg.icons,
-                                    country=country, rev=asset_version(),
+                                    country=country, rev=rev,
                                     medal_renderer=agg.medals)
         data["text"] = shadowbox_art.plate_text(rank, player.get("name") or "",
                                                 country=country, rank_id=rank_id)

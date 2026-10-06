@@ -30,7 +30,26 @@ logger = logging.getLogger(__name__)
 
 ART = Path(__file__).resolve().parent / "static" / "images" / "medals"
 # Bump whenever the composition or the art changes; it is part of the URLs.
-REVISION = 29
+REVISION = 30
+
+# A device pinned to the ribbon stands a little off the cloth: a soft dark
+# copy of its outline, down and slightly right, under it. Without one the
+# clusters looked printed on. In drape pixels (the drape is 224 wide).
+DEVICE_SHADOW_OFFSET = (1, 2)
+DEVICE_SHADOW_BLUR = 1.6
+DEVICE_SHADOW_ALPHA = 0.55
+
+
+def _device_shadow(device):
+    """The shadow for one device, and where it sits relative to the device."""
+    from PIL import Image, ImageFilter
+    pad = 4
+    alpha = device.getchannel("A").point(lambda v: round(v * DEVICE_SHADOW_ALPHA))
+    shadow = Image.new("RGBA", (device.width + 2 * pad, device.height + 2 * pad), (25, 16, 6, 0))
+    mask = Image.new("L", shadow.size, 0)
+    mask.paste(alpha, (pad, pad))
+    shadow.putalpha(mask.filter(ImageFilter.GaussianBlur(DEVICE_SHADOW_BLUR)))
+    return shadow, (DEVICE_SHADOW_OFFSET[0] - pad, DEVICE_SHADOW_OFFSET[1] - pad)
 
 # --- US: drawn art -----------------------------------------------------------
 # Every base medal is drawn 224 px wide - the drape is 1 3/8 inch, the same
@@ -409,7 +428,14 @@ class MedalRenderer:
                 gap, width = ribbons.fit_row([d.width for d in row], DRAPE[0], DEVICE_GAP, DEVICE_GAP_TIGHT)
                 x = ribbons.row_origin(row_names, [d.width for d in row], gap, DRAPE[0])
                 for d in row:
-                    canvas.alpha_composite(d, (x, y + (rh - d.height) // 2))
+                    at = (x, y + (rh - d.height) // 2)
+                    shadow, offset = _device_shadow(d)
+                    sx, sy = at[0] + offset[0], at[1] + offset[1]
+                    # alpha_composite refuses a negative destination; a
+                    # device at the ribbon's edge loses that strip of padding
+                    canvas.alpha_composite(shadow, (max(0, sx), max(0, sy)),
+                                           (max(0, -sx), max(0, -sy)))
+                    canvas.alpha_composite(d, at)
                     x += d.width + gap
                 y += rh + vgap
         buf = io.BytesIO()

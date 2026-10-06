@@ -1461,6 +1461,12 @@ table.roster th.col-photo, table.roster td.photo-cell { width: 78px; }
    which carry their own shadow. Without one they sit on the cloth rather
    than above it. */
 .sbox-emblem { filter: drop-shadow(0 6px 7px rgba(0, 0, 0, .55)); }
+/* The decorations hang a finger's breadth off the cloth: a tight contact
+   shadow and a wider soft one. The game's own baked shadow is taken out of
+   the atlas art (icons.py) and the composed US medals never had one. */
+.sbox-medal, .sbox-badge, .sbox-citation {
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45)) drop-shadow(4px 9px 9px rgba(0, 0, 0, .40));
+}
 
 /* The glass goes over everything, including the plate engraving: it is a
    photograph of the pane, so anything it does not cover reads as if it were
