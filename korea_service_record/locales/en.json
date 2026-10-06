@@ -40,6 +40,8 @@
     "sorties_value": "{total} ({good} successful)",
     "loss_title": "The game is not recording your sorties.",
     "loss_body": "{n} completed missions since {date} have no flight records in this career file. The game writes the mission, the awards and the counters, then fails to save the sorties themselves, so they cannot be shown here. Reported to the developers; nothing here is at fault and nothing else in the career is affected.",
+    "ui_stale_title": "A game update changed career screens this mod replaces.",
+    "ui_stale_body": "The mod installs its own copy of {files} so custom portraits show in the game. This game version has changed those screens, and the mod's older copies now hide the update's changes. Install a Service Record version made for this game version.",
     "flight_time": "Flight Time",
     "award_points": "Award Points"
   },

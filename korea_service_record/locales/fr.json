@@ -40,6 +40,8 @@
     "sorties_value": "{total} ({good} réussies)",
     "loss_title": "Le jeu n’enregistre pas vos sorties.",
     "loss_body": "{n} missions terminées depuis le {date} n’ont aucun relevé de vol dans ce fichier de carrière. Le jeu écrit la mission, les décorations et les compteurs, puis échoue à enregistrer les sorties elles-mêmes, qui ne peuvent donc pas être affichées ici. Signalé aux développeurs ; rien ici n’est en cause et le reste de la carrière n’est pas touché.",
+    "ui_stale_title": "Une mise à jour du jeu a modifié des écrans de carrière que ce mod remplace.",
+    "ui_stale_body": "Le mod installe sa propre copie de {files} pour que les portraits personnalisés apparaissent dans le jeu. Cette version du jeu a modifié ces écrans, et les copies plus anciennes du mod masquent désormais les changements de la mise à jour. Installez une version de l’état de service prévue pour cette version du jeu.",
     "flight_time": "Temps de vol",
     "award_points": "Points de décoration"
   },

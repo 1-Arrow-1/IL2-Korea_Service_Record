@@ -40,6 +40,8 @@
     "sorties_value": "{total} ({good} erfolgreich)",
     "loss_title": "Das Spiel zeichnet Ihre Einsätze nicht auf.",
     "loss_body": "{n} abgeschlossene Missionen seit {date} haben in dieser Laufbahndatei keine Flugaufzeichnungen. Das Spiel schreibt Mission, Auszeichnungen und Zähler, scheitert dann aber am Speichern der Einsätze selbst, sodass sie hier nicht gezeigt werden können. Den Entwicklern gemeldet; hier liegt kein Fehler vor, und die übrige Laufbahn ist nicht betroffen.",
+    "ui_stale_title": "Ein Spielupdate hat Karrierebildschirme geändert, die diese Mod ersetzt.",
+    "ui_stale_body": "Die Mod installiert eigene Kopien von {files}, damit eigene Porträts im Spiel erscheinen. Diese Spielversion hat diese Bildschirme geändert, und die älteren Kopien der Mod verdecken nun die Änderungen des Updates. Installieren Sie eine Version der Dienstakte, die für diese Spielversion gemacht ist.",
     "flight_time": "Flugzeit",
     "award_points": "Auszeichnungspunkte"
   },

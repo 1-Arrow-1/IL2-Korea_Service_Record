@@ -63,6 +63,18 @@
 				<Setter Property="Foreground" Value="{StaticResource Brush.Lite_Olive_Drab}"/>
 				<Setter Property="MinHeight" Value="100"/>
 				<Setter Property="VerticalAlignment" Value="Center"/>
+				<Setter Property="Focusable" Value="False"/>
+				<Setter Property="ContentTemplate">
+					<Setter.Value>
+						<DataTemplate>
+							<TextBlock TextAlignment="Center"
+							           TextWrapping="Wrap"
+							           Style="{StaticResource Style.ARM_Title_2}"
+							           d:Text="Text"
+							           app:Text.RichText="{Binding}"/>
+						</DataTemplate>
+					</Setter.Value>
+				</Setter>
 				<Setter Property="Template">
 					<Setter.Value>
 						<ControlTemplate TargetType="HeaderedContentControl">
@@ -91,13 +103,7 @@
 									        Background="{TemplateBinding BorderBrush}"/>
 								</Grid>
 								<Decorator Height="10"/>
-								<TextBlock HorizontalAlignment="Center"
-								           Foreground="{TemplateBinding Foreground}"
-								           TextAlignment="Center"
-								           TextWrapping="Wrap"
-								           Style="{StaticResource Style.ARM_Title_2}"
-								           d:Text="Text"
-								           app:Text.RichText="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content}"/>
+								<ContentPresenter HorizontalAlignment="Center"/>
 							</StackPanel>
 						</ControlTemplate>
 					</Setter.Value>
@@ -387,38 +393,105 @@
 				</Grid>
 			</ControlTemplate>
 
-			<ControlTemplate x:Key="ControlTemplate.PilotAward">
-				<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.Event}"
-				                        Header="{app:Localize carEventHeaderPilotAward, Compile={app:Mapping Key=name, Binding={Binding Data}}}"/>
+			<ControlTemplate x:Key="ControlTemplate.PilotsSingleAward">
+				<StackPanel Grid.Row="0" VerticalAlignment="Center">
+					<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.Event}" Header="{app:Localize carEventHeaderPilotsGroupAward}">
+						<HeaderedContentControl.ContentTemplate>
+							<DataTemplate>
+								<TextBlock HorizontalAlignment="Center"
+								           Foreground="{StaticResource Brush.Light_Gray}"
+								           Style="{StaticResource Style.ARM_Title_1}"
+								           app:Text.IsUpperCase="True"
+								           Text="{app:Localize carEventSubHeaderPilotAwards}"/>
+							</DataTemplate>
+						</HeaderedContentControl.ContentTemplate>
+					</HeaderedContentControl>
+
+					<Border MinHeight="200">
+						<StackPanel VerticalAlignment="Center">
+							<ItemsControl MaxHeight="200"
+							              HorizontalAlignment="Center"
+							              Focusable="False"
+							              ItemsSource="{Binding Data}"
+							              d:ItemsSource="{d:SampleData ItemCount=18}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<WrapPanel Orientation="Vertical"/>
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<TextBlock HorizontalAlignment="Stretch"
+										           Margin="20,0"
+										           Foreground="{StaticResource Brush.Lite_Olive_Drab}"
+										           TextAlignment="Left"
+										           TextWrapping="NoWrap"
+										           Style="{StaticResource Style.ARM_Title_2}"
+										           Text="{Binding}"/>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+
+							<TextBlock HorizontalAlignment="Center"
+							           Margin="0,10"
+							           Foreground="{StaticResource Brush.Lite_Olive_Drab}"
+							           Style="{StaticResource Style.ARM_Paragraph_Text}"
+							           Text="{app:Localize carAwardLabel}"/>
+
+							<TextBlock HorizontalAlignment="Center"
+							           Margin="20,0"
+							           Foreground="{StaticResource Brush.Field_Green}"
+							           Style="{StaticResource Style.ARM_Title_2}"
+							           Text="{Binding Text}"/>
+
+						</StackPanel>
+					</Border>
+
+				</StackPanel>
 			</ControlTemplate>
 
-			<ControlTemplate x:Key="ControlTemplate.PilotsGroupAward">
-				<StackPanel Grid.Row="0"
-				            VerticalAlignment="Center">
-					<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.Event}"
-					                        Header="{app:Localize carEventHeaderPilotsGroupAward}"/>
-
-					<ItemsControl MaxHeight="200"
+			<ControlTemplate x:Key="ControlTemplate.PilotsMultiAward">
+				<StackPanel Grid.Row="0" VerticalAlignment="Center">
+					<HeaderedContentControl Style="{StaticResource Style.HeaderedContentControl.Event}" Header="{app:Localize carEventHeaderPilotsGroupAward}">
+						<HeaderedContentControl.ContentTemplate>
+							<DataTemplate>
+								<TextBlock HorizontalAlignment="Center"
+								           Foreground="{StaticResource Brush.Light_Gray}"
+								           Style="{StaticResource Style.ARM_Title_1}"
+								           app:Text.IsUpperCase="True"
+								           Text="{app:Localize carEventSubHeaderPilotAwards}"/>
+							</DataTemplate>
+						</HeaderedContentControl.ContentTemplate>
+					</HeaderedContentControl>
+					<ItemsControl HorizontalAlignment="Center"
 					              Focusable="False"
-					              ItemsSource="{Binding Data}"
-					              d:ItemsSource="{d:SampleData ItemCount=18}">
-
-						<ItemsControl.ItemsPanel>
-							<ItemsPanelTemplate>
-								<WrapPanel HorizontalAlignment="Center"
-								           Orientation="Vertical"
-								           ItemHeight="Auto" ItemWidth="Auto"/>
-							</ItemsPanelTemplate>
-						</ItemsControl.ItemsPanel>
+					              ItemsSource="{Binding Data}">
 						<ItemsControl.ItemTemplate>
 							<DataTemplate>
-								<TextBlock HorizontalAlignment="Stretch"
-								           Margin="10,0,10,0"
-								           Foreground="{StaticResource Brush.Light_Gray}"
-								           TextWrapping="NoWrap"
-								           Style="{StaticResource Style.ARM_Title_Small_1}"
-								           Text="{Binding}"
-								           d:Text="МУРАШКИН АЛЕКСАНДР"/>
+								<StackPanel>
+									<TextBlock HorizontalAlignment="Stretch"
+									           Foreground="{StaticResource Brush.Lite_Olive_Drab}"
+									           TextWrapping="NoWrap"
+									           Style="{StaticResource Style.ARM_Title_2}"
+									           Text="{Binding Name}"/>
+
+									<ItemsControl Margin="0,4,0,0"
+									              Focusable="False"
+									              ItemsSource="{Binding Value}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<TextBlock Foreground="{StaticResource Brush.Field_Green}"
+												           Style="{StaticResource Style.ARM_Title_Small_1}"
+												           Text="{Binding}"/>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+
+									<Decorator Height="30"
+									           Visibility="{Binding Tag, Converter={StaticResource IsFalseToVis}, RelativeSource={RelativeSource Self}, FallbackValue=Visible}"
+									           Tag="{app:IsLastItem}"/>
+
+								</StackPanel>
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
 					</ItemsControl>
@@ -855,6 +928,7 @@
 
 
 			<Style x:Key="Style.ContentControl.Event" TargetType="Control">
+				<Setter Property="Focusable" Value="False"/>
 				<Style.Triggers>
 					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.NewDay}">
 						<Setter Property="Template" Value="{StaticResource ControlTemplate.NewDay}"/>
@@ -874,11 +948,11 @@
 					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.CommanderRank}">
 						<Setter Property="Template" Value="{StaticResource ControlTemplate.CommanderRank}"/>
 					</DataTrigger>
-					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotAward}">
-						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotAward}"/>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotsSingleAward}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotsSingleAward}"/>
 					</DataTrigger>
-					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotsGroupAward}">
-						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotsGroupAward}"/>
+					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotsMultiAward}">
+						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotsMultiAward}"/>
 					</DataTrigger>
 					<DataTrigger Binding="{Binding Type}" Value="{x:Static app:NotificationType.PilotRank}">
 						<Setter Property="Template" Value="{StaticResource ControlTemplate.PilotRank}"/>
@@ -967,7 +1041,7 @@
 		</ResourceDictionary>
 	</UserControl.Resources>
 
-	<DockPanel>
+	<DockPanel app:NumberFormat.DisplayUnits="{Binding DisplayUnits}">
 		<HeaderedContentControl DockPanel.Dock="Top"
 		                        Style="{StaticResource Style.HeaderedContentControl.Social.Header}"
 		                        Header="{app:Localize carScreenHeader}"

@@ -40,6 +40,8 @@
     "sorties_value": "{total} ({good} con éxito)",
     "loss_title": "El juego no está registrando sus salidas.",
     "loss_body": "{n} misiones completadas desde el {date} no tienen registros de vuelo en este archivo de carrera. El juego guarda la misión, las condecoraciones y los contadores, pero falla al guardar las salidas, de modo que no pueden mostrarse aquí. Notificado a los desarrolladores; aquí no hay ningún fallo y el resto de la carrera no se ve afectado.",
+    "ui_stale_title": "Una actualización del juego cambió pantallas de carrera que este mod reemplaza.",
+    "ui_stale_body": "El mod instala su propia copia de {files} para que los retratos personalizados aparezcan en el juego. Esta versión del juego cambió esas pantallas, y las copias antiguas del mod ahora ocultan los cambios de la actualización. Instale una versión de la Hoja de Servicios hecha para esta versión del juego.",
     "flight_time": "Horas de vuelo",
     "award_points": "Puntos de condecoración"
   },

@@ -1729,6 +1729,12 @@ class CareerAggregator:
             })
             return data
 
+    def _ui_stale(self) -> List[str]:
+        if not hasattr(self, "_ui_stale_cache"):
+            from .. import uioverrides
+            self._ui_stale_cache = uioverrides.stale(self.resolver)
+        return self._ui_stale_cache
+
     @staticmethod
     def _sortie_loss(db) -> Dict[str, Any]:
         """
@@ -2768,6 +2774,9 @@ class CareerAggregator:
                 # Sorties the game finished but failed to save. Reported so
                 # the reader blames the right thing - see _sortie_loss.
                 "sortie_loss": self._sortie_loss(db),
+                # Career screens the mod replaces that a game update has
+                # changed since (uioverrides.py). Checked once per run.
+                "ui_stale": self._ui_stale(),
                 # squadrons.xaml keys emblems by the squadron's configId
                 "squadron_key": str(squad["configId"]) if squad else "",
                 # What the squadron actually flies, for the header artwork.

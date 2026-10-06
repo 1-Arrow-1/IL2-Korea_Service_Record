@@ -1644,6 +1644,13 @@
             lossEl.innerHTML = !loss.missions ? "" :
                 '<strong>' + esc(T("record.loss_title")) + "</strong> " +
                 esc(T("record.loss_body", {n: fmtNum(loss.missions), date: loss.since}));
+            // A game update changed a career screen the mod replaces.
+            const stale = d.ui_stale || [];
+            const staleEl = el("d-ui-stale");
+            staleEl.hidden = !stale.length;
+            staleEl.innerHTML = !stale.length ? "" :
+                '<strong>' + esc(T("record.ui_stale_title")) + "</strong> " +
+                esc(T("record.ui_stale_body", {files: stale.join(", ")}));
             // Operations the squadron saw through, and how many it won.
             // Hidden before the first one closes, rather than showing a
             // squadron that has fought a month its record as "0 (0
