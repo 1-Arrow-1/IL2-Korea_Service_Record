@@ -37,6 +37,7 @@ body.biography-page {
     border-bottom: 1px solid rgba(255,255,255,0.1);
     box-sizing: border-box;
 }
+#bio-back { justify-self: start; }
 .biography-note { justify-self: center; font-family: Georgia, serif; letter-spacing: 0.04em; }
 .biography-pager { justify-self: end; display: flex; align-items: center; gap: 0.65rem; }
 .biography-pager .nav-btn:disabled { opacity: 0.38; cursor: default; }
