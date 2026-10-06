@@ -152,6 +152,46 @@ _NAMES = {
 }
 
 
+# What a player who writes his own biography may choose, per nation: each
+# family with its ids, plain medal first. A family with more than one id is a
+# campaign medal whose later ids add bronze service stars. China and North
+# Korea have no prior-service medals.
+CHOICES: Dict[int, Tuple[Tuple[str, Tuple[int, ...]], ...]] = {
+    601: (
+        ("american_defense", (AMERICAN_DEFENSE,)),
+        ("asiatic_pacific", ASIATIC_PACIFIC),
+        ("eame", EAME),
+        ("wwii_victory", (WWII_VICTORY,)),
+    ),
+    501: (
+        ("defense_leningrad", (DEFENSE_LENINGRAD,)),
+        ("defense_moscow", (DEFENSE_MOSCOW,)),
+        ("defense_stalingrad", (DEFENSE_STALINGRAD,)),
+        ("victory_germany", (VICTORY_GERMANY,)),
+        ("victory_japan", (VICTORY_JAPAN,)),
+    ),
+}
+
+
+def family_name(family: str, lang: str = "eng") -> str:
+    """Localized name of one medal family from :data:`CHOICES`."""
+    return (_NAMES.get(lang) or _NAMES["eng"])[family]
+
+
+def chosen(award_ids, country: int) -> Tuple[int, ...]:
+    """
+    A player's own choice, cleaned: only this nation's medals, at most one
+    grade of each family, in the order the families are worn.
+    """
+    wanted = {int(a) for a in (award_ids or ()) if str(a).lstrip("-").isdigit()}
+    out = []
+    for _family, ids in CHOICES.get(country, ()):
+        picked = [a for a in ids if a in wanted]
+        if picked:
+            out.append(max(picked, key=ids.index))
+    return tuple(out)
+
+
 def name(award_id: int, lang: str = "eng") -> Optional[str]:
     """Localized family name for a synthetic award id, if it is one."""
     family = _FAMILY.get(award_id)

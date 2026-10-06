@@ -57,6 +57,7 @@ from korea_service_record import corrections                   # noqa: E402
 from korea_service_record.assets import AssetResolver           # noqa: E402
 from korea_service_record.gamedata import loads_lenient         # noqa: E402
 import custom_pilot_photo as pilot_photo                         # noqa: E402
+from korea_service_record import custombio, wwii_awards          # noqa: E402
 
 BACKUPS = default_cache_dir().parent / "backups"
 # The squadron's seats. 24 of them, which is what Career.SEATS has always
@@ -155,6 +156,25 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "photo_restored": "Original photo restored for {name}. Backup: {backup}",
         "photo_no_restore": "There is no original-photo record for this career.",
         "photo_filetypes": "Image files",
+        "tab_bio": "Biography",
+        "bio_intro": "The game shows your pilot's biography only when a career is created. Here you can rewrite it; the biography in the Service Record then shows your version. Nothing in the game or in the career file changes, so the game may stay open.",
+        "bio_vars": "Placeholders, filled in when the biography is shown - write them exactly like this: $[name] full name · $[firstName] first name · $[lastName] last name · $[birthDate] date of birth · $[startRank] rank at the start of the career. Leave an empty line between paragraphs.",
+        "bio_source_game": "This is the game's biography. Change it and save to make it your own.",
+        "bio_source_own": "This is your own biography, saved {date}.",
+        "bio_count": "{n} of {max} characters",
+        "bio_medals": "World War II medals",
+        "bio_medals_intro": "Which medals did your pilot earn before Korea? The Service Record shows them on his uniforms and in the shadowbox.",
+        "bio_medals_nation": "Chinese and North Korean pilots have no World War II medals to choose.",
+        "bio_medal_none": "not awarded",
+        "bio_medal_plain": "medal",
+        "bio_stars_hint": "★ = bronze service star, one per campaign",
+        "bio_save": "Save biography",
+        "bio_restore": "Restore the game's biography",
+        "bio_saved": "Biography and medals saved for {name}. Reopen the biography in the Service Record to read it.",
+        "bio_restored": "{name} has the game's biography and medals again.",
+        "bio_unknown": "These placeholders are not known and will appear exactly as written:\n{vars}\n\nSave anyway?",
+        "bio_too_long": "The biography is {n} characters long; the limit is {max}.",
+        "bio_none": "This career has no biography to start from.",
         "fl_legend": "The three numbers are the pilot's own skills / discipline / courage, as his panel shows them. ↑ is his boosters. AI is how the generated mission rates him in the air: his skill, but capped at 4 - so a pilot at 5 flies no better than one at 4, and a wound costs him a level.",
         "col_name": "Pilot", "col_state": "Fate", "col_date": "Lost on", "col_can": "Revivable",
         "kia": "killed in action", "mia": "missing in action",
@@ -300,6 +320,25 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "photo_restored": "Originalfoto für {name} wiederhergestellt. Sicherung: {backup}",
         "photo_no_restore": "Für diese Laufbahn ist kein Originalfoto gespeichert.",
         "photo_filetypes": "Bilddateien",
+        "tab_bio": "Biografie",
+        "bio_intro": "Das Spiel zeigt die Biografie Ihres Piloten nur beim Anlegen einer Laufbahn. Hier können Sie sie neu schreiben; die Biografie in der Dienstakte zeigt dann Ihre Fassung. Im Spiel und in der Laufbahndatei ändert sich nichts, das Spiel darf also geöffnet bleiben.",
+        "bio_vars": "Platzhalter, die beim Anzeigen ausgefüllt werden - genau so schreiben: $[name] voller Name · $[firstName] Vorname · $[lastName] Nachname · $[birthDate] Geburtsdatum · $[startRank] Dienstgrad zu Beginn der Laufbahn. Zwischen Absätzen eine Leerzeile lassen.",
+        "bio_source_game": "Dies ist die Biografie aus dem Spiel. Ändern und speichern macht sie zu Ihrer eigenen.",
+        "bio_source_own": "Dies ist Ihre eigene Biografie, gespeichert am {date}.",
+        "bio_count": "{n} von {max} Zeichen",
+        "bio_medals": "Medaillen des Zweiten Weltkriegs",
+        "bio_medals_intro": "Welche Medaillen hat Ihr Pilot vor Korea erhalten? Die Dienstakte zeigt sie an seinen Uniformen und im Schaukasten.",
+        "bio_medals_nation": "Für chinesische und nordkoreanische Piloten gibt es keine Medaillen des Zweiten Weltkriegs zur Auswahl.",
+        "bio_medal_none": "nicht verliehen",
+        "bio_medal_plain": "Medaille",
+        "bio_stars_hint": "★ = bronzener Service Star, einer je Feldzug",
+        "bio_save": "Biografie speichern",
+        "bio_restore": "Biografie des Spiels wiederherstellen",
+        "bio_saved": "Biografie und Medaillen für {name} gespeichert. Öffnen Sie die Biografie in der Dienstakte erneut, um sie zu lesen.",
+        "bio_restored": "Für {name} gelten wieder Biografie und Medaillen aus dem Spiel.",
+        "bio_unknown": "Diese Platzhalter sind unbekannt und erscheinen genau so, wie sie geschrieben sind:\n{vars}\n\nTrotzdem speichern?",
+        "bio_too_long": "Die Biografie ist {n} Zeichen lang; erlaubt sind {max}.",
+        "bio_none": "Diese Laufbahn hat keine Biografie, von der aus Sie beginnen könnten.",
         "fl_legend": "Die drei Zahlen sind die eigenen Werte des Piloten – Fähigkeiten / Disziplin / Mut – so wie sie sein Blatt zeigt. ↑ sind seine Boni. KI ist die Einstufung, die der erzeugte Einsatz ihm in der Luft gibt: seine Fähigkeiten, aber bei 4 gedeckelt – ein Pilot mit 5 fliegt also nicht besser als einer mit 4, und eine Verwundung kostet ihn eine Stufe.",
         "col_name": "Pilot", "col_state": "Schicksal", "col_date": "Verloren am", "col_can": "Zurückholbar",
         "kia": "gefallen", "mia": "vermisst",
@@ -445,6 +484,25 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "photo_restored": "Foto original restaurada para {name}. Copia de seguridad: {backup}",
         "photo_no_restore": "No hay un registro de la foto original para esta carrera.",
         "photo_filetypes": "Archivos de imagen",
+        "tab_bio": "Biografía",
+        "bio_intro": "El juego muestra la biografía de su piloto solo al crear una carrera. Aquí puede reescribirla; la biografía de la Hoja de Servicios mostrará entonces su versión. No cambia nada en el juego ni en el archivo de la carrera, así que el juego puede seguir abierto.",
+        "bio_vars": "Marcadores que se rellenan al mostrar la biografía; escríbalos exactamente así: $[name] nombre completo · $[firstName] nombre · $[lastName] apellido · $[birthDate] fecha de nacimiento · $[startRank] rango al inicio de la carrera. Deje una línea vacía entre párrafos.",
+        "bio_source_game": "Esta es la biografía del juego. Modifíquela y guárdela para que sea suya.",
+        "bio_source_own": "Esta es su propia biografía, guardada el {date}.",
+        "bio_count": "{n} de {max} caracteres",
+        "bio_medals": "Medallas de la Segunda Guerra Mundial",
+        "bio_medals_intro": "¿Qué medallas obtuvo su piloto antes de Corea? La Hoja de Servicios las muestra en sus uniformes y en la vitrina.",
+        "bio_medals_nation": "Los pilotos chinos y norcoreanos no tienen medallas de la Segunda Guerra Mundial para elegir.",
+        "bio_medal_none": "no concedida",
+        "bio_medal_plain": "medalla",
+        "bio_stars_hint": "★ = estrella de servicio de bronce, una por campaña",
+        "bio_save": "Guardar biografía",
+        "bio_restore": "Restaurar la biografía del juego",
+        "bio_saved": "Biografía y medallas guardadas para {name}. Vuelva a abrir la biografía en la Hoja de Servicios para leerla.",
+        "bio_restored": "{name} vuelve a tener la biografía y las medallas del juego.",
+        "bio_unknown": "Estos marcadores no se conocen y aparecerán tal como están escritos:\n{vars}\n\n¿Guardar de todos modos?",
+        "bio_too_long": "La biografía tiene {n} caracteres; el límite es {max}.",
+        "bio_none": "Esta carrera no tiene una biografía de la que partir.",
         "fl_legend": "Los tres números son las aptitudes propias del piloto: habilidad / disciplina / valor, tal como aparecen en su ficha. ↑ son sus bonificaciones. IA es la categoría que la misión generada le asigna en vuelo: su habilidad, pero limitada a 4, de modo que un piloto de 5 no vuela mejor que uno de 4, y una herida le cuesta un nivel.",
         "col_name": "Piloto", "col_state": "Suerte", "col_date": "Perdido el", "col_can": "Recuperable",
         "kia": "muerto en combate", "mia": "desaparecido en combate",
@@ -590,6 +648,25 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "photo_restored": "Photo d’origine restaurée pour {name}. Sauvegarde : {backup}",
         "photo_no_restore": "Aucune photo d’origine n’est enregistrée pour cette carrière.",
         "photo_filetypes": "Fichiers image",
+        "tab_bio": "Biographie",
+        "bio_intro": "Le jeu n’affiche la biographie de votre pilote qu’à la création d’une carrière. Vous pouvez la réécrire ici ; la biographie de l’état de service affichera alors votre version. Rien ne change dans le jeu ni dans le fichier de carrière : le jeu peut rester ouvert.",
+        "bio_vars": "Variables remplies à l’affichage de la biographie ; écrivez-les exactement ainsi : $[name] nom complet · $[firstName] prénom · $[lastName] nom de famille · $[birthDate] date de naissance · $[startRank] grade au début de la carrière. Laissez une ligne vide entre les paragraphes.",
+        "bio_source_game": "Voici la biographie du jeu. Modifiez-la et enregistrez-la pour en faire la vôtre.",
+        "bio_source_own": "Voici votre propre biographie, enregistrée le {date}.",
+        "bio_count": "{n} sur {max} caractères",
+        "bio_medals": "Médailles de la Seconde Guerre mondiale",
+        "bio_medals_intro": "Quelles médailles votre pilote a-t-il obtenues avant la Corée ? L’état de service les affiche sur ses uniformes et dans la vitrine.",
+        "bio_medals_nation": "Les pilotes chinois et nord-coréens n’ont pas de médailles de la Seconde Guerre mondiale à choisir.",
+        "bio_medal_none": "non décernée",
+        "bio_medal_plain": "médaille",
+        "bio_stars_hint": "★ = étoile de service en bronze, une par campagne",
+        "bio_save": "Enregistrer la biographie",
+        "bio_restore": "Rétablir la biographie du jeu",
+        "bio_saved": "Biographie et médailles enregistrées pour {name}. Rouvrez la biographie dans l’état de service pour la lire.",
+        "bio_restored": "{name} a de nouveau la biographie et les médailles du jeu.",
+        "bio_unknown": "Ces variables sont inconnues et apparaîtront telles qu’écrites :\n{vars}\n\nEnregistrer quand même ?",
+        "bio_too_long": "La biographie compte {n} caractères ; la limite est de {max}.",
+        "bio_none": "Cette carrière n’a pas de biographie de départ.",
         "fl_legend": "Les trois nombres sont les qualités propres du pilote — compétence / discipline / courage — telles que sa fiche les affiche. ↑ ce sont ses bonus. IA est le niveau que la mission générée lui donne en vol : sa compétence, mais plafonnée à 4, si bien qu’un pilote à 5 ne vole pas mieux qu’un pilote à 4, et une blessure lui coûte un niveau.",
         "col_name": "Pilote", "col_state": "Sort", "col_date": "Perdu le", "col_can": "Récupérable",
         "kia": "mort au combat", "mia": "porté disparu",
@@ -735,6 +812,25 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "photo_restored": "Исходное фото восстановлено для {name}. Резервная копия: {backup}",
         "photo_no_restore": "Для этой карьеры нет записи об исходном фото.",
         "photo_filetypes": "Файлы изображений",
+        "tab_bio": "Биография",
+        "bio_intro": "Игра показывает биографию лётчика только при создании карьеры. Здесь её можно переписать; биография в послужном списке будет показывать вашу версию. В игре и в файле карьеры ничего не меняется, поэтому игру можно не закрывать.",
+        "bio_vars": "Подстановки, которые заполняются при показе биографии, — пишите их именно так: $[name] полное имя · $[firstName] имя · $[lastName] фамилия · $[birthDate] дата рождения · $[startRank] звание в начале карьеры. Между абзацами оставляйте пустую строку.",
+        "bio_source_game": "Это биография из игры. Измените и сохраните её, чтобы она стала вашей.",
+        "bio_source_own": "Это ваша собственная биография, сохранённая {date}.",
+        "bio_count": "{n} из {max} символов",
+        "bio_medals": "Медали Второй мировой войны",
+        "bio_medals_intro": "Какие медали ваш лётчик получил до Кореи? Послужной список показывает их на его форме и в витрине.",
+        "bio_medals_nation": "Для китайских и северокорейских лётчиков медалей Второй мировой войны нет.",
+        "bio_medal_none": "не вручена",
+        "bio_medal_plain": "медаль",
+        "bio_stars_hint": "★ = бронзовая звезда за участие, по одной за кампанию",
+        "bio_save": "Сохранить биографию",
+        "bio_restore": "Вернуть биографию из игры",
+        "bio_saved": "Биография и медали для {name} сохранены. Откройте биографию в послужном списке заново, чтобы прочитать её.",
+        "bio_restored": "У {name} снова биография и медали из игры.",
+        "bio_unknown": "Эти подстановки неизвестны и будут показаны так, как написаны:\n{vars}\n\nВсё равно сохранить?",
+        "bio_too_long": "Длина биографии — {n} символов; предел — {max}.",
+        "bio_none": "У этой карьеры нет биографии, от которой можно оттолкнуться.",
         "fl_legend": "Три числа — собственные качества лётчика: мастерство / дисциплина / смелость, в том же порядке, что и в его карточке. ↑ — его надбавки. ИИ — оценка, которую сгенерированный вылет даёт ему в воздухе: его мастерство, но не выше 4 — так что лётчик с 5 летает не лучше, чем с 4, а ранение стоит ему одной ступени.",
         "col_name": "Лётчик", "col_state": "Судьба", "col_date": "Потерян", "col_can": "Можно вернуть",
         "kia": "погиб", "mia": "пропал без вести",
@@ -880,6 +976,25 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "photo_restored": "已为 {name} 恢复原始照片。备份：{backup}",
         "photo_no_restore": "此生涯没有原始照片记录。",
         "photo_filetypes": "图像文件",
+        "tab_bio": "生平",
+        "bio_intro": "游戏只在创建生涯时显示飞行员的生平。您可以在这里重写它；服役记录中的生平随后会显示您的版本。游戏和生涯文件都不会改变，因此无需关闭游戏。",
+        "bio_vars": "显示生平时会自动填写的占位符，请严格按此书写：$[name] 全名 · $[firstName] 名 · $[lastName] 姓 · $[birthDate] 出生日期 · $[startRank] 生涯开始时的军衔。段落之间请空一行。",
+        "bio_source_game": "这是游戏自带的生平。修改并保存后即成为您自己的版本。",
+        "bio_source_own": "这是您自己的生平，保存于 {date}。",
+        "bio_count": "{n} / {max} 个字符",
+        "bio_medals": "第二次世界大战奖章",
+        "bio_medals_intro": "您的飞行员在朝鲜战争之前获得了哪些奖章？服役记录会在他的军服和奖章展示框中显示它们。",
+        "bio_medals_nation": "中国和朝鲜飞行员没有可选择的第二次世界大战奖章。",
+        "bio_medal_none": "未授予",
+        "bio_medal_plain": "奖章",
+        "bio_stars_hint": "★ = 铜质服役星，每次战役一颗",
+        "bio_save": "保存生平",
+        "bio_restore": "恢复游戏自带的生平",
+        "bio_saved": "已为 {name} 保存生平和奖章。请在服役记录中重新打开生平以阅读。",
+        "bio_restored": "{name} 已恢复游戏自带的生平和奖章。",
+        "bio_unknown": "以下占位符无法识别，将按原样显示：\n{vars}\n\n仍要保存吗？",
+        "bio_too_long": "生平长度为 {n} 个字符；上限为 {max}。",
+        "bio_none": "此生涯没有可作为起点的生平。",
         "fl_legend": "三个数字是飞行员自身的技能 / 纪律 / 勇气，与他的面板显示一致。↑ 是他的加成。AI 是生成的任务对他空中表现的评级：取决于技能，但上限为 4 —— 所以技能 5 的飞行员并不比 4 的飞得好，而负伤会降一级。",
         "col_name": "飞行员", "col_state": "结局", "col_date": "损失日期", "col_can": "可复活",
         "kia": "阵亡", "mia": "失踪",
@@ -1588,6 +1703,28 @@ class Career:
             "avatar_path": row["avatarPath"] or "",
         }
 
+    def player_biography(self) -> Dict[str, Any]:
+        """The current player's chosen biography, as ``pilot.description`` holds it."""
+        with self._open() as con:
+            row = con.execute(
+                """SELECT id, name, lastName, country, description
+                   FROM pilot WHERE id=(SELECT playerId FROM career)"""
+            ).fetchone()
+        if row is None:
+            raise ValueError("the career has no current player")
+        fields = {}
+        for pair in urllib.parse.unquote(row["description"] or "").split("&"):
+            key, _, value = pair.partition("=")
+            if key:
+                fields[key] = value
+        return {
+            "id": row["id"],
+            "name": f"{row['name']} {row['lastName']}".strip(),
+            "country": row["country"],
+            "description": row["description"] or "",
+            "biography_id": fields.get("biographyId", ""),
+        }
+
     def set_player_portrait(self, avatar_path: str) -> Path:
         """Point the current player's portrait at a loose DDS, after backup."""
         from korea_service_record.portraitfix import MAX_AVATAR_PATH
@@ -2012,6 +2149,7 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         lang = pick_language()
+        self.lang = lang
         self.t = STRINGS[lang]
         # The game's own names for the parts of a line-up, so the board and
         # the Combat Units screen agree. Read once; {} if it cannot be, and
@@ -2360,6 +2498,55 @@ class App(tk.Tk):
                 self.PAPER)
         self._render_photo()
 
+        # -- own biography tab: the text lives with the tracker (custombio),
+        # never in the game or the career file - the game shows a biography
+        # only while a career is being created.
+        bio = ttk.Frame(nb)
+        nb.add(bio, text=self.t["tab_bio"])
+        ttk.Label(bio, text=self.t["bio_intro"], wraplength=1080,
+                  foreground="#444").pack(anchor="w", padx=8, pady=(8, 2))
+        ttk.Label(bio, text=self.t["bio_vars"], wraplength=1080,
+                  foreground=self.INK_MUTED).pack(anchor="w", padx=8, pady=(0, 6))
+        self.bio_source_var = tk.StringVar()
+        ttk.Label(bio, textvariable=self.bio_source_var,
+                  foreground=self.ACCENT_DARK).pack(anchor="w", padx=8)
+        bio_body = ttk.Frame(bio)
+        bio_body.pack(fill="both", expand=True, padx=8, pady=(4, 8))
+        bio_text_frame = ttk.Frame(bio_body)
+        bio_text_frame.pack(side="left", fill="both", expand=True)
+        self.bio_text = tk.Text(
+            # width/height are only the minimum asked for; pack's expand gives
+            # it the room left beside the medals. Tk's default 80 columns of
+            # Georgia pushed the medal panel out of the window.
+            bio_text_frame, width=40, height=10, wrap="word", undo=True, font=("Georgia", 11),
+            background=self.PAPER, foreground=self.INK, insertbackground=self.INK,
+            relief="flat", highlightthickness=1, highlightbackground=self.BORDER,
+            padx=10, pady=8)
+        bio_scroll = ttk.Scrollbar(bio_text_frame, orient="vertical",
+                                   command=self.bio_text.yview)
+        self.bio_text.configure(yscrollcommand=bio_scroll.set)
+        bio_scroll.pack(side="right", fill="y")
+        self.bio_text.pack(side="left", fill="both", expand=True)
+        self.bio_text.bind("<<Modified>>", self._bio_modified)
+
+        bio_side = ttk.Frame(bio_body, width=340)
+        bio_side.pack(side="left", fill="y", padx=(14, 0))
+        self.bio_count_var = tk.StringVar()
+        ttk.Label(bio_side, textvariable=self.bio_count_var,
+                  foreground=self.INK_MUTED).pack(anchor="w")
+        self.bio_medals_frame = ttk.LabelFrame(bio_side, text=self.t["bio_medals"])
+        self.bio_medals_frame.pack(fill="x", pady=(8, 12))
+        self.bio_save_btn = ttk.Button(bio_side, text=self.t["bio_save"],
+                                       command=self._save_bio, state="disabled")
+        self.bio_save_btn.pack(anchor="w", fill="x")
+        self.bio_restore_btn = ttk.Button(bio_side, text=self.t["bio_restore"],
+                                          command=self._restore_bio, state="disabled")
+        self.bio_restore_btn.pack(anchor="w", fill="x", pady=(8, 0))
+        self.bio_info: Optional[Dict[str, Any]] = None
+        self.bio_game_text = ""
+        self.bio_inferred: tuple = ()
+        self.bio_medal_vars: List[tuple] = []
+
         # -- flights tab
         fl = ttk.Frame(nb)
         nb.add(fl, text=self.t["tab_flights"])
@@ -2510,6 +2697,7 @@ class App(tk.Tk):
         self._fill_times()
         self._fill_pending()
         self._fill_photo()
+        self._fill_bio()
         self._fill_flights()
 
     # -- custom pilot photo --------------------------------------------------
@@ -2711,6 +2899,161 @@ class App(tk.Tk):
         self.status.set(self.t["photo_restored"].format(
             name=player["name"], backup=backup))
         self._fill_photo()
+
+    # -- own biography -------------------------------------------------------
+
+    def _bio_set_text(self, text: str) -> None:
+        self.bio_text.delete("1.0", "end")
+        self.bio_text.insert("1.0", text)
+        self.bio_text.edit_reset()
+        self.bio_text.edit_modified(False)
+        self._bio_count()
+
+    def _bio_count(self) -> None:
+        n = len(self.bio_text.get("1.0", "end").strip())
+        self.bio_count_var.set(self.t["bio_count"].format(n=n, max=custombio.MAX_LENGTH))
+
+    def _bio_modified(self, _event=None) -> None:
+        if self.bio_text.edit_modified():
+            self._bio_count()
+            self.bio_text.edit_modified(False)
+
+    def _fill_bio(self) -> None:
+        self.bio_info = None
+        self.bio_game_text = ""
+        self._bio_set_text("")
+        for child in self.bio_medals_frame.winfo_children():
+            child.destroy()
+        self.bio_medal_vars = []
+        self.bio_save_btn["state"] = "disabled"
+        self.bio_restore_btn["state"] = "disabled"
+        if self.career is None:
+            self.bio_source_var.set("")
+            return
+        try:
+            info = self.career.player_biography()
+        except (sqlite3.Error, ValueError) as exc:
+            self.bio_source_var.set(self.t["failed"].format(error=exc))
+            return
+        self.bio_info = info
+        game_lang = GAME_LANGS.get(self.lang, "eng")
+        raw = None
+        game = find_game_dir()
+        if game is not None and info["biography_id"]:
+            try:
+                resolver = AssetResolver(game)
+                for code in dict.fromkeys((game_lang, "eng")):
+                    raw = resolver.read_text(
+                        "nsdata/assets/characterbio/"
+                        f"bio.id={info['biography_id']}.locale={code}.txt")
+                    if raw:
+                        break
+            except Exception:            # noqa: BLE001 - an empty editor is still usable
+                raw = None
+        self.bio_game_text = custombio.editable(raw or "")
+        own = custombio.load(self.career.path, info["id"])
+        if own and own["text"]:
+            self._bio_set_text(own["text"])
+            self.bio_source_var.set(self.t["bio_source_own"].format(
+                date=(own.get("updated") or "")[:10] or "—"))
+        else:
+            self._bio_set_text(self.bio_game_text)
+            self.bio_source_var.set(self.t["bio_source_game"] if self.bio_game_text
+                                    else self.t["bio_none"])
+
+        # The medals: the player's own choice once made, otherwise what the
+        # chosen biography implies - the same rule the Service Record uses.
+        country = info["country"]
+        self.bio_inferred = wwii_awards.for_career_description(info["description"], country)
+        selected = set(own["wwii_awards"] if own and own["wwii_awards"] is not None
+                       else self.bio_inferred)
+        families = wwii_awards.CHOICES.get(country, ())
+        if not families:
+            ttk.Label(self.bio_medals_frame, text=self.t["bio_medals_nation"],
+                      wraplength=320, foreground=self.INK_MUTED).pack(anchor="w", padx=8, pady=6)
+        else:
+            ttk.Label(self.bio_medals_frame, text=self.t["bio_medals_intro"],
+                      wraplength=320, foreground=self.INK_MUTED).pack(anchor="w", padx=8, pady=(6, 4))
+            stars = False
+            for family, ids in families:
+                label = wwii_awards.family_name(family, game_lang)
+                if len(ids) == 1:
+                    var = tk.BooleanVar(value=ids[0] in selected)
+                    ttk.Checkbutton(self.bio_medals_frame, text=label, variable=var
+                                    ).pack(anchor="w", padx=8, pady=2)
+                    self.bio_medal_vars.append((ids, var))
+                    continue
+                stars = True
+                ttk.Label(self.bio_medals_frame, text=label, wraplength=320
+                          ).pack(anchor="w", padx=8, pady=(6, 0))
+                plain = self.t["bio_medal_plain"]
+                values = [self.t["bio_medal_none"], plain] + [
+                    f"{plain} {'★' * n}" for n in range(1, len(ids))]
+                picked = [ids.index(a) + 1 for a in ids if a in selected]
+                box = ttk.Combobox(self.bio_medals_frame, values=values,
+                                   state="readonly", width=22)
+                box.current(max(picked) if picked else 0)
+                box.pack(anchor="w", padx=(24, 8), pady=(2, 2))
+                self.bio_medal_vars.append((ids, box))
+            if stars:
+                ttk.Label(self.bio_medals_frame, text=self.t["bio_stars_hint"],
+                          foreground=self.INK_MUTED).pack(anchor="w", padx=8, pady=(4, 6))
+        self.bio_save_btn["state"] = "normal"
+        self.bio_restore_btn["state"] = "normal" if own is not None else "disabled"
+
+    def _bio_selected_awards(self) -> List[int]:
+        out = []
+        for ids, widget in self.bio_medal_vars:
+            if isinstance(widget, tk.BooleanVar):
+                if widget.get():
+                    out.append(ids[0])
+            else:
+                index = widget.current()
+                if index > 0:
+                    out.append(ids[index - 1])
+        return out
+
+    def _save_bio(self) -> None:
+        if self.career is None or self.bio_info is None:
+            return
+        info = self.bio_info
+        text = self.bio_text.get("1.0", "end").strip()
+        if len(text) > custombio.MAX_LENGTH:
+            messagebox.showerror(self.t["title"], self.t["bio_too_long"].format(
+                n=len(text), max=custombio.MAX_LENGTH))
+            return
+        unknown = custombio.unknown_variables(text)
+        if unknown and not messagebox.askyesno(
+                self.t["title"], self.t["bio_unknown"].format(vars="\n".join(unknown))):
+            return
+        # Unchanged text and medals are not stored, so the record only ever
+        # holds what the player actually changed.
+        own_text = (None if custombio.paragraphs(text) == custombio.paragraphs(self.bio_game_text)
+                    else text)
+        awards = None
+        if self.bio_medal_vars:
+            country = info["country"]
+            picked = wwii_awards.chosen(self._bio_selected_awards(), country)
+            if picked != wwii_awards.chosen(self.bio_inferred, country):
+                awards = list(picked)
+        try:
+            if own_text is None and awards is None:
+                custombio.clear(self.career.path)
+            else:
+                custombio.save(self.career.path, info["id"], info["country"], own_text, awards)
+        except Exception as exc:          # noqa: BLE001 - presented in the UI
+            messagebox.showerror(self.t["title"], self.t["failed"].format(error=exc))
+            return
+        self._fill_bio()
+        self.status.set(self.t["bio_saved"].format(name=info["name"]))
+
+    def _restore_bio(self) -> None:
+        if self.career is None or self.bio_info is None:
+            return
+        name = self.bio_info["name"]
+        custombio.clear(self.career.path)
+        self._fill_bio()
+        self.status.set(self.t["bio_restored"].format(name=name))
 
     def _selected(self) -> Optional[Dict]:
         sel = self.tree.selection()

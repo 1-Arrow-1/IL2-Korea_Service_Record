@@ -1,6 +1,7 @@
 from contextlib import nullcontext
 from types import SimpleNamespace
 
+from korea_service_record import custombio
 from korea_service_record.career.aggregator import (
     CareerAggregator,
     _biography_paragraphs,
@@ -66,15 +67,23 @@ class _Database:
         return [{"rankId": 1}]
 
 
-def test_biography_reads_selected_game_template_and_starting_rank():
+def _aggregator(tmp_path, monkeypatch):
+    # Own-biography records live beside the asset cache; keep them out of
+    # the real %LOCALAPPDATA%.
+    monkeypatch.setenv("KOREA_TRACKER_CACHE", str(tmp_path / "assets"))
     agg = object.__new__(CareerAggregator)
     agg.lang = "eng"
     agg.locale = _Locale()
     agg.resolver = _Resolver()
     agg._career_files = lambda: {
-        "career": SimpleNamespace(path="career.db")
+        "career": SimpleNamespace(path=str(tmp_path / "career.db"))
     }
     agg._open = lambda _meta: nullcontext(_Database())
+    return agg
+
+
+def test_biography_reads_selected_game_template_and_starting_rank(tmp_path, monkeypatch):
+    agg = _aggregator(tmp_path, monkeypatch)
 
     result = agg.biography("career", 7)
 
@@ -84,6 +93,7 @@ def test_biography_reads_selected_game_template_and_starting_rank():
     assert result == {
         "career_id": "career",
         "biography_id": "601003",
+        "custom": False,
         "source_language": "eng",
         "paragraphs": [
             "$[name] was born on $[birthDate].",
@@ -98,3 +108,18 @@ def test_biography_reads_selected_game_template_and_starting_rank():
             "starting_rank": "First Lieutenant",
         },
     }
+
+
+def test_own_biography_replaces_the_game_text_for_its_pilot_only(tmp_path, monkeypatch):
+    agg = _aggregator(tmp_path, monkeypatch)
+    custombio.save(tmp_path / "career.db", 7, 601,
+                   "$[name] wrote this.\r\n\r\nSecond   line\nwraps.", None)
+
+    result = agg.biography("career", 7)
+
+    assert result["custom"] is True
+    assert result["biography_id"] == "601003"          # the game's choice stays
+    assert result["paragraphs"] == ["$[name] wrote this.", "Second line wraps."]
+
+    custombio.save(tmp_path / "career.db", 8, 601, "A successor's text.", None)
+    assert agg.biography("career", 7)["custom"] is False

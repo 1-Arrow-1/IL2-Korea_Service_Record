@@ -38,7 +38,7 @@ from ..geo import (MapTiles, Overlay, WAYPOINT_TAKEOFF, WAYPOINT_LANDING,
                    parse_point, parse_route)
 from ..icons import IconLibrary
 from ..diary import DiaryBuilder
-from .. import citations, corrections, ribbons, wwii_awards
+from .. import citations, corrections, custombio, ribbons, wwii_awards
 from .. import medals as medal_art
 
 # KOREA_PREVIEW_RACK=all|navy|usmc|sov|dprk: every ladder of that country at its top
@@ -298,25 +298,9 @@ def _pilot_description(raw: str) -> Dict[str, str]:
     return out
 
 
-def _biography_paragraphs(raw: str) -> List[str]:
-    """The game's small HTML biography as safe, plain-text paragraphs."""
-    text = (raw or "").strip()
-    if not text:
-        return []
-    found = re.findall(r"<p(?:\s[^>]*)?>(.*?)</p>", text,
-                       flags=re.IGNORECASE | re.DOTALL)
-    pieces = found if found else re.split(r"(?:\r?\n){2,}", text)
-    paragraphs = []
-    for piece in pieces:
-        # Stock biographies contain only <p>, but a hand-written loose file
-        # may contain simple inline markup. The page receives text, never
-        # game-supplied HTML, so it cannot become executable browser content.
-        plain = re.sub(r"<br\s*/?>", " ", piece, flags=re.IGNORECASE)
-        plain = re.sub(r"<[^>]+>", "", plain)
-        plain = re.sub(r"\s+", " ", html.unescape(plain)).strip()
-        if plain:
-            paragraphs.append(plain)
-    return paragraphs
+# The game's small HTML biography as safe, plain-text paragraphs; shared
+# with the Career Helper, which edits the same text.
+_biography_paragraphs = custombio.html_paragraphs
 
 
 def _humanise(key: str) -> str:
@@ -1673,6 +1657,12 @@ class CareerAggregator:
                     "nsdata/assets/characterbio/"
                     f"bio.id={biography_id}.locale=eng.txt")
             paragraphs = _biography_paragraphs(raw or "")
+            # A biography the player rewrote in the Career Helper wins.
+            own = custombio.load(Path(meta.path), pilot["id"])
+            custom = bool(own and own["text"])
+            if custom:
+                paragraphs = custombio.paragraphs(own["text"])
+                source_language = self.lang
             if not paragraphs:
                 return None
 
@@ -1682,6 +1672,7 @@ class CareerAggregator:
             return {
                 "career_id": career_id,
                 "biography_id": biography_id,
+                "custom": custom,
                 "source_language": source_language,
                 "paragraphs": paragraphs,
                 "pilot": {
@@ -2730,12 +2721,18 @@ class CareerAggregator:
             # The selectable biography is the only surviving evidence of the
             # pilot's service before Korea.  These medals belong on what he
             # wears, but are not Korean-career award events and therefore do
-            # not enter the dated awards list above.
+            # not enter the dated awards list above.  A player who wrote his
+            # own biography in the Career Helper chose them himself.
+            own = custombio.load(Path(meta.path), pid)
+            if own and own["wwii_awards"] is not None:
+                prior_ids = wwii_awards.chosen(own["wwii_awards"], player["country"])
+            else:
+                prior_ids = wwii_awards.for_career_description(
+                    player["description"], player["country"])
             prior_awards = [
                 {"type": award_id, "name": self.award_name(award_id),
                  "pending": False, "history": []}
-                for award_id in wwii_awards.for_career_description(
-                    player["description"], player["country"])
+                for award_id in prior_ids
             ]
 
             # The rank on the earliest sortie is where the career began.
