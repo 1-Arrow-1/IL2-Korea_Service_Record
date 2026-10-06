@@ -1,0 +1,41 @@
+IL-2 Korea Service Record 2.2.3 — hotfix for custom portraits
+
+
+Gentlemen,
+
+If you are on 2.2.2 and gave your pilot a custom portrait with the Career
+Helper, please update now.
+
+THE PROBLEM
+
+The game only accepts a portrait name of up to 15 characters. 2.2.2 wrote a
+longer one, and from then on the game crashed to the desktop every time the
+career moved on to a new day.
+
+THE FIX
+
+- 2.2.3 gives custom portraits a short name the game can handle.
+- If your career is already affected, open it once in the Service Record
+  after updating. It moves your portrait to the short name and repairs the
+  career automatically, with a backup first. Your portrait stays.
+- After that, the next day works again. Nothing else in your career changes.
+
+ALSO
+
+- The pilot biography now sits on a desk instead of a plain background.
+- A note on 2.2.0's napalm correction: the repeated kills come from any fire
+  on airfield buildings, not only napalm - a bomb that sets a fuel store
+  burning does it too. The correction already handles both.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.2.3
+
+Installer  IL2_Korea_Service_Record_Setup_v2.2.3.exe
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Zip        IL-2.Korea.Service.Record.v2.2.3.zip
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Everything is Authenticode signed.

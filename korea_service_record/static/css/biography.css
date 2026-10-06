@@ -13,10 +13,16 @@ body.biography-page {
     min-height: 100vh;
     margin: 0;
     color: var(--bio-ink);
-    background:
+    background-color: var(--bio-desk);
+    background-image:
+        linear-gradient(rgba(11, 11, 8, 0.08), rgba(11, 11, 8, 0.08)),
+        url("../images/biography/biography_background.jpg"),
         radial-gradient(ellipse at 50% 15%, rgba(255, 244, 209, 0.12), transparent 55%),
-        repeating-linear-gradient(92deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 8px),
-        var(--bio-desk);
+        repeating-linear-gradient(92deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 8px);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 .biography-bar {

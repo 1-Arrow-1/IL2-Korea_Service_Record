@@ -34,13 +34,13 @@ def test_player_portrait_updates_only_career_player(tmp_path):
         "personage_id": 601002,
         "avatar_path": "usa50a/7",
     }
-    backup = career.set_player_portrait("custom/example-2")
+    backup = career.set_player_portrait("cp/example2")
 
     assert backup.is_file()
     with sqlite3.connect(career.path) as con:
         assert con.execute(
             "SELECT id, avatarPath FROM pilot ORDER BY id"
-        ).fetchall() == [(1, "usa50a/1"), (2, "custom/example-2")]
+        ).fetchall() == [(1, "usa50a/1"), (2, "cp/example2")]
 
 
 def test_restore_record_round_trip(tmp_path, monkeypatch):

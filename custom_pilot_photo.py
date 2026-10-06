@@ -24,6 +24,7 @@ import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 
 from korea_service_record.assets import default_cache_dir
+from korea_service_record.portraitfix import MAX_AVATAR_PATH, short_avatar_path  # noqa: F401
 
 
 PORTRAIT_SIZE = 512
@@ -278,12 +279,15 @@ def career_key(career_path: Path) -> str:
 
 
 def custom_avatar_path(career_path: Path, pilot_id: int) -> str:
-    return f"custom/{career_key(career_path)}-{int(pilot_id)}"
+    # 13 characters. The game copies avatarPath into a 16-byte buffer and aborts
+    # on anything longer (see korea_service_record/portraitfix.py) - 2.2.2 used
+    # custom/<16 hex>-<id>, 26 characters, and crashed every new day.
+    return short_avatar_path(career_path, pilot_id)
 
 
 def portrait_destination(game_dir: Path, avatar_path: str) -> Path:
     safe = avatar_path.replace("\\", "/").strip("/")
-    if not re.fullmatch(r"custom/[A-Za-z0-9_-]+", safe):
+    if not re.fullmatch(r"(custom|cp)/[A-Za-z0-9_-]+", safe):
         raise ValueError("unsafe custom portrait path")
     return Path(game_dir) / "data/NSData/assets/pilotphotos" / f"{safe}.dds"
 

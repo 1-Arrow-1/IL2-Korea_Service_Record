@@ -1590,6 +1590,10 @@ class Career:
 
     def set_player_portrait(self, avatar_path: str) -> Path:
         """Point the current player's portrait at a loose DDS, after backup."""
+        from korea_service_record.portraitfix import MAX_AVATAR_PATH
+        if len(avatar_path) > MAX_AVATAR_PATH:
+            # The game aborts at the next new day on a longer path.
+            raise ValueError(f"portrait path longer than {MAX_AVATAR_PATH} characters: {avatar_path}")
         backup = self.backup()
         with self._open(write=True) as con:
             con.execute("BEGIN IMMEDIATE")

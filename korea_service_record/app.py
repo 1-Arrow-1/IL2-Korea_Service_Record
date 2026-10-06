@@ -409,6 +409,13 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             auto_sync(Path(meta.path), agg.game_dir)
         except Exception:                    # noqa: BLE001 - never break the page over this
             logger.exception("Automatic flight-time correction failed for %s", career_id)
+        # A custom portrait path the game cannot hold (portraitfix.py): it
+        # crashes the next day rollover, so this runs first.
+        try:
+            from . import portraitfix
+            portraitfix.repair(Path(meta.path), agg.game_dir)
+        except Exception:                    # noqa: BLE001
+            logger.exception("Portrait path repair failed for %s", career_id)
         # Sorties the 29 Sep build never saved (recovery.py), restored from the
         # debrief - before the napalm run, so it sees and corrects them too.
         try:
