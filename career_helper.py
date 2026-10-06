@@ -175,10 +175,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "bio_too_long": "The biography is {n} characters long; the limit is {max}.",
         "bio_none": "This career has no biography to start from.",
         "bio_boost": "Boosters",
-        "bio_boost_intro": "Your biography gave {total} booster points. Share them out again, at most {max} on one attribute; points added at promotions since stay on top. Applying writes to the career: close IL-2 Korea first. A backup is taken.",
+        "bio_boost_intro": "Your pilot has {total} booster points: {bio} from his biography and {promo} from promotions. Share them out again as you like, at most {max} on one attribute. Applying writes to the career: close IL-2 Korea first. A backup is taken.",
         "bio_boost_left": "{n} of {total} points still to share",
         "bio_boost_done": "All {total} points shared",
-        "bio_boost_earned": "Added at promotions since: {values}",
         "bio_boost_apply": "Apply boosters",
         "bio_boost_applied": "Boosters for {name} are now {values}. Backup: {backup}",
         "bio_boost_unknown": "The game data does not say how many points this biography gave, so its boosters cannot be shared out again.",
@@ -346,10 +345,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "bio_too_long": "Die Biografie ist {n} Zeichen lang; erlaubt sind {max}.",
         "bio_none": "Diese Laufbahn hat keine Biografie, von der aus Sie beginnen könnten.",
         "bio_boost": "Boni",
-        "bio_boost_intro": "Ihre Biografie gab {total} Bonuspunkte. Verteilen Sie sie neu, höchstens {max} auf eine Eigenschaft; Punkte aus späteren Beförderungen bleiben obendrauf. Übernehmen schreibt in die Laufbahn: zuerst IL-2 Korea schließen. Es wird eine Sicherung angelegt.",
+        "bio_boost_intro": "Ihr Pilot hat {total} Bonuspunkte: {bio} aus der Biografie und {promo} aus Beförderungen. Verteilen Sie sie beliebig neu, höchstens {max} auf eine Eigenschaft. Übernehmen schreibt in die Laufbahn: zuerst IL-2 Korea schließen. Es wird eine Sicherung angelegt.",
         "bio_boost_left": "Noch {n} von {total} Punkten zu verteilen",
         "bio_boost_done": "Alle {total} Punkte verteilt",
-        "bio_boost_earned": "Seither bei Beförderungen hinzugekommen: {values}",
         "bio_boost_apply": "Boni übernehmen",
         "bio_boost_applied": "Die Boni von {name} sind jetzt {values}. Sicherung: {backup}",
         "bio_boost_unknown": "Die Spieldaten sagen nicht, wie viele Punkte diese Biografie gab, daher können ihre Boni nicht neu verteilt werden.",
@@ -517,10 +515,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "bio_too_long": "La biografía tiene {n} caracteres; el límite es {max}.",
         "bio_none": "Esta carrera no tiene una biografía de la que partir.",
         "bio_boost": "Potenciadores",
-        "bio_boost_intro": "Su biografía dio {total} puntos de potenciador. Repártalos de nuevo, como máximo {max} en un atributo; los puntos obtenidos después en ascensos se mantienen. Aplicar escribe en la carrera: cierre antes IL-2 Korea. Se crea una copia de seguridad.",
+        "bio_boost_intro": "Su piloto tiene {total} puntos de potenciador: {bio} de su biografía y {promo} de ascensos. Repártalos de nuevo como quiera, como máximo {max} en un atributo. Aplicar escribe en la carrera: cierre antes IL-2 Korea. Se crea una copia de seguridad.",
         "bio_boost_left": "Quedan {n} de {total} puntos por repartir",
         "bio_boost_done": "Los {total} puntos están repartidos",
-        "bio_boost_earned": "Añadidos después en ascensos: {values}",
         "bio_boost_apply": "Aplicar potenciadores",
         "bio_boost_applied": "Los potenciadores de {name} son ahora {values}. Copia de seguridad: {backup}",
         "bio_boost_unknown": "Los datos del juego no indican cuántos puntos dio esta biografía, así que sus potenciadores no se pueden repartir de nuevo.",
@@ -688,10 +685,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "bio_too_long": "La biographie compte {n} caractères ; la limite est de {max}.",
         "bio_none": "Cette carrière n’a pas de biographie de départ.",
         "bio_boost": "Bonus",
-        "bio_boost_intro": "Votre biographie a donné {total} points de bonus. Répartissez-les à nouveau, au plus {max} sur un attribut ; les points obtenus depuis lors de promotions restent en plus. Appliquer écrit dans la carrière : fermez d’abord IL-2 Korea. Une sauvegarde est créée.",
+        "bio_boost_intro": "Votre pilote a {total} points de bonus : {bio} de sa biographie et {promo} de promotions. Répartissez-les à nouveau comme vous le souhaitez, au plus {max} sur un attribut. Appliquer écrit dans la carrière : fermez d’abord IL-2 Korea. Une sauvegarde est créée.",
         "bio_boost_left": "Encore {n} points sur {total} à répartir",
         "bio_boost_done": "Les {total} points sont répartis",
-        "bio_boost_earned": "Ajoutés depuis lors de promotions : {values}",
         "bio_boost_apply": "Appliquer les bonus",
         "bio_boost_applied": "Les bonus de {name} sont maintenant {values}. Sauvegarde : {backup}",
         "bio_boost_unknown": "Les données du jeu n’indiquent pas combien de points cette biographie a donnés ; ses bonus ne peuvent donc pas être répartis à nouveau.",
@@ -859,10 +855,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "bio_too_long": "Длина биографии — {n} символов; предел — {max}.",
         "bio_none": "У этой карьеры нет биографии, от которой можно оттолкнуться.",
         "bio_boost": "Бустеры",
-        "bio_boost_intro": "Ваша биография дала {total} очка бустеров. Распределите их заново, не больше {max} на одно качество; очки, полученные позже при повышениях, сохраняются сверху. Применение записывает в карьеру: сначала закройте IL-2 Korea. Создаётся резервная копия.",
+        "bio_boost_intro": "Очки бустеров вашего лётчика: {total} — {bio} из биографии и {promo} за повышения. Распределите их заново как угодно, не больше {max} на одно качество. Применение записывает в карьеру: сначала закройте IL-2 Korea. Создаётся резервная копия.",
         "bio_boost_left": "Осталось распределить {n} из {total} очков",
         "bio_boost_done": "Все {total} очка распределены",
-        "bio_boost_earned": "Добавлено позже при повышениях: {values}",
         "bio_boost_apply": "Применить бустеры",
         "bio_boost_applied": "Бустеры {name} теперь {values}. Резервная копия: {backup}",
         "bio_boost_unknown": "В данных игры не указано, сколько очков дала эта биография, поэтому её бустеры нельзя распределить заново.",
@@ -1030,10 +1025,9 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "bio_too_long": "生平长度为 {n} 个字符；上限为 {max}。",
         "bio_none": "此生涯没有可作为起点的生平。",
         "bio_boost": "加成",
-        "bio_boost_intro": "您的生平提供了 {total} 点加成。请重新分配，每项属性最多 {max} 点；此后晋升时获得的点数会保留在上面。应用会写入生涯：请先关闭 IL-2 Korea。会先创建备份。",
+        "bio_boost_intro": "您的飞行员共有 {total} 点加成：生平提供 {bio} 点，晋升获得 {promo} 点。可任意重新分配，每项属性最多 {max} 点。应用会写入生涯：请先关闭 IL-2 Korea。会先创建备份。",
         "bio_boost_left": "还有 {n} / {total} 点待分配",
         "bio_boost_done": "{total} 点已全部分配",
-        "bio_boost_earned": "此后晋升时增加：{values}",
         "bio_boost_apply": "应用加成",
         "bio_boost_applied": "{name} 的加成现在为 {values}。备份：{backup}",
         "bio_boost_unknown": "游戏数据未说明此生平提供了多少点，因此无法重新分配其加成。",
@@ -2665,14 +2659,14 @@ class App(tk.Tk):
         self.bio_boost_left_var = tk.StringVar()
         ttk.Label(boost, textvariable=self.bio_boost_left_var,
                   foreground=self.ACCENT_DARK).pack(anchor="w", padx=8, pady=(4, 0))
-        self.bio_boost_earned_var = tk.StringVar()
-        ttk.Label(boost, textvariable=self.bio_boost_earned_var, wraplength=320,
-                  foreground=self.INK_MUTED).pack(anchor="w", padx=8)
         self.bio_boost_btn = ttk.Button(boost, text=self.t["bio_boost_apply"],
                                         command=self._apply_boosters, state="disabled")
         self.bio_boost_btn.pack(anchor="w", fill="x", padx=8, pady=(6, 8))
         self.bio_boost_total = 0
-        self.bio_boost_allocated: Optional[Dict[str, int]] = None
+        # the boosters as the box read them; the write is refused if the
+        # career holds anything else by then
+        self.bio_boost_current: Optional[Dict[str, int]] = None
+        self.bio_boost_lead: Optional[int] = None
         self.bio_info: Optional[Dict[str, Any]] = None
         self.bio_game_text = ""
         self.bio_inferred: tuple = ()
@@ -3140,17 +3134,16 @@ class App(tk.Tk):
         }[key]
         return self.game_t.get(game_key) or self.t[ours]
 
-    def _boost_text(self, values: Dict[str, int], only_positive: bool = False) -> str:
+    def _boost_text(self, values: Dict[str, int]) -> str:
         return " · ".join(f"{self._boost_name(k)} {values[k]}"
-                          for k in ("skill", "discipline", "courage")
-                          if values[k] > 0 or not only_positive)
+                          for k in ("skill", "discipline", "courage"))
 
     def _fill_boosters(self, info: Dict[str, Any], own: Optional[Dict[str, Any]],
                        game: Optional[Path]) -> None:
-        self.bio_boost_allocated = None
+        self.bio_boost_current = None
+        self.bio_boost_lead = None
         self.bio_boost_total = 0
         self.bio_boost_left_var.set("")
-        self.bio_boost_earned_var.set("")
         self.bio_boost_btn["state"] = "disabled"
         points = None
         if game is not None and info["biography_id"]:
@@ -3166,30 +3159,29 @@ class App(tk.Tk):
             for var in self.bio_boost_vars.values():
                 var.set(0)
             return
-        # What the career holds of the biography's points: the player's last
-        # sharing-out if he made one, else the biography's own. Anything above
-        # that came from promotions and is left where it is.
-        allocated = own["boosters"] if own and own["boosters"] else points
-        self.bio_boost_allocated = allocated
-        self.bio_boost_total = sum(points.values())
+        # Everything the pilot has is shared out again, promotion points
+        # included (custombio): the box shows what the career holds.
         current = custombio.boosters(info["lead_level"])
-        earned = {k: max(0, current[k] - allocated[k]) for k in custombio.BOOSTER_KEYS}
+        biography = sum(points.values())
+        total = sum(current.values())
+        cap = custombio.booster_cap(biography, current)
+        self.bio_boost_current = current
+        self.bio_boost_lead = info["lead_level"]
+        self.bio_boost_total = total
+        self.bio_boost_cap = cap
         for key, var in self.bio_boost_vars.items():
-            var.set(allocated[key])
+            var.set(current[key])
         for spin in self.bio_boost_spins:
-            spin["state"] = "readonly"
+            spin.configure(to=cap, state="readonly")
         self.bio_boost_intro_var.set(self.t["bio_boost_intro"].format(
-            total=self.bio_boost_total, max=custombio.BOOSTER_MAX))
-        if any(earned.values()):
-            self.bio_boost_earned_var.set(self.t["bio_boost_earned"].format(
-                values=self._boost_text(earned, only_positive=True)))
+            total=total, bio=min(biography, total), promo=max(0, total - biography), max=cap))
         self._bio_boost_changed()
 
     def _bio_boost_chosen(self) -> Dict[str, int]:
         return {key: int(var.get()) for key, var in self.bio_boost_vars.items()}
 
     def _bio_boost_changed(self) -> None:
-        if self.bio_boost_allocated is None:
+        if self.bio_boost_current is None:
             return
         chosen = self._bio_boost_chosen()
         left = self.bio_boost_total - sum(chosen.values())
@@ -3197,27 +3189,26 @@ class App(tk.Tk):
             self.t["bio_boost_done"].format(total=self.bio_boost_total) if left == 0 else
             self.t["bio_boost_left"].format(n=left, total=self.bio_boost_total))
         self.bio_boost_btn["state"] = (
-            "normal" if left == 0 and chosen != self.bio_boost_allocated else "disabled")
+            "normal" if left == 0 and chosen != self.bio_boost_current else "disabled")
 
     def _apply_boosters(self) -> None:
-        if self.career is None or self.bio_boost_allocated is None:
+        if self.career is None or self.bio_boost_current is None:
             return
         chosen = self._bio_boost_chosen()
         try:
-            custombio.check_allocation(chosen, self.bio_boost_total)
-            info = self.career.player_biography()        # what the file holds now
-            lead = custombio.reallocate(info["lead_level"], self.bio_boost_allocated, chosen)
-            backup = self.career.set_player_boosters(info["lead_level"], lead)
-            custombio.save_boosters(self.career.path, info["id"], info["country"], chosen)
+            custombio.check_allocation(chosen, self.bio_boost_total, self.bio_boost_cap)
+            lead = custombio.repack(self.bio_boost_lead, chosen)
+            backup = self.career.set_player_boosters(self.bio_boost_lead, lead)
         except sqlite3.OperationalError:
             messagebox.showerror(self.t["title"], self.t["locked"])
             return
         except Exception as exc:          # noqa: BLE001 - presented in the UI
             messagebox.showerror(self.t["title"], self.t["failed"].format(error=exc))
             return
+        name = self.bio_info["name"] if self.bio_info else ""
         self._fill_bio()
         self.status.set(self.t["bio_boost_applied"].format(
-            name=info["name"], values=self._boost_text(custombio.boosters(lead)), backup=backup))
+            name=name, values=self._boost_text(custombio.boosters(lead)), backup=backup))
 
     def _bio_selected_awards(self) -> List[int]:
         out = []

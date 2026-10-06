@@ -41,11 +41,19 @@ _VARIABLE = re.compile(r"\$\[([^\]]*)\]")
 
 # Boosters. The biography chosen at career start seeds the player's
 # ``pilot.leadLevel`` from ``characterbio/info.json`` (4 points, 5 for two
-# biographies, at most 3 on one attribute); the game adds more during the
-# career. leadLevel packs them low nibble first as skill, courage, discipline
-# (see career/attributes.py). Unlike the text, these DO matter to the game:
-# the mission commander's boosters raise every participant's weights in
-# missions resolved without the player (Ranks-effectiveness.cfg).
+# biographies, at most 3 on one attribute); every promotion adds one more,
+# on the attribute the player picks in the game. leadLevel packs them low
+# nibble first as skill, courage, discipline (see career/attributes.py).
+# Unlike the text, these DO matter to the game: the mission commander's
+# boosters raise every participant's weights in missions resolved without
+# the player (Ranks-effectiveness.cfg).
+#
+# The player may share out ALL his points again - the promotion points too,
+# since he chose where they went - keeping the total, and with no attribute
+# above what the game itself could have produced: 3 from the biography plus
+# every promotion point. Nothing needs remembering between changes, so a
+# lost or unseen record cannot add points (an earlier design kept the
+# biography's share in the record and did exactly that).
 BOOSTER_KEYS = ("skill", "courage", "discipline")       # packed order
 BOOSTER_MAX = 3                                          # per attribute, as the stock biographies
 
@@ -70,30 +78,33 @@ def boosters(lead_level: int) -> Dict[str, int]:
     return {key: (lead >> (4 * i)) & 0xF for i, key in enumerate(BOOSTER_KEYS)}
 
 
-def check_allocation(chosen: Dict[str, int], total: int) -> None:
+def booster_cap(biography_total: int, current: Dict[str, int]) -> int:
+    """
+    The most one attribute may hold: the biography's 3 plus every point the
+    promotions added - and never less than the pilot already has there.
+    """
+    promotions = max(0, sum(current.values()) - int(biography_total))
+    # 15 is all a leadLevel nibble holds
+    return min(0xF, max(BOOSTER_MAX + promotions, max(current.values())))
+
+
+def check_allocation(chosen: Dict[str, int], total: int, cap: int) -> None:
     """Raise ValueError unless ``chosen`` shares out exactly ``total`` points."""
     values = [int(chosen.get(key, -1)) for key in BOOSTER_KEYS]
-    if any(v < 0 or v > BOOSTER_MAX for v in values):
-        raise ValueError(f"each booster must be 0 to {BOOSTER_MAX}")
+    if any(v < 0 or v > cap for v in values):
+        raise ValueError(f"each booster must be 0 to {cap}")
     if sum(values) != total:
         raise ValueError(f"the boosters must add up to {total}, not {sum(values)}")
 
 
-def reallocate(lead_level: int, allocated: Dict[str, int],
-               chosen: Dict[str, int]) -> int:
-    """
-    ``leadLevel`` with the biography's share moved from ``allocated`` to
-    ``chosen``. What the game added on top stays; bits above the three
-    boosters are kept as they are.
-    """
+def repack(lead_level: int, chosen: Dict[str, int]) -> int:
+    """``leadLevel`` holding ``chosen``; bits above the three boosters are kept."""
     lead = int(lead_level or 0)
-    current = boosters(lead)
     packed = 0
     for i, key in enumerate(BOOSTER_KEYS):
-        earned = max(0, current[key] - int(allocated[key]))
-        value = earned + int(chosen[key])
-        if value > 0xF:
-            raise ValueError(f"{key} booster would exceed 15")
+        value = int(chosen[key])
+        if not 0 <= value <= 0xF:
+            raise ValueError(f"{key} booster out of range: {value}")
         packed |= value << (4 * i)
     return (lead & ~0xFFF) | packed
 
@@ -123,16 +134,6 @@ def _write(career_path: Path, data: Dict[str, Any]) -> Path:
     return target
 
 
-def _boosters_of(data: Dict[str, Any]) -> Optional[Dict[str, int]]:
-    value = data.get("boosters")
-    if not isinstance(value, dict):
-        return None
-    try:
-        return {key: int(value[key]) for key in BOOSTER_KEYS}
-    except (KeyError, TypeError, ValueError):
-        return None
-
-
 def load(career_path: Path, pilot_id: int) -> Optional[Dict[str, Any]]:
     """This pilot's record, or None when there is none or it is another's."""
     data = _read(career_path, pilot_id)
@@ -145,8 +146,6 @@ def load(career_path: Path, pilot_id: int) -> Optional[Dict[str, Any]]:
         "country": data.get("country"),
         "text": text if isinstance(text, str) and text.strip() else None,
         "wwii_awards": list(awards) if isinstance(awards, list) else None,
-        # the biography's points as the player last shared them out
-        "boosters": _boosters_of(data),
         "updated": data.get("updated"),
     }
 
@@ -155,16 +154,14 @@ def save(career_path: Path, pilot_id: int, country: int,
          text: Optional[str], awards: Optional[List[int]]) -> Path:
     """
     Write the text and medals. ``text`` None keeps the game's biography;
-    ``awards`` None keeps the medals inferred from it. A booster allocation
-    already recorded is kept. Raises ValueError on a text longer than
-    :data:`MAX_LENGTH`.
+    ``awards`` None keeps the medals inferred from it. Raises ValueError on a
+    text longer than :data:`MAX_LENGTH`.
     """
     if text is not None:
         text = text.replace("\r\n", "\n").strip()
         if len(text) > MAX_LENGTH:
             raise ValueError(f"biography longer than {MAX_LENGTH} characters")
         text = text or None
-    previous = _read(career_path, pilot_id) or {}
     data = {
         "version": 1,
         "career": str(career_path),
@@ -173,32 +170,12 @@ def save(career_path: Path, pilot_id: int, country: int,
         "text": text,
         "wwii_awards": (None if awards is None
                         else list(wwii_awards.chosen(awards, int(country)))),
-        "boosters": _boosters_of(previous),
     }
     return _write(career_path, data)
 
 
-def save_boosters(career_path: Path, pilot_id: int, country: int,
-                  chosen: Dict[str, int]) -> Path:
-    """Record how the biography's points are now shared out; text and medals stay."""
-    data = _read(career_path, pilot_id) or {
-        "version": 1, "career": str(career_path), "pilot_id": int(pilot_id),
-        "country": int(country), "text": None, "wwii_awards": None}
-    data["boosters"] = {key: int(chosen[key]) for key in BOOSTER_KEYS}
-    return _write(career_path, data)
-
-
 def clear(career_path: Path, pilot_id: Optional[int] = None) -> None:
-    """
-    Back to the game's text and medals. A booster allocation stays recorded:
-    the career still holds it, and the next change must know it.
-    """
-    data = _read(career_path, pilot_id) if pilot_id is not None else None
-    if data is not None and _boosters_of(data) is not None:
-        data["text"] = None
-        data["wwii_awards"] = None
-        _write(career_path, data)
-        return
+    """Back to the game's text and medals. ``pilot_id`` is accepted for callers."""
     try:
         state_path(career_path).unlink()
     except FileNotFoundError:

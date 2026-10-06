@@ -54,7 +54,7 @@ def test_a_damaged_record_is_ignored(tmp_path, monkeypatch):
                     encoding="utf-8")
     assert custombio.load(career, 20) == {
         "pilot_id": 20, "country": None, "text": None,
-        "wwii_awards": None, "boosters": None, "updated": None}
+        "wwii_awards": None, "updated": None}
 
 
 def test_game_markup_becomes_editable_text_and_back():
@@ -103,38 +103,28 @@ def test_lead_level_unpacks_skill_courage_discipline():
     assert custombio.boosters(0x22D) == {"skill": 13, "courage": 2, "discipline": 2}
 
 
-def test_reallocation_moves_only_the_biography_points():
-    base = {"skill": 0, "courage": 2, "discipline": 2}
-    chosen = {"skill": 3, "courage": 1, "discipline": 0}
-    # the game's earned skill point stays on top of the new share
-    assert custombio.reallocate(0x221, base, chosen) == 0x014
-    # and moving back gives the original value again
-    assert custombio.reallocate(0x014, chosen, base) == 0x221
+def test_everything_is_shared_out_within_what_the_game_could_produce():
+    # Alex: 3/1/1 (skill/courage/discipline) = biography 4 + one promotion point
+    current = custombio.boosters(0x113)
+    assert current == {"skill": 3, "courage": 1, "discipline": 1}
+    assert custombio.booster_cap(4, current) == 4          # 3 + 1 promotion
+    custombio.check_allocation({"skill": 2, "courage": 2, "discipline": 1}, 5, 4)
+    assert custombio.repack(0x113, {"skill": 2, "courage": 2, "discipline": 1}) == 0x122
     # bits above the three boosters are left alone
-    assert custombio.reallocate(0x5221, base, chosen) == 0x5014
+    assert custombio.repack(0x5113, {"skill": 2, "courage": 2, "discipline": 1}) == 0x5122
+    # never below what the pilot already has on one attribute
+    assert custombio.booster_cap(4, {"skill": 4, "courage": 0, "discipline": 0}) == 4
+    # and never above what a leadLevel nibble holds
+    assert custombio.booster_cap(4, {"skill": 13, "courage": 2, "discipline": 2}) == 15
 
 
 def test_allocation_must_share_out_the_total_within_the_cap():
-    custombio.check_allocation({"skill": 2, "courage": 2, "discipline": 0}, 4)
+    custombio.check_allocation({"skill": 2, "courage": 2, "discipline": 0}, 4, 3)
     for bad in ({"skill": 4, "courage": 0, "discipline": 0},
                 {"skill": 1, "courage": 1, "discipline": 1},
                 {"skill": 3, "courage": 2}):
         try:
-            custombio.check_allocation(bad, 4)
+            custombio.check_allocation(bad, 4, 3)
         except ValueError:
             continue
         raise AssertionError(f"accepted {bad}")
-
-
-def test_booster_record_survives_text_saves_and_restore(tmp_path, monkeypatch):
-    career = _isolate(tmp_path, monkeypatch)
-    chosen = {"skill": 2, "courage": 2, "discipline": 0}
-    custombio.save_boosters(career, 20, 601, chosen)
-    custombio.save(career, 20, 601, "Own text.", [601076])
-    own = custombio.load(career, 20)
-    assert own["boosters"] == chosen and own["text"] == "Own text."
-
-    custombio.clear(career, 20)
-    own = custombio.load(career, 20)
-    assert own["boosters"] == chosen
-    assert own["text"] is None and own["wwii_awards"] is None
