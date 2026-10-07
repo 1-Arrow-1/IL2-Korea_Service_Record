@@ -395,6 +395,9 @@
   "roster": {
     "count_with_reserve": "{total}, {reserve} in reserve",
     "heading": "Squadron Statistics",
+    "promo_show": "Show what each pilot needs for his next rank",
+    "promo_hide": "Hide the promotion requirements",
+    "promo_top": "Highest rank the game promotes to",
     "operations": "Operations",
     "operations_value": "{total} ({successful} successful)",
     "operations_hint": "Operations the squadron saw through to their end. An operation it flew no sorties in still counts against the total, which is how the game itself scores a unit.",

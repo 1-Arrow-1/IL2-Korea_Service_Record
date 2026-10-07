@@ -797,6 +797,26 @@ table.roster tr.is-kia td { color: #93796a; }
    line-up, not as faded as the dead — they are coming back. */
 table.roster tr.is-reserve td { color: var(--ink-muted); }
 table.roster tr.is-reserve .roster-photo { filter: saturate(0.6); opacity: 0.85; }
+/* The +/- beside RANK opens a promotion line under every living pilot,
+   merged across RANK and NAME, with no rule between the man and his line. */
+table.roster th .promo-toggle {
+    margin-left: 0.45rem; width: 1.15rem; height: 1.15rem; padding: 0;
+    border: 1px solid var(--border-soft); border-radius: 3px;
+    background: var(--paper); color: var(--accent-dark);
+    font: bold 0.8rem/1 Georgia, serif; cursor: pointer; vertical-align: middle;
+}
+table.roster th .promo-toggle:hover { background: var(--paper-deep); }
+/* The pilot's other cells span both rows; only RANK and NAME sit above the
+   line, close to it, so it reads as part of his row. */
+table.roster tr.has-promo > td:not([rowspan]) { border-bottom: 0; padding-bottom: 0.1rem; vertical-align: bottom; }
+table.roster tbody tr.promo-row td { padding-top: 0.1rem; padding-bottom: 0.5rem;
+    vertical-align: top; font-weight: normal; }
+table.roster td.promo-cell { white-space: normal; }
+table.roster tbody tr.has-promo:hover + tr.promo-row td { background: var(--paper-deep); }
+.promo-target { display: block; font-size: 0.82rem; color: var(--accent-dark); margin-bottom: 0.15rem; }
+.promo-bar { display: block; line-height: 1.4; }
+.promo-bar .p-num { margin-left: 0.4rem; }
+.promo-top { font-size: 0.8rem; color: var(--ink-muted); font-style: italic; }
 
 /* A state with no stamp drawn for it, said in words so the cell is never
    blank. Reserve is the common case; an unmapped "state N" also lands here,

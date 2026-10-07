@@ -395,6 +395,9 @@
   "roster": {
     "count_with_reserve": "{total}, {reserve} en reserva",
     "heading": "Estadísticas del escuadrón",
+    "promo_show": "Mostrar lo que necesita cada piloto para su próximo rango",
+    "promo_hide": "Ocultar los requisitos de ascenso",
+    "promo_top": "Rango más alto al que asciende el juego",
     "operations": "Operaciones",
     "operations_value": "{total} ({successful} con éxito)",
     "operations_hint": "Operaciones que el escuadrón vio concluir. Una operación en la que no voló ninguna salida cuenta igualmente en el total, que es como el propio juego puntúa a una unidad.",

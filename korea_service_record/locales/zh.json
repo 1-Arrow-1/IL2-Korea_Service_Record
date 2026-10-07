@@ -395,6 +395,9 @@
   "roster": {
     "count_with_reserve": "{total}，其中 {reserve} 名预备",
     "heading": "中队统计",
+    "promo_show": "显示每位飞行员晋升下一军衔所需条件",
+    "promo_hide": "隐藏晋升条件",
+    "promo_top": "已达游戏可晋升的最高军衔",
     "operations": "作战行动",
     "operations_value": "{total} 次（成功 {successful} 次）",
     "operations_hint": "本中队经历至结束的作战行动。即便一次出击也未飞的行动同样计入总数，游戏本身就是这样评定一支部队的。",

@@ -609,6 +609,17 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             return jsonify({"error": "biography_not_found"}), 404
         return jsonify(data)
 
+    @app.route("/api/promotions/<path:career_id>")
+    def api_promotions(career_id: str):
+        """Every living pilot's next promotion, for the roster's rank column."""
+        agg = aggregator(career_id)
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        data = agg.squadron_promotions(career_id)
+        if data is None:
+            return jsonify({"error": "career_not_found"}), 404
+        return jsonify(data)
+
     @app.route("/api/logbook/<path:career_id>")
     @app.route("/api/logbook/<path:career_id>/<int:pilot_id>")
     def api_logbook(career_id: str, pilot_id: Optional[int] = None):

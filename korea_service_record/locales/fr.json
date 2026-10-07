@@ -395,6 +395,9 @@
   "roster": {
     "count_with_reserve": "{total}, dont {reserve} en réserve",
     "heading": "Statistiques de l'escadrille",
+    "promo_show": "Afficher ce qu’il faut à chaque pilote pour son prochain grade",
+    "promo_hide": "Masquer les conditions de promotion",
+    "promo_top": "Grade le plus élevé que le jeu accorde",
     "operations": "Opérations",
     "operations_value": "{total} ({successful} réussies)",
     "operations_hint": "Opérations que l’escadron a vues jusqu’à leur terme. Une opération où il n’a effectué aucune sortie compte tout de même dans le total : c’est ainsi que le jeu note une unité.",

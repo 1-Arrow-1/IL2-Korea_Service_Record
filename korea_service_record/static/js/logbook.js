@@ -14,39 +14,8 @@
 (async function () {
     "use strict";
 
-    // The GRADE box is narrow, so long rank names (the game's own, in all six
-    // of its languages) are abbreviated there; the signature line and the
-    // box's tooltip keep the full name.
-    const SHORT_RANKS = {
-        // English (the Spanish game names US and some Soviet ranks in English too)
-        "Second Lieutenant": "2nd Lt.", "First Lieutenant": "1st Lt.", "Senior Lieutenant": "Sr. Lt.",
-        "Lieutenant Colonel": "Lt. Colonel", "Lieutenant General": "Lt. General",
-        "Brigadier General": "Brig. General", "Major General": "Maj. General",
-        "Lieutenant Junior Grade": "Lt. (jg)", "Lieutenant Commander": "Lt. Commander",
-        "Rear Admiral (lower half)": "Rear Adm. (LH)", "Rear Admiral": "Rear Adm.",
-        // Spanish transliterations of Soviet ranks
-        "Starshy Leytenant": "St. Leytenant", "General-leytenant": "Gen.-leyt.",
-        "General-mayor": "Gen.-mayor", "Podpolkovnik": "Podpolk.",
-        // German
-        "Oberleutnant": "Oblt.", "Oberstleutnant": "Oberstlt.", "Generalmajor": "GenMaj.",
-        "Generalleutnant": "GenLt.", "Brigadegeneral": "BrigGen.",
-        "Leutnant zur See": "Lt. z. S.", "Oberleutnant zur See": "Oblt. z. S.",
-        "Kapitänleutnant": "KptLt.", "Korvettenkapitän": "KKpt.", "Fregattenkapitän": "FKpt.",
-        "Kapitän zur See": "Kpt. z. S.", "Flottillenadmiral": "FltlAdm.", "Konteradmiral": "KAdm.",
-        // French
-        "Sous-lieutenant": "S/Lt", "Lieutenant senior": "Lt senior", "Lieutenant-colonel": "Lt-colonel",
-        "Général-major": "Gal-major", "Général-lieutenant": "Gal-lt",
-        "Général de brigade": "Gal de brig.", "Général de division": "Gal de div.",
-        "Lieutenant de vaisseau junior": "Lt de vaiss. jr", "Lieutenant de vaisseau": "Lt de vaiss.",
-        "Capitaine de corvette": "Cne de corv.", "Capitaine de frégate": "Cne de frég.",
-        "Capitaine de vaisseau": "Cne de vaiss.", "Contre-amiral": "C.-amiral",
-        // Russian
-        "Второй лейтенант": "2-й лейтенант", "Первый лейтенант": "1-й лейтенант",
-        "Старший лейтенант": "Ст. лейтенант", "Младший лейтенант": "Мл. лейтенант",
-        "Подполковник": "Подполк.", "Генерал-майор": "Ген.-майор", "Генерал-лейтенант": "Ген.-лейт.",
-        "Бригадный генерал": "Бриг. генерал", "Лейтенант-коммандер": "Лейт.-комм.",
-        "Контр-адмирал": "Контр-адм.",
-    };
+    // The GRADE box is narrow, so long rank names are shortened there
+    // (js/ranks.js); the signature line and the tooltip keep the full name.
 
     const el = (id) => document.getElementById(id);
     const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
@@ -141,7 +110,7 @@
         const grade = String((mo.rows.length && mo.rows[mo.rows.length - 1].rank) || data.pilot.rank || "").trim();
         const fields = [
             [TF("logbook.form.name"), data.form === "usaf" ? data.pilot.last + ", " + data.pilot.first : data.pilot.name],
-            [TF("logbook.form.grade"), SHORT_RANKS[grade] || grade, grade],
+            [TF("logbook.form.grade"), shortRank(grade), grade],
             [TF("logbook.form.organization"), data.organization],
             [TF("logbook.form.station"), mo.station],
             [TF("logbook.form.aircraft_type"), data.aircraft],

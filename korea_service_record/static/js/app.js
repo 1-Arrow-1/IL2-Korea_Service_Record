@@ -239,6 +239,13 @@
     let rosterRows = [];
     let sortKey = "rank_id";
     let sortAsc = false;
+    // The roster's promotion lines (the +/- beside RANK): whether they are
+    // open, and every living pilot's next promotion for the career they were
+    // fetched for. Asked for on the first opening only; a new career starts
+    // collapsed.
+    let promoOpen = false;
+    let promoData = null;
+    let promoCareer = null;
 
     // Flatten the attribute rows so the table can sort on them like any other
     // column. level is null for the commander; keeping it null means his cell
@@ -1438,6 +1445,38 @@
     // missing and the wounded, which separates nothing.
     const STATE_ORDER = { active: 0, not_ready: 1, wounded: 2, reserve: 3, missing: 4, kia: 5 };
 
+    // A pilot's promotion line under his row, merged across RANK and NAME.
+    // The killed and the missing are not in promoData and get none; a pilot
+    // with null has no promotion left in awards.cfg.
+    function promoRow(p, cls) {
+        if (!promoOpen || !promoData ||
+            !Object.prototype.hasOwnProperty.call(promoData, String(p.id))) {
+            return "";
+        }
+        const promo = promoData[String(p.id)];
+        let body;
+        if (!promo) {
+            body = '<span class="promo-top">' + esc(T("roster.promo_top")) + "</span>";
+        } else {
+            body = '<span class="promo-target">' +
+                esc(T("progress.next_rank", {rank: shortRank(promo.rank)})) + "</span>" +
+                (promo.ready
+                    ? '<span class="p-ready">' + esc(T("progress.eligible")) + "</span>"
+                    : promo.bars.map((b) => '<span class="promo-bar">' +
+                        progressBar(b) + "</span>").join(""));
+        }
+        // The other cells of the pilot's row span this one (renderRoster).
+        return '<tr class="promo-row ' + cls + '" data-pilot="' + p.id + '">' +
+            '<td colspan="2" class="promo-cell">' + body + "</td></tr>";
+    }
+
+    function setPromoToggle() {
+        const button = el("d-promo-toggle");
+        button.textContent = promoOpen ? "−" : "+";
+        button.setAttribute("aria-expanded", promoOpen ? "true" : "false");
+        button.title = T(promoOpen ? "roster.promo_hide" : "roster.promo_show");
+    }
+
     function renderRoster() {
         const body = el("d-roster").querySelector("tbody");
         const sorted = rosterRows.slice().sort((a, b) => {
@@ -1471,18 +1510,23 @@
             const statusTitle = stateWord +
                 (p.state_until ? " until " + p.state_until : "") +
                 (p.state_since ? " " + p.state_since : "");
+            // An open promotion line sits under RANK and NAME only; every
+            // other cell spans both rows, so it uses the height the photo
+            // and the medal already give the row.
+            const promo = promoRow(p, cls);
+            const rs = promo ? ' rowspan="2"' : "";
             return '<tr class="' + cls + '" data-pilot="' + p.id + '">' +
-                '<td class="photo-cell"><img class="roster-photo" src="' +
+                '<td class="photo-cell"' + rs + '><img class="roster-photo" src="' +
                     photoUrl(currentCareer, p.id, p.avatar, 162) +
                     '" alt="" onerror="this.style.display=&quot;none&quot;"></td>' +
                 '<td class="rank-cell">' +
                     (icon("rank", p.rank_key, 56, "rank-icon", p.rank) ||
                      esc(p.rank)) + "</td>" +
                 "<td>" + esc(p.name) + "</td>" +
-                '<td class="award-cell col-award">' +
+                '<td class="award-cell col-award"' + rs + ">" +
                     (icon("award", p.top_award_id, 88, "award-icon", p.top_award) ||
                      "&mdash;") + "</td>" +
-                '<td class="col-status" title="' + esc(statusTitle) + '">' +
+                '<td class="col-status"' + rs + ' title="' + esc(statusTitle) + '">' +
                     (STAMPED.indexOf(p.state) >= 0
                         ? '<img class="status-stamp" src="/static/images/stamps/' +
                           esc(p.state) + '.png" alt="' + esc(p.state) +
@@ -1493,17 +1537,21 @@
                         : '<span class="status-word ' + dotClass + '">' +
                           esc(stateWord) + "</span>") +
                     "</td>" +
-                '<td class="num">' + esc(p.airborne) + "</td>" +
-                '<td class="num">' + esc(p.ground_targets) + "</td>" +
-                '<td class="num">' + esc(p.sorties) + "</td>" +
-                '<td class="num">' + esc(p.flight_hours) + "</td>" +
-                '<td class="num">' + levelCell(p.skills, p.skills_points) + "</td>" +
-                '<td class="num">' + levelCell(p.discipline, p.discipline_points) + "</td>" +
-                '<td class="num">' + levelCell(p.courage, p.courage_points) + "</td>" +
-                '<td class="num">' + esc(p.awards_held) + "</td>" +
-                '<td class="num">' + (p.awards_pending ? esc(p.awards_pending) : "") + "</td>" +
-                "</tr>";
+                '<td class="num"' + rs + ">" + esc(p.airborne) + "</td>" +
+                '<td class="num"' + rs + ">" + esc(p.ground_targets) + "</td>" +
+                '<td class="num"' + rs + ">" + esc(p.sorties) + "</td>" +
+                '<td class="num"' + rs + ">" + esc(p.flight_hours) + "</td>" +
+                '<td class="num"' + rs + ">" + levelCell(p.skills, p.skills_points) + "</td>" +
+                '<td class="num"' + rs + ">" + levelCell(p.discipline, p.discipline_points) + "</td>" +
+                '<td class="num"' + rs + ">" + levelCell(p.courage, p.courage_points) + "</td>" +
+                '<td class="num"' + rs + ">" + esc(p.awards_held) + "</td>" +
+                '<td class="num"' + rs + ">" + (p.awards_pending ? esc(p.awards_pending) : "") + "</td>" +
+                "</tr>" + promo;
         }).join("");
+        body.querySelectorAll("tr.promo-row").forEach((row) => {
+            const above = row.previousElementSibling;
+            if (above) above.classList.add("has-promo");
+        });
         el("d-roster").querySelectorAll("th").forEach((th) => {
             th.classList.toggle("sorted", th.dataset.sort === sortKey);
             th.classList.toggle("asc", th.dataset.sort === sortKey && sortAsc);
@@ -1765,6 +1813,10 @@
         show(el("d-victories-panel"), victories.length > 0);
 
         rosterRows = d.roster.map(flatten);
+        promoOpen = false;
+        promoData = null;
+        promoCareer = null;
+        setPromoToggle();
             // "(66)" hid that 47 of them were in the pool. Say both.
             const inReserve = rosterRows.filter((p) => p.reserve).length;
             el("d-roster-count").textContent = inReserve
@@ -2276,6 +2328,23 @@
         // way out to the career list.
         const match = location.hash.match(/^#career\/(.+?)\/pilot\/\d+$/);
         location.hash = match ? "#career/" + match[1] : "";
+    });
+    el("d-promo-toggle").addEventListener("click", async (event) => {
+        // It sits in the RANK header, which sorts on a click.
+        event.stopPropagation();
+        if (!promoOpen && (!promoData || promoCareer !== currentCareer)) {
+            const careerId = currentCareer;
+            try {
+                const d = await getJSON("/api/promotions/" + encodeURIComponent(careerId));
+                promoData = d.pilots || {};
+                promoCareer = careerId;
+            } catch (_err) {
+                return;
+            }
+        }
+        promoOpen = !promoOpen;
+        setPromoToggle();
+        renderRoster();
     });
     el("d-roster").querySelectorAll("th").forEach((th) => {
         th.addEventListener("click", () => {

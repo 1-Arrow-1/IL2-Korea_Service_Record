@@ -921,9 +921,20 @@ class CareerAggregator:
             self.awards_cfg, unit_held, unit_values, country,
             squadron=True), 4, unit_values)
 
-        # Promotions are pseudo-awards with no art and no name of their own,
-        # so they belong beside the rank rather than in the medal list.
-        promotion = None
+        promotion = self._next_promotion(values, country)
+        return {"awards": awards, "citations": citations, "promotion": promotion}
+
+    def _next_promotion(self, values: Dict[str, Any], country: int) -> Optional[Dict[str, Any]]:
+        """
+        The promotion out of the pilot's present rank: the rank it leads to,
+        whether he has already met it, and a bar per counter he is still
+        short on. None when awards.cfg has no promotion out of his rank.
+
+        Promotions are pseudo-awards with no art and no name of their own,
+        so they belong beside the rank rather than in the medal list.
+        """
+        from .. import progress as prog
+
         for defn in sorted(self.awards_cfg.definitions.values(),
                            key=lambda d: d.order):
             if not defn.is_promotion or not defn.in_proc:
@@ -934,23 +945,41 @@ class CareerAggregator:
             rank_gap = [g for g in gaps if g.variable.lower() == "rankid"]
             if rank_gap or (not ok and not gaps):
                 continue
+            rank = self.locale.rank_name(country, int(values.get("rankid", 0)) + 1)
             if ok:
-                promotion = {"rank": self.locale.rank_name(
-                    country, int(values.get("rankid", 0)) + 1), "ready": True,
-                    "bars": []}
-            else:
-                promotion = {
-                    "rank": self.locale.rank_name(
-                        country, int(values.get("rankid", 0)) + 1),
-                    "ready": False,
-                    "bars": [{"what": g.variable, "have": round(g.current, 1),
-                              "need": g.needed, "unit": prog.unit_for(g.variable),
-                              "fraction": round(g.fraction, 3)}
-                             for g in gaps if g.kind == "cumulative"],
-                }
-            break
+                return {"rank": rank, "ready": True, "bars": []}
+            return {
+                "rank": rank,
+                "ready": False,
+                "bars": [{"what": g.variable, "have": round(g.current, 1),
+                          "need": g.needed, "unit": prog.unit_for(g.variable),
+                          "fraction": round(g.fraction, 3)}
+                         for g in gaps if g.kind == "cumulative"],
+            }
+        return None
 
-        return {"awards": awards, "citations": citations, "promotion": promotion}
+    def squadron_promotions(self, career_id: str) -> Optional[Dict[str, Any]]:
+        """
+        The next promotion of every pilot still on the squadron's books -
+        all but the killed (state 2) and the missing (state 3) - keyed by
+        pilot id, for the roster's expandable rank column. Asked for only
+        when the reader opens it: one evaluation per pilot.
+        """
+        from .. import progress as prog
+
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            career, squad = db.career(), db.squadron()
+            out = {}
+            for pilot in db.pilots():
+                if pilot["state"] in (2, 3):
+                    continue
+                values = prog.pilot_variables(pilot, career, squad)
+                out[str(pilot["id"])] = self._next_promotion(
+                    values, int(pilot["country"] or 0))
+            return {"career_id": career_id, "pilots": out}
 
     def _routes(self, rung, values, country: int) -> List[Dict[str, Any]]:
         """

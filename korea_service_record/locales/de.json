@@ -395,6 +395,9 @@
   "roster": {
     "count_with_reserve": "{total}, davon {reserve} in Reserve",
     "heading": "Staffelstatistik",
+    "promo_show": "Zeigen, was jeder Pilot für den nächsten Dienstgrad braucht",
+    "promo_hide": "Beförderungsvoraussetzungen ausblenden",
+    "promo_top": "Höchster Dienstgrad, zu dem das Spiel befördert",
     "operations": "Operationen",
     "operations_value": "{total} ({successful} erfolgreich)",
     "operations_hint": "Operationen, die die Staffel bis zum Ende miterlebt hat. Auch eine Operation ohne einen einzigen Einsatz zählt zur Gesamtzahl – so bewertet das Spiel eine Einheit selbst.",

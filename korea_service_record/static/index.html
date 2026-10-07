@@ -290,7 +290,7 @@
                                 <thead>
                                     <tr>
                                         <th class="col-photo"></th>
-                                        <th data-sort="rank_id" data-i18n="roster.rank">Rank</th>
+                                        <th data-sort="rank_id"><span data-i18n="roster.rank">Rank</span><button type="button" id="d-promo-toggle" class="promo-toggle" aria-expanded="false" data-i18n-title="roster.promo_show">+</button></th>
                                         <th data-sort="name" data-i18n="roster.name">Name</th>
                                         <th data-sort="top_award" class="col-award" data-i18n="roster.top_award">Highest<br>Combat Award</th>
                                         <th data-sort="state" class="col-status" data-i18n="roster.status">Status</th>
@@ -448,6 +448,7 @@
 </div>
 <script src="/static/vendor/leaflet/leaflet.js"></script>
 <script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/ranks.js?v=__ASSET_VERSION__"></script>
 <script src="/static/js/map.js?v=__ASSET_VERSION__"></script>
 <script src="/static/js/app.js?v=__ASSET_VERSION__"></script>
 </body>
