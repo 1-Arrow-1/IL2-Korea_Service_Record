@@ -1,0 +1,83 @@
+IL-2 Korea Service Record 2.2.4 — personnel files, your own biography, a squadron forecast
+
+
+Gentlemen,
+
+2.2.4 is out. It brings a few things you asked for, some I wanted myself,
+and one fix that matters if you are on game update 1.004.
+
+FIX FOR GAME UPDATE 1.004
+
+- The mod replaces two of the game's career screens so custom portraits show
+  in the game. Its copies were older than 1.004 and hid the update's own
+  changes, such as the pending-awards marker. Both are now rebuilt from the
+  1.004 originals, with only the portrait change made.
+- If a future game update changes those screens again, the career page now
+  says so instead of hiding the update quietly.
+
+NEW: THE PERSONNEL FILE (USAF)
+
+- One printable document per pilot: cover sheet with photo, record of
+  service, his commissions, his award certificates, the biography, the
+  flight record (two months to a page) and the shadowbox.
+- Every promotion now comes with a commission from the President, filled in
+  by hand and signed by the officials in office on that date.
+- One certificate per decoration as he wears it. The earlier awards of each
+  ladder are listed in the record of service with their citations.
+- Print it, or choose "Save as PDF" for a file to keep or post.
+- Soviet, Chinese and North Korean files will follow.
+
+NEW IN THE CAREER HELPER: YOUR OWN BIOGRAPHY
+
+- The game shows your biography only when you create the career. The new
+  Biography tab lets you rewrite it at any time. The Service Record shows
+  your version, with your name, birth date and starting rank filled in.
+- Choose which World War II medals your pilot earned before Korea
+  (USAF and Soviet pilots). They appear on his uniforms and in the shadowbox.
+- Share out your booster points again - skill, discipline and courage - at
+  most 3 per attribute plus one for every promotion. The game is not touched
+  by the text or the medals; the boosters are written to the career, with a
+  backup first.
+
+NEW IN THE SERVICE RECORD
+
+- Squadron statistics: click the + beside RANK and every pilot shows what
+  he still needs for his next promotion.
+- Materiel forecast: what a flying day costs the squadron in fuel, ordnance
+  and equipment, what the next week, fortnight and month should cost at
+  your pace, and how long your stocks last. From now on the tracker
+  measures the real consumption from your stocks and uses that once it has
+  three flying days.
+- Medals have a proper shadow again, in the record and in the shadowbox,
+  and the oak leaf clusters and stars stand off the ribbon.
+- The flight record shortens long ranks (Lt. Colonel, Brig. General) so the
+  GRADE box is never cut off.
+- A certificate opened from the record now closes its tab when you go back,
+  like the flight record and the war diary.
+
+AWARDS MOD
+
+- Silver Star and DSC no longer stop at a fixed number of kills. A sortie
+  earns the highest decoration it qualifies for: Silver Star from 2 air
+  kills, DSC from 4, Medal of Honor from 6. Once you hold the full ladder of
+  one, the next one down takes its place - a pilot who already has the
+  Medal of Honor with its cluster now gets a DSC for his next 6-kill sortie
+  instead of nothing.
+- In the F-86 squadrons the Silver Star and DSC still have to be approved:
+  60% at the lower kill count, 80% above it. A failed DSC can still bring a
+  Silver Star.
+- These rules apply to the USAF. Navy and Marine Corps decorations work the
+  old way for now.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.2.4
+
+Installer  IL2_Korea_Service_Record_Setup_v2.2.4.exe
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Zip        IL-2.Korea.Service.Record.v2.2.4.zip
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Everything is Authenticode signed.
