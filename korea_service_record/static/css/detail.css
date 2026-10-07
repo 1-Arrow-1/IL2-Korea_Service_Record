@@ -736,6 +736,18 @@ table.roster td.award-cell { white-space: normal; }
 }
 .airframes > summary:hover { color: var(--ink-strong); }
 .airframes .table-scroll { margin-top: 0.8rem; }
+/* Squadron statistics & forecast: figures large, their spread under them. */
+.logistics .panel-note { margin-top: 0.7rem; }
+.logistics .panel-subhead { margin: 1.1rem 0 0.2rem; }
+.logistics-table td:first-child { white-space: nowrap; }
+.lg-range { display: block; font-size: 0.74rem; color: var(--ink-muted); }
+.lg-sub { display: block; font-size: 0.68rem; letter-spacing: 0; text-transform: none; color: var(--ink-muted); }
+.logistics-table tr.lg-left td { border-top: 1px solid var(--border-soft); }
+.lg-short { color: #8c3a2c; font-weight: bold; }
+.lg-line { margin: 0.7rem 0; }
+.lg-src { display: block; font-size: 0.7rem; font-style: italic; color: var(--ink-muted); }
+.lg-label { display: inline-flex; align-items: center; gap: 0.6rem; }
+.lg-icon { width: 1.9rem; height: 1.9rem; flex: none; object-fit: contain; }
 table.airframe-table { font-size: 0.95rem; }
 table.airframe-table td { padding: 0.45rem 0.6rem; }
 table.airframe-table .code-cell { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--ink-strong); }

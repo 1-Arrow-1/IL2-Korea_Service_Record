@@ -1230,6 +1230,102 @@
 
     // The squadron's aircraft: strength, the repair queue with the game's own
     // completion dates, deliveries on their way, and the three stores.
+    // The squadron's consumption, spread and forecast under the materiel
+    // panel (aggregator._logistics). One table: what a flying day costs,
+    // then what the next week, fortnight and month should cost at the
+    // squadron's pace, with the stock that leaves.
+    function renderLogistics(s) {
+        const box = el("d-logistics");
+        if (!s) { box.hidden = true; return; }
+        box.hidden = false;
+        const H = s.horizons || [];
+        const pd = s.per_flying_day;
+        const num = (v) => fmtNum(Math.round(v));
+        const litres = (v) => T("aircraft.litres", {value: num(v)});
+        // Thirty thousand days of equipment is true and tells nobody anything.
+        const days = (v) => v == null ? "—" : v >= 1000 ? "> " + num(1000) : "≈ " + num(v);
+        const range = (fmt, row, key) => esc(fmt(row[key])) +
+            // the unit once, after the upper end: 25,254–36,327 L
+            '<span class="lg-range">' + esc(num(row[key + "_low"]) + "–" + fmt(row[key + "_high"])) + "</span>";
+        const spread = (fmt, key) => esc(fmt(pd[key].mean)) +
+            '<span class="lg-range">± ' + esc(fmt(pd[key].sd)) + "</span>";
+        const left = (fmt, v) => '<span class="' + (v < 0 ? "lg-short" : "") + '">' + esc(fmt(v)) + "</span>";
+        const head = "<th></th>" + "<th class=\"num\">" + esc(T("logistics.col_per_day")) + "</th>" +
+            H.map((h) => '<th class="num">' + esc(T("logistics.col_" + h.days)) +
+                '<span class="lg-sub">' + esc(T("logistics.flying_days", {n: fmtNum(h.flying_days)})) +
+                "</span></th>").join("");
+        // Where each store's figures come from: booked per mission, estimated
+        // from the repairs, or measured from the stock history.
+        const src = s.source || {};
+        // Each row carries the panel's own pictogram for what it counts.
+        const label = (glyph, text, key) => '<span class="lg-label">' + pictogram(glyph, "lg-icon") +
+            "<span>" + esc(text) + (key ? '<span class="lg-src">' +
+                esc(T("logistics.src_" + (src[key] || "booked"))) + "</span>" : "") +
+            "</span></span>";
+        const row = (label, first, cells, cls, labelHtml) => '<tr class="' + (cls || "") + '"><td>' +
+            (labelHtml || esc(label)) +
+            '</td><td class="num">' + first + "</td>" +
+            cells.map((c) => '<td class="num">' + c + "</td>").join("") + "</tr>";
+        const table =
+            '<table class="roster logistics-table"><thead><tr>' + head + "</tr></thead><tbody>" +
+            row("", spread(litres, "fuel"), H.map((h) => range(litres, h, "fuel")), "",
+                label("mat_fuel", T("aircraft.fuel"), "fuel")) +
+            row("", spread(num, "ordnance"), H.map((h) => range(num, h, "ordnance")), "",
+                label("mat_ordnance", T("aircraft.ordnance"), "ordnance")) +
+            row("", spread(num, "equipment"), H.map((h) => range(num, h, "equipment")), "",
+                label("mat_equipment", T("aircraft.equipment"), "equipment")) +
+            row("", spread((v) => fmtNum(v), "missions"),
+                H.map((h) => esc(num(pd.missions.mean * h.flying_days))), "",
+                label("sorties", T("logistics.row_missions"))) +
+            row("", spread(num, "requests"), H.map((h) => range(num, h, "requests")), "",
+                label("mat_requests", T("logistics.row_requests"))) +
+            row("", "", H.map((h) => left(litres, h.fuel_left)), "lg-left",
+                label("mat_fuel", T("logistics.row_fuel_left"))) +
+            row("", "", H.map((h) => left(num, h.ordnance_left)), "lg-left",
+                label("mat_ordnance", T("logistics.row_ordnance_left"))) +
+            row("", "", H.map((h) => left(num, h.equipment_left)), "lg-left",
+                label("mat_equipment", T("logistics.row_equipment_left"))) +
+            "</tbody></table>";
+
+        const kinds = ["fuel", "ordnance", "equipment", "aircraft", "pilots"];
+        const glyphs = {fuel: "mat_fuel", ordnance: "mat_ordnance", equipment: "mat_equipment",
+                        aircraft: "ac_received", pilots: "squadroncommander"};
+        const names = {fuel: T("aircraft.fuel"), ordnance: T("aircraft.ordnance"),
+                       equipment: T("aircraft.equipment"), aircraft: T("logistics.row_aircraft"),
+                       pilots: T("logistics.row_pilots")};
+        const delivered = s.delivered || {};
+        const supply =
+            '<h4 class="panel-subhead with-glyph">' + pictogram("mat_deliveries", "h-icon") +
+            "<span>" + esc(T("logistics.deliveries_heading")) + "</span></h4>" +
+            '<table class="roster logistics-table"><thead><tr><th></th>' +
+            ["col_deliveries", "col_total", "col_points", "col_per_point"].map((k) =>
+                '<th class="num">' + esc(T("logistics." + k)) + "</th>").join("") +
+            "</tr></thead><tbody>" +
+            kinds.filter((k) => delivered[k]).map((k) => {
+                const d = delivered[k];
+                const fmt = k === "fuel" ? litres : num;
+                return "<tr><td>" + label(glyphs[k], names[k]) + '</td><td class="num">' + esc(num(d.count)) +
+                    '</td><td class="num">' + esc(fmt(d.quantity)) +
+                    '</td><td class="num">' + esc(num(d.cost)) +
+                    '</td><td class="num">' + esc(d.per_point == null ? "—" : fmt(d.per_point)) + "</td></tr>";
+            }).join("") + "</tbody></table>";
+
+        el("d-logistics-body").innerHTML =
+            '<p class="panel-note">' + esc(T("logistics.basis", {flying: s.flying_days, days: s.span_days,
+                pct: Math.round(s.flying_rate * 100)})) + "</p>" +
+            '<div class="table-scroll">' + table + "</div>" +
+            '<p class="lg-line">' + esc(T("logistics.lasts", {
+                fuel: days(s.lasts.fuel), ordnance: days(s.lasts.ordnance),
+                equipment: days(s.lasts.equipment)})) + "</p>" +
+            '<div class="table-scroll">' + supply + "</div>" +
+            '<p class="lg-line lg-label">' + pictogram("ac_written_off", "lg-icon") + esc(T("logistics.losses", {
+                aircraft: fmtNum(s.losses_per_month.aircraft), pilots: fmtNum(s.losses_per_month.pilots)})) + "</p>" +
+            '<p class="panel-note">' + esc(src.fuel === "measured"
+                ? T("logistics.measured", {n: s.measured_days})
+                : T("logistics.measuring", {n: s.measured_days, needed: s.measured_needed})) + " " +
+                esc(T("logistics.note")) + "</p>";
+    }
+
     function renderAircraft(a) {
         const panel = el("d-aircraft-panel");
         if (!a || !a.on_strength) { panel.hidden = true; return; }
@@ -1295,6 +1391,7 @@
         // Every airframe the squadron has had, line-up first, write-offs
         // last. Folded by default: forty rows are for the reader who wants
         // them, not for everyone scrolling to the roster.
+        renderLogistics(a.statistics);
         const frames = a.airframes || [];
         el("d-airframes-count").textContent = "(" + frames.length + ")";
         el("d-airframes").querySelector("tbody").innerHTML = frames.map((f) => {

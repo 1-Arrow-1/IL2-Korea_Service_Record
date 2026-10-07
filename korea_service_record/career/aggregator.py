@@ -1795,7 +1795,7 @@ class CareerAggregator:
                          if r["config"])
         return counts.most_common(1)[0][0] if counts else ""
 
-    def _aircraft(self, db, career, squad) -> Dict[str, Any]:
+    def _aircraft(self, db, career, squad, career_path: Optional[Path] = None) -> Dict[str, Any]:
         """
         The squadron's aircraft: what is serviceable, what is in the shop and
         for how long, and what is on its way.
@@ -1964,6 +1964,163 @@ class CareerAggregator:
                 "ordnance": squad["ammoQty"] if squad else 0,
                 "equipment": squad["partsQty"] if squad else 0,
                 "requests": squad["requestPoints"] if squad else 0,
+            },
+            "statistics": self._logistics(db, career, squad, len(written_off), career_path),
+        }
+
+    # The forecast horizons, in career days.
+    LOGISTICS_HORIZONS = (7, 14, 30)
+    # Flying days the stock history must cover before measured consumption
+    # replaces the booked and estimated figures.
+    MEASURED_MIN_DAYS = 3
+
+    def _logistics(self, db, career, squad, written_off: int,
+                   career_path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+        """
+        The squadron's consumption, its spread and a forecast - for the
+        collapsible statistics under the materiel panel.
+
+        What the game books, proven against the stock between career backups
+        (2026-10-07): a completed mission takes exactly its ``assignedAmmo``;
+        it takes fuel too, a little under ``assignedFuel`` (the aircraft burn
+        some 7-15 % less). Assigned fuel is used here: it is what the game
+        checks before a mission may fly, and it keeps the forecast on the
+        safe side. Request points: each completed mission earns ``ipar1`` of
+        its type-26 event, each delivery costs its ``cost``.
+
+        Everything is counted per *flying day*, because a squadron flies in
+        bursts - the 12th FBS flew on 30 of 100 days - and a per-calendar-day
+        mean would smear three busy days across a week. The horizons are
+        career days, so the flying rate carries them across.
+
+        Equipment is booked nowhere per mission. It goes on repairs, so it is
+        *estimated* from the repair starts (event type 18, ipar1 0, ipar2 the
+        aircraft's health): about one unit per 20 % of damage, which matched
+        the stock between two backups (5 % -> 1 unit, 56 % -> 3 units).
+
+        Measured beats both: every read records the stocks (stockhistory),
+        and once the readings cover MEASURED_MIN_DAYS flying days the real
+        consumption replaces the booked and estimated means. The spread keeps
+        the per-day shape of the booked figures, scaled to the measured mean.
+        """
+        import datetime as _dt
+        import math
+        import statistics
+
+        def day(text):
+            try:
+                y, m, d = (int(x) for x in str(text)[:10].split("."))
+                return _dt.date(y, m, d)
+            except (TypeError, ValueError):
+                return None
+
+        flown = db.query("SELECT id, date, assignedFuel, assignedAmmo FROM mission "
+                         "WHERE isDeleted=0 AND state<>0")
+        today = day(career["currentDate"]) if career else None
+        days = sorted({day(m["date"]) for m in flown if day(m["date"])})
+        if not days or today is None:
+            return None
+        span = max(1, (today - days[0]).days + 1)
+        earned = {}
+        for e in db.query("SELECT date, ipar1 FROM event WHERE type=26 AND isDeleted=0"):
+            d = day(e["date"])
+            if d and (e["ipar1"] or 0) > 0:
+                earned[d] = earned.get(d, 0) + e["ipar1"]
+        repairs = {}
+        for e in db.query("SELECT date, ipar2 FROM event WHERE type=18 AND ipar1=0 AND isDeleted=0"):
+            d = day(e["date"])
+            health = e["ipar2"] if e["ipar2"] is not None else 100
+            if d:
+                repairs[d] = repairs.get(d, 0) + max(1, math.ceil((100 - health) / 20))
+        per_day = {d: {"fuel": 0, "ordnance": 0, "missions": 0, "requests": earned.get(d, 0),
+                       "equipment": repairs.get(d, 0)}
+                   for d in days}
+        for m in flown:
+            d = day(m["date"])
+            if d in per_day:
+                per_day[d]["fuel"] += m["assignedFuel"] or 0
+                per_day[d]["ordnance"] += m["assignedAmmo"] or 0
+                per_day[d]["missions"] += 1
+
+        def spread(key):
+            values = [v[key] for v in per_day.values()]
+            return {"mean": round(statistics.mean(values), 1),
+                    "sd": round(statistics.stdev(values), 1) if len(values) > 1 else 0.0}
+
+        stats = {k: spread(k) for k in ("fuel", "ordnance", "equipment", "missions", "requests")}
+        rate = len(days) / span
+        stock = {"fuel": squad["fuelQty"] if squad else 0,
+                 "ordnance": squad["ammoQty"] if squad else 0,
+                 "equipment": squad["partsQty"] if squad else 0}
+
+        delivered_total = {"fuel": 0, "ordnance": 0, "equipment": 0}
+        for s in db.query("SELECT type, quantity FROM supply WHERE isDeleted=0 AND status=3"):
+            kind = SUPPLY_KINDS.get(s["type"])
+            if kind in delivered_total:
+                delivered_total[kind] += s["quantity"] or 0
+        source = {"fuel": "booked", "ordnance": "booked", "equipment": "estimated"}
+        measured = None
+        if career_path is not None:
+            from .. import stockhistory
+            readings = stockhistory.record(career_path, {
+                "date": career["currentDate"], "stock": stock, "delivered": delivered_total,
+                "last_mission": max((m["id"] for m in flown), default=0)})
+            measured = stockhistory.measured(readings, flown)
+        measured_days = measured["flying_days"] if measured else 0
+        if measured and measured_days >= self.MEASURED_MIN_DAYS:
+            for key in ("fuel", "ordnance", "equipment"):
+                mean = measured["used"][key] / measured_days
+                booked = stats[key]["mean"]
+                sd = stats[key]["sd"] * (mean / booked) if booked else 0.0
+                stats[key] = {"mean": round(mean, 1), "sd": round(sd, 1)}
+                source[key] = "measured"
+
+        horizons = []
+        for h in self.LOGISTICS_HORIZONS:
+            n = rate * h                      # expected flying days in the horizon
+            row = {"days": h, "flying_days": round(n, 1)}
+            for key in ("fuel", "ordnance", "equipment", "requests"):
+                mean, sd = stats[key]["mean"], stats[key]["sd"]
+                # the sum of n flying days: mean n*mu, spread sqrt(n)*sigma
+                row[key] = round(n * mean)
+                row[key + "_low"] = max(0, round(n * mean - math.sqrt(n) * sd))
+                row[key + "_high"] = round(n * mean + math.sqrt(n) * sd)
+            for key in ("fuel", "ordnance", "equipment"):
+                row[key + "_left"] = stock[key] - row[key]
+            horizons.append(row)
+        lasts = {key: (round(stock[key] / (stats[key]["mean"] * rate))
+                       if stats[key]["mean"] else None)
+                 for key in ("fuel", "ordnance", "equipment")}
+
+        delivered = {}
+        for s in db.query("SELECT type, quantity, cost FROM supply "
+                          "WHERE isDeleted=0 AND status=3"):
+            kind = SUPPLY_KINDS.get(s["type"])
+            if kind is None:
+                continue
+            row = delivered.setdefault(kind, {"count": 0, "quantity": 0, "cost": 0})
+            row["count"] += 1
+            row["quantity"] += s["quantity"] or 0
+            row["cost"] += s["cost"] or 0
+        for row in delivered.values():
+            row["per_point"] = round(row["quantity"] / row["cost"], 1) if row["cost"] else None
+
+        lost_pilots = db.query("SELECT COUNT(*) AS n FROM pilot WHERE isDeleted=0 AND state IN (2, 3)")
+        month = 30 / span
+        return {
+            "span_days": span,
+            "flying_days": len(days),
+            "flying_rate": round(rate, 3),
+            "per_flying_day": stats,
+            "source": source,
+            "measured_days": measured_days,
+            "measured_needed": self.MEASURED_MIN_DAYS,
+            "horizons": horizons,
+            "lasts": lasts,
+            "delivered": delivered,
+            "losses_per_month": {
+                "aircraft": round(written_off * month, 1),
+                "pilots": round((lost_pilots[0]["n"] if lost_pilots else 0) * month, 1),
             },
         }
 
@@ -2850,5 +3007,5 @@ class CareerAggregator:
                 "citations": self._citation_ladders(
                     [r for r in awards_by_pilot.get(-1, []) if r["category"] == 2],
                     retired_citations),
-                "aircraft": self._aircraft(db, career, squad),
+                "aircraft": self._aircraft(db, career, squad, Path(meta.path)),
             }
