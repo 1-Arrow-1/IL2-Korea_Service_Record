@@ -1732,6 +1732,16 @@
                 (d.player && d.player.id != null ? "&pilot=" + encodeURIComponent(d.player.id) : "");
             logbook.title = T("logbook.open_hint");
             logbook.hidden = false;
+            // The personnel file, for a USAF pilot (other air forces later).
+            const personnel = el("d-personnel");
+            if (d.player && d.player.country === 601 && d.player.id != null) {
+                personnel.href = "/personnel?career=" + encodeURIComponent(careerId) +
+                    "&pilot=" + encodeURIComponent(d.player.id);
+                personnel.title = T("personnel.open_hint");
+                personnel.hidden = false;
+            } else {
+                personnel.hidden = true;
+            }
             // The war diary is the squadron's, not one pilot's, so it takes
             // no pilot id - the same page whoever the record belongs to.
             const diary = el("d-diary");

@@ -21,3 +21,7 @@ signed/
 # running decision log, useful here but not meant for the public repo.
 AGENTS.md
 docs/HANDOFF.md
+
+# BeneScriptine (c) 1990 R. Schenk, all rights reserved: used from the Windows
+# font folder where installed, never bundled (korea_service_record/promotion_cert.py)
+*BeneScriptine*

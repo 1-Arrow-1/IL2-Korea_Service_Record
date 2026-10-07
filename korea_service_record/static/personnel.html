@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personnel File</title>
+    <link rel="icon" href="/static/images/icon.png?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/main.css?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/personnel.css?v=__ASSET_VERSION__">
+</head>
+<body class="personnel-page">
+    <!-- A USAF pilot's personnel file, one printable document: the cover
+         sheet and the service record drawn here; the award certificates and
+         the flight record are the existing pages, embedded; the promotion
+         certificates come from the server as pictures. Letter paper,
+         portrait and landscape pages mixed. -->
+    <div class="personnel-bar no-print">
+        <a id="pf-back" class="nav-btn" href="/">&larr; <span data-i18n="personnel.back">Service Record</span></a>
+        <span id="pf-status" class="pf-status"></span>
+        <button id="pf-print" class="nav-btn" data-i18n="personnel.print" disabled>Print</button>
+    </div>
+    <main id="pf-doc"></main>
+    <p id="pf-state" class="state-message" hidden></p>
+<script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/ranks.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/personnel.js?v=__ASSET_VERSION__"></script>
+</body>
+</html>

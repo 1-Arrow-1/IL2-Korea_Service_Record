@@ -183,6 +183,91 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         html = html.replace("__ASSET_VERSION__", asset_version())
         return Response(html, mimetype="text/html", headers={"Cache-Control": "no-store"})
 
+    @app.route("/personnel")
+    def personnel_page():
+        """A USAF pilot's personnel file: one printable document."""
+        html = (Path(app.static_folder) / "personnel.html").read_text(encoding="utf-8")
+        html = html.replace("__ASSET_VERSION__", asset_version())
+        return Response(html, mimetype="text/html", headers={"Cache-Control": "no-store"})
+
+    @app.route("/api/personnel/<path:career_id>/<int:pilot_id>")
+    def api_personnel(career_id: str, pilot_id: int):
+        """
+        Everything the personnel file shows that the existing pages do not
+        draw themselves, in English - the language of a USAF file, whatever
+        the reader's. USAF pilots only, for now.
+        """
+        agg = aggregator_for("en")
+        detail = agg.career_detail(career_id, pilot_id)
+        if detail is None:
+            return jsonify({"error": "career_not_found"}), 404
+        player = detail.get("player") or {}
+        if player.get("country") != 601:
+            return jsonify({"error": "not_usaf"}), 404
+        # One entry per decoration ladder: the rung he holds gets its
+        # certificate, the rungs before it are listed in the service record
+        # with the citation each came with - six Air Medal sheets would say
+        # little the sixth does not.
+        def citation_text(award_id, earned):
+            data = agg.citation(career_id, pilot_id, award_id, earned) or {}
+            return " ".join(data.get("paragraphs") or [])
+
+        def rung(h):
+            return {"type": h.get("type"), "earned": h.get("earned") or "",
+                    "received": h.get("received") or "",
+                    "name": h.get("name") or agg.award_name(h.get("type"))}
+
+        decorations = []
+        for award in detail.get("awards") or []:
+            if award.get("pending"):
+                continue
+            earlier = sorted((rung(h) for h in award.get("history") or []),
+                             key=lambda g: (g["earned"], g["type"] or 0))
+            for g in earlier:
+                g["citation"] = citation_text(g["type"], g["earned"])
+            top = rung(award)
+            top["earlier"] = earlier
+            decorations.append(top)
+        decorations.sort(key=lambda g: (g["earned"], g["type"] or 0))
+        biography = agg.biography(career_id, pilot_id)
+        return jsonify({
+            "career_id": career_id,
+            "pilot": player,
+            "squadron": detail.get("squadron") or "",
+            "start_date": detail.get("start_date") or "",
+            "current_date": detail.get("current_date") or "",
+            "promotions": [p for p in detail.get("promotions") or [] if not p.get("pending")],
+            "decorations": decorations,
+            "grants_total": sum(1 + len(d["earlier"]) for d in decorations),
+            "biography": biography,
+        })
+
+    @app.route("/api/promotion-certificate/<path:career_id>/<int:pilot_id>/<int:rank_id>")
+    def api_promotion_certificate(career_id: str, pilot_id: int, rank_id: int):
+        """
+        The USAF commission for one promotion, filled in on the owner's
+        template (promotion_cert.py). An English document whatever the
+        reader's language, so the rank is the game's English name.
+        """
+        from . import promotion_cert
+        agg = aggregator_for("en")
+        detail = agg.career_detail(career_id, pilot_id)
+        if detail is None:
+            return jsonify({"error": "career_not_found"}), 404
+        player = detail.get("player") or {}
+        if player.get("country") != 601:
+            return jsonify({"error": "not_usaf"}), 404
+        promo = next((p for p in detail.get("promotions") or []
+                      if p.get("rank_id") == rank_id and not p.get("pending")), None)
+        if promo is None:
+            return jsonify({"error": "no_such_promotion"}), 404
+        try:
+            y, m, d = (int(x) for x in str(promo["date"])[:10].split("."))
+        except (TypeError, ValueError):
+            return jsonify({"error": "bad_date"}), 404
+        data = promotion_cert.render(player.get("name") or "", promo["rank"], (y, m, d))
+        return Response(data, mimetype="image/jpeg", headers={"Cache-Control": "no-cache"})
+
     @app.route("/api/icon/<kind>/<ident>")
     def api_icon(kind: str, ident: str):
         """

@@ -8,6 +8,16 @@
 .certificate-page { background: var(--desk); padding: 1rem 1rem 3rem; }
 .certificate-bar { display: flex; align-items: center; gap: 1rem; max-width: 1100px; margin: 0 auto 1rem; }
 .certificate-bar .ct-spacer { flex: 1; }
+/* Embedded in the personnel file: the sheet alone, at exactly the width it
+   is designed for - 1100 px landscape, 760 px portrait - on screen and on
+   paper alike (the print rules below would rescale it to the paper). The
+   file scales the finished sheet down as a whole. */
+body.embed { background: transparent; padding: 0; margin: 0; }
+body.embed .certificate-bar { display: none; }
+body.embed .sheet { width: 1100px; max-width: none; margin: 0; box-shadow: none; }
+body.embed .sheet.portrait { width: 760px; }
+body.embed .ct-text, body.embed .ct-signature { font-size: calc(1100px * 0.012); }
+body.embed .sheet.portrait .ct-text, body.embed .sheet.portrait .ct-signature { font-size: calc(760px * 1.2853 / 100); }
 
 .sheet {
     position: relative; max-width: 1100px; margin: 0 auto; aspect-ratio: 2200 / 1700;

@@ -17,6 +17,11 @@
         ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
     const q = new URLSearchParams(location.search);
     const careerId = q.get("career"), pilotId = q.get("pilot"), awardId = q.get("award"), earned = q.get("earned") || "";
+    // Embedded in the personnel file: the sheet alone, and a mark on the
+    // body when it is drawn (or cannot be) so the file knows to measure it.
+    const embedded = q.get("embed") === "1";
+    if (embedded) document.body.classList.add("embed");
+    const done = () => { document.body.dataset.ready = "1"; };
 
     const settings = await fetch("/api/settings").then((r) => r.json()).catch(() => ({}));
     const override = (settings.overrides || []).find((o) => o.career === careerId);
@@ -66,6 +71,7 @@
         if (!data || !data.certificate) throw new Error("none");
     } catch (err) {
         el("ct-state").textContent = i18n.t("certificate.failed"); el("ct-state").hidden = false;
+        done();
         return;
     }
     const c = data.certificate;
@@ -160,4 +166,5 @@
                 "</div>" +
             "</section>";
     }
+    done();
 })();

@@ -1,0 +1,99 @@
+/**
+ * The personnel file: Letter paper at 96 px to the inch. Every page has a
+ * fixed content box - portrait 726 x 966 px inside a 45 px margin, landscape
+ * 996 x 756 inside 30 px - the same on screen and on paper, where the
+ * margin comes from @page instead of padding. Embedded sheets are drawn at
+ * their own design width and scaled down as a whole to fit that box.
+ */
+
+.personnel-page { background: var(--desk); padding: 1rem 1rem 3rem; }
+.personnel-bar { display: flex; align-items: center; gap: 1rem; max-width: 1056px; margin: 0 auto 1rem; }
+.pf-status { flex: 1; font-size: 0.85rem; font-style: italic; color: var(--ink-muted); }
+
+.pf-page {
+    position: relative; box-sizing: content-box; margin: 0 auto 1.4rem;
+    background: #fbf7ec; color: #1f140a; box-shadow: var(--shadow-soft);
+    font-family: 'Courier New', Courier, monospace; overflow: hidden;
+}
+.pf-page.portrait { width: 726px; height: 966px; padding: 45px; }
+.pf-page.landscape { width: 996px; height: 756px; padding: 30px; }
+/* Text that runs as long as it runs - the biography, the service record. */
+.pf-page.flow { height: auto; min-height: 966px; overflow: visible; }
+
+/* A scaled sheet: the frame keeps its design size, the holder the scaled one. */
+.pf-fit { position: relative; margin: 0 auto; overflow: hidden; }
+.pf-fit iframe { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; background: transparent; }
+.pf-centre { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 14px; }
+.pf-half { height: 476px; display: flex; align-items: center; justify-content: center; }
+.pf-half + .pf-half { border-top: 1px dashed #c9b994; margin-top: 14px; }
+.pf-cert-img { display: block; max-width: 100%; max-height: 100%; margin: 0 auto; }
+
+/* ------------------------------------------------------------- the forms */
+.pf-form-head { text-align: center; font-family: Arial, Helvetica, sans-serif; letter-spacing: 0.14em; }
+.pf-form-head .dept { font-size: 0.82rem; font-weight: bold; }
+.pf-form-head .title { font-size: 1.35rem; font-weight: bold; margin: 0.3rem 0 0.15rem; }
+.pf-form-head .sub { font-size: 0.72rem; letter-spacing: 0.08em; }
+.pf-rule { border: 0; border-top: 2px solid #1f140a; margin: 0.9rem 0; }
+
+.pf-cover { display: grid; grid-template-columns: 1fr 190px; gap: 22px; margin-top: 1.4rem; }
+.pf-photo { width: 190px; border: 1px solid #1f140a; padding: 6px; background: #fff; align-self: start; }
+.pf-photo img { display: block; width: 100%; filter: grayscale(0.35) sepia(0.25); }
+.pf-fields { display: grid; grid-template-columns: 1fr; border: 1.5px solid #1f140a; align-self: start; }
+.pf-field { padding: 0.3rem 0.55rem 0.4rem; border-bottom: 1px solid #1f140a; }
+.pf-field:last-child { border-bottom: 0; }
+.pf-field .k { display: block; font-family: Arial, Helvetica, sans-serif; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: #4a3a24; }
+.pf-field .v { font-size: 1rem; }
+/* The contents, filling the cover's lower half as a file's index sheet does. */
+.pf-contents { margin-top: 2.2rem; }
+.pf-contents td.num { width: 2.5em; }
+.pf-stamp { position: absolute; right: 70px; bottom: 120px; width: 230px; transform: rotate(-9deg); opacity: 0.85; }
+.pf-foot { position: absolute; left: 45px; right: 45px; bottom: 30px; display: flex; justify-content: space-between;
+    font-family: Arial, Helvetica, sans-serif; font-size: 0.62rem; letter-spacing: 0.08em; color: #4a3a24; }
+
+.pf-section { margin-top: 1.3rem; }
+.pf-section h3 { font-family: Arial, Helvetica, sans-serif; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    border-bottom: 1.5px solid #1f140a; padding-bottom: 0.2rem; margin: 0 0 0.35rem; }
+.pf-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.pf-table th { font-family: Arial, Helvetica, sans-serif; font-size: 0.6rem; letter-spacing: 0.07em; text-transform: uppercase;
+    text-align: left; color: #4a3a24; font-weight: normal; padding: 0.15rem 0.3rem; border-bottom: 1px solid #1f140a; }
+.pf-table td { padding: 0.18rem 0.3rem; border-bottom: 1px dotted #b9a882; vertical-align: top; }
+.pf-table td.num, .pf-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.pf-table td.date { white-space: nowrap; width: 7.5em; }
+/* A decoration may run onto the next sheet; a single citation may not. */
+.pf-earlier { list-style: none; margin: 0.25rem 0 0.1rem 0.4rem; padding: 0 0 0 0.7rem; border-left: 1px solid #c9b994; font-size: 0.78rem; }
+.pf-earlier li { margin: 0 0 0.3rem; break-inside: avoid; page-break-inside: avoid; }
+.pf-earlier .date { color: #4a3a24; margin-right: 0.35rem; }
+.pf-cite { display: block; font-family: Georgia, serif; font-style: italic; font-size: 0.8rem; line-height: 1.35; color: #3b2e1c; margin-top: 0.1rem; }
+
+.pf-bio h2 { font-family: Georgia, serif; font-weight: normal; text-align: center; letter-spacing: 0.25em; font-size: 1.4rem; margin: 0.6rem 0 0.1rem; }
+.pf-bio .who { text-align: center; font-family: Georgia, serif; font-style: italic; margin-bottom: 1.2rem; }
+.pf-bio h4 { font-family: Georgia, serif; font-size: 1.05rem; font-weight: bold; text-align: center; margin: 1.1rem 0 0.6rem; }
+.pf-bio p { font-family: Georgia, serif; font-size: 0.98rem; line-height: 1.55; text-align: justify; text-indent: 1.6em; margin: 0 0 0.6rem; }
+
+/* The shadowbox, laid out as on the career page. */
+.pf-sbox { position: relative; margin: 0 auto; }
+.pf-sbox > img, .pf-sbox .items img { position: absolute; }
+.pf-sbox .frame { left: 0; top: 0; width: 100%; height: 100%; }
+.pf-sbox .items img.sbox-board-right { transform: scaleX(-1); }
+.pf-sbox .sbox-medal, .pf-sbox .sbox-badge, .pf-sbox .sbox-citation {
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45)) drop-shadow(4px 9px 9px rgba(0, 0, 0, .40)); }
+.pf-sbox .sbox-emblem { filter: drop-shadow(0 6px 7px rgba(0, 0, 0, .55)); }
+.pf-plate { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: Georgia, 'Times New Roman', serif; font-weight: bold; color: #4a3410; text-align: center; line-height: 1.1;
+    text-shadow: 0 1px 0 rgba(255, 244, 214, .45); }
+.pf-plate span { white-space: nowrap; }
+
+@media print {
+    @page { size: letter portrait; margin: 45px; }
+    @page landscape { size: letter landscape; margin: 30px; }
+    .no-print { display: none !important; }
+    /* the whole sheet white: html's desk colour showed under the last page */
+    html, .personnel-page { background: #fff !important; padding: 0; }
+    .pf-page { margin: 0; padding: 0; box-shadow: none; background: transparent;
+        break-after: page; page-break-after: always;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .pf-page:last-child { break-after: auto; page-break-after: auto; }
+    .pf-page.landscape { page: landscape; }
+    .pf-page.flow { min-height: 0; }
+    .pf-foot { left: 0; right: 0; bottom: 0; }
+}

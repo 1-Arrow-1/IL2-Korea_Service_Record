@@ -36,6 +36,11 @@
 .logbook-bar { display: flex; align-items: center; gap: 1rem; max-width: 1180px; margin: 0 auto 1rem; }
 .logbook-bar .lb-note { flex: 1; font-size: 0.84rem; color: var(--ink-muted); font-style: italic; }
 .lb-pager { display: flex; align-items: center; gap: 0.5rem; }
+/* Embedded in the personnel file: one month's sheet alone, edge to edge. */
+body.embed { background: transparent; padding: 0; margin: 0; }
+body.embed::before { display: none; }
+body.embed .logbook-bar { display: none; }
+body.embed .sheet { width: 1180px; max-width: none; margin: 0; box-shadow: none; box-sizing: border-box; }
 .lb-pager[hidden] { display: none; }
 .lb-pager #lb-month { min-width: 9rem; text-align: center; font-variant-numeric: tabular-nums; }
 .lb-pager button:disabled { opacity: 0.35; cursor: default; }

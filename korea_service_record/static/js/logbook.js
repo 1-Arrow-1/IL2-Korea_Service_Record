@@ -23,6 +23,12 @@
     const params = new URLSearchParams(location.search);
     const careerId = params.get("career");
     const pilotId = params.get("pilot");
+    // Embedded in the personnel file: one month's sheet alone (?month=1951.06),
+    // and a mark on the body when it is drawn so the file can measure it.
+    const embedded = params.get("embed") === "1";
+    const embedMonth = params.get("month");
+    if (embedded) document.body.classList.add("embed");
+    const done = () => { document.body.dataset.ready = "1"; };
 
     const settings = await fetch("/api/settings").then((r) => r.json()).catch(() => ({}));
     const override = (settings.overrides || []).find((o) => o.career === careerId);
@@ -64,6 +70,7 @@
         data = await r.json();
     } catch (err) {
         el("lb-state").textContent = i18n.t("logbook.failed"); el("lb-state").hidden = false;
+        done();
         return;
     }
 
@@ -101,6 +108,9 @@
         return out.join(" · ");
     };
 
+    if (embedded && embedMonth) {
+        data.months = data.months.filter((mo) => mo.month === embedMonth);
+    }
     const sheets = data.months.map((mo, i) => {
         const head = data.form === "usaf" ? '<div class="form-title"><span>' + esc(TF("logbook.form.title")) + "</span>" +
                 '<span class="form-no">' + esc(TF("logbook.form.form_no")) + "</span></div>"
@@ -173,4 +183,5 @@
         });
     }
     if (nodes.length) { document.body.classList.add("paged"); show(); }
+    done();
 })();
