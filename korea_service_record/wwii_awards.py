@@ -19,6 +19,7 @@ AMERICAN_DEFENSE = 601064
 ASIATIC_PACIFIC = (601065, 601066, 601067, 601068)       # plain, 1-3 stars
 EAME = tuple(range(601069, 601076))                       # plain, 1-6 stars
 WWII_VICTORY = 601076
+ARMY_OF_OCCUPATION = 601077
 
 DEFENSE_LENINGRAD = 501050
 DEFENSE_MOSCOW = 501051
@@ -55,6 +56,12 @@ _EAME_CREDITS: Dict[str, int] = {
     "601013": 3,
 }
 _WWII_VICTORY = {f"601{i:03d}" for i in range(1, 14)}
+# The Army of Occupation Medal needs 30 consecutive days at a normal post of
+# duty in occupied Germany, Austria, Italy, Japan or Korea after VE/VJ-Day.
+# Like Moscow above, it is offered for a player's own biography, but no
+# selectable biography is credited with it until one is shown to state an
+# occupation posting - a post-war assignment alone is not eligibility.
+_ARMY_OF_OCCUPATION = set()
 
 # The Soviet biography text supports these awards directly.  Moscow is kept
 # as an available family because its artwork was supplied, but no selectable
@@ -75,6 +82,7 @@ _FAMILY = {
     **{award_id: "asiatic_pacific" for award_id in ASIATIC_PACIFIC},
     **{award_id: "eame" for award_id in EAME},
     WWII_VICTORY: "wwii_victory",
+    ARMY_OF_OCCUPATION: "army_of_occupation",
     DEFENSE_LENINGRAD: "defense_leningrad",
     DEFENSE_MOSCOW: "defense_moscow",
     DEFENSE_STALINGRAD: "defense_stalingrad",
@@ -88,6 +96,7 @@ _NAMES = {
         "asiatic_pacific": "Asiatic-Pacific Campaign Medal",
         "eame": "European-African-Middle Eastern Campaign Medal",
         "wwii_victory": "World War II Victory Medal",
+        "army_of_occupation": "Army of Occupation Medal",
         "defense_leningrad": "Medal for the Defense of Leningrad",
         "defense_moscow": "Medal for the Defense of Moscow",
         "defense_stalingrad": "Medal for the Defense of Stalingrad",
@@ -99,6 +108,7 @@ _NAMES = {
         "asiatic_pacific": "Asiatisch-Pazifische Feldzugsmedaille",
         "eame": "Europa-Afrika-Nahost-Feldzugsmedaille",
         "wwii_victory": "Siegesmedaille des Zweiten Weltkriegs",
+        "army_of_occupation": "Medaille der Besatzungsarmee",
         "defense_leningrad": "Medaille „Für die Verteidigung Leningrads“",
         "defense_moscow": "Medaille „Für die Verteidigung Moskaus“",
         "defense_stalingrad": "Medaille „Für die Verteidigung Stalingrads“",
@@ -110,6 +120,7 @@ _NAMES = {
         "asiatic_pacific": "Medalla de la Campaña de Asia-Pacífico",
         "eame": "Medalla de la Campaña de Europa-África-Oriente Medio",
         "wwii_victory": "Medalla de la Victoria de la Segunda Guerra Mundial",
+        "army_of_occupation": "Medalla del Ejército de Ocupación",
         "defense_leningrad": "Medalla por la Defensa de Leningrado",
         "defense_moscow": "Medalla por la Defensa de Moscú",
         "defense_stalingrad": "Medalla por la Defensa de Stalingrado",
@@ -121,6 +132,7 @@ _NAMES = {
         "asiatic_pacific": "Médaille de la campagne d’Asie-Pacifique",
         "eame": "Médaille de la campagne Europe-Afrique-Moyen-Orient",
         "wwii_victory": "Médaille de la victoire de la Seconde Guerre mondiale",
+        "army_of_occupation": "Médaille de l’armée d’occupation",
         "defense_leningrad": "Médaille pour la défense de Léningrad",
         "defense_moscow": "Médaille pour la défense de Moscou",
         "defense_stalingrad": "Médaille pour la défense de Stalingrad",
@@ -132,6 +144,7 @@ _NAMES = {
         "asiatic_pacific": "Медаль «За Азиатско-Тихоокеанскую кампанию»",
         "eame": "Медаль «За Европейско-Африканско-Ближневосточную кампанию»",
         "wwii_victory": "Медаль Победы во Второй мировой войне",
+        "army_of_occupation": "Медаль «За службу в оккупационной армии»",
         "defense_leningrad": "Медаль «За оборону Ленинграда»",
         "defense_moscow": "Медаль «За оборону Москвы»",
         "defense_stalingrad": "Медаль «За оборону Сталинграда»",
@@ -143,6 +156,7 @@ _NAMES = {
         "asiatic_pacific": "亚太战役奖章",
         "eame": "欧洲-非洲-中东战役奖章",
         "wwii_victory": "第二次世界大战胜利奖章",
+        "army_of_occupation": "占领军奖章",
         "defense_leningrad": "列宁格勒保卫奖章",
         "defense_moscow": "莫斯科保卫奖章",
         "defense_stalingrad": "斯大林格勒保卫奖章",
@@ -162,6 +176,7 @@ CHOICES: Dict[int, Tuple[Tuple[str, Tuple[int, ...]], ...]] = {
         ("asiatic_pacific", ASIATIC_PACIFIC),
         ("eame", EAME),
         ("wwii_victory", (WWII_VICTORY,)),
+        ("army_of_occupation", (ARMY_OF_OCCUPATION,)),
     ),
     501: (
         ("defense_leningrad", (DEFENSE_LENINGRAD,)),
@@ -226,6 +241,8 @@ def for_biography(biography_id: str, country: int = 601) -> Tuple[int, ...]:
     if bio in _EAME_CREDITS:
         out.append(EAME[_EAME_CREDITS[bio]])
     out.append(WWII_VICTORY)
+    if bio in _ARMY_OF_OCCUPATION:
+        out.append(ARMY_OF_OCCUPATION)
     return tuple(out)
 
 

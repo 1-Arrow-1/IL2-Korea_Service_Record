@@ -66,3 +66,25 @@ def test_soviet_loose_medals_share_the_mounted_canvas(tmp_path):
         assert medal.size == medals.SOVIET_MOUNT_CANVAS
         assert ribbon.getbbox()
         assert medal.getbbox()
+
+
+def test_army_of_occupation_medal_is_a_plain_us_choice(tmp_path):
+    aom = wwii_awards.ARMY_OF_OCCUPATION
+    assert ("army_of_occupation", (aom,)) in wwii_awards.CHOICES[601]
+    assert wwii_awards.chosen([aom, 601076], 601) == (601076, aom)
+    assert wwii_awards.chosen([aom], 501) == ()
+    for lang in ("eng", "ger", "spa", "fra", "rus", "chs"):
+        assert wwii_awards.name(aom, lang)
+    # Worn after the WWII Victory Medal and before the National Defense
+    # Service Medal, with no devices.
+    assert ribbons.PRECEDENCE[601076] < ribbons.PRECEDENCE[aom] < ribbons.PRECEDENCE[601053]
+    assert ribbons.RIBBONS[aom].devices == []
+    assert ribbons.rack([601053, aom, 601076]) == [601076, aom, 601053]
+    assert aom in medals.DRAWN
+    ribbon_renderer = ribbons.RibbonRenderer(tmp_path)
+    medal_renderer = medals.MedalRenderer(tmp_path, ribbon_renderer)
+    ribbon = Image.open(BytesIO(ribbon_renderer.png(aom))).convert("RGBA")
+    medal = Image.open(BytesIO(medal_renderer.png(aom))).convert("RGBA")
+    assert ribbon.size == ribbons.CANVAS
+    assert medal.size == medals.DRAPE
+    assert aom in medals.wear([aom])["bar"]

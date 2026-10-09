@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 ART = Path(__file__).resolve().parent / "static" / "images" / "ribbons"
 # Bump whenever the composition or the art changes: it goes into the image
 # URLs, so browsers that were told to cache a ribbon for a year re-fetch it.
-REVISION = 24
+REVISION = 26
 # US bars are 1 3/8 x 3/8 inch (11:3); Soviet-pattern bars (USSR, DPRK) are
 # 24 x 8 mm (3:1). Each sits centred on a canvas 20 px bigger all round, so a
 # unit citation's frame can overhang without changing the grid.
@@ -232,6 +232,7 @@ RIBBONS[601064] = Ribbon(601064)                                                
 RIBBONS.update(_campaign_ladder(601065, [601065, 601066, 601067, 601068]))          # Asiatic-Pacific
 RIBBONS.update(_campaign_ladder(601069, list(range(601069, 601076))))               # EAME
 RIBBONS[601076] = Ribbon(601076)                                                    # World War II Victory
+RIBBONS[601077] = Ribbon(601077)                                                    # Army of Occupation
 
 # Navy / Marine Corps personal and unit awards. Shared medals use the same
 # base art as their USAF counterparts but carry naval 5/16-inch award stars.

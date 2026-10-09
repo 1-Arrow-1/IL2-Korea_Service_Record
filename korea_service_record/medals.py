@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 ART = Path(__file__).resolve().parent / "static" / "images" / "medals"
 # Bump whenever the composition or the art changes; it is part of the URLs.
-REVISION = 30
+REVISION = 33
 
 # A device pinned to the ribbon stands a little off the cloth: a soft dark
 # copy of its outline, down and slightly right, under it. Without one the
