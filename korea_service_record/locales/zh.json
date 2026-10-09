@@ -53,7 +53,9 @@
         "other": "{count} 架 {type} {n} 天后到达"
       },
       "wounded": "您正在住院",
-      "wounded_until": "住院至 {date}"
+      "wounded_until": "住院至 {date}",
+      "next_rank": "{rank}：{progress}",
+      "aircraft": "可用飞机 {ready} / {total}"
     }
   },
   "record": {

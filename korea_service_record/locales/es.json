@@ -58,7 +58,9 @@
         "other": "{count} × {type} llegan en {n} días"
       },
       "wounded": "Está en el hospital",
-      "wounded_until": "En el hospital hasta el {date}"
+      "wounded_until": "En el hospital hasta el {date}",
+      "next_rank": "{rank}: {progress}",
+      "aircraft": "Aviones {ready} / {total} listos"
     }
   },
   "record": {

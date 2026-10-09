@@ -206,6 +206,8 @@
     margin-top: 0.7rem;
     padding-top: 0.55rem;
 }
+/* an item never breaks inside itself; the line wraps between items */
+.career-briefing span:not(.sep) { white-space: nowrap; }
 .career-briefing .good { color: #2f6b2f; font-weight: 600; }
 .career-briefing .warn { color: #a0371f; font-weight: 600; }
-.career-briefing .sep { color: var(--border-soft); }
+.career-briefing .sep { color: var(--ink-muted); opacity: 0.6; }

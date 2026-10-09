@@ -219,6 +219,15 @@
                 : T("landing.brief.promotions", {n: b.promotions_due}), "good");
         }
         if (b.awards_pending) item(T("landing.brief.awards", {n: b.awards_pending}), "good");
+        // always shown: his own next rung, and the aircraft ready to fly
+        if (b.next_rank) {
+            item(T("landing.brief.next_rank", {rank: b.next_rank.rank,
+                progress: fmtNum(b.next_rank.have) + " / " + fmtNum(b.next_rank.need) + unitPlain(b.next_rank.unit)}));
+        }
+        if (b.aircraft_total) {
+            item(T("landing.brief.aircraft", {ready: b.aircraft_ready, total: b.aircraft_total}),
+                 b.aircraft_ready * 2 < b.aircraft_total ? "warn" : "");
+        }
         if (b.stores && b.stores.days != null) {
             item(T("landing.brief.stores", {what: T("landing.brief.store_" + b.stores.kind), n: b.stores.days}),
                  b.stores.days < 14 ? "warn" : "");

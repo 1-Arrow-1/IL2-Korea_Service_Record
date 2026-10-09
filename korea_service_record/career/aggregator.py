@@ -986,6 +986,16 @@ class CareerAggregator:
                 if nxt and nxt["ready"]:
                     due.add(pilot["id"])
             awards_waiting = sum(1 for r in pending if r["category"] != 1)
+            # The player's own next rung, by the counter he is furthest from.
+            mine = None
+            if player["state"] not in (2, 3) and player["id"] not in due:
+                nxt = self._next_promotion(prog.pilot_variables(player, career, squad),
+                                           int(player["country"] or 0))
+                bars = (nxt or {}).get("bars") or []
+                if bars:
+                    worst = min(bars, key=lambda b: b["fraction"])
+                    mine = {"rank": nxt["rank"], "have": worst["have"], "need": worst["need"],
+                            "unit": worst["unit"]}
 
             aircraft = self._aircraft(db, career, squad, Path(meta.path))
             lasts = ((aircraft.get("statistics") or {}).get("lasts") or {})
@@ -1007,6 +1017,8 @@ class CareerAggregator:
                 "promotions_due": len(due),
                 "player_promotion_due": player["id"] in due,
                 "awards_pending": awards_waiting,
+                "next_rank": mine,
+                "aircraft_ready": aircraft["serviceable"], "aircraft_total": aircraft["on_strength"],
                 "stores": ({"kind": shortest[0], "days": shortest[1]} if shortest else None),
                 "in_repair": aircraft["in_repair"],
                 "repair_next": ({"code": soonest["code"], "days": soonest["days"]} if soonest else None),

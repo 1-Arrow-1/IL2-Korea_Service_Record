@@ -58,7 +58,9 @@
         "other": "{count} × {type} arriving in {n} days"
       },
       "wounded": "You are in hospital",
-      "wounded_until": "In hospital until {date}"
+      "wounded_until": "In hospital until {date}",
+      "next_rank": "{rank}: {progress}",
+      "aircraft": "Aircraft {ready} / {total} ready"
     }
   },
   "record": {

@@ -58,7 +58,9 @@
         "other": "{count} × {type} treffen in {n} Tagen ein"
       },
       "wounded": "Sie sind im Lazarett",
-      "wounded_until": "Im Lazarett bis {date}"
+      "wounded_until": "Im Lazarett bis {date}",
+      "next_rank": "{rank}: {progress}",
+      "aircraft": "Flugzeuge {ready} / {total} einsatzbereit"
     }
   },
   "record": {

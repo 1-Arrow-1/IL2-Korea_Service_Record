@@ -68,7 +68,9 @@
         "other": "{count} × {type} прибудут через {n} дня"
       },
       "wounded": "Вы в госпитале",
-      "wounded_until": "В госпитале до {date}"
+      "wounded_until": "В госпитале до {date}",
+      "next_rank": "{rank}: {progress}",
+      "aircraft": "Исправных самолётов {ready} из {total}"
     }
   },
   "record": {
