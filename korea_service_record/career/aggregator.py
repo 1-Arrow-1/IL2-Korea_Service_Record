@@ -355,6 +355,48 @@ MISSION_SYMBOL = {
 }
 
 
+# The Navy's flight classification (Naval Aircraft Flight Classification
+# System, condensed): condition 1 day visual / 3 night visual, then the
+# general purpose letter and the specific purpose number. Combat letters:
+# T attack on non-ASC targets, U counter-air offensive, V reconnaissance,
+# W air defence of own base, X air defence of other forces.
+NAVY_FLIGHT_CODE = {
+    1101: "X7", 1102: "X7", 1103: "X7", 1104: "X7", 1108: "X7",     # intercept (scramble)
+    1105: "W2",                                                      # CAP over own base
+    1121: "X4", 1124: "X4", 1125: "X4",                              # CAP over friendly forces
+    1123: "U1", 1126: "U1", 1206: "U1",                              # sweep, intruder, airfield strike
+    1122: "T1", 1201: "T1", 1202: "T1", 1203: "T1", 1204: "T1",      # pre-assigned target
+    1205: "T1", 1208: "T1", 1209: "T1",
+    1128: "T2", 1207: "T2", 1215: "T2",                              # armed reconnaissance
+    1151: "U8", 1156: "U8", 1153: "U9",                              # escort of bombers, transports
+    1152: "T9", 1154: "V9", 1155: "V9",                              # escort of attack, recon
+    1139: "X4",                                                      # cover of a strategic object
+    1217: "S1",                                                      # harbour strike: ASC targets
+    1301: "T2", 1302: "T2", 1304: "T2",                              # close support: targets given airborne
+    1501: "T1", 1502: "T1", 1503: "T1", 1504: "U1", 1505: "T1",      # bombing, pre-assigned
+    1506: "T1", 1507: "T1", 1508: "T1", 1513: "T1",
+    1901: "J1", 1902: "J1",                                          # ferry
+}
+
+
+def navy_flight_code(mission_type: int, night_share: float) -> str:
+    """'1T1': day or night, then the purpose of the flight."""
+    purpose = NAVY_FLIGHT_CODE.get(int(mission_type or 0), "Q5")
+    return ("3" if night_share > 0.5 else "1") + purpose
+
+
+def bureau_number(plane_id: int, plane_key: str, career_key: str) -> str:
+    """A Navy Bureau Number for an aircraft the game knows only by its
+    tail code: six digits, fixed per airframe, in the block the type was
+    built in (F9F Panthers 122xxx-127xxx, F4U-4 and AD 81xxx-97xxx,
+    129xxx for the later Corsairs and Skyraiders)."""
+    import hashlib
+    key = (plane_key or "").lower()
+    lo, hi = (122560, 127430) if key.startswith(("f9f", "f2h")) else              (129318, 133890) if key.startswith(("f4u5", "f4u-5", "au1", "ad4")) else (81000, 97500)
+    n = int(hashlib.sha1(f"{career_key}|{plane_id}".encode()).hexdigest()[:8], 16)
+    return str(lo + n % (hi - lo))
+
+
 def _seconds(clock: str) -> float:
     """'HH:MM[:SS]' as seconds of the day."""
     try:
@@ -2940,6 +2982,9 @@ class CareerAggregator:
                     "outcome": "bailed" if flight and flight.ejected else ("ok" if returned else "missing"),
                     "rank": self.locale.rank_name(pilot["country"], s["rankId"]),
                 }
+                if int(pilot["country"]) in (602, 603):
+                    row["char"] = navy_flight_code(m["type"], night_h / hours if hours else 0)
+                    row["bureau"] = bureau_number(plane["id"], plane_key, career_id) if plane else ""
                 month["rows"].append(row)
                 for tot in (month["totals"], to_date):
                     tot["hours"] += hours; tot["day"] += hours - night_h; tot["night"] += night_h
@@ -2961,7 +3006,8 @@ class CareerAggregator:
                 # advisers and keeps the Soviet book, as his award papers
                 # already use the Soviet sheet. Without 502 here he was
                 # handed an AF Form 5.
-                "form": {601: "usaf", 501: "sov", 502: "sov", 503: "dprk"}.get(country, "usaf"),
+                "form": {601: "usaf", 602: "navy", 603: "navy", 501: "sov", 502: "sov",
+                         503: "dprk"}.get(country, "usaf"),
                 "months": [months[k] for k in sorted(months)],
                 "as_of": career["currentDate"],
                 "corrected": getattr(db, "_corr", None) is not None,

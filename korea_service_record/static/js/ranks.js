@@ -13,6 +13,7 @@
         "Lieutenant Colonel": "Lt. Colonel", "Lieutenant General": "Lt. General",
         "Brigadier General": "Brig. General", "Major General": "Maj. General",
         "Lieutenant Junior Grade": "Lt. (jg)", "Lieutenant Commander": "Lt. Commander",
+        "Rear Admiral (LH)": "Rear Adm. (LH)", "Rear Admiral (UH)": "Rear Adm. (UH)",
         "Rear Admiral (lower half)": "Rear Adm. (LH)", "Rear Admiral": "Rear Adm.",
         // Spanish transliterations of Soviet ranks
         "Starshy Leytenant": "St. Leytenant", "General-leytenant": "Gen.-leyt.",

@@ -463,7 +463,7 @@ RANK_ABBR = {
           4: "Lt. Col.", 5: "Col.", 6: "Brig. Gen.", 7: "Maj. Gen."},
     # The Navy ladder is its own: a lieutenant junior grade is never "1st Lt."
     602: {0: "Ens.", 1: "Lt. (j.g.)", 2: "Lt.", 3: "Lt. Cdr.",
-          4: "Cdr.", 5: "Capt.", 6: "RAdm. (l.h.)", 7: "RAdm."},
+          4: "Cdr.", 5: "Capt.", 6: "RAdm. (LH)", 7: "RAdm. (UH)"},
     # The Marines wear the Army ladder, as the game's own names show.
     603: {0: "2nd Lt.", 1: "1st Lt.", 2: "Capt.", 3: "Maj.",
           4: "Lt. Col.", 5: "Col.", 6: "Brig. Gen.", 7: "Maj. Gen."},

@@ -78,7 +78,7 @@
     // The form keeps its own language whatever the page speaks: English on
     // the Form 5, Russian on the flight book - the Korean People's Army
     // took its paperwork from its Soviet advisers, as its award sheets do.
-    const formLang = {usaf: "en", sov: "ru", dprk: "ru"}[data.form] || pageLang;
+    const formLang = {usaf: "en", navy: "en", sov: "ru", dprk: "ru"}[data.form] || pageLang;
     if (formLang !== pageLang) await i18n.load(formLang);
     const bundle = i18n.loaded[formLang] || i18n.loaded[pageLang];
     const TF = (key, p) => {
@@ -111,7 +111,72 @@
     if (embedded && embedMonth) {
         data.months = data.months.filter((mo) => mo.month === embedMonth);
     }
-    const sheets = data.months.map((mo, i) => {
+
+    // The Navy's and Marine Corps' Aviator's Flight Log Book: a two-page
+    // spread a month, written by hand on the printed ledger
+    // (certificates/Vintage_Blank_Flight_Logbook_Ledger.jpg, 1448 x 1086),
+    // after Lt. W. E. Bancroft's book of August 1951. 22 ruled lines a
+    // spread; a busy month runs onto the next, totals carried forward.
+    // Positions are the ledger's own pixels.
+    const NAVY_W = 1448, NAVY_H = 1086, NAVY_TOP = 132, NAVY_PITCH = 35.27, NAVY_LINES = 22;
+    const NAVY_COLS = {day: [75, 115], model: [115, 219], bureau: [219, 328], char: [328, 386],
+        pilot: [386, 445], copilot: [445, 503], student: [503, 562], passenger: [562, 623], total: [623, 700],
+        instrument: [752, 816], me_day: [816, 877], me_night: [877, 936], se_night: [936, 995],
+        carrier: [995, 1064], remarks: [1068, 1398]};
+    const NAVY_TOTALS = [[908, 947], [947, 985], [985, 1024]];
+    const navyCell = (cls, col, y0, y1, text) => {
+        const [x0, x1] = NAVY_COLS[col];
+        return '<span class="nv ' + cls + '" style="left:' + (x0 / NAVY_W * 100) + "%;width:" + ((x1 - x0) / NAVY_W * 100) +
+            "%;top:" + (y0 / NAVY_H * 100) + "%;height:" + ((y1 - y0) / NAVY_H * 100) + '%">' + esc(text) + "</span>";
+    };
+    const navySpreads = () => {
+        const out = [];
+        let carried = {pilot: 0, total: 0, se_night: 0, carrier: 0};
+        data.months.forEach((mo, n) => {
+            // Brought forward: the career's hours before this month - right
+            // even when one month is shown alone in the personnel file.
+            if (n === 0 && mo.to_date && mo.totals) {
+                carried = {pilot: mo.to_date.hours - mo.totals.hours, total: mo.to_date.hours - mo.totals.hours,
+                           se_night: (mo.to_date.night || 0) - (mo.totals.night || 0), carrier: 0};
+            }
+            const [y, m] = mo.month.split(".");
+            const monthWord = new Date(Date.UTC(+y, +m - 1, 1)).toLocaleDateString("en", {month: "long", timeZone: "UTC"}).toUpperCase();
+            for (let start = 0; start === 0 || start < mo.rows.length; start += NAVY_LINES) {
+                const rows = mo.rows.slice(start, start + NAVY_LINES);
+                const page = {pilot: 0, total: 0, se_night: 0, carrier: 0};
+                let html = '<span class="nv head" style="left:9.6%;top:1.6%;width:14%">' + esc(monthWord) + "</span>" +
+                    '<span class="nv head" style="left:34.5%;top:1.6%;width:10%">' + esc(y) + "</span>";
+                rows.forEach((r, i) => {
+                    const y0 = NAVY_TOP + i * NAVY_PITCH, y1 = y0 + NAVY_PITCH;
+                    const night = r.night_h || 0;
+                    page.pilot += r.hours; page.total += r.hours; page.se_night += night; page.carrier += 0;
+                    html += navyCell("c", "day", y0, y1, r.day) + navyCell("", "model", y0, y1, r.aircraft) +
+                        navyCell("c", "bureau", y0, y1, r.bureau || "") + navyCell("c", "char", y0, y1, r.char || "") +
+                        navyCell("c", "pilot", y0, y1, tenths(r.hours)) + navyCell("c", "total", y0, y1, tenths(r.hours)) +
+                        (night ? navyCell("c", "se_night", y0, y1, tenths(night)) : "") +
+                        navyCell("rm", "remarks", y0, y1, [r.mission, remarks(r)].filter(Boolean).join(" · "));
+                });
+                const grand = {};
+                Object.keys(page).forEach((k) => { grand[k] = carried[k] + page[k]; });
+                [[page, 0], [carried, 1], [grand, 2]].forEach(([t, n]) => {
+                    const [y0, y1] = NAVY_TOTALS[n];
+                    html += navyCell("c tot", "pilot", y0, y1, tenths(t.pilot)) + navyCell("c tot", "total", y0, y1, tenths(t.total)) +
+                        (t.se_night ? navyCell("c tot", "se_night", y0, y1, tenths(t.se_night)) : "");
+                });
+                carried = grand;
+                html += '<span class="nv sig" style="left:75%;top:85.6%;width:21%">' + esc(data.pilot.name) + "</span>";
+                out.push({month: mo.month, html: '<section class="sheet navy">' + html + "</section>"});
+            }
+        });
+        return out;
+    };
+    if (data.form === "navy") {
+        const spreads = navySpreads();
+        data.months = spreads.map((s) => data.months.find((mo) => mo.month === s.month));
+        el("lb-sheets").innerHTML = spreads.map((s) => s.html).join("") ||
+            '<p class="state-message">' + esc(i18n.t("logbook.empty")) + "</p>";
+    }
+    const sheets = data.form === "navy" ? [] : data.months.map((mo, i) => {
         const head = data.form === "usaf" ? '<div class="form-title"><span>' + esc(TF("logbook.form.title")) + "</span>" +
                 '<span class="form-no">' + esc(TF("logbook.form.form_no")) + "</span></div>"
             : '<div class="form-title book"><span>' + esc(TF("logbook.form.title")) + "</span></div>";
@@ -161,7 +226,9 @@
                 '<span class="page">' + esc(TF("logbook.form.page", {n: i + 1, of: data.months.length})) + "</span></div>" +
             "</section>";
     });
-    el("lb-sheets").innerHTML = sheets.join("") || '<p class="state-message">' + esc(i18n.t("logbook.empty")) + "</p>";
+    if (data.form !== "navy") {
+        el("lb-sheets").innerHTML = sheets.join("") || '<p class="state-message">' + esc(i18n.t("logbook.empty")) + "</p>";
+    }
 
     // On screen one sheet at a time, the current month first, the arrows
     // (and the keyboard's) turning the pages; print gets them all.

@@ -75,3 +75,11 @@ def test_the_owners_font_is_never_in_the_repository():
     folder = pc.STATIC / "certificates"
     assert not list(folder.glob("*BeneScriptine*"))
     assert (folder / "UnifrakturMaguntia-OFL.txt").is_file()
+
+
+def test_navy_flight_codes_follow_the_classification_system():
+    from korea_service_record.career.aggregator import MISSION_SYMBOL, NAVY_FLIGHT_CODE, navy_flight_code
+    assert navy_flight_code(1201, 0.0) == "1T1"          # pre-assigned strike, day visual
+    assert navy_flight_code(1101, 0.8) == "3X7"          # scramble, night visual
+    assert navy_flight_code(1304, 0.0) == "1T2"          # close support, targets given airborne
+    assert not [k for k in MISSION_SYMBOL if k not in NAVY_FLIGHT_CODE]

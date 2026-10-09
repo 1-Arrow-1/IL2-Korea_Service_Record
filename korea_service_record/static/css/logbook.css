@@ -154,3 +154,16 @@ body.embed .sheet { width: 1180px; max-width: none; margin: 0; box-shadow: none;
     .form-head .field { border-bottom: 1px solid #1f140a; }
     .sheet { padding: 1rem 0.8rem; overflow-x: auto; }
 }
+
+/* The Navy's Aviator's Flight Log Book (logbook.js navySpreads): the blank
+   ledger as the sheet, every entry placed on it in the pilot's blue ink. */
+.sheet.navy { position: relative; padding: 0; aspect-ratio: 1448 / 1086; container-type: inline-size;
+    background: url("../images/certificates/Vintage_Blank_Flight_Logbook_Ledger.jpg") center / 100% 100% no-repeat; }
+.sheet.navy .nv { position: absolute; display: flex; align-items: flex-end; padding: 0 0.35cqw 0.3cqw;
+    box-sizing: border-box; overflow: hidden; white-space: nowrap; color: #1d3a8a;
+    font-family: 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive; font-size: 1.35cqw; line-height: 1; }
+.sheet.navy .nv.c { justify-content: center; }
+.sheet.navy .nv.rm { font-size: 1.15cqw; }
+.sheet.navy .nv.tot { align-items: center; }
+.sheet.navy .nv.head { font-size: 1.9cqw; height: 3cqw; letter-spacing: 0.05em; }
+.sheet.navy .nv.sig { font-family: 'Segoe Script', 'Brush Script MT', cursive; font-size: 1.9cqw; height: 3.5cqw; }
