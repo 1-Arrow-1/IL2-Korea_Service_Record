@@ -175,6 +175,14 @@
         data.months = spreads.map((s) => data.months.find((mo) => mo.month === s.month));
         el("lb-sheets").innerHTML = spreads.map((s) => s.html).join("") ||
             '<p class="state-message">' + esc(i18n.t("logbook.empty")) + "</p>";
+        // A long remark is written smaller, as a pilot squeezes it in, never cut.
+        document.querySelectorAll(".sheet.navy .nv.rm").forEach((cell) => {
+            let size = parseFloat(getComputedStyle(cell).fontSize);
+            while (cell.scrollWidth > cell.clientWidth && size > 6) {
+                size -= 0.5;
+                cell.style.fontSize = size + "px";
+            }
+        });
     }
     const sheets = data.form === "navy" ? [] : data.months.map((mo, i) => {
         const head = data.form === "usaf" ? '<div class="form-title"><span>' + esc(TF("logbook.form.title")) + "</span>" +
