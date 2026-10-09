@@ -178,6 +178,22 @@ CHOICES: Dict[int, Tuple[Tuple[str, Tuple[int, ...]], ...]] = {
         ("wwii_victory", (WWII_VICTORY,)),
         ("army_of_occupation", (ARMY_OF_OCCUPATION,)),
     ),
+    # The Navy and the Marine Corps wore the same defense, campaign and
+    # victory medals; the ribbon rack gives their campaign stars the naval
+    # pattern. Their occupation medal was the Navy Occupation Service Medal,
+    # not the Army's, so that family is not offered until it has art.
+    602: (
+        ("american_defense", (AMERICAN_DEFENSE,)),
+        ("asiatic_pacific", ASIATIC_PACIFIC),
+        ("eame", EAME),
+        ("wwii_victory", (WWII_VICTORY,)),
+    ),
+    603: (
+        ("american_defense", (AMERICAN_DEFENSE,)),
+        ("asiatic_pacific", ASIATIC_PACIFIC),
+        ("eame", EAME),
+        ("wwii_victory", (WWII_VICTORY,)),
+    ),
     501: (
         ("defense_leningrad", (DEFENSE_LENINGRAD,)),
         ("defense_moscow", (DEFENSE_MOSCOW,)),

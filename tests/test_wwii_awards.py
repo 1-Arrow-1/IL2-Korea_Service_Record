@@ -88,3 +88,8 @@ def test_army_of_occupation_medal_is_a_plain_us_choice(tmp_path):
     assert ribbon.size == ribbons.CANVAS
     assert medal.size == medals.DRAPE
     assert aom in medals.wear([aom])["bar"]
+
+def test_the_navy_and_marines_choose_the_shared_medals_but_not_the_army_occupation():
+    for country in (602, 603):
+        ids = wwii_awards.chosen([601064, 601068, 601076, wwii_awards.ARMY_OF_OCCUPATION], country)
+        assert ids == (601064, 601068, 601076)
