@@ -552,6 +552,17 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             return jsonify({"error": "game_not_found", "careers": []}), 200
         return jsonify({"careers": agg.list_careers()})
 
+    @app.route("/api/briefing/<path:career_id>")
+    def api_briefing(career_id: str):
+        """The squadron at a glance, for one career card on the start page."""
+        agg = aggregator(career_id)
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        data = agg.career_briefing(career_id)
+        if data is None:
+            return jsonify({"error": "career_not_found"}), 404
+        return jsonify(data)
+
     def auto_correct(career_id: str) -> None:
         """A career kept corrected by standing order (set in the Career
         Helper) gets its new missions applied when it is read."""

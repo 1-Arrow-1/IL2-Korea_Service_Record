@@ -200,7 +200,46 @@
                 stat(career.airborne, T("landing.air")) +
                 stat(career.ground_targets, T("landing.ground")) +
                 stat(career.awards, T("landing.awards")) +
-            "</div></button>";
+            "</div>" +
+            '<div class="career-briefing" data-briefing="' + esc(career.id) + '"></div>' +
+            "</button>";
+    }
+
+    // The squadron at a glance, under each card: asked for card by card once
+    // the list is drawn, so the start page never waits on it. Nothing to
+    // report leaves the line empty.
+    function briefingLine(b) {
+        const items = [];
+        const item = (text, cls) => items.push('<span class="' + (cls || "") + '">' + esc(text) + "</span>");
+        if (b.player_state === "wounded") {
+            item(b.player_until ? T("landing.brief.wounded_until", {date: b.player_until}) : T("landing.brief.wounded"), "warn");
+        }
+        if (b.promotions_due) {
+            item(b.player_promotion_due && b.promotions_due === 1 ? T("landing.brief.promotion_you")
+                : T("landing.brief.promotions", {n: b.promotions_due}), "good");
+        }
+        if (b.awards_pending) item(T("landing.brief.awards", {n: b.awards_pending}), "good");
+        if (b.stores && b.stores.days != null) {
+            item(T("landing.brief.stores", {what: T("landing.brief.store_" + b.stores.kind), n: b.stores.days}),
+                 b.stores.days < 14 ? "warn" : "");
+        }
+        if (b.repair_next) {
+            item(b.repair_next.days === 0 ? T("landing.brief.repair_today", {code: b.repair_next.code})
+                : T("landing.brief.repair", {code: b.repair_next.code, n: b.repair_next.days}));
+        }
+        if (b.arrival) {
+            item(T("landing.brief.arrival", {count: b.arrival.quantity, type: b.arrival.type, n: b.arrival.days}));
+        }
+        return items.join('<span class="sep"> · </span>');
+    }
+
+    function loadBriefings(list) {
+        list.querySelectorAll("[data-briefing]").forEach(async (slot) => {
+            try {
+                const b = await getJSON("/api/briefing/" + encodeURIComponent(slot.dataset.briefing));
+                slot.innerHTML = briefingLine(b);
+            } catch (err) { /* a card without its line is still a card */ }
+        });
     }
 
     async function loadLanding() {
@@ -227,6 +266,7 @@
                 });
             });
             show(list);
+            loadBriefings(list);
         } catch (err) {
             show(el("careers-loading"), false);
             el("careers-error-text").textContent = T("landing.error", {reason: err.message});

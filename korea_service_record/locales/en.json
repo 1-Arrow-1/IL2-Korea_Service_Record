@@ -30,7 +30,36 @@
     "ground": "Ground",
     "awards": "Awards",
     "empty_hint": "Start a career in IL-2 Korea, then reload this page.",
-    "lede": "Every career IL-2 Korea has on this machine, read from the game's own files. Nothing here is written back."
+    "lede": "Every career IL-2 Korea has on this machine, read from the game's own files. Nothing here is written back.",
+    "brief": {
+      "promotions": {
+        "one": "Promotion due for {n} pilot",
+        "other": "Promotion due for {n} pilots"
+      },
+      "promotion_you": "Your promotion is due",
+      "awards": {
+        "one": "{n} award to present",
+        "other": "{n} awards to present"
+      },
+      "stores": {
+        "one": "{what} lasts ≈ {n} day",
+        "other": "{what} lasts ≈ {n} days"
+      },
+      "store_fuel": "Fuel",
+      "store_ordnance": "Ordnance",
+      "store_equipment": "Equipment",
+      "repair": {
+        "one": "{code} ready in {n} day",
+        "other": "{code} ready in {n} days"
+      },
+      "repair_today": "{code} ready today",
+      "arrival": {
+        "one": "{count} × {type} arriving in {n} day",
+        "other": "{count} × {type} arriving in {n} days"
+      },
+      "wounded": "You are in hospital",
+      "wounded_until": "In hospital until {date}"
+    }
   },
   "record": {
     "loading": "Opening service record…",

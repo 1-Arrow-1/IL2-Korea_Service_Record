@@ -30,7 +30,31 @@
     "ground": "地面",
     "awards": "勋章",
     "empty_hint": "请在 IL-2 朝鲜中开始一段生涯，然后重新加载本页。",
-    "lede": "本机上 IL-2 Korea 的全部生涯，直接读自游戏文件，绝不回写。"
+    "lede": "本机上 IL-2 Korea 的全部生涯，直接读自游戏文件，绝不回写。",
+    "brief": {
+      "promotions": {
+        "other": "{n} 名飞行员待晋升"
+      },
+      "promotion_you": "您的晋升已到期",
+      "awards": {
+        "other": "{n} 枚奖章待授予"
+      },
+      "stores": {
+        "other": "{what}约可用 {n} 天"
+      },
+      "store_fuel": "燃油",
+      "store_ordnance": "弹药",
+      "store_equipment": "器材",
+      "repair": {
+        "other": "{code} {n} 天后修复"
+      },
+      "repair_today": "{code} 今天修复",
+      "arrival": {
+        "other": "{count} 架 {type} {n} 天后到达"
+      },
+      "wounded": "您正在住院",
+      "wounded_until": "住院至 {date}"
+    }
   },
   "record": {
     "loading": "正在打开服役档案…",

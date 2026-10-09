@@ -958,6 +958,62 @@ class CareerAggregator:
             }
         return None
 
+    def career_briefing(self, career_id: str) -> Optional[Dict[str, Any]]:
+        """
+        The squadron at a glance, for the career's card on the start page:
+        promotions due, awards waiting to be presented, the store that runs
+        out first, the next aircraft back from repair and the next delivery,
+        and the player's own state if he is off flying. Asked for per card,
+        after the list has drawn, so the start page never waits on it.
+        """
+        from .. import progress as prog
+
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            career, squad, player = db.career(), db.squadron(), db.player()
+            if career is None or player is None:
+                return None
+            pending = db.query("SELECT pilotId, category FROM award WHERE isDeleted=0 AND isPending=1")
+            promoted = {r["pilotId"] for r in pending if r["category"] == 1}
+            due = set(promoted)
+            for pilot in db.pilots():
+                if pilot["state"] in (2, 3) or pilot["id"] in due:
+                    continue
+                values = prog.pilot_variables(pilot, career, squad)
+                nxt = self._next_promotion(values, int(pilot["country"] or 0))
+                if nxt and nxt["ready"]:
+                    due.add(pilot["id"])
+            awards_waiting = sum(1 for r in pending if r["category"] != 1)
+
+            aircraft = self._aircraft(db, career, squad, Path(meta.path))
+            lasts = ((aircraft.get("statistics") or {}).get("lasts") or {})
+            shortest = min(((k, v) for k, v in lasts.items() if v is not None),
+                           key=lambda kv: kv[1], default=None)
+            repairs = [r for r in aircraft["repairs"] if r["days"] is not None]
+            soonest = min(repairs, key=lambda r: r["days"], default=None)
+            arrivals = [a for a in aircraft["arrivals"] if a.get("kind") == "aircraft"]
+
+            state = ""
+            until = ""
+            if player["state"] == 4:
+                state = "wounded"
+                until = "" if player["stateEndDate"].startswith("0000") else player["stateEndDate"][:10]
+            elif player["state"] in (2, 3):
+                state = {2: "kia", 3: "missing"}[player["state"]]
+            return {
+                "career_id": career_id,
+                "promotions_due": len(due),
+                "player_promotion_due": player["id"] in due,
+                "awards_pending": awards_waiting,
+                "stores": ({"kind": shortest[0], "days": shortest[1]} if shortest else None),
+                "in_repair": aircraft["in_repair"],
+                "repair_next": ({"code": soonest["code"], "days": soonest["days"]} if soonest else None),
+                "arrival": arrivals[0] if arrivals else None,
+                "player_state": state, "player_until": until,
+            }
+
     def squadron_promotions(self, career_id: str) -> Optional[Dict[str, Any]]:
         """
         The next promotion of every pilot still on the squadron's books -

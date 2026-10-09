@@ -30,7 +30,36 @@
     "ground": "Tierra",
     "awards": "Condecoraciones",
     "empty_hint": "Empiece una carrera en IL-2 Corea y vuelva a cargar esta página.",
-    "lede": "Todas las carreras que IL-2 Korea tiene en este equipo, leídas de los archivos del propio juego. Aquí no se escribe nada."
+    "lede": "Todas las carreras que IL-2 Korea tiene en este equipo, leídas de los archivos del propio juego. Aquí no se escribe nada.",
+    "brief": {
+      "promotions": {
+        "one": "Ascenso pendiente para {n} piloto",
+        "other": "Ascenso pendiente para {n} pilotos"
+      },
+      "promotion_you": "Su ascenso está pendiente",
+      "awards": {
+        "one": "{n} condecoración por entregar",
+        "other": "{n} condecoraciones por entregar"
+      },
+      "stores": {
+        "one": "{what}: ≈ {n} día de reserva",
+        "other": "{what}: ≈ {n} días de reserva"
+      },
+      "store_fuel": "Combustible",
+      "store_ordnance": "Munición",
+      "store_equipment": "Material",
+      "repair": {
+        "one": "{code} listo en {n} día",
+        "other": "{code} listo en {n} días"
+      },
+      "repair_today": "{code} listo hoy",
+      "arrival": {
+        "one": "{count} × {type} llega en {n} día",
+        "other": "{count} × {type} llegan en {n} días"
+      },
+      "wounded": "Está en el hospital",
+      "wounded_until": "En el hospital hasta el {date}"
+    }
   },
   "record": {
     "loading": "Abriendo la hoja de servicios…",

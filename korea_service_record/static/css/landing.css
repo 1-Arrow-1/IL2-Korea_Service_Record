@@ -192,3 +192,20 @@
     letter-spacing: 0.07em;
     color: var(--ink-muted);
 }
+
+/* The squadron at a glance, under the stats (app.js briefingLine). Empty
+   when there is nothing to report, so a quiet career keeps a quiet card. */
+.career-briefing {
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--ink-muted);
+    text-align: center;
+}
+.career-briefing:not(:empty) {
+    border-top: 1px solid var(--border-soft);
+    margin-top: 0.7rem;
+    padding-top: 0.55rem;
+}
+.career-briefing .good { color: #2f6b2f; font-weight: 600; }
+.career-briefing .warn { color: #a0371f; font-weight: 600; }
+.career-briefing .sep { color: var(--border-soft); }

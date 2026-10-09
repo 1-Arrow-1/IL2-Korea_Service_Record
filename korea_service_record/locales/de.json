@@ -30,7 +30,36 @@
     "ground": "Boden",
     "awards": "Auszeichnungen",
     "empty_hint": "Starten Sie eine Karriere in IL-2 Korea und laden Sie diese Seite neu.",
-    "lede": "Jede Laufbahn, die IL-2 Korea auf diesem Rechner führt, gelesen aus den Dateien des Spiels. Es wird nichts zurückgeschrieben."
+    "lede": "Jede Laufbahn, die IL-2 Korea auf diesem Rechner führt, gelesen aus den Dateien des Spiels. Es wird nichts zurückgeschrieben.",
+    "brief": {
+      "promotions": {
+        "one": "Beförderung fällig für {n} Piloten",
+        "other": "Beförderung fällig für {n} Piloten"
+      },
+      "promotion_you": "Ihre Beförderung ist fällig",
+      "awards": {
+        "one": "{n} Auszeichnung zu überreichen",
+        "other": "{n} Auszeichnungen zu überreichen"
+      },
+      "stores": {
+        "one": "{what} reicht ≈ {n} Tag",
+        "other": "{what} reicht ≈ {n} Tage"
+      },
+      "store_fuel": "Treibstoff",
+      "store_ordnance": "Munition",
+      "store_equipment": "Material",
+      "repair": {
+        "one": "{code} einsatzbereit in {n} Tag",
+        "other": "{code} einsatzbereit in {n} Tagen"
+      },
+      "repair_today": "{code} heute einsatzbereit",
+      "arrival": {
+        "one": "{count} × {type} trifft in {n} Tag ein",
+        "other": "{count} × {type} treffen in {n} Tagen ein"
+      },
+      "wounded": "Sie sind im Lazarett",
+      "wounded_until": "Im Lazarett bis {date}"
+    }
   },
   "record": {
     "loading": "Dienstakte wird geöffnet …",

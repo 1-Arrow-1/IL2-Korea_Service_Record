@@ -30,7 +30,36 @@
     "ground": "Sol",
     "awards": "Décorations",
     "empty_hint": "Commencez une carrière dans IL-2 Corée, puis rechargez cette page.",
-    "lede": "Toutes les carrières qu’IL-2 Korea conserve sur cette machine, lues dans les fichiers du jeu. Rien n’y est réécrit."
+    "lede": "Toutes les carrières qu’IL-2 Korea conserve sur cette machine, lues dans les fichiers du jeu. Rien n’y est réécrit.",
+    "brief": {
+      "promotions": {
+        "one": "Promotion due pour {n} pilote",
+        "other": "Promotion due pour {n} pilotes"
+      },
+      "promotion_you": "Votre promotion est due",
+      "awards": {
+        "one": "{n} décoration à remettre",
+        "other": "{n} décorations à remettre"
+      },
+      "stores": {
+        "one": "{what} : ≈ {n} jour de réserve",
+        "other": "{what} : ≈ {n} jours de réserve"
+      },
+      "store_fuel": "Carburant",
+      "store_ordnance": "Munitions",
+      "store_equipment": "Matériel",
+      "repair": {
+        "one": "{code} prêt dans {n} jour",
+        "other": "{code} prêt dans {n} jours"
+      },
+      "repair_today": "{code} prêt aujourd'hui",
+      "arrival": {
+        "one": "{count} × {type} arrive dans {n} jour",
+        "other": "{count} × {type} arrivent dans {n} jours"
+      },
+      "wounded": "Vous êtes à l'hôpital",
+      "wounded_until": "À l'hôpital jusqu'au {date}"
+    }
   },
   "record": {
     "loading": "Ouverture de l'état de service…",
