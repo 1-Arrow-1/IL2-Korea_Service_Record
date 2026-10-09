@@ -400,6 +400,21 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         hook()
         return jsonify({"ok": True})
 
+    @app.route("/api/update-shutdown", methods=["POST"])
+    def api_update_shutdown():
+        """Close the tracker while leaving its updater Helper alive.
+
+        The ordinary quit path closes every Helper process the tracker
+        started.  During an update that would kill the process which still
+        has to launch Setup, so the launcher installs a separate hook for
+        this one local request.
+        """
+        hook = app.config.get("UPDATE_SHUTDOWN")
+        if hook is None:
+            return jsonify({"ok": False, "reason": "no shutdown hook"}), 409
+        hook()
+        return jsonify({"ok": True})
+
     @app.route("/api/ribbon/<int:award_id>")
     def api_ribbon(award_id: int):
         """A service ribbon with its devices, composed from the mod's own art."""

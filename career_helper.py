@@ -37,7 +37,9 @@ from __future__ import annotations
 
 import io
 import locale
+import queue
 import sqlite3
+import threading
 import urllib.parse
 from datetime import datetime, timedelta
 import sys
@@ -58,7 +60,8 @@ from korea_service_record import corrections                   # noqa: E402
 from korea_service_record.assets import AssetResolver           # noqa: E402
 from korea_service_record.gamedata import loads_lenient         # noqa: E402
 import custom_pilot_photo as pilot_photo                         # noqa: E402
-from korea_service_record import custombio, wwii_awards          # noqa: E402
+from korea_service_record import custombio, updater, wwii_awards # noqa: E402
+from korea_service_record.version import VERSION                 # noqa: E402
 from korea_service_record.portraitfix import is_custom           # noqa: E402
 
 BACKUPS = default_cache_dir().parent / "backups"
@@ -252,6 +255,35 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Please open the Career Helper from the Service Record - the button in its header.",
         "needs_mod": "The Career Helper is part of the awards mod. Install the mod component of the Service Record setup and enable modifications in IL-2 Korea.",
         "withdrawn": "{n} awards withdrawn. Backup: {backup}",
+        "tab_update": "Update IL-2 Korea Service Record",
+        "update_intro": "Check GitHub for a newer signed release. The update installs the Service Record, Career Helper and your selected awards-mod variant together. No network request is made until this tab is opened or you press Check.",
+        "update_versions": "Versions",
+        "update_installed": "Installed: {version}",
+        "update_latest": "Latest release: {version}",
+        "update_release": "Published {date} · {size}",
+        "update_notes": "Release notes",
+        "update_open_tab": "Open this tab or press Check to look for a release.",
+        "update_check": "Check again",
+        "update_install": "Download and install",
+        "update_checking": "Checking GitHub for the latest release…",
+        "update_up_to_date": "The installed version is up to date.",
+        "update_available": "Version {version} is available.",
+        "update_cannot_check": "Cannot check for updates: {error}",
+        "update_invalid_release": "GitHub returned an incomplete release: {error}",
+        "update_downloading": "Downloading the signed installer… {percent}%",
+        "update_verifying_hash": "Verifying the SHA-256 digest…",
+        "update_verifying_signature": "Verifying the Authenticode signature and signer…",
+        "update_starting_installer": "Starting the silent installer. The Helper will reopen when it finishes…",
+        "update_confirm": "Download and install version {version}? Close IL-2 Korea first. The Service Record will close automatically; the Helper will reopen after installation.",
+        "update_game_running": "IL-2 Korea is running. Close the game, then try again.",
+        "update_tracker_running": "The Service Record could not be closed. Quit it from its tray icon, then try again.",
+        "update_digest_missing": "The release has no valid SHA-256 digest. Installation was aborted.",
+        "update_digest_mismatch": "The downloaded file does not match GitHub's SHA-256 digest. Installation was aborted.",
+        "update_signature_invalid": "The installer does not have a valid Authenticode signature. Installation was aborted. {error}",
+        "update_running_unsigned": "This Career Helper is not validly signed, so it cannot establish the trusted signer. Install a signed public release manually first.",
+        "update_signer_mismatch": "The installer was signed by a different certificate. Installation was aborted.",
+        "update_download_failed": "The installer could not be downloaded: {error}",
+        "update_install_failed": "The installer could not be started: {error}",
         "the_squadron": "The squadron",
     },
     "de": {
@@ -422,6 +454,35 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Bitte öffnen Sie den Laufbahn-Helfer aus der Dienstakte - über die Schaltfläche in ihrer Kopfzeile.",
         "needs_mod": "Der Laufbahn-Helfer gehört zum Auszeichnungs-Mod. Installieren Sie die Mod-Komponente des Dienstakte-Setups und aktivieren Sie Modifikationen in IL-2 Korea.",
         "withdrawn": "{n} Auszeichnungen entzogen. Sicherung: {backup}",
+        "tab_update": "Aktualisieren",
+        "update_intro": "Auf GitHub nach einer neueren signierten Version suchen. Das Update installiert Dienstakte, Laufbahn-Helfer und die gewählte Variante des Auszeichnungs-Mods gemeinsam. Erst beim Öffnen dieses Reiters oder mit „Prüfen“ wird eine Netzwerkverbindung hergestellt.",
+        "update_versions": "Versionen",
+        "update_installed": "Installiert: {version}",
+        "update_latest": "Neueste Version: {version}",
+        "update_release": "Veröffentlicht am {date} · {size}",
+        "update_notes": "Versionshinweise",
+        "update_open_tab": "Diesen Reiter öffnen oder „Prüfen“ wählen, um nach einer Version zu suchen.",
+        "update_check": "Erneut prüfen",
+        "update_install": "Herunterladen und installieren",
+        "update_checking": "GitHub wird nach der neuesten Version gefragt…",
+        "update_up_to_date": "Die installierte Version ist aktuell.",
+        "update_available": "Version {version} ist verfügbar.",
+        "update_cannot_check": "Updateprüfung nicht möglich: {error}",
+        "update_invalid_release": "GitHub hat eine unvollständige Version geliefert: {error}",
+        "update_downloading": "Signiertes Installationsprogramm wird heruntergeladen… {percent}%",
+        "update_verifying_hash": "SHA-256-Prüfsumme wird geprüft…",
+        "update_verifying_signature": "Authenticode-Signatur und Unterzeichner werden geprüft…",
+        "update_starting_installer": "Die unbeaufsichtigte Installation startet. Der Helfer wird danach wieder geöffnet…",
+        "update_confirm": "Version {version} herunterladen und installieren? Schließen Sie zuerst IL-2 Korea. Die Dienstakte wird automatisch beendet; der Helfer öffnet sich nach der Installation wieder.",
+        "update_game_running": "IL-2 Korea läuft. Schließen Sie das Spiel und versuchen Sie es erneut.",
+        "update_tracker_running": "Die Dienstakte konnte nicht beendet werden. Beenden Sie sie über das Symbol im Infobereich und versuchen Sie es erneut.",
+        "update_digest_missing": "Die Version enthält keine gültige SHA-256-Prüfsumme. Die Installation wurde abgebrochen.",
+        "update_digest_mismatch": "Die heruntergeladene Datei stimmt nicht mit der SHA-256-Prüfsumme von GitHub überein. Die Installation wurde abgebrochen.",
+        "update_signature_invalid": "Das Installationsprogramm besitzt keine gültige Authenticode-Signatur. Die Installation wurde abgebrochen. {error}",
+        "update_running_unsigned": "Dieser Laufbahn-Helfer ist nicht gültig signiert und kann den vertrauenswürdigen Unterzeichner daher nicht feststellen. Installieren Sie zuerst eine signierte öffentliche Version von Hand.",
+        "update_signer_mismatch": "Das Installationsprogramm wurde mit einem anderen Zertifikat signiert. Die Installation wurde abgebrochen.",
+        "update_download_failed": "Das Installationsprogramm konnte nicht heruntergeladen werden: {error}",
+        "update_install_failed": "Das Installationsprogramm konnte nicht gestartet werden: {error}",
         "the_squadron": "Die Staffel",
     },
     "es": {
@@ -592,6 +653,35 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Abra el Asistente de carrera desde la Hoja de Servicios: el botón de su cabecera.",
         "needs_mod": "El Asistente de carrera forma parte del mod de condecoraciones. Instale el componente del mod en el instalador de la Hoja de Servicios y active las modificaciones en IL-2 Korea.",
         "withdrawn": "{n} condecoraciones retiradas. Copia de seguridad: {backup}",
+        "tab_update": "Actualizar",
+        "update_intro": "Busque en GitHub una versión firmada más reciente. La actualización instala juntos la Hoja de Servicios, el Asistente de carrera y la variante seleccionada del mod de condecoraciones. No se conecta a la red hasta que abra esta pestaña o pulse Comprobar.",
+        "update_versions": "Versiones",
+        "update_installed": "Instalada: {version}",
+        "update_latest": "Última versión: {version}",
+        "update_release": "Publicada el {date} · {size}",
+        "update_notes": "Notas de la versión",
+        "update_open_tab": "Abra esta pestaña o pulse Comprobar para buscar una versión.",
+        "update_check": "Comprobar de nuevo",
+        "update_install": "Descargar e instalar",
+        "update_checking": "Buscando la última versión en GitHub…",
+        "update_up_to_date": "La versión instalada está actualizada.",
+        "update_available": "La versión {version} está disponible.",
+        "update_cannot_check": "No se pueden buscar actualizaciones: {error}",
+        "update_invalid_release": "GitHub devolvió una versión incompleta: {error}",
+        "update_downloading": "Descargando el instalador firmado… {percent}%",
+        "update_verifying_hash": "Verificando el resumen SHA-256…",
+        "update_verifying_signature": "Verificando la firma Authenticode y el firmante…",
+        "update_starting_installer": "Iniciando la instalación silenciosa. El Asistente volverá a abrirse al terminar…",
+        "update_confirm": "¿Descargar e instalar la versión {version}? Cierre primero IL-2 Korea. La Hoja de Servicios se cerrará automáticamente; el Asistente volverá a abrirse después.",
+        "update_game_running": "IL-2 Korea está en ejecución. Cierre el juego e inténtelo de nuevo.",
+        "update_tracker_running": "No se pudo cerrar la Hoja de Servicios. Ciérrela desde su icono de la bandeja e inténtelo de nuevo.",
+        "update_digest_missing": "La versión no contiene un resumen SHA-256 válido. Se canceló la instalación.",
+        "update_digest_mismatch": "El archivo descargado no coincide con el resumen SHA-256 de GitHub. Se canceló la instalación.",
+        "update_signature_invalid": "El instalador no tiene una firma Authenticode válida. Se canceló la instalación. {error}",
+        "update_running_unsigned": "Este Asistente de carrera no está firmado correctamente y no puede establecer el firmante de confianza. Instale primero a mano una versión pública firmada.",
+        "update_signer_mismatch": "El instalador fue firmado con otro certificado. Se canceló la instalación.",
+        "update_download_failed": "No se pudo descargar el instalador: {error}",
+        "update_install_failed": "No se pudo iniciar el instalador: {error}",
         "the_squadron": "El escuadrón",
     },
     "fr": {
@@ -762,6 +852,35 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Ouvrez l’assistant de carrière depuis l’état de service : le bouton de son en-tête.",
         "needs_mod": "L’assistant de carrière fait partie du mod de décorations. Installez le composant mod de l’installateur de l’état de service et activez les modifications dans IL-2 Korea.",
         "withdrawn": "{n} décorations retirées. Sauvegarde : {backup}",
+        "tab_update": "Mise à jour",
+        "update_intro": "Recherchez sur GitHub une version signée plus récente. La mise à jour installe ensemble l’état de service, l’assistant de carrière et la variante choisie du mod de décorations. Aucune connexion réseau n’est établie avant l’ouverture de cet onglet ou un clic sur Vérifier.",
+        "update_versions": "Versions",
+        "update_installed": "Installée : {version}",
+        "update_latest": "Dernière version : {version}",
+        "update_release": "Publiée le {date} · {size}",
+        "update_notes": "Notes de version",
+        "update_open_tab": "Ouvrez cet onglet ou cliquez sur Vérifier pour rechercher une version.",
+        "update_check": "Vérifier à nouveau",
+        "update_install": "Télécharger et installer",
+        "update_checking": "Recherche de la dernière version sur GitHub…",
+        "update_up_to_date": "La version installée est à jour.",
+        "update_available": "La version {version} est disponible.",
+        "update_cannot_check": "Impossible de rechercher les mises à jour : {error}",
+        "update_invalid_release": "GitHub a renvoyé une version incomplète : {error}",
+        "update_downloading": "Téléchargement de l’installateur signé… {percent}%",
+        "update_verifying_hash": "Vérification de l’empreinte SHA-256…",
+        "update_verifying_signature": "Vérification de la signature Authenticode et du signataire…",
+        "update_starting_installer": "L’installation silencieuse démarre. L’assistant se rouvrira à la fin…",
+        "update_confirm": "Télécharger et installer la version {version} ? Fermez d’abord IL-2 Korea. L’état de service se fermera automatiquement ; l’assistant se rouvrira après l’installation.",
+        "update_game_running": "IL-2 Korea est en cours d’exécution. Fermez le jeu puis réessayez.",
+        "update_tracker_running": "L’état de service n’a pas pu être fermé. Quittez-le par son icône de notification puis réessayez.",
+        "update_digest_missing": "La version ne fournit pas d’empreinte SHA-256 valide. L’installation a été annulée.",
+        "update_digest_mismatch": "Le fichier téléchargé ne correspond pas à l’empreinte SHA-256 de GitHub. L’installation a été annulée.",
+        "update_signature_invalid": "L’installateur ne possède pas de signature Authenticode valide. L’installation a été annulée. {error}",
+        "update_running_unsigned": "Cet assistant de carrière n’est pas correctement signé et ne peut pas établir le signataire de confiance. Installez d’abord manuellement une version publique signée.",
+        "update_signer_mismatch": "L’installateur a été signé avec un autre certificat. L’installation a été annulée.",
+        "update_download_failed": "L’installateur n’a pas pu être téléchargé : {error}",
+        "update_install_failed": "L’installateur n’a pas pu être lancé : {error}",
         "the_squadron": "L’escadron",
     },
     "ru": {
@@ -932,6 +1051,35 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "Откройте помощник карьеры из послужного списка — кнопкой в его шапке.",
         "needs_mod": "Помощник карьеры — часть мода наград. Установите компонент мода в установщике послужного списка и включите модификации в IL-2 Korea.",
         "withdrawn": "Отозвано наград: {n}. Резервная копия: {backup}",
+        "tab_update": "Обновление",
+        "update_intro": "Проверить GitHub на наличие более новой подписанной версии. Обновление одновременно устанавливает послужной список, помощник карьеры и выбранный вариант мода наград. Сетевой запрос выполняется только при открытии этой вкладки или нажатии «Проверить».",
+        "update_versions": "Версии",
+        "update_installed": "Установлена: {version}",
+        "update_latest": "Последняя версия: {version}",
+        "update_release": "Опубликована {date} · {size}",
+        "update_notes": "Примечания к выпуску",
+        "update_open_tab": "Откройте эту вкладку или нажмите «Проверить», чтобы найти выпуск.",
+        "update_check": "Проверить снова",
+        "update_install": "Скачать и установить",
+        "update_checking": "Проверяется последний выпуск на GitHub…",
+        "update_up_to_date": "Установлена актуальная версия.",
+        "update_available": "Доступна версия {version}.",
+        "update_cannot_check": "Не удалось проверить обновления: {error}",
+        "update_invalid_release": "GitHub вернул неполный выпуск: {error}",
+        "update_downloading": "Загружается подписанный установщик… {percent}%",
+        "update_verifying_hash": "Проверяется хеш SHA-256…",
+        "update_verifying_signature": "Проверяются подпись Authenticode и подписант…",
+        "update_starting_installer": "Запускается тихая установка. После завершения помощник откроется снова…",
+        "update_confirm": "Скачать и установить версию {version}? Сначала закройте IL-2 Korea. Послужной список закроется автоматически; после установки помощник откроется снова.",
+        "update_game_running": "IL-2 Korea запущена. Закройте игру и повторите попытку.",
+        "update_tracker_running": "Не удалось закрыть послужной список. Закройте его через значок в области уведомлений и повторите попытку.",
+        "update_digest_missing": "В выпуске нет допустимого хеша SHA-256. Установка отменена.",
+        "update_digest_mismatch": "Загруженный файл не совпадает с хешем SHA-256 на GitHub. Установка отменена.",
+        "update_signature_invalid": "У установщика нет действительной подписи Authenticode. Установка отменена. {error}",
+        "update_running_unsigned": "Этот помощник карьеры не имеет действительной подписи, поэтому доверенного подписанта определить нельзя. Сначала установите подписанный публичный выпуск вручную.",
+        "update_signer_mismatch": "Установщик подписан другим сертификатом. Установка отменена.",
+        "update_download_failed": "Не удалось загрузить установщик: {error}",
+        "update_install_failed": "Не удалось запустить установщик: {error}",
         "the_squadron": "Эскадрилья",
     },
     "zh": {
@@ -1102,6 +1250,35 @@ STRINGS: Dict[str, Dict[str, str]] = {
         "open_from_tracker": "请从服役记录中打开生涯助手——其页眉中的按钮。",
         "needs_mod": "生涯助手是奖励模组的一部分。请在服役记录安装程序中安装模组组件，并在 IL-2 Korea 中启用修改。",
         "withdrawn": "已撤销 {n} 项奖励。备份：{backup}",
+        "tab_update": "更新",
+        "update_intro": "在 GitHub 上检查更新的已签名版本。更新会同时安装服役记录、生涯助手以及您所选的奖励模组版本。只有打开此选项卡或按下“检查”时才会联网。",
+        "update_versions": "版本",
+        "update_installed": "已安装：{version}",
+        "update_latest": "最新版本：{version}",
+        "update_release": "发布于 {date} · {size}",
+        "update_notes": "发行说明",
+        "update_open_tab": "打开此选项卡或按“检查”以查找新版本。",
+        "update_check": "再次检查",
+        "update_install": "下载并安装",
+        "update_checking": "正在 GitHub 上检查最新版本…",
+        "update_up_to_date": "已安装的版本为最新版本。",
+        "update_available": "版本 {version} 可用。",
+        "update_cannot_check": "无法检查更新：{error}",
+        "update_invalid_release": "GitHub 返回的版本不完整：{error}",
+        "update_downloading": "正在下载已签名的安装程序… {percent}%",
+        "update_verifying_hash": "正在验证 SHA-256 摘要…",
+        "update_verifying_signature": "正在验证 Authenticode 签名和签名者…",
+        "update_starting_installer": "正在启动静默安装。完成后生涯助手会重新打开…",
+        "update_confirm": "下载并安装版本 {version}？请先关闭 IL-2 Korea。服役记录将自动关闭；安装后生涯助手会重新打开。",
+        "update_game_running": "IL-2 Korea 正在运行。请关闭游戏后重试。",
+        "update_tracker_running": "无法关闭服役记录。请从系统托盘图标退出后重试。",
+        "update_digest_missing": "此版本没有有效的 SHA-256 摘要。安装已中止。",
+        "update_digest_mismatch": "下载的文件与 GitHub 的 SHA-256 摘要不符。安装已中止。",
+        "update_signature_invalid": "安装程序没有有效的 Authenticode 签名。安装已中止。{error}",
+        "update_running_unsigned": "此生涯助手没有有效签名，因此无法确定受信任的签名者。请先手动安装已签名的公开版本。",
+        "update_signer_mismatch": "安装程序由不同的证书签名。安装已中止。",
+        "update_download_failed": "无法下载安装程序：{error}",
+        "update_install_failed": "无法启动安装程序：{error}",
         "the_squadron": "中队",
     },
 }
@@ -2205,6 +2382,7 @@ def propose_seating(seats: List[Dict], bench: Optional[List[Dict]] = None) -> Di
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
+        self._ui_queue: queue.Queue = queue.Queue()
         lang = pick_language()
         self.lang = lang
         self.t = STRINGS[lang]
@@ -2222,7 +2400,18 @@ class App(tk.Tk):
         self.career: Optional[Career] = None
         self.lost: List[Dict] = []
         self._build()
+        self._ui_after = self.after(75, self._drain_ui_queue)
         self._load_careers()
+
+    def destroy(self) -> None:
+        after_id = getattr(self, "_ui_after", None)
+        if after_id is not None:
+            try:
+                self.after_cancel(after_id)
+            except tk.TclError:
+                pass
+            self._ui_after = None
+        super().destroy()
 
     # -- looks ---------------------------------------------------------------
 
@@ -2255,7 +2444,7 @@ class App(tk.Tk):
         st.configure("TSeparator", background=self.BORDER)
         st.configure("TNotebook", background=self.DESK, bordercolor=self.BORDER, tabmargins=(6, 4, 6, 0))
         st.configure("TNotebook.Tab", background=self.DESK, foreground=self.INK_MUTED,
-                     padding=(14, 6), font=head)
+                     padding=(4, 6), font=("Georgia", 9, "bold"))
         st.map("TNotebook.Tab",
                background=[("selected", self.PANEL)],
                foreground=[("selected", self.ACCENT_DARK)],
@@ -2307,6 +2496,7 @@ class App(tk.Tk):
 
         nb = ttk.Notebook(self)
         nb.pack(fill="both", expand=True, **pad)
+        self.notebook = nb
 
         # -- revive tab
         rev = ttk.Frame(nb)
@@ -2761,10 +2951,223 @@ class App(tk.Tk):
         self.fl_var = tk.StringVar(value=self.t["fl_hint"])
         ttk.Label(frow, textvariable=self.fl_var).pack(side="left", padx=10)
 
+        self._build_update_tab(nb)
+        nb.bind("<<NotebookTabChanged>>", self._notebook_changed)
+
         self.status = tk.StringVar()
         ttk.Label(self, textvariable=self.status, wraplength=820,
                   foreground=self.INK_MUTED).pack(
             fill="x", padx=10, pady=(0, 8))
+
+    # -- updater -----------------------------------------------------------
+
+    def _post_ui(self, function, *args) -> None:
+        self._ui_queue.put((function, args))
+
+    def _drain_ui_queue(self) -> None:
+        self._ui_after = None
+        while True:
+            try:
+                function, args = self._ui_queue.get_nowait()
+            except queue.Empty:
+                break
+            function(*args)
+        try:
+            self._ui_after = self.after(75, self._drain_ui_queue)
+        except tk.TclError:
+            pass
+
+    def _build_update_tab(self, notebook: ttk.Notebook) -> None:
+        tab = ttk.Frame(notebook)
+        notebook.add(tab, text=self.t["tab_update"])
+        self.update_tab = tab
+        self.update_checked = False
+        self.update_busy = False
+        self.update_release: Optional[updater.ReleaseInfo] = None
+
+        ttk.Label(tab, text=self.t["update_intro"], wraplength=1040,
+                  foreground="#444").pack(anchor="w", padx=12, pady=(14, 12))
+        facts = ttk.LabelFrame(tab, text=self.t["update_versions"])
+        facts.pack(fill="x", padx=12)
+        self.update_installed_var = tk.StringVar(
+            value=self.t["update_installed"].format(version=VERSION))
+        self.update_latest_var = tk.StringVar(
+            value=self.t["update_latest"].format(version="—"))
+        self.update_release_var = tk.StringVar(value="")
+        ttk.Label(facts, textvariable=self.update_installed_var,
+                  font=("", 11, "bold")).pack(anchor="w", padx=10, pady=(8, 2))
+        ttk.Label(facts, textvariable=self.update_latest_var,
+                  font=("", 11)).pack(anchor="w", padx=10, pady=2)
+        ttk.Label(facts, textvariable=self.update_release_var,
+                  foreground=self.INK_MUTED).pack(anchor="w", padx=10, pady=(2, 8))
+
+        ttk.Label(tab, text=self.t["update_notes"],
+                  font=("Georgia", 10, "bold")).pack(anchor="w", padx=12, pady=(14, 4))
+        notes_frame = ttk.Frame(tab)
+        notes_frame.pack(fill="both", expand=True, padx=12)
+        self.update_notes = tk.Text(
+            notes_frame, height=12, wrap="word", state="disabled",
+            background=self.PAPER, foreground=self.INK, relief="flat",
+            highlightthickness=1, highlightbackground=self.BORDER,
+            padx=10, pady=8, font=("Georgia", 10),
+        )
+        notes_scroll = ttk.Scrollbar(notes_frame, orient="vertical",
+                                     command=self.update_notes.yview)
+        self.update_notes.configure(yscrollcommand=notes_scroll.set)
+        notes_scroll.pack(side="right", fill="y")
+        self.update_notes.pack(side="left", fill="both", expand=True)
+
+        self.update_status_var = tk.StringVar(value=self.t["update_open_tab"])
+        ttk.Label(tab, textvariable=self.update_status_var, wraplength=1040,
+                  foreground=self.ACCENT_DARK).pack(anchor="w", padx=12, pady=(10, 4))
+        self.update_progress = ttk.Progressbar(tab, mode="determinate", maximum=100)
+        self.update_progress.pack(fill="x", padx=12, pady=(0, 8))
+        buttons = ttk.Frame(tab)
+        buttons.pack(fill="x", padx=12, pady=(0, 12))
+        self.update_check_btn = ttk.Button(
+            buttons, text=self.t["update_check"], command=self._check_update)
+        self.update_check_btn.pack(side="left")
+        self.update_install_btn = ttk.Button(
+            buttons, text=self.t["update_install"], command=self._install_update,
+            state="disabled")
+        self.update_install_btn.pack(side="left", padx=8)
+
+    def _notebook_changed(self, _event=None) -> None:
+        if (self.notebook.select() == str(self.update_tab)
+                and not self.update_checked and not self.update_busy):
+            self._check_update()
+
+    def _set_update_notes(self, text: str) -> None:
+        self.update_notes.configure(state="normal")
+        self.update_notes.delete("1.0", "end")
+        self.update_notes.insert("1.0", text or "—")
+        self.update_notes.configure(state="disabled")
+
+    def _check_update(self) -> None:
+        if self.update_busy:
+            return
+        self.update_busy = True
+        self.update_checked = True
+        self.update_release = None
+        self.update_check_btn["state"] = "disabled"
+        self.update_install_btn["state"] = "disabled"
+        self.update_progress.configure(mode="indeterminate")
+        self.update_progress.start(12)
+        self.update_status_var.set(self.t["update_checking"])
+
+        def work():
+            try:
+                release = updater.fetch_latest()
+            except updater.UpdateError as exc:
+                code, detail = exc.code, exc.detail
+                self._post_ui(self._update_check_failed, code, detail)
+                return
+            self._post_ui(self._update_check_done, release)
+
+        threading.Thread(target=work, name="service-record-update-check",
+                         daemon=True).start()
+
+    def _update_check_failed(self, code: str, detail: str) -> None:
+        self.update_progress.stop()
+        self.update_progress.configure(mode="determinate", value=0)
+        self.update_busy = False
+        self.update_check_btn["state"] = "normal"
+        key = "update_invalid_release" if code in {"invalid_release", "asset_missing"} else "update_cannot_check"
+        self.update_status_var.set(self.t[key].format(error=detail or code))
+
+    def _update_check_done(self, release: updater.ReleaseInfo) -> None:
+        self.update_progress.stop()
+        self.update_progress.configure(mode="determinate", value=0)
+        self.update_busy = False
+        self.update_check_btn["state"] = "normal"
+        self.update_release = release
+        self.update_latest_var.set(
+            self.t["update_latest"].format(version=release.version))
+        date = release.published_at[:10] or "—"
+        size = release.asset.size / (1024 * 1024)
+        self.update_release_var.set(
+            self.t["update_release"].format(date=date, size=f"{size:.1f} MB"))
+        self._set_update_notes(release.notes)
+        if updater.is_newer(release.version, VERSION):
+            self.update_status_var.set(
+                self.t["update_available"].format(version=release.version))
+            self.update_install_btn["state"] = "normal"
+        else:
+            self.update_status_var.set(self.t["update_up_to_date"])
+            self.update_install_btn["state"] = "disabled"
+
+    def _update_stage(self, stage: str, done: int = 0, total: int = 0) -> None:
+        def show():
+            if stage == "downloading":
+                percent = round(done * 100 / total) if total else 0
+                self.update_progress.configure(value=percent)
+                self.update_status_var.set(
+                    self.t["update_downloading"].format(percent=percent))
+            else:
+                key = {
+                    "verifying_hash": "update_verifying_hash",
+                    "verifying_signature": "update_verifying_signature",
+                    "starting_installer": "update_starting_installer",
+                }.get(stage)
+                if key:
+                    self.update_status_var.set(self.t[key])
+        self._post_ui(show)
+
+    def _install_update(self) -> None:
+        release = self.update_release
+        if release is None or self.update_busy:
+            return
+        if not messagebox.askyesno(
+                self.t["title"],
+                self.t["update_confirm"].format(version=release.version),
+                parent=self):
+            return
+        self.update_busy = True
+        self.update_check_btn["state"] = "disabled"
+        self.update_install_btn["state"] = "disabled"
+        self.update_progress.configure(mode="determinate", value=0)
+
+        def work():
+            try:
+                setup = updater.download_and_verify(
+                    release,
+                    progress=lambda stage, done, total: self._update_stage(
+                        stage, done, total),
+                )
+                self._update_stage("starting_installer")
+                updater.launch_installer(setup)
+            except updater.UpdateError as exc:
+                code, detail = exc.code, exc.detail
+                self._post_ui(self._update_install_failed, code, detail)
+                return
+            self._post_ui(self.destroy)
+
+        threading.Thread(target=work, name="service-record-update-install",
+                         daemon=True).start()
+
+    def _update_install_failed(self, code: str, detail: str) -> None:
+        keys = {
+            "game_running": "update_game_running",
+            "tracker_running": "update_tracker_running",
+            "digest_missing": "update_digest_missing",
+            "digest_mismatch": "update_digest_mismatch",
+            "size_mismatch": "update_digest_mismatch",
+            "signature_invalid": "update_signature_invalid",
+            "running_unsigned": "update_running_unsigned",
+            "signer_mismatch": "update_signer_mismatch",
+            "signature_tool": "update_signature_invalid",
+            "download_failed": "update_download_failed",
+            "process_check": "update_install_failed",
+            "install_failed": "update_install_failed",
+        }
+        key = keys.get(code, "update_install_failed")
+        text = self.t[key].format(error=detail or code)
+        self.update_status_var.set(text)
+        self.update_busy = False
+        self.update_check_btn["state"] = "normal"
+        if self.update_release and updater.is_newer(self.update_release.version, VERSION):
+            self.update_install_btn["state"] = "normal"
+        messagebox.showerror(self.t["title"], text, parent=self)
 
     # -- data ------------------------------------------------------------------
 

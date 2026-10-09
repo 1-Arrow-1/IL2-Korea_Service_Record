@@ -103,7 +103,7 @@ def log_helpers(closed: int) -> None:
         log.info("closed %d Career Helper window%s", closed, "" if closed == 1 else "s")
 
 
-def request_quit(shutdown) -> None:
+def request_quit(shutdown, close_helper_processes: bool = True) -> None:
     """
     Shut down from a web request. The response must leave first, so the
     work happens on a timer; the tray's Quit path is used when there is one,
@@ -114,8 +114,10 @@ def request_quit(shutdown) -> None:
         try:
             # the helper goes first: os._exit below skips atexit, so anything
             # left to clean up here is left for good
-            log_helpers(close_helpers())
-            stop = TRAY.get("stop")
+            if close_helper_processes:
+                log_helpers(close_helpers())
+            stop = TRAY.get(
+                "stop" if close_helper_processes else "stop_for_update")
             if stop is not None:
                 stop()
             elif shutdown is not None:
@@ -157,9 +159,15 @@ def run_tray(url: str, shutdown) -> bool:
         if icon is not None:
             icon.stop()
 
+    def quit_for_update(*_):
+        shutdown()
+        if icon is not None:
+            icon.stop()
+
     # The page's own Close control ends up here too, so the tray icon goes
     # away with the server instead of lingering as a dead entry.
     TRAY["stop"] = quit_now
+    TRAY["stop_for_update"] = quit_for_update
 
     menu = pystray.Menu(
         pystray.MenuItem("Open Service Record",
@@ -214,6 +222,7 @@ def main() -> int:
 
     if console:
         app.config["SHUTDOWN"] = lambda: request_quit(None)
+        app.config["UPDATE_SHUTDOWN"] = lambda: request_quit(None, False)
         app.run(host=args.host, port=args.port,
                 debug=args.debug, use_reloader=False)
         return 0
@@ -224,6 +233,7 @@ def main() -> int:
     server = make_server(args.host, args.port, app, threaded=True)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     app.config["SHUTDOWN"] = lambda: request_quit(server.shutdown)
+    app.config["UPDATE_SHUTDOWN"] = lambda: request_quit(server.shutdown, False)
 
     if not run_tray(url, server.shutdown):
         log.warning("no tray icon; serving until the process is stopped")

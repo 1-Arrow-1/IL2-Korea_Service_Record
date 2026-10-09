@@ -44,6 +44,8 @@ DefaultDirName={localappdata}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 UsePreviousAppDir=yes
+UsePreviousSetupType=yes
+UsePreviousTasks=yes
 OutputBaseFilename=IL2_Korea_Service_Record_Setup_v{#MyAppVersion}
 OutputDir=Output
 Compression=lzma
@@ -273,6 +275,8 @@ Type: dirifempty; Name: "{code:GetIL2Dir}\data\nsdata\assets\awards"
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "Open the Service Record"; \
     Flags: nowait postinstall skipifsilent
+Filename: "{app}\IL2_Korea_Career_Helper.exe"; Parameters: "--from-tracker --after-update"; \
+    Flags: nowait skipifnotsilent
 
 [Code]
 var
@@ -377,10 +381,19 @@ end;
 
 function GetIL2Dir(Param: string): string;
 begin
+  { A silent update skips the custom page. Resolve its value if it was
+    initialised, then fall back explicitly to the HKA value written by the
+    previous install. This keeps the mod in the same game folder. }
+  Result := FindIL2Root(ExpandConstant('{param:IL2DIR}'));
+  if Result <> '' then
+    Exit;
   if IL2Page <> nil then
-    Result := IL2Page.Values[0]
-  else
-    Result := GetStoredIL2Path();
+  begin
+    Result := FindIL2Root(IL2Page.Values[0]);
+    if Result <> '' then
+      Exit;
+  end;
+  Result := FindIL2Root(GetStoredIL2Path());
 end;
 
 procedure PrefillIL2Dir();

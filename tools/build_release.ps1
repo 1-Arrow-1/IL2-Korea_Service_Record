@@ -6,7 +6,7 @@
 # Everything a release needs, in the order it needs doing, with the steps
 # that have gone wrong before enforced rather than remembered:
 #
-#   * both version strings move together, so the zip and the installer can
+#   * all three version strings move together, so the apps and installer can
 #     never disagree
 #   * the tag is created at the commit the binaries were built from, not
 #     wherever main happens to be by the time someone remembers to tag
@@ -63,6 +63,7 @@ $repo = Split-Path -Parent $PSScriptRoot
 $signScript = Join-Path $PSScriptRoot "sign_artifact.ps1"
 $iss = Join-Path $repo "installer\IL2_Korea_Service_Record.iss"
 $zipPy = Join-Path $repo "tools\make_release_zip.py"
+$runtimeVersion = Join-Path $repo "korea_service_record\version.py"
 $slug = "1-Arrow-1/IL2-Korea_Service_Record"
 
 function Assert-NativeSuccess {
@@ -149,7 +150,7 @@ try {
     # A release is cut from a known commit. PyInstaller builds the working
     # tree, but the tag can only point at a commit - so uncommitted work means
     # a tag that does not describe the binaries under it. -Version is no
-    # exception: its commit carries the two version lines and nothing else.
+    # exception: its commit carries the three version lines and nothing else.
     if ($Publish) {
         $dirty = & git status --porcelain
         if ($dirty) {
@@ -162,15 +163,18 @@ try {
     if ($Version) {
         $issText = Get-Content -LiteralPath $iss -Raw
         $zipText = Get-Content -LiteralPath $zipPy -Raw
+        $runtimeText = Get-Content -LiteralPath $runtimeVersion -Raw
         $issText = [regex]::Replace($issText, '(#define\s+MyAppVersion\s+")[^"]+(")', "`${1}$Version`${2}")
         $zipText = [regex]::Replace($zipText, '(?m)^(VERSION\s*=\s*")[^"]+(")', "`${1}$Version`${2}")
+        $runtimeText = [regex]::Replace($runtimeText, '(?m)^(VERSION\s*=\s*")[^"]+(")', "`${1}$Version`${2}")
         Set-Content -LiteralPath $iss -Value $issText -NoNewline
         Set-Content -LiteralPath $zipPy -Value $zipText -NoNewline
-        Write-Host "  bumped the .iss and make_release_zip.py to $Version"
+        Set-Content -LiteralPath $runtimeVersion -Value $runtimeText -NoNewline
+        Write-Host "  bumped the .iss, make_release_zip.py and runtime version to $Version"
         if ($DryRun) {
             Would "commit the version bump"
         } else {
-            & git add -- $iss $zipPy
+            & git add -- $iss $zipPy $runtimeVersion
             # Nothing staged means the tree already carried this version -
             # a rerun after a failed publish, not a problem.
             $staged = & git diff --cached --name-only
@@ -188,11 +192,15 @@ try {
         throw "Could not read MyAppVersion from $iss."
     }
     $version = $Matches[1]
-    # The two must agree, or the zip is named for one release and built from
-    # another - which shipped a 1.3.0 tracker inside 1.4.0 once.
+    # All three must agree, or the running applications can offer themselves
+    # as an update, or the zip can be named for a different release.
     $zipText = Get-Content -LiteralPath $zipPy -Raw
     if ($zipText -notmatch '(?m)^VERSION\s*=\s*"([^"]+)"' -or $Matches[1] -ne $version) {
-        throw "Version mismatch: the .iss says $version, make_release_zip.py says $($Matches[1]). Pass -Version to set both."
+        throw "Version mismatch: the .iss says $version, make_release_zip.py says $($Matches[1]). Pass -Version to set all three."
+    }
+    $runtimeText = Get-Content -LiteralPath $runtimeVersion -Raw
+    if ($runtimeText -notmatch '(?m)^VERSION\s*=\s*"([^"]+)"' -or $Matches[1] -ne $version) {
+        throw "Version mismatch: the .iss says $version, version.py says $($Matches[1]). Pass -Version to set all three."
     }
     Write-Host "  building $version"
 
