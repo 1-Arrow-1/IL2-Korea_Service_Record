@@ -451,26 +451,26 @@ def _centred(cx: float, cy: float, w: float, h: float) -> tuple:
 #
 # These are abbreviations, not translations. The plate carries the issuing
 # air force's own language and never the reader's, so there is one form per
-# rank per country and no locale file is involved. Only the long compound
-# ranks are shortened; Captain, Major and Colonel are already short enough
-# to engrave, and shortening them would look affected rather than correct.
+# rank per country and no locale file is involved. Every rank is shortened,
+# so the name keeps its room; the plate never runs past its inner frame
+# (nameplate.js fits it, cutting the first name to an initial if need be).
 #
 # 502 and 503 are absent on purpose. The Chinese ranks are two characters
 # each and the Korean ones are romanised single words - Sojwa, Taejwa -
 # so there is nothing to shorten and a wrong guess would be worse than none.
 RANK_ABBR = {
-    601: {0: "2nd Lt.", 1: "1st Lt.", 2: "Captain", 3: "Major",
-          4: "Lt. Col.", 5: "Colonel", 6: "Brig. Gen.", 7: "Maj. Gen."},
+    601: {0: "2nd Lt.", 1: "1st Lt.", 2: "Capt.", 3: "Maj.",
+          4: "Lt. Col.", 5: "Col.", 6: "Brig. Gen.", 7: "Maj. Gen."},
     # The Navy ladder is its own: a lieutenant junior grade is never "1st Lt."
-    602: {0: "Ensign", 1: "Lt. (j.g.)", 2: "Lieutenant", 3: "Lt. Cdr.",
-          4: "Commander", 5: "Captain", 6: "Rear Adm. (l.h.)",
-          7: "Rear Adm."},
+    602: {0: "Ens.", 1: "Lt. (j.g.)", 2: "Lt.", 3: "Lt. Cdr.",
+          4: "Cdr.", 5: "Capt.", 6: "RAdm. (l.h.)", 7: "RAdm."},
     # The Marines wear the Army ladder, as the game's own names show.
-    603: {0: "2nd Lt.", 1: "1st Lt.", 2: "Captain", 3: "Major",
-          4: "Lt. Col.", 5: "Colonel", 6: "Brig. Gen.", 7: "Maj. Gen."},
-    # Soviet practice shortens the compounds the same way: ст. лейтенант,
-    # ген.-майор. Подполковник is one word and is written out.
-    501: {1: "Ст. лейтенант", 6: "Ген.-майор", 7: "Ген.-лейтенант"},
+    603: {0: "2nd Lt.", 1: "1st Lt.", 2: "Capt.", 3: "Maj.",
+          4: "Lt. Col.", 5: "Col.", 6: "Brig. Gen.", 7: "Maj. Gen."},
+    # The Soviet Army's own written abbreviations: л-т, ст. л-т, к-н, м-р,
+    # п/п-к, п-к, ген.-м-р, ген.-л-т - capitalised at the head of the plate.
+    501: {0: "Л-т", 1: "Ст. л-т", 2: "К-н", 3: "М-р", 4: "П/п-к", 5: "П-к",
+          6: "Ген.-м-р", 7: "Ген.-л-т"},
 }
 
 
@@ -590,6 +590,7 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case",
     hero = (rack.get("hero") or {}).get("type") if isinstance(rack.get("hero"), dict) else None
     star = art_of(hero, (rack.get("hero") or {}).get("name", "")) if hero else None
     if star:
+        first = len(items)
         (src, w, h, ribbon), nm = star
         sl, sr, st = _SPANS.get(src, (0, w - 1, 0))
         add(f"{src}?v={rev}",
@@ -620,6 +621,16 @@ def _eastern(rack, rank_id, squadron_key, icons, rev, case: "Case",
             place = x - (il + ir) / 2.0 if step else x - il
             add(f"{s}?v={rev}", (place, SOV_ROW1_LINE - it, aw, ah), nm, "sbox-medal")
             x += step if step else (ir - il + 1) + SOV_GAP
+        # An uneven row - one medal beside the star, or three - is centred as
+        # a whole rather than leaving an empty place on one side of the star.
+        if len(left) != len(right):
+            row = items[first:]
+            lo = min(it["left"] for it in row)
+            hi = max(it["left"] + it["width"] for it in row)
+            middle = centre_x / case.frame[0] * 100
+            shift = middle - (lo + hi) / 2.0
+            for it in row:
+                it["left"] += shift
     else:
         row = [art_of(a, names.get(a, "")) for a in bar]
         row = [r for r in row if r]

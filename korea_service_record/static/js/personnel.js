@@ -70,7 +70,19 @@
             fetch("/api/personnel/" + enc(careerId) + "/" + enc(pilotId)),
             fetch("/api/logbook/" + enc(careerId) + "/" + enc(pilotId)),
         ]);
-        if (!a.ok) throw new Error(a.status);
+        if (!a.ok) {
+            // Not a USAF pilot: a Chinese, Soviet or North Korean one has a file of his own.
+            for (const [api, render] of [["prc-file", window.renderPrcFile], ["ussr-file", window.renderUssrFile],
+                                         ["dprk-file", window.renderDprkFile]]) {
+                if (a.status !== 404) break;
+                const c = await fetch("/api/" + api + "/" + enc(careerId) + "/" + enc(pilotId) + "?lang=" + enc(pageLang));
+                if (c.ok) {
+                    await render({data: await c.json(), el: el, esc: esc, enc: enc, careerId: careerId});
+                    return;
+                }
+            }
+            throw new Error(a.status);
+        }
         data = await a.json();
         logbook = b.ok ? await b.json() : {months: []};
     } catch (err) {
@@ -200,29 +212,7 @@
 
     el("pf-doc").innerHTML = pages.join("");
 
-    if (box) {
-        const [W, H] = box.size || [2050, 1860];
-        const k = Math.min(996 / W, 756 / H);
-        const holder = el("pf-sbox");
-        holder.style.width = Math.round(W * k) + "px";
-        holder.style.height = Math.round(H * k) + "px";
-        const pos = (o) => "left:" + o.left + "%;top:" + o.top + "%;width:" + o.width + "%;height:" + o.height + "%";
-        const plateText = (box.text && box.text.full) || "";
-        holder.innerHTML = '<img class="frame" src="' + esc(box.frame) + '" alt="">' +
-            '<div class="items">' + (box.items || []).map((it) => '<img class="' + esc(it.cls || "") + '" src="' +
-                esc(it.src) + '" alt="" style="' + pos(it) + '">').join("") + "</div>" +
-            '<div class="pf-plate" style="' + pos(box.plate) + '"><span>' + esc(plateText) + "</span>" +
-                (box.squadron ? "<span>" + esc(box.squadron) + "</span>" : "") + "</div>" +
-            '<img class="glass" src="' + esc(box.glass.src) + '" alt="" style="' + pos(box.glass) + '">';
-        // the engraving: as large as the brass holds
-        const plate = holder.querySelector(".pf-plate");
-        let size = plate.clientHeight * 0.36;
-        plate.style.fontSize = size + "px";
-        while (size > 6 && (plate.scrollWidth > plate.clientWidth + 1 || plate.scrollHeight > plate.clientHeight + 1)) {
-            size -= 0.5;
-            plate.style.fontSize = size + "px";
-        }
-    }
+    if (box) PFC.shadowbox(el("pf-sbox"), box);
 
     // Wait for each embedded page, then scale it into its box.
     const fits = Array.from(document.querySelectorAll(".pf-fit"));
@@ -235,45 +225,7 @@
         el("pf-print").disabled = finished < total;
     };
     status();
-    const ready = (frame) => new Promise((resolve) => {
-        const check = () => {
-            const doc = frame.contentDocument;
-            if (doc && doc.body && doc.body.dataset.ready === "1") {
-                const pending = Array.from(doc.images).filter((im) => !im.complete);
-                if (!pending.length) { resolve(doc); return; }
-            }
-            setTimeout(check, 120);
-        };
-        check();
-    });
-    const settle = async (fit) => {
-        const frame = fit.querySelector("iframe");
-        // a wide frame first, so the sheet is laid out at its design width
-        frame.style.width = "1200px";
-        frame.style.height = "1600px";
-        const doc = await ready(frame);
-        const sheet = doc.querySelector(".sheet");
-        const pageEl = fit.closest(".pf-page");
-        if (!sheet || (doc.getElementById("ct-state") && !doc.getElementById("ct-state").hidden)) {
-            // no certificate for this award: the page goes
-            if (fit.dataset.kind === "cert") pageEl.remove(); else fit.closest(".pf-half").remove();
-            return;
-        }
-        const w = sheet.offsetWidth, h = sheet.offsetHeight;
-        if (fit.dataset.kind === "cert" && w > h) {
-            pageEl.classList.remove("portrait");
-            pageEl.classList.add("landscape");
-        }
-        const boxW = fit.dataset.kind === "logbook" ? 726 : (pageEl.classList.contains("landscape") ? 996 : 726);
-        const boxH = fit.dataset.kind === "logbook" ? 476 : (pageEl.classList.contains("landscape") ? 756 : 966);
-        const k = Math.min(1, boxW / w, boxH / h);
-        frame.style.width = w + "px";
-        frame.style.height = h + "px";
-        frame.style.transform = "scale(" + k + ")";
-        fit.style.width = Math.round(w * k) + "px";
-        fit.style.height = Math.round(h * k) + "px";
-    };
-    await Promise.all(fits.map((fit) => settle(fit).catch(() => {}).then(() => { finished += 1; status(); })));
+    await Promise.all(fits.map((fit) => PFC.settle(fit).catch(() => {}).then(() => { finished += 1; status(); })));
     // The contents, counted now that awards without a certificate have
     // gone: how many commissions, certificates and flight-record months.
     const counted = {promotions: 0, awards: 0};

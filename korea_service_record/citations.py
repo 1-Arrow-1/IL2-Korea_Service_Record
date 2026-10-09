@@ -13,6 +13,7 @@ come from the career and the flight log; the sentences are the locale's.
 
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -127,11 +128,44 @@ def _latin(text: str) -> str:
     return "".join(out)
 
 
+# Russian nouns after a number: the texts are written with the form for 5-20
+# ("41 боевых вылетов"); after 1, 21, 31 ... it is the singular, after 2-4,
+# 22-24 ... the genitive singular ("41 боевой вылет", "3 самолёта").
+_RU_COUNTED = {
+    "боевых вылетов": ("боевой вылет", "боевых вылета", "боевых вылетов"),
+    "вылетов": ("вылет", "вылета", "вылетов"),
+    "самолётов": ("самолёт", "самолёта", "самолётов"),
+    "единиц": ("единицу", "единицы", "единиц"),
+    "часов": ("час", "часа", "часов"),
+}
+_RU_NUMBER_NOUN = re.compile(r"(?<![\d,.])(\d+(?:,\d+)?)( (?:боевых вылетов|вылетов|самолётов|единиц|часов))")
+
+
+def _ru_agree(text: str) -> str:
+    """Make the noun after each whole number agree with it."""
+    def fix(m):
+        noun = m.group(2).strip()
+        one, few, many = _RU_COUNTED[noun]
+        if "," in m.group(1):                  # a fraction: 34,7 часа
+            return f"{m.group(1)} {few}"
+        n = int(m.group(1))
+        if n % 10 == 1 and n % 100 != 11:
+            form = one
+        elif 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
+            form = few
+        else:
+            form = many
+        return f"{m.group(1)} {form}"
+    return _RU_NUMBER_NOUN.sub(fix, text)
+
+
 def _fill(template: str, facts: Dict[str, Any]) -> str:
     class _Safe(dict):
         def __missing__(self, key):
             return ""
-    return template.format_map(_Safe(facts))
+    text = template.format_map(_Safe(facts))
+    # a Cyrillic template counts in Russian
+    return _ru_agree(text) if re.search("[а-яё]", template) else text
 
 
 # Resolve the rung by award id. A family name such as ``air_medal`` exists in
@@ -423,7 +457,7 @@ def certificate(lang: str, award_id: int, facts: Dict[str, Any], received: str,
         "form": "nagradnoy", "translation": translation,
         "name": facts.get("name_ru") or facts.get("name", ""),
         "rank": facts.get("rank_ru") or facts.get("rank", ""),
-        "post": _fill(n["post"], {"unit": facts.get("unit", "")}),
+        "post": facts.get("post_ru") or _fill(n["post"], {"unit": facts.get("unit", "")}),
         "to": n["to"].get(fam_key, ""),
         "born": birth[:4] if birth else "",
         "birthplace": bio.get("born", ""),

@@ -6,13 +6,21 @@
  * their own design width and scaled down as a whole to fit that box.
  */
 
-.personnel-page { background: var(--desk); padding: 1rem 1rem 3rem; }
+.personnel-page { background: var(--desk); padding: 1rem 1rem 3rem; isolation: isolate; }
+/* The records archive behind the file: fixed while the pages scroll past,
+   dimmed and softened so the paper stays what the eye reads. Screen only. */
+.personnel-page::before {
+    content: ""; position: fixed; inset: -12px; z-index: -1; pointer-events: none;
+    background: linear-gradient(rgba(236, 225, 200, .62), rgba(236, 225, 200, .72)),
+                url("../images/personnel_archive.webp") center / cover no-repeat;
+    filter: blur(2px) saturate(.8);
+}
 .personnel-bar { display: flex; align-items: center; gap: 1rem; max-width: 1056px; margin: 0 auto 1rem; }
 .pf-status { flex: 1; font-size: 0.85rem; font-style: italic; color: var(--ink-muted); }
 
 .pf-page {
     position: relative; box-sizing: content-box; margin: 0 auto 1.4rem;
-    background: #fbf7ec; color: #1f140a; box-shadow: var(--shadow-soft);
+    background: #fbf7ec; color: #1f140a; box-shadow: 0 4px 16px rgba(60, 40, 15, .35);
     font-family: 'Courier New', Courier, monospace; overflow: hidden;
 }
 .pf-page.portrait { width: 726px; height: 966px; padding: 45px; }
@@ -83,12 +91,88 @@
     text-shadow: 0 1px 0 rgba(255, 244, 214, .45); }
 .pf-plate span { white-space: nowrap; }
 
+/* --------------------------------------------- the Chinese file (personnel_prc.js) */
+.pf-page.prc { font-family: "PMingLiU", "MingLiU", "Microsoft JhengHei", "SimSun", serif; }
+.prc-head { text-align: center; margin: 0.4rem 0 1rem; }
+.prc-head h1 { font-size: 2rem; letter-spacing: 0.6em; margin: 0.4rem 0 0; font-weight: bold; }
+.prc-head h2 { font-size: 1.5rem; letter-spacing: 0.4em; margin: 0.4rem 0 0; font-weight: bold; }
+.pf-page.prc h3 { font-family: inherit; letter-spacing: 0.3em; font-size: 0.95rem; }
+.pf-page.prc .pf-field .k { font-family: inherit; font-size: 0.78rem; text-transform: none; letter-spacing: 0.2em; }
+.pf-page.prc .pf-field .v { font-size: 1.05rem; }
+.pf-page.prc .pf-table th { font-family: inherit; font-size: 0.8rem; text-transform: none; letter-spacing: 0.2em; }
+.pf-page.prc .pf-table td.date { width: 11em; }
+.pf-page.prc [data-tip] { cursor: help; }
+.prc-doc { position: relative; flex: none; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); }
+.prc-doc img { display: block; width: 100%; height: 100%; }
+.prc-region { position: absolute; border-radius: 3px; }
+.prc-region:hover { background: rgba(255, 214, 120, .18); box-shadow: inset 0 0 0 1px rgba(150, 100, 20, .45); }
+.prc-pair { flex-direction: row; gap: 16px; }
+.prc-hero { gap: 10px; }
+.prc-hero-medal { height: 600px; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .4)) drop-shadow(5px 10px 10px rgba(0, 0, 0, .3)); }
+.prc-hero-title { font-size: 2rem; letter-spacing: 0.4em; font-weight: bold; margin-top: 0.6rem; }
+.prc-hero-name { font-size: 1.4rem; letter-spacing: 0.3em; }
+.prc-hero-date, .prc-hero-by { font-size: 1rem; letter-spacing: 0.15em; }
+.prc-medals { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 26px 34px; margin-top: 2rem; }
+.prc-medals figure { margin: 0; width: 150px; text-align: center; }
+.prc-medals img { height: 260px; max-width: 150px; object-fit: contain;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .4)) drop-shadow(3px 7px 7px rgba(0, 0, 0, .3)); }
+.prc-medals figcaption { font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.35; }
+.prc-bio p { font-family: inherit; text-indent: 2em; line-height: 1.8; }
+.prc-tip { position: fixed; z-index: 50; max-width: 380px; padding: 0.45rem 0.65rem; border-radius: 4px;
+    background: #2b2318; color: #f6eedb; font: 0.85rem/1.4 Arial, Helvetica, sans-serif; pointer-events: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .35); white-space: pre-line; }
+
+/* --------------------------------------------- the Soviet file (personnel_ussr.js) */
+.pf-page.ussr { font-family: "Times New Roman", Georgia, serif; }
+.pf-page.ussr-typed, .pf-page.ussr-typed .pf-table { font-family: "Courier New", Courier, monospace; }
+.pf-page.ussr [data-tip] { cursor: help; }
+.ussr-head { text-align: center; margin: 0.4rem 0 1rem; }
+.ussr-head h1 { font-size: 2rem; letter-spacing: 0.4em; margin: 0.4rem 0 0; }
+.ussr-head h2 { font-size: 1.35rem; letter-spacing: 0.3em; margin: 0.4rem 0 0.4rem; }
+.ussr-head .sub { margin: 0.15rem 0; }
+.pf-page.ussr h3 { font-family: inherit; letter-spacing: 0.08em; font-size: 0.9rem; text-transform: none; }
+.pf-page.ussr .pf-field .k, .pf-page.ussr .pf-table th { font-family: inherit; text-transform: none; letter-spacing: 0.05em; }
+.pf-page.ussr .pf-table td.date { width: 10.5em; }
+.ussr-facts { margin: 0.6rem 0 1rem; }
+.ussr-text p { text-indent: 2em; line-height: 1.6; margin: 0 0 0.4rem; text-align: justify; }
+.ussr-text .conclusion { margin-top: 0.8rem; text-indent: 0; }
+.ussr-sign { margin-top: 1.6rem; position: relative; }
+.ussr-sign p { margin: 0.2rem 0; }
+.ussr-squiggle { display: inline-block; width: 150px; height: 26px; margin: 0.2rem 0 0 2rem;
+    border-bottom: 2px solid rgba(78, 48, 138, .75); border-radius: 0 0 60% 40%; transform: rotate(-4deg); }
+.ussr-extract { position: relative; height: 455px; padding: 0.4rem 0.2rem; }
+.ussr-extract p { margin: 0.25rem 0; line-height: 1.45; }
+.ussr-extract .head { text-align: center; font-weight: bold; letter-spacing: 0.06em; }
+.ussr-extract .num, .ussr-extract .sec { text-align: center; }
+.ussr-extract .text { text-indent: 2em; margin-top: 0.8rem; text-align: justify; }
+.ussr-extract .signed { margin-top: 0.9rem; }
+.ussr-certified { position: relative; margin-top: 1.2rem; }
+.ussr-stamp { position: absolute; left: 330px; top: -40px; width: 120px; opacity: 0.55; transform: rotate(-11deg);
+    mix-blend-mode: multiply; }
+.ussr-cut { border: 0; border-top: 1px dashed #b9a882; margin: 0.6rem 0; }
+.ussr-bio p { text-indent: 2em; line-height: 1.6; }
+.doc-photo { position: absolute; object-fit: cover; filter: grayscale(1) sepia(0.25) contrast(1.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .35); }
+
+/* ------------------------------------------- the North Korean file (personnel_dprk.js) */
+@font-face { font-family: "Korea Record Print"; src: url("../images/certificates/KoreaRecordPrint.ttf"); }
+.pf-page.dprk { font-family: "Korea Record Print", "Batang", "Malgun Gothic", serif; }
+.pf-page.dprk [data-tip] { cursor: help; }
+.pf-page.dprk h3, .pf-page.dprk .pf-field .k, .pf-page.dprk .pf-table th { font-family: inherit; text-transform: none; letter-spacing: 0.1em; }
+.pf-page.dprk .pf-table td.date { width: 10em; }
+.dprk-head { text-align: center; margin: 0.4rem 0 1rem; }
+.dprk-head h1 { font-size: 2rem; letter-spacing: 0.5em; margin: 0.4rem 0 0; }
+.dprk-head h2 { font-size: 1.4rem; letter-spacing: 0.35em; margin: 0.4rem 0 0.2rem; }
+.dprk-note { font-size: 0.85rem; }
+
 @media print {
+    .prc-region:hover { background: none; box-shadow: none; }
     @page { size: letter portrait; margin: 45px; }
     @page landscape { size: letter landscape; margin: 30px; }
     .no-print { display: none !important; }
     /* the whole sheet white: html's desk colour showed under the last page */
     html, .personnel-page { background: #fff !important; padding: 0; }
+    .personnel-page::before { display: none; }
     .pf-page { margin: 0; padding: 0; box-shadow: none; background: transparent;
         break-after: page; page-break-after: always;
         -webkit-print-color-adjust: exact; print-color-adjust: exact; }

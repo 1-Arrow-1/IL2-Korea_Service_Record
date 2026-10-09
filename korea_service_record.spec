@@ -26,6 +26,8 @@ back for development.
 
 from pathlib import Path
 
+from PyInstaller.utils.hooks import collect_data_files
+
 base = Path(SPECPATH)
 package = base / "korea_service_record"
 
@@ -46,6 +48,10 @@ datas = [
      "licenses/directxtex"),
     (str(base / "vendor" / "onnxruntime"), "licenses/onnxruntime"),
 ]
+# OpenCC's conversion tables (JSON config and dictionaries, read at runtime):
+# the Chinese personnel file turns the game's simplified Chinese into the
+# traditional characters of 1951. Without them the file stays simplified.
+datas += collect_data_files("opencc")
 
 binaries = [
     # The helper calls this directly to produce the game's known-good
@@ -68,6 +74,8 @@ hiddenimports = [
     "pystray",
     "pystray._win32",
     "PIL.IcoImagePlugin",
+    # imported inside hanzi._converter() only
+    "opencc",
 ]
 
 excludes = [

@@ -1,3 +1,4 @@
 Flask>=3.0
 Pillow>=10.0
 onnxruntime>=1.22,<2
+opencc-python-reimplemented>=0.1.7

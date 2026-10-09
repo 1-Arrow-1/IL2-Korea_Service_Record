@@ -2548,6 +2548,108 @@ class CareerAggregator:
                 "pilot_id": pilot_id,
             }
 
+    def _day_sortie(self, db, pilot_id: int, earned: str, sorties, missions):
+        """
+        The sortie an award of that day was for - the one with the most in
+        it - with its mission and its airborne kills by aircraft name, or
+        None when he did not fly that day.
+        """
+        day = [s for s in sorties if missions[s["missionId"]]["date"] == earned]
+        if not day:
+            return None
+        best = max(day, key=lambda s: (KillStats(s["killStats"]).airborne, KillStats(s["killStats"]).ground_targets))
+        m = missions[best["missionId"]]
+        kills: Dict[str, int] = {}
+        for e in db.query("SELECT tpar1 AS target FROM event WHERE type=0 AND isDeleted=0 AND pilotId=? AND missionId=? ORDER BY id",
+                          (pilot_id, m["id"])):
+            info = self.objects.describe(e["target"])
+            if info["aircraft"] and not info["parked"]:
+                kills[info["name"]] = kills.get(info["name"], 0) + 1
+        return best, m, kills
+
+    def pilot_basics(self, career_id: str, pilot_id: int) -> Optional[Dict[str, Any]]:
+        """
+        What a personnel file needs that the service record does not carry:
+        the name in its parts, the unit code, the biography and birth date
+        (the player's only), and every award row he has been presented
+        with, repeat awardings of one id included, oldest first.
+        """
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            pilot = db.pilot(pilot_id)
+            if pilot is None:
+                return None
+            squadron = db.query_one("SELECT configId FROM squadron WHERE id=?", (pilot["squadronId"],))
+            desc = dict(urllib.parse.parse_qsl(urllib.parse.unquote(pilot["description"] or "")))
+            awards = [{"type": r["type"], "earned": r["earnedDate"] or "",
+                       "received": r["receivedDate"] or r["earnedDate"] or "",
+                       "rank_id": r["pilotRank"] if r["pilotRank"] is not None else pilot["rankId"],
+                       "name": self.award_name(r["type"])}
+                      for r in db.awards(pilot_id) if r["category"] != 1 and not r["isPending"]]
+            awards.sort(key=lambda a: (a["earned"], a["type"]))
+            return {"first_name": pilot["name"] or "", "last_name": pilot["lastName"] or "",
+                    "country": int(pilot["country"]), "rank_id": pilot["rankId"],
+                    "lead_level": pilot["leadLevel"],
+                    "unit_code": squadron["configId"] if squadron else 0,
+                    "bio_id": desc.get("biographyId", ""), "birth_date": desc.get("birthDate", ""),
+                    "awards": awards}
+
+    def prc_merits(self, career_id: str, pilot_id: int) -> Optional[Dict[str, Any]]:
+        """
+        The facts behind a Chinese pilot's merit booklet: every merit and
+        Combat Hero Medal he holds, each with the sortie of its day (kills
+        by aircraft name and the nearest place, both in this aggregator's
+        language), and the post he held then. prc_file turns them into the
+        documents; the zh aggregator supplies the Chinese words, the
+        reader's one the tooltips.
+        """
+        from .. import prc_file
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            pilot = db.pilot(pilot_id)
+            if pilot is None or int(pilot["country"]) != 502:
+                return None
+            missions = {m["id"]: m for m in db.missions()}
+            sorties = [s for s in db.sorties(pilot_id) if s["missionId"] in missions]
+            features = self.overlay.features()
+            squadron = db.query_one("SELECT configId FROM squadron WHERE id=?", (pilot["squadronId"],))
+            desc = dict(urllib.parse.parse_qsl(urllib.parse.unquote(pilot["description"] or "")))
+            entries = []
+            for row in db.awards(pilot_id):
+                kind = prc_file.kind_of(row["type"])
+                if kind is None or row["isPending"]:
+                    continue
+                earned = row["earnedDate"] or ""
+                entry = {"type": row["type"], "kind": kind, "earned": earned,
+                         "received": row["receivedDate"] or earned,
+                         "rank_id": row["pilotRank"] if row["pilotRank"] is not None else pilot["rankId"],
+                         "name": self.award_name(row["type"]),
+                         "rank_name": self.locale.rank_name(502, row["pilotRank"] if row["pilotRank"] is not None
+                                                            else pilot["rankId"]),
+                         "kills": {}, "place": "", "hits": 0, "outcome": "ok", "flown": False}
+                day = self._day_sortie(db, pilot_id, earned, sorties, missions)
+                if day:
+                    best, m, kills = day
+                    flight = self.flightlogs.for_sortie(best["date"][:10], best["date"][11:16]) if pilot["isPlayer"] else None
+                    entry.update({
+                        "flown": True, "kills": kills, "place": self.place_of(db, m, features),
+                        "hits": sum(b.hits for b in flight.damage) if flight and flight.damage else 0,
+                        "outcome": "bailed" if flight and flight.ejected else ("ok" if best["status"] == 0 else "missing"),
+                    })
+                entries.append(entry)
+            entries.sort(key=lambda e: (e["earned"], e["type"]))
+            return {
+                "name": f"{pilot['name']} {pilot['lastName']}".strip(),
+                "first_name": pilot["name"] or "", "last_name": pilot["lastName"] or "",
+                "rank_id": pilot["rankId"], "unit_code": squadron["configId"] if squadron else 0,
+                "bio_id": desc.get("biographyId", ""), "birth_date": desc.get("birthDate", ""),
+                "entries": entries,
+            }
+
     def citation(self, career_id: str, pilot_id: int, award_id: int,
                  earned: str) -> Optional[Dict[str, Any]]:
         """
@@ -2616,17 +2718,31 @@ class CareerAggregator:
                 "aircraft": plane_name(sorties[-1]) if sorties else "",
                 "has_sortie": False, "kills": {}, "ground_n": 0, "hits": 0, "outcome": "ok",
             }
-            # The day's sortie: the one with the most in it.
-            day = [s for s in sorties if missions[s["missionId"]]["date"] == earned]
+            if self.lang == "rus":
+                # The наградной лист is a Russian form: names in Cyrillic, from
+                # the game's own name table, and for a Soviet pilot "Фамилия,
+                # имя и отчество" as the form asks. The tooltips romanise them.
+                from ..native_names import native
+                from ..ussr_file import patronymic
+                first, last = native(pilot["name"], self.resolver, "rus"), native(pilot["lastName"], self.resolver, "rus")
+                if first and last:
+                    father = patronymic(facts["bio_id"], pilot["name"] + pilot["lastName"]) if country == 501 else ""
+                    facts["name"] = f"{first} {last}"
+                    facts["name_ru"] = " ".join(x for x in (last, first, father) if x)
+                if country == 501:
+                    # his post and regiment as a Soviet form types them
+                    from ..ussr_file import post, unit
+                    squadron = db.query_one("SELECT configId FROM squadron WHERE id=?", (pilot["squadronId"],))
+                    regiment = unit(squadron["configId"] if squadron else 0)["short"]
+                    facts["post_ru"] = f"{post(rank_id)[0]}, {regiment}"
+                if commander:
+                    c_first = native(commander["name"], self.resolver, "rus")
+                    c_last = native(commander["lastName"], self.resolver, "rus")
+                    if c_first and c_last:
+                        facts["commander"] = f"{c_first} {c_last}"
+            day = self._day_sortie(db, pilot_id, earned, sorties, missions)
             if day:
-                best = max(day, key=lambda s: (KillStats(s["killStats"]).airborne, KillStats(s["killStats"]).ground_targets))
-                m = missions[best["missionId"]]
-                kills: Dict[str, int] = {}
-                for e in db.query("SELECT tpar1 AS target FROM event WHERE type=0 AND isDeleted=0 AND pilotId=? AND missionId=? ORDER BY id",
-                                  (pilot_id, m["id"])):
-                    info = self.objects.describe(e["target"])
-                    if info["aircraft"] and not info["parked"]:
-                        kills[info["name"]] = kills.get(info["name"], 0) + 1
+                best, m, kills = day
                 flight = None
                 if pilot["isPlayer"]:
                     flight = self.flightlogs.for_sortie(best["date"][:10], best["date"][11:16])

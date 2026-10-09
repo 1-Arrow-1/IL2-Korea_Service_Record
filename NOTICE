@@ -44,8 +44,26 @@ Bundled third-party software
     korea_service_record/models/U-2-Net-LICENSE.txt.
   * Microsoft ONNX Runtime, MIT License — see licenses/onnxruntime/LICENSE.txt
     and licenses/onnxruntime/ThirdPartyNotices.txt in the packaged application.
+  * LXGW WenKai TC (korea_service_record/static/images/certificates/
+    LXGWWenKaiTC-PRC.ttf), a subset made with tools/make_prc_font.py,
+    Copyright 2022-2026 The LXGW WenKai Project Authors, SIL Open Font
+    License 1.1 — see LXGWWenKaiTC-OFL.txt in that folder.
+  * Korea Record Print and Korea Record Hand (korea_service_record/static/
+    images/certificates/KoreaRecordPrint.ttf, KoreaRecordHand.ttf): subsets of
+    Nanum Myeongjo and Nanum Pen Script made by tools/make_korean_data.py and
+    renamed as the licence requires, Copyright (c) 2010 NHN Corporation, SIL
+    Open Font License 1.1 - see KoreaRecord-OFL.txt in that folder.
+  * korea_service_record/locales/dprk/korean_readings.json, Korean readings of Chinese
+    characters, derived from the hanja package's table (WTFPL).
+  * Bad Script (korea_service_record/static/images/certificates/
+    BadScript-Regular.ttf), Copyright 2011 The Bad Script Project Authors,
+    SIL Open Font License 1.1 — see BadScript-OFL.txt in that folder.
+  * UnifrakturMaguntia (korea_service_record/static/images/certificates/
+    UnifrakturMaguntia-Book.ttf), SIL Open Font License 1.1 — see
+    UnifrakturMaguntia-OFL.txt in that folder.
 
 Runtime dependencies (installed from PyPI, licences per package): Flask
-(BSD-3-Clause), Pillow (MIT-CMU), pystray (LGPL-3.0), ONNX Runtime (MIT).
+(BSD-3-Clause), Pillow (MIT-CMU), pystray (LGPL-3.0), ONNX Runtime (MIT),
+opencc-python-reimplemented (Apache-2.0, with OpenCC's conversion tables).
 The Windows build is produced with PyInstaller (GPL with bootloader exception)
 and packaged with Inno Setup (Inno Setup License).

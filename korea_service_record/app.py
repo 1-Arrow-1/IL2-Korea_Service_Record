@@ -268,6 +268,78 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         data = promotion_cert.render(player.get("name") or "", promo["rank"], (y, m, d))
         return Response(data, mimetype="image/jpeg", headers={"Cache-Control": "no-cache"})
 
+    @app.route("/api/prc-file/<path:career_id>/<int:pilot_id>")
+    def api_prc_file(career_id: str, pilot_id: int):
+        """
+        A Chinese pilot's personnel file (prc_file.py): Chinese documents,
+        each field with a tooltip in the reader's language (?lang=).
+        """
+        from . import prc_file
+        lang = request.args.get("lang") or "en"
+        if lang not in ("en", "de", "es", "fr", "ru", "zh"):
+            lang = "en"
+        data = prc_file.file_json(career_id, pilot_id, aggregator_for("zh"), aggregator_for(lang), lang)
+        if data is None:
+            return jsonify({"error": "not_prc"}), 404
+        return jsonify(data)
+
+    @app.route("/api/prc-doc/<path:career_id>/<int:pilot_id>/<doc>")
+    def api_prc_doc(career_id: str, pilot_id: int, doc: str):
+        """One filled-in Chinese document: spread, form-<n> or cert-<award>."""
+        from . import prc_file
+        data = prc_file.render_doc(career_id, pilot_id, doc, aggregator_for("zh"))
+        if data is None:
+            return ("", 404)
+        return Response(data, mimetype="image/jpeg", headers={"Cache-Control": "no-cache"})
+
+    @app.route("/api/ussr-file/<path:career_id>/<int:pilot_id>")
+    def api_ussr_file(career_id: str, pilot_id: int):
+        """
+        A Soviet pilot's personnel file (ussr_file.py): Russian documents,
+        each field with a tooltip in the reader's language (?lang=).
+        """
+        from . import ussr_file
+        lang = request.args.get("lang") or "en"
+        if lang not in ("en", "de", "es", "fr", "ru", "zh"):
+            lang = "en"
+        data = ussr_file.file_json(career_id, pilot_id, aggregator_for("ru"), aggregator_for(lang), lang)
+        if data is None:
+            return jsonify({"error": "not_ussr"}), 404
+        return jsonify(data)
+
+    @app.route("/api/ussr-doc/<path:career_id>/<int:pilot_id>/<doc>")
+    def api_ussr_doc(career_id: str, pilot_id: int, doc: str):
+        """One filled-in Soviet document: name, awards-<page> or hero."""
+        from . import ussr_file
+        data = ussr_file.render_doc(career_id, pilot_id, doc, aggregator_for("ru"))
+        if data is None:
+            return ("", 404)
+        return Response(data, mimetype="image/jpeg", headers={"Cache-Control": "no-cache"})
+
+    @app.route("/api/dprk-file/<path:career_id>/<int:pilot_id>")
+    def api_dprk_file(career_id: str, pilot_id: int):
+        """
+        A North Korean pilot's personnel file (dprk_file.py): Korean
+        documents, each field with a tooltip in the reader's language.
+        """
+        from . import dprk_file
+        lang = request.args.get("lang") or "en"
+        if lang not in ("en", "de", "es", "fr", "ru", "zh"):
+            lang = "en"
+        data = dprk_file.file_json(career_id, pilot_id, aggregator_for("en"), aggregator_for(lang), lang)
+        if data is None:
+            return jsonify({"error": "not_dprk"}), 404
+        return jsonify(data)
+
+    @app.route("/api/dprk-doc/<path:career_id>/<int:pilot_id>/<doc>")
+    def api_dprk_doc(career_id: str, pilot_id: int, doc: str):
+        """One North Korean document: cover-<order>, name, awards-<order> or hero-<n>."""
+        from . import dprk_file
+        data = dprk_file.render_doc(career_id, pilot_id, doc, aggregator_for("en"))
+        if data is None:
+            return ("", 404)
+        return Response(data, mimetype="image/jpeg", headers={"Cache-Control": "no-cache"})
+
     @app.route("/api/icon/<kind>/<ident>")
     def api_icon(kind: str, ident: str):
         """

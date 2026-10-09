@@ -590,79 +590,12 @@
     let sboxFor = null;
 
     function fitPlate() {
-        // The engraving is sized from the brass itself. The plate is a
-        // percentage of a box whose width is whatever the viewport gives,
-        // so this runs on open and on resize rather than being a fixed pt.
+        // The engraving is sized from the brass itself (nameplate.js): the
+        // plate is a percentage of a box whose width is whatever the viewport
+        // gives, so this runs on open and on resize.
         const holder = el("sbox-plate-text");
-        const nameLine = holder.querySelector(".sbox-plate-name");
-        const squadronLine = holder.querySelector(".sbox-plate-squadron");
-        if (!nameLine || !squadronLine || !holder.offsetHeight) { return; }
-        // The engraving field is the brass between the two screws, which sit
-        // at about 7% and 93% inside the plate's raised border.
-        const room = holder.clientWidth * 0.77;
-        const squadron = holder.dataset.squadron || "";
-        squadronLine.textContent = squadron;
-        squadronLine.hidden = !squadron;
-        // Two lines occupy about two thirds of the plate, leaving a small,
-        // even margin above and below and a visible breath between them.
-        // With no squadron, keep the original single-line proportions.
-        const want = holder.offsetHeight * (squadron ? 0.34 : 0.42);
-        const least = holder.offsetHeight * (squadron ? 0.24 : 0.30);
-        holder.style.rowGap = (squadron ? holder.offsetHeight * 0.05 : 0) + "px";
-
-        // Measure a candidate at the preferred size and say what size, if
-        // any, would make it fit the field.
-        const sizeFor = (text) => {
-            nameLine.textContent = text;
-            nameLine.style.fontSize = want + "px";
-            squadronLine.style.fontSize = want * 0.75 + "px";
-            const nameScale = nameLine.scrollWidth > room ? room / nameLine.scrollWidth : 1;
-            const squadronScale = squadron && squadronLine.scrollWidth > room
-                ? room / squadronLine.scrollWidth : 1;
-            return want * Math.min(nameScale, squadronScale);
-        };
-
-        // A man's name goes on his plate in full wherever the brass can hold
-        // it, even if that means slightly smaller letters. Only when it will
-        // not go at a readable size is the first name cut to an initial,
-        // which is what an engraver would do.
-        const full = holder.dataset.full || "";
-        const short = holder.dataset.short || full;
-        let text = full, fit = sizeFor(full);
-        if (fit < least && short !== full) {
-            const shortFit = sizeFor(short);
-            if (shortFit > fit) { text = short; fit = shortFit; }
-        }
-        // A name too long even for the initial form used to be set at a
-        // 7px floor and then clipped by the plate's overflow, so it was cut
-        // off mid-word with nothing to show for it. Engrave what the brass
-        // holds and end it in an ellipsis, which is at least honest about
-        // having been shortened.
-        if (fit < least) {
-            fit = least;
-        }
-        nameLine.style.fontSize = fit + "px";
-        squadronLine.style.fontSize = fit * 0.75 + "px";
-
-        const fitText = (line, value) => {
-            line.textContent = value;
-            if (line.scrollWidth <= room) { return; }
-            let lo = 0, hi = value.length;
-            while (lo < hi) {                         // longest prefix that fits
-                const mid = Math.ceil((lo + hi) / 2);
-                line.textContent = value.slice(0, mid).trimEnd() + "…";
-                if (line.scrollWidth <= room) { lo = mid; } else { hi = mid - 1; }
-            }
-            line.textContent = value.slice(0, lo).trimEnd() + "…";
-        };
-        fitText(nameLine, text);
-        if (squadron) { fitText(squadronLine, squadron); }
-
-        if (fit <= least) {
-            // The plate's title attribute is the rank translation, which is
-            // a deliberate feature - not somewhere to put the name.
-            return;
-        }
+        Nameplate.fit(holder, holder.querySelector(".sbox-plate-name"), holder.querySelector(".sbox-plate-squadron"),
+                      [holder.dataset.full, holder.dataset.short], holder.dataset.squadron || "");
     }
 
     async function openShadowbox() {
@@ -1732,9 +1665,10 @@
                 (d.player && d.player.id != null ? "&pilot=" + encodeURIComponent(d.player.id) : "");
             logbook.title = T("logbook.open_hint");
             logbook.hidden = false;
-            // The personnel file, for a USAF pilot (other air forces later).
+            // The personnel file: USAF, Chinese, Soviet and North Korean pilots
+            // (the Navy and Marines have no file yet).
             const personnel = el("d-personnel");
-            if (d.player && d.player.country === 601 && d.player.id != null) {
+            if (d.player && [601, 502, 501, 503].indexOf(d.player.country) >= 0 && d.player.id != null) {
                 personnel.href = "/personnel?career=" + encodeURIComponent(careerId) +
                     "&pilot=" + encodeURIComponent(d.player.id);
                 personnel.title = T("personnel.open_hint");
