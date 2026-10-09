@@ -34,7 +34,7 @@ them. When a change needs a string the game does not have, create it:
 | what               | file, one per language                              |
 |--------------------|-----------------------------------------------------|
 | award name         | `nsdata/assets/locale/awards.locale=<lang>.json`    |
-| award description  | `nsdata/assets/awards/6xx/<id>.locale=<lang>.txt`   |
+| award description  | `nsdata/assets/awards/6xx/<id>.locale=<lang>.txt` (5xx for 50x ids) |
 | rank name          | `nsdata/assets/locale/ranks.locale=<lang>.json`     |
 
 Match the file's own conventions: each language uses its own equivalent

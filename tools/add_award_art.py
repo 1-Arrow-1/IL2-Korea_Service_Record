@@ -224,7 +224,11 @@ def main() -> int:
         else:
             xaml = xaml[:last.end()] + line + "\n" + xaml[last.end():]
         print("  awards.xaml: entry added")
-    (out_dir / "awards.xaml").write_text(xaml, encoding="utf-8")
+    # CRLF throughout, written untranslated: the text read back already
+    # carries CRLF, the lines added here carry LF, and the default newline
+    # translation on Windows turned each CRLF into CR CR LF.
+    xaml = xaml.replace("\r", "").replace("\n", "\r\n")
+    (out_dir / "awards.xaml").write_text(xaml, encoding="utf-8", newline="")
     return 0
 
 

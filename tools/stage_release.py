@@ -50,6 +50,10 @@ MOD_FILES = {
     # everything the stock atlases had no room for (second-batch unit
     # citations, Silver Star rungs 4-6, Commendation, NDSM, DSM).
     "awards6xx3.dds": "nsdata/assets/images",
+    # The mod's atlas for the Eastern Bloc (add_award_art.py --atlas
+    # Awards5xx2): PRC merit booklet, shared by all fifteen merit ids, and
+    # the three classes of the Combat Hero Medal.
+    "awards5xx2.dds": "nsdata/assets/images",
     # Flag rank for all six ladders. Each atlas carries two more ranks in the
     # one free row a 1024x1024 texture had left, ranks.xaml crops them, and
     # each locale names them - without which the game draws RANK6016!LOCALIZE!.
@@ -80,6 +84,11 @@ for award in ("601027", "601040", "601041", "601042", "601043", "601044",
               "601063", "602053"):
     for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
         MOD_FILES[f"{award}.locale={lang}.txt"] = "nsdata/assets/awards/6xx"
+# PRC merit citations, one id per entry in the merit booklet (502005-502019),
+# and the three classes of the Combat Hero Medal (502020-502022).
+for award in range(502005, 502023):
+    for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
+        MOD_FILES[f"{award}.locale={lang}.txt"] = "nsdata/assets/awards/5xx"
 for lang in ("chs", "eng", "fra", "ger", "rus", "spa"):
     MOD_FILES[f"awards.locale={lang}.json"] = "nsdata/assets/locale"
 

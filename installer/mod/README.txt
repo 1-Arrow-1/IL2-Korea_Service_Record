@@ -22,6 +22,116 @@ awards.cfg:
 
 Both carry the same medal fixes. Only the promotion block differs.
 
+<IL-2 Korea>\data\nsdata\assets\awards\5xx\
+    502005.locale=chs.txt
+    502005.locale=eng.txt
+    502005.locale=fra.txt
+    502005.locale=ger.txt
+    502005.locale=rus.txt
+    502005.locale=spa.txt
+    502006.locale=chs.txt
+    502006.locale=eng.txt
+    502006.locale=fra.txt
+    502006.locale=ger.txt
+    502006.locale=rus.txt
+    502006.locale=spa.txt
+    502007.locale=chs.txt
+    502007.locale=eng.txt
+    502007.locale=fra.txt
+    502007.locale=ger.txt
+    502007.locale=rus.txt
+    502007.locale=spa.txt
+    502008.locale=chs.txt
+    502008.locale=eng.txt
+    502008.locale=fra.txt
+    502008.locale=ger.txt
+    502008.locale=rus.txt
+    502008.locale=spa.txt
+    502009.locale=chs.txt
+    502009.locale=eng.txt
+    502009.locale=fra.txt
+    502009.locale=ger.txt
+    502009.locale=rus.txt
+    502009.locale=spa.txt
+    502010.locale=chs.txt
+    502010.locale=eng.txt
+    502010.locale=fra.txt
+    502010.locale=ger.txt
+    502010.locale=rus.txt
+    502010.locale=spa.txt
+    502011.locale=chs.txt
+    502011.locale=eng.txt
+    502011.locale=fra.txt
+    502011.locale=ger.txt
+    502011.locale=rus.txt
+    502011.locale=spa.txt
+    502012.locale=chs.txt
+    502012.locale=eng.txt
+    502012.locale=fra.txt
+    502012.locale=ger.txt
+    502012.locale=rus.txt
+    502012.locale=spa.txt
+    502013.locale=chs.txt
+    502013.locale=eng.txt
+    502013.locale=fra.txt
+    502013.locale=ger.txt
+    502013.locale=rus.txt
+    502013.locale=spa.txt
+    502014.locale=chs.txt
+    502014.locale=eng.txt
+    502014.locale=fra.txt
+    502014.locale=ger.txt
+    502014.locale=rus.txt
+    502014.locale=spa.txt
+    502015.locale=chs.txt
+    502015.locale=eng.txt
+    502015.locale=fra.txt
+    502015.locale=ger.txt
+    502015.locale=rus.txt
+    502015.locale=spa.txt
+    502016.locale=chs.txt
+    502016.locale=eng.txt
+    502016.locale=fra.txt
+    502016.locale=ger.txt
+    502016.locale=rus.txt
+    502016.locale=spa.txt
+    502017.locale=chs.txt
+    502017.locale=eng.txt
+    502017.locale=fra.txt
+    502017.locale=ger.txt
+    502017.locale=rus.txt
+    502017.locale=spa.txt
+    502018.locale=chs.txt
+    502018.locale=eng.txt
+    502018.locale=fra.txt
+    502018.locale=ger.txt
+    502018.locale=rus.txt
+    502018.locale=spa.txt
+    502019.locale=chs.txt
+    502019.locale=eng.txt
+    502019.locale=fra.txt
+    502019.locale=ger.txt
+    502019.locale=rus.txt
+    502019.locale=spa.txt
+    502020.locale=chs.txt
+    502020.locale=eng.txt
+    502020.locale=fra.txt
+    502020.locale=ger.txt
+    502020.locale=rus.txt
+    502020.locale=spa.txt
+    502021.locale=chs.txt
+    502021.locale=eng.txt
+    502021.locale=fra.txt
+    502021.locale=ger.txt
+    502021.locale=rus.txt
+    502021.locale=spa.txt
+    502022.locale=chs.txt
+    502022.locale=eng.txt
+    502022.locale=fra.txt
+    502022.locale=ger.txt
+    502022.locale=rus.txt
+    502022.locale=spa.txt
+
 <IL-2 Korea>\data\nsdata\assets\awards\6xx\
     601027.locale=chs.txt
     601027.locale=eng.txt
@@ -320,6 +430,7 @@ Both carry the same medal fixes. Only the promotion block differs.
     Ranks602.dds
     Ranks603.dds
     awards.xaml
+    awards5xx2.dds
     awards6xx.dds
     awards6xx2.dds
     awards6xx3.dds

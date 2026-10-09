@@ -215,6 +215,9 @@ Source: "mod\assets\awards6xx2.dds"; DestDir: "{code:GetIL2Dir}\data\nsdata\asse
 ; citations - Silver Star rungs, DSM, NDSM, Commendation ladder, Bronze Star V.
 Source: "mod\assets\awards6xx3.dds"; DestDir: "{code:GetIL2Dir}\data\nsdata\assets\images"; \
     Components: mod; Flags: ignoreversion uninsremovereadonly
+; The mod's Eastern Bloc atlas: PRC merit booklet, Combat Hero Medal.
+Source: "mod\assets\awards5xx2.dds"; DestDir: "{code:GetIL2Dir}\data\nsdata\assets\images"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
 
 ; The six locale dictionaries carrying the new decorations' names.
 Source: "mod\assets\awards.locale=*.json"; \
@@ -224,6 +227,10 @@ Source: "mod\assets\awards.locale=*.json"; \
 ; The description texts for the added decorations, six languages each.
 Source: "mod\assets\6*.locale=*.txt"; \
     DestDir: "{code:GetIL2Dir}\data\nsdata\assets\awards\6xx"; \
+    Components: mod; Flags: ignoreversion uninsremovereadonly
+; The PRC merit citations and Combat Hero Medal (502005-502022).
+Source: "mod\assets\5*.locale=*.txt"; \
+    DestDir: "{code:GetIL2Dir}\data\nsdata\assets\awards\5xx"; \
     Components: mod; Flags: ignoreversion uninsremovereadonly
 
 ; Flag rank — two ranks beyond the six the game ships, for the USSR, PRC, DPRK
@@ -260,6 +267,7 @@ Type: files; Name: "{app}\game_dir.txt"
 ; them, which would otherwise be left behind empty. Only ever the mod's own
 ; folder — never data\nsdata\assets, which the game itself uses.
 Type: dirifempty; Name: "{code:GetIL2Dir}\data\nsdata\assets\awards\6xx"
+Type: dirifempty; Name: "{code:GetIL2Dir}\data\nsdata\assets\awards\5xx"
 Type: dirifempty; Name: "{code:GetIL2Dir}\data\nsdata\assets\awards"
 
 [Run]
