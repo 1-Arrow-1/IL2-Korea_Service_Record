@@ -165,37 +165,40 @@ body.embed .sheet.portrait .ct-text, body.embed .sheet.portrait .ct-signature { 
    Department of the Navy example. Its medal fills the upper third; the seal
    is printed at the foot, between the date block and Secretary's signature. */
 .sheet.navy_dsm .ct-text {
-    top: 38.5%; bottom: 18%; left: 8%; right: 8%; gap: 0.08em;
+    top: 39%; bottom: 14%; left: 7%; right: 7%; gap: 0.08em;
 }
+/* Sizes after the Department of the Navy's own form: the department line
+   about half the sheet wide, the medal's name about two thirds, the
+   recipient over half, the deed in three long lines. */
 .sheet.navy_dsm .ct-country {
-    font-size: 2.25em; letter-spacing: 0.035em; line-height: 1.05;
+    font-size: 3.15em; letter-spacing: 0.04em; line-height: 1.05;
 }
 .sheet.navy_dsm .ct-pre {
-    font-size: 0.82em; max-width: 92%; line-height: 1.15; letter-spacing: 0.025em;
+    font-size: 1.02em; max-width: 92%; line-height: 1.35; letter-spacing: 0.03em; margin-top: 0.2em;
 }
 .sheet.navy_dsm .ct-name {
-    font-size: 2.25em; line-height: 1.05; margin-top: 0.82em; letter-spacing: 0.035em;
+    font-size: 3.3em; line-height: 1.05; margin-top: 0.45em; letter-spacing: 0.035em;
 }
-.sheet.navy_dsm .ct-to { font-size: 1.15em; margin-top: 0.48em; }
+.sheet.navy_dsm .ct-to { font-size: 1.45em; margin-top: 0.35em; }
 .sheet.navy_dsm .ct-recipient {
-    font-size: 1.35em; font-weight: bold; margin-top: 0.6em; letter-spacing: 0.055em;
+    font-size: 2.05em; font-weight: bold; margin-top: 0.45em; letter-spacing: 0.06em;
 }
 .sheet.navy_dsm .ct-service, .sheet.navy_dsm .ct-deed { display: none; }
 /* As the Department of the Navy's own form: the deed in a plain sans,
    right under the name; the day of the award typed below the printed
    "Given under my hand" line. */
 .sheet.navy_dsm .ct-for {
-    max-width: 86%; margin: 0.75em auto 0; font-size: 1.12em; line-height: 1.35;
+    max-width: 88%; margin: 0.6em auto 0; font-size: 1.62em; line-height: 1.32;
     text-align: left; font-family: Arial, Helvetica, sans-serif; letter-spacing: 0.01em;
 }
 .sheet.navy_dsm .ct-given + .ct-given {
     font-family: 'Courier New', Courier, monospace; font-weight: bold; margin-top: 0.3em;
 }
 .sheet.navy_dsm .ct-given-block {
-    position: absolute; left: -3%; bottom: -30%; width: 42%; margin: 0; text-align: left;
+    position: absolute; left: -3%; bottom: -24%; width: 46%; margin: 0; text-align: left;
 }
 .sheet.navy_dsm .ct-given {
-    font-size: 0.9em; line-height: 1.35; letter-spacing: 0.025em;
+    white-space: nowrap; font-size: 1.05em; line-height: 1.35; letter-spacing: 0.025em;
 }
 .sheet.navy_dsm .ct-signature.right { right: 5%; bottom: 4.5%; width: 29%; }
 .sheet.navy_dsm .ct-signature .ct-sign-title { font-size: 0.72em; }
