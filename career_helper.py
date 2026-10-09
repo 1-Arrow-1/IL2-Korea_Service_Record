@@ -35,6 +35,7 @@ event types 2 (aircraft lost) and 3 (killed) / 4 (missing).
 
 from __future__ import annotations
 
+import io
 import locale
 import sqlite3
 import urllib.parse
@@ -58,6 +59,7 @@ from korea_service_record.assets import AssetResolver           # noqa: E402
 from korea_service_record.gamedata import loads_lenient         # noqa: E402
 import custom_pilot_photo as pilot_photo                         # noqa: E402
 from korea_service_record import custombio, wwii_awards          # noqa: E402
+from korea_service_record.portraitfix import is_custom           # noqa: E402
 
 BACKUPS = default_cache_dir().parent / "backups"
 # The squadron's seats. 24 of them, which is what Career.SEATS has always
@@ -2840,16 +2842,29 @@ class App(tk.Tk):
             return
         self.photo_current_var.set(
             self.t["photo_current"].format(path=player["avatar_path"] or "—"))
+        # Until a new photo is chosen the preview shows the portrait the
+        # career uses now - a loose custom DDS or the game's own.
+        self.photo_current = None
+        game = find_game_dir()
+        if game is not None and player["avatar_path"]:
+            try:
+                data = AssetResolver(game).read(f"nsdata/assets/pilotphotos/{player['avatar_path']}.dds")
+                if data:
+                    self.photo_current = Image.open(io.BytesIO(data)).convert("RGB")
+            except Exception:     # noqa: BLE001 - no preview is not an error
+                self.photo_current = None
+        if getattr(self, "photo_source", None) is None:
+            self._render_photo()
         state = pilot_photo.load_state(self.career.path)
         can_restore = bool(state and state.get("pilot_id") == player["id"] and
-                           "original_avatar_path" in state)
+                           not is_custom(state.get("original_avatar_path", "custom/")))
         self.photo_restore_btn["state"] = "normal" if can_restore else "disabled"
 
     def _render_photo(self) -> None:
         if not hasattr(self, "photo_canvas") or self.photo_background is None:
             return
         if self.photo_source is None:
-            image = self.photo_background.resize(
+            image = (getattr(self, "photo_current", None) or self.photo_background).resize(
                 (pilot_photo.PORTRAIT_SIZE, pilot_photo.PORTRAIT_SIZE),
                 Image.Resampling.LANCZOS)
         else:
@@ -2984,11 +2999,13 @@ class App(tk.Tk):
             pilot_photo.convert_to_dds(composed, destination)
             state = pilot_photo.load_state(self.career.path)
             if not state or state.get("pilot_id") != player["id"]:
-                state = {
-                    "career": str(self.career.path),
-                    "pilot_id": player["id"],
-                    "original_avatar_path": player["avatar_path"],
-                }
+                state = {"career": str(self.career.path), "pilot_id": player["id"]}
+                # Only a game portrait is an original. A custom one already in
+                # the career was set by an earlier photo whose record this copy
+                # cannot see (a source run keeps its own); remembering it as the
+                # "original" made Restore put an old custom path back.
+                if not is_custom(player["avatar_path"]):
+                    state["original_avatar_path"] = player["avatar_path"]
             state["custom_avatar_path"] = avatar
             pilot_photo.save_state(self.career.path, state)
             backup = self.career.set_player_portrait(avatar)
@@ -3009,7 +3026,7 @@ class App(tk.Tk):
         try:
             player = self.career.player_portrait()
             if not state or state.get("pilot_id") != player["id"] or \
-                    "original_avatar_path" not in state:
+                    is_custom(state.get("original_avatar_path", "custom/")):
                 self.status.set(self.t["photo_no_restore"])
                 self._fill_photo()
                 return

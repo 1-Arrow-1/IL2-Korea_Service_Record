@@ -54,3 +54,8 @@ def test_clean_career_is_not_touched(tmp_path):
     assert portraitfix.repair(db, tmp_path / "game") is None
     assert db.read_bytes() == before
     assert not list((tmp_path / "backups").glob("*"))
+
+def test_a_custom_portrait_is_never_an_original():
+    from korea_service_record.portraitfix import is_custom
+    assert is_custom("custom/ce037aaa5cebbef6-20") and is_custom("cp/bbd9de0c48")
+    assert not is_custom("usa50h/1") and not is_custom("")

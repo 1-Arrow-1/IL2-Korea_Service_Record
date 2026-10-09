@@ -40,6 +40,11 @@ def career_key(career_path: Path) -> str:
     return hashlib.sha256(identity.encode("utf-8")).hexdigest()[:16]
 
 
+def is_custom(avatar_path: str) -> bool:
+    """A portrait the Career Helper made, never one the game shipped."""
+    return str(avatar_path or "").startswith(("custom/", "cp/"))
+
+
 def short_avatar_path(career_path: Path, pilot_id: int) -> str:
     """``cp/`` and ten hex digits of career and pilot: 13 characters."""
     digest = hashlib.sha256(f"{career_key(career_path)}-{int(pilot_id)}".encode("utf-8"))
@@ -112,8 +117,9 @@ def repair(db_path: Path, game_dir: Path) -> Optional[List[Dict[str, Any]]]:
     try:
         state = json.loads(state_file.read_text(encoding="utf-8"))
         for d in done:
-            if state.get("custom_avatar_path") == d["from"]:
-                state["custom_avatar_path"] = d["to"]
+            for key in ("custom_avatar_path", "original_avatar_path"):
+                if state.get(key) == d["from"]:
+                    state[key] = d["to"]
         state_file.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     except (OSError, ValueError, AttributeError):
         pass
