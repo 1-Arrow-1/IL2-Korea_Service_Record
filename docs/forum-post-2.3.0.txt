@@ -70,9 +70,9 @@ DOWNLOAD
     https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.3.0
 
 Installer  IL2_Korea_Service_Record_Setup_v2.3.0.exe
-           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+           SHA-256  f5051e070b728f0a94f3ce6f9dbfade6d5e57aced1a2d863971edefe87c3045c
 
 Zip        IL-2.Korea.Service.Record.v2.3.0.zip
-           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+           SHA-256  60df8d6fc8a17e01159fdc8bdd4c267feb3909d80834d85c2c4ed75c1ea3a25d
 
 Everything is Authenticode signed.
