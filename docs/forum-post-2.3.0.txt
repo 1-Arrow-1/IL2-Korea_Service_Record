@@ -1,0 +1,78 @@
+IL-2 Korea Service Record 2.3.0 — personnel files for every air force, Chinese merits, updates from inside the Helper
+
+
+Gentlemen,
+
+2.3.0 is out. The personnel file now exists for every air force you can
+fly, the Chinese pilots finally have decorations worth earning, and from
+this version on the Career Helper can update the whole package itself.
+
+UPDATES FROM INSIDE THE CAREER HELPER
+
+- A new tab, "Update IL-2 Korea Service Record", shows your version and
+  checks for a newer release when you ask it to - never by itself.
+- One click downloads the new release, checks it and installs it: the
+  tracker, the Helper and the awards mod in the game folder, keeping your
+  folders and your promotion choice. Close the game first.
+- Nothing is installed unless the download matches GitHub's checksum and
+  carries the same signature as the program you are running.
+- This version still has to be installed by hand. From here on, the
+  Helper does it.
+
+NEW: PERSONNEL FILES FOR THE PRC, THE USSR AND NORTH KOREA
+
+Each file is written in its own air force's language, as it would have
+been kept. Point at any line and it is translated into yours.
+
+- Chinese pilots: a cadre record, the merit booklet with one entry for
+  every merit, the Air Force certificate for First and Special Class
+  merit (after Hua Longyi's of 1951) and a page for the Combat Hero.
+- Soviet pilots: the personal file, record of service, the commander's
+  attestation, the order extracts for each promotion, the order booklet,
+  the Hero of the Soviet Union certificate and the nomination sheets.
+- North Korean pilots: the cadre record, an order booklet for each order,
+  the Presidium's certificate for a Hero, and the biography in Korean.
+- Navy and Marine Corps pilots get the U.S. file with their own
+  commission, the Navy's Aviator's Flight Log Book and the Navy's own
+  certificates - ready for the day the game gives us naval squadrons.
+
+AWARDS MOD
+
+- Chinese pilots earn merit for air victories in one sortie: Third Class
+  from 2, Second Class from 3, First Class from 4, Special Class from 6.
+  On top of a merit, the Combat Hero Medal in three classes.
+- Navy and Marine Corps decorations now work like the Air Force ones: a
+  sortie earns the highest decoration it qualifies for.
+- The Navy's flag ranks are Rear Admiral (LH) and Rear Admiral (UH).
+
+NEW IN THE SERVICE RECORD
+
+- Every career card on the start page carries a briefing: your next
+  promotion, aircraft ready, promotions and awards due, the store that
+  runs out first, the next aircraft back from repair.
+- The Army of Occupation Medal can be chosen as a World War II medal -
+  contributed by Héctor, with thanks. Navy and Marine pilots can now
+  choose their World War II medals too.
+- The nameplate in the shadowbox always fits its frame: the rank is
+  abbreviated, the first name shortened if need be, the unit set smaller.
+- The Russian nomination sheets are typed at a readable size, and their
+  figures read correctly ("41 боевой вылет").
+
+FIXES
+
+- Career Helper, custom pilot photo: "Restore original photo" could fail
+  after an earlier photo. Fixed, and the tab now shows the portrait the
+  career uses.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.3.0
+
+Installer  IL2_Korea_Service_Record_Setup_v2.3.0.exe
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Zip        IL-2.Korea.Service.Record.v2.3.0.zip
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Everything is Authenticode signed.
