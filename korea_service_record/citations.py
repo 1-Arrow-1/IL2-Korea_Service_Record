@@ -203,6 +203,7 @@ _NAVAL_TEMPLATE = {
     "nmc_medal": "Navy_MC_medal",
     "moh": "Navy_MoH",
     "navy_cross": "Navy_Cross",
+    "navy_dsm": "Navy_dsm",
     "navy_commendation": "Navy_commendation",
     "navy_puc": "Navy_puc",
     "navy_unit_commendation": "Navy_unit_commendation",

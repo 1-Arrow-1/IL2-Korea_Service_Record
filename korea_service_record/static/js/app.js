@@ -1714,10 +1714,10 @@
                 (d.player && d.player.id != null ? "&pilot=" + encodeURIComponent(d.player.id) : "");
             logbook.title = T("logbook.open_hint");
             logbook.hidden = false;
-            // The personnel file: USAF, Chinese, Soviet and North Korean pilots
-            // (the Navy and Marines have no file yet).
+            // The personnel file: all six air services. The three U.S.
+            // branches share the U.S. file; the others have their own forms.
             const personnel = el("d-personnel");
-            if (d.player && [601, 502, 501, 503].indexOf(d.player.country) >= 0 && d.player.id != null) {
+            if (d.player && [601, 602, 603, 502, 501, 503].indexOf(d.player.country) >= 0 && d.player.id != null) {
                 personnel.href = "/personnel?career=" + encodeURIComponent(careerId) +
                     "&pilot=" + encodeURIComponent(d.player.id);
                 personnel.title = T("personnel.open_hint");

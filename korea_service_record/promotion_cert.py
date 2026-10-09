@@ -1,8 +1,8 @@
 """
-The USAF promotion certificate: the owner's template filled in by hand.
+The U.S. promotion certificate: the owner's branch template filled in by hand.
 
-Template ``static/images/certificates/USAF_promotion_cert_template.jpg``
-(1014 x 1317 px at 100 ppi) is the owner's. Every field is set with Photoshop
+The USAF, Navy and Marine Corps templates in ``static/images/certificates``
+(1014 x 1317 px at 100 ppi) are the owner's. Every field is set with Photoshop
 tracking 65 (65/1000 em), centred on the owner's coordinates - the centre of
 the text's ink, so a field grows equally to the left and the right.
 
@@ -26,7 +26,17 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 STATIC = Path(__file__).resolve().parent / "static" / "images"
-TEMPLATE = STATIC / "certificates" / "USAF_promotion_cert_template.jpg"
+TEMPLATES = {
+    601: STATIC / "certificates" / "USAF_promotion_cert_template.jpg",
+    602: STATIC / "certificates" / "USNavy_promotion_cert_template.jpg",
+    603: STATIC / "certificates" / "USMC_promotion_cert_template.jpg",
+}
+TEMPLATE = TEMPLATES[601]                 # compatibility for existing callers/tests
+SERVICES = {
+    601: "United States Air Force",
+    602: "United States Navy",
+    603: "United States Marine Corps",
+}
 FALLBACK_FONT = STATIC / "certificates" / "UnifrakturMaguntia-Book.ttf"
 OWNER_FONT = "BeneScriptine Regular.ttf"
 SIGNATURES = STATIC / "signatures"
@@ -111,7 +121,8 @@ def independence_year(year: int, month: int, day: int) -> int:
 
 
 def fields_for(name: str, rank: str, date: Tuple[int, int, int],
-               done: Optional[Tuple[int, int, int]] = None) -> Dict[str, str]:
+               done: Optional[Tuple[int, int, int]] = None,
+               country: int = 601) -> Dict[str, str]:
     """
     The written-out text of every field. ``date`` is the commission (rank
     from), ``done`` the day it was signed - a few days later
@@ -125,7 +136,9 @@ def fields_for(name: str, rank: str, date: Tuple[int, int, int],
     dy, dm, dd = done or signing_date(name, date)
     return {
         "name": name,
-        "rank": f"{rank}, United States Air Force",
+        # The Navy and Marine forms print the service right after the field
+        # ("... in the United States Navy"), so the grade stands alone there.
+        "rank": rank if country in (602, 603) else f"{rank}, {SERVICES[601]}",
         "rank_day": ordinal(d),
         "rank_month": MONTHS[m - 1],
         "rank_year": words(y - 1900),
@@ -210,13 +223,12 @@ def _signature(image, file: Path, slot: Dict[str, int]) -> None:
     image.paste(sig, (round(slot["centre_x"] - sig.width / 2), slot["bottom"] - sig.height), sig)
 
 
-def signers(date: Tuple[int, int, int]) -> Tuple[Optional[str], Optional[str]]:
+def signers(date: Tuple[int, int, int], country: int = 601) -> Tuple[Optional[str], Optional[str]]:
     """
-    The signature stems for a commission signed on ``date``: the Deputy Chief
-    of Staff, Personnel (left) and the Secretary of the Air Force (right) in
-    office that day, from the signer table the award certificates use
-    (locales/citations/eng.json, certificate.signers). The Edwards -> Kuter
-    hand-over in mid-1951 is approximate.
+    The signature stems for a commission signed on ``date``. Air Force forms
+    carry the Deputy Chief of Staff, Personnel (left) and Secretary of the Air
+    Force (right); Navy and Marine Corps forms carry the Secretary of the Navy
+    on the right. Names come from the award-certificate signer table.
     """
     import json
     table = json.loads((Path(__file__).resolve().parent / "locales" / "citations" /
@@ -227,23 +239,26 @@ def signers(date: Tuple[int, int, int]) -> Tuple[Optional[str], Optional[str]]:
         rows = table.get(office) or []
         row = next((r for r in rows if day <= r[0]), rows[-1] if rows else None)
         return row[3] if row and len(row) > 3 else None
+    if country in (602, 603):
+        return None, pick("navy_secretary")
     return pick("personnel"), pick("secretary")
 
 
 def render(name: str, rank: str, date: Tuple[int, int, int],
            left_signature: Optional[str] = None, right_signature: Optional[str] = None,
-           done: Optional[Tuple[int, int, int]] = None) -> bytes:
+           done: Optional[Tuple[int, int, int]] = None,
+           country: int = 601) -> bytes:
     """The filled-in certificate as JPEG bytes. Signatures are file stems in
     static/images/signatures, by default the men in office on the signing
     date; a missing image leaves its line empty."""
     from PIL import Image
     signed = done or signing_date(name, date)
     if left_signature is None and right_signature is None:
-        left_signature, right_signature = signers(signed)
-    with Image.open(TEMPLATE) as template:
+        left_signature, right_signature = signers(signed, country)
+    with Image.open(TEMPLATES.get(country, TEMPLATE)) as template:
         image = template.convert("RGB")
     substitutions = font_choice()[2]
-    for key, text in fields_for(name, rank, date, signed).items():
+    for key, text in fields_for(name, rank, date, signed, country).items():
         for plain, glyph in substitutions.items():
             text = text.replace(plain, glyph)
         _draw_centred(image, text, FIELDS[key], _fitting(text, MAX_WIDTH.get(key)))

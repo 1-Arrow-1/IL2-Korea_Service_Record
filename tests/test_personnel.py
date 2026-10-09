@@ -58,11 +58,21 @@ def test_one_entry_per_ladder_with_its_earlier_rungs(client):
     assert [p["rank_id"] for p in d["promotions"]] == [4]          # pending left out
 
 
-def test_the_file_is_for_usaf_pilots_only(client):
+def test_the_us_file_rejects_non_us_pilots(client):
     c, agg = client
     agg.country = 501
     assert c.get("/api/personnel/career/20").status_code == 404
     assert c.get("/api/promotion-certificate/career/20/4").status_code == 404
+
+
+@pytest.mark.parametrize("country", [602, 603])
+def test_navy_and_marine_files_use_the_us_document_path(client, country):
+    c, agg = client
+    agg.country = country
+    assert c.get("/api/personnel/career/20").status_code == 200
+    certificate = c.get("/api/promotion-certificate/career/20/4")
+    assert certificate.status_code == 200
+    assert certificate.mimetype == "image/jpeg"
 
 
 def test_a_promotion_certificate_is_a_picture(client):

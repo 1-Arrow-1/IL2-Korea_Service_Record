@@ -1,3 +1,5 @@
+import pytest
+
 from korea_service_record import promotion_cert as pc
 
 
@@ -23,6 +25,17 @@ def test_fields_of_a_commission():
     }
 
 
+def test_navy_and_marine_commissions_name_the_correct_service():
+    navy = pc.fields_for(
+        "Edward Meyer", "Lieutenant Commander", (1951, 6, 20),
+        (1951, 6, 23), country=602)
+    marine = pc.fields_for(
+        "John Smith", "Major", (1951, 6, 20),
+        (1951, 6, 23), country=603)
+    assert navy["rank"] == "Lieutenant Commander"
+    assert marine["rank"] == "Major"
+
+
 def test_signed_a_few_days_later_and_always_the_same_day():
     signed = pc.signing_date("Alex Bleiholder", (1951, 6, 20))
     assert signed == pc.signing_date("Alex Bleiholder", (1951, 6, 20))
@@ -33,10 +46,19 @@ def test_signers_are_the_men_in_office_that_day():
     assert pc.signers((1951, 6, 23)) == ("edwards", "finletter")
     assert pc.signers((1951, 11, 6)) == ("kuter", "finletter")
     assert pc.signers((1953, 3, 1)) == ("kuter", "talbott")
+    assert pc.signers((1951, 6, 23), 602) == (None, "matthews")
+    assert pc.signers((1952, 1, 1), 603) == (None, "kimball")
 
 
 def test_a_certificate_renders():
     data = pc.render("Alex Bleiholder", "Brigadier General", (1952, 10, 3))
+    assert data[:2] == b"\xff\xd8" and len(data) > 100_000
+
+
+@pytest.mark.parametrize("country", [602, 603])
+def test_navy_and_marine_certificates_render(country):
+    data = pc.render(
+        "Edward Meyer", "Lieutenant Commander", (1952, 1, 3), country=country)
     assert data[:2] == b"\xff\xd8" and len(data) > 100_000
 
 

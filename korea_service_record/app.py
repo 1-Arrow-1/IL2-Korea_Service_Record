@@ -194,16 +194,17 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
     def api_personnel(career_id: str, pilot_id: int):
         """
         Everything the personnel file shows that the existing pages do not
-        draw themselves, in English - the language of a USAF file, whatever
-        the reader's. USAF pilots only, for now.
+        draw themselves, in English - the language of a U.S. service file,
+        whatever the reader's. Air Force, Navy and Marine Corps pilots use
+        this common file; the other nations have their own document sets.
         """
         agg = aggregator_for("en")
         detail = agg.career_detail(career_id, pilot_id)
         if detail is None:
             return jsonify({"error": "career_not_found"}), 404
         player = detail.get("player") or {}
-        if player.get("country") != 601:
-            return jsonify({"error": "not_usaf"}), 404
+        if player.get("country") not in (601, 602, 603):
+            return jsonify({"error": "not_us_service"}), 404
         # One entry per decoration ladder: the rung he holds gets its
         # certificate, the rungs before it are listed in the service record
         # with the citation each came with - six Air Medal sheets would say
@@ -245,9 +246,10 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
     @app.route("/api/promotion-certificate/<path:career_id>/<int:pilot_id>/<int:rank_id>")
     def api_promotion_certificate(career_id: str, pilot_id: int, rank_id: int):
         """
-        The USAF commission for one promotion, filled in on the owner's
-        template (promotion_cert.py). An English document whatever the
-        reader's language, so the rank is the game's English name.
+        The U.S. commission for one promotion, filled in on the owner's Air
+        Force, Navy or Marine Corps template (promotion_cert.py). An English
+        document whatever the reader's language, so the rank is the game's
+        English name.
         """
         from . import promotion_cert
         agg = aggregator_for("en")
@@ -255,8 +257,9 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         if detail is None:
             return jsonify({"error": "career_not_found"}), 404
         player = detail.get("player") or {}
-        if player.get("country") != 601:
-            return jsonify({"error": "not_usaf"}), 404
+        country = int(player.get("country") or 0)
+        if country not in (601, 602, 603):
+            return jsonify({"error": "not_us_service"}), 404
         promo = next((p for p in detail.get("promotions") or []
                       if p.get("rank_id") == rank_id and not p.get("pending")), None)
         if promo is None:
@@ -265,7 +268,8 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
             y, m, d = (int(x) for x in str(promo["date"])[:10].split("."))
         except (TypeError, ValueError):
             return jsonify({"error": "bad_date"}), 404
-        data = promotion_cert.render(player.get("name") or "", promo["rank"], (y, m, d))
+        data = promotion_cert.render(
+            player.get("name") or "", promo["rank"], (y, m, d), country=country)
         return Response(data, mimetype="image/jpeg", headers={"Cache-Control": "no-cache"})
 
     @app.route("/api/prc-file/<path:career_id>/<int:pilot_id>")

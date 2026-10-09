@@ -1,5 +1,5 @@
 /*
- * A USAF pilot's personnel file, one printable document (/personnel?career=&pilot=):
+ * A U.S. pilot's personnel file, one printable document (/personnel?career=&pilot=):
  *
  *   1  cover sheet                 drawn here
  *   2  service record              drawn here
@@ -71,7 +71,7 @@
             fetch("/api/logbook/" + enc(careerId) + "/" + enc(pilotId)),
         ]);
         if (!a.ok) {
-            // Not a USAF pilot: a Chinese, Soviet or North Korean one has a file of his own.
+            // Not a U.S. pilot: a Chinese, Soviet or North Korean one has a file of his own.
             for (const [api, render] of [["prc-file", window.renderPrcFile], ["ussr-file", window.renderUssrFile],
                                          ["dprk-file", window.renderDprkFile]]) {
                 if (a.status !== 404) break;
@@ -90,6 +90,13 @@
         return;
     }
     const p = data.pilot;
+    const branch = ({
+        601: {department: "DEPARTMENT OF THE AIR FORCE", service: "UNITED STATES AIR FORCE"},
+        602: {department: "DEPARTMENT OF THE NAVY", service: "UNITED STATES NAVY"},
+        603: {department: "DEPARTMENT OF THE NAVY", service: "UNITED STATES MARINE CORPS"},
+    })[p.country] || {};
+    const formText = (key) => branch[key] ||
+        (key === "part_logbook" && p.country !== 601 ? "Individual flight records" : TF("personnel.form." + key));
     document.documentElement.lang = "en";
     document.title = TF("personnel.form.title") + " — " + p.name;
 
@@ -101,8 +108,8 @@
     };
     const field = (key, value) => '<div class="pf-field"><span class="k">' + esc(TF("personnel.form." + key)) +
         '</span><span class="v">' + esc(value) + "</span></div>";
-    const head = (title) => '<div class="pf-form-head"><div class="dept">' + esc(TF("personnel.form.department")) +
-        '</div><div class="title">' + esc(title) + '</div><div class="sub">' + esc(TF("personnel.form.service")) + "</div></div>" +
+    const head = (title) => '<div class="pf-form-head"><div class="dept">' + esc(formText("department")) +
+        '</div><div class="title">' + esc(title) + '</div><div class="sub">' + esc(formText("service")) + "</div></div>" +
         '<hr class="pf-rule">';
     const foot = (n) => '<div class="pf-foot"><span>' + esc(p.name) + " · " + esc(data.squadron) + "</span><span>" +
         esc(TF("personnel.form.page", {n: n})) + "</span></div>";
@@ -238,7 +245,7 @@
     const many = {promotions: counted.promotions, awards: counted.awards,
                   logbook: document.querySelectorAll(".pf-half").length};
     el("pf-contents").innerHTML = order.filter((x) => x !== "cover").map((x, i) =>
-        '<tr><td class="num">' + (i + 1) + ".</td><td>" + esc(TF("personnel.form.part_" + x)) +
+        '<tr><td class="num">' + (i + 1) + ".</td><td>" + esc(formText("part_" + x)) +
         (x in many ? " (" + many[x] + ")" : "") + "</td></tr>").join("");
     status();
 })();
