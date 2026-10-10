@@ -329,7 +329,7 @@
   },
   "combat_report": {
     "open": "Combat report",
-    "mission_open": "Mission report",
+    "mission_open": "Combat mission report",
     "mission_open_hint": "Open the combined mission and combat report",
     "open_hint": "Open the career gunnery record and mission combat reports",
     "title": "Gunnery and Combat Report",

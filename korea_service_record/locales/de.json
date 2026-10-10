@@ -329,7 +329,7 @@
   },
   "combat_report": {
     "open": "Gefechtsbericht",
-    "mission_open": "Einsatzbericht",
+    "mission_open": "Gefechtsbericht zum Einsatz",
     "mission_open_hint": "Den kombinierten Einsatz- und Gefechtsbericht öffnen",
     "open_hint": "Schießnachweis der Laufbahn und Gefechtsberichte der einzelnen Einsätze öffnen",
     "title": "Schieß- und Gefechtsbericht",

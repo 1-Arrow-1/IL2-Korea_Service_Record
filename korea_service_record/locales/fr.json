@@ -329,7 +329,7 @@
   },
   "combat_report": {
     "open": "Rapport de combat",
-    "mission_open": "Rapport de mission",
+    "mission_open": "Rapport de mission de combat",
     "mission_open_hint": "Ouvrir le rapport combiné de mission et de combat",
     "open_hint": "Ouvrir le relevé de tir de la carrière et les rapports de chaque mission",
     "title": "Rapport de tir et de combat",

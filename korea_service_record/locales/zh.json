@@ -324,7 +324,7 @@
   },
   "combat_report": {
     "open": "战斗报告",
-    "mission_open": "任务报告",
+    "mission_open": "战斗任务报告",
     "mission_open_hint": "打开合并的任务与战斗报告",
     "open_hint": "打开整个生涯的射击记录和各次任务战斗报告",
     "title": "射击与战斗报告",

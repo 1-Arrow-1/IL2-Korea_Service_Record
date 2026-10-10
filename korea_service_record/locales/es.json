@@ -329,7 +329,7 @@
   },
   "combat_report": {
     "open": "Informe de combate",
-    "mission_open": "Informe de misión",
+    "mission_open": "Informe de misión de combate",
     "mission_open_hint": "Abrir el informe combinado de misión y combate",
     "open_hint": "Abrir el registro de tiro de la carrera y los informes de cada misión",
     "title": "Informe de tiro y combate",
