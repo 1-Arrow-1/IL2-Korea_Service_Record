@@ -123,3 +123,13 @@ class AmmoSchemes:
     def describe(self, plane: str, payload_id: int) -> str:
         """'2 × AN-M64A1 500 lb, 6 × HVAR SAP 5"' — empty for guns only."""
         return ", ".join(f"{s['count']} × {s['name']}" for s in self.stores(plane, payload_id))
+
+    def has_cluster_bombs(self, plane: str, payload_id: int) -> bool:
+        """Whether a scheme carries a cluster-bomb container.
+
+        Use the game's internal object stem rather than its translated hangar
+        name.  The US M26/M29 containers are ``CLUSTERBOMB_*``; the same test
+        also covers any scheme exposing a ``CLUSTER_*`` container directly.
+        """
+        return any(stem.upper().startswith("CLUSTER")
+                   for stem, _count in self._load(plane).get(payload_id, []))

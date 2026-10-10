@@ -724,7 +724,8 @@ class CareerAggregator:
         return ""
 
     def _gunnery(self, flight, start: str = "", kill_events=None,
-                 corrected_targets: Optional[int] = None) -> Dict[str, Any]:
+                 corrected_targets: Optional[int] = None,
+                 cluster_bombs: bool = False) -> Dict[str, Any]:
         """A factual weapons account from one human player's binary log.
 
         AType 10 and 4 hold the four ammunition counters before and after the
@@ -792,6 +793,28 @@ class CareerAggregator:
                          and not any(abs(at_s - t) <= 2.0 for t in projectile_times)]
             if destroyed:
                 destructive_effects.append((effect, destroyed))
+
+        # A cluster-bomb canister creates a succession of bomblet blast
+        # clouds.  Those contacts can be split by the flight log's normal
+        # five-second blast grouping, but they still came from one released
+        # bomb and therefore count as one hit.  Effects in one compact strike
+        # are joined here; the two canisters in the live M26/M29 sorties land
+        # roughly a minute apart and remain two distinct attacks.
+        if cluster_bombs and destructive_effects:
+            clustered = []
+            for effect, destroyed in destructive_effects:
+                if (clustered and
+                        effect.start_s - clustered[-1][0].end_s <= 20.0):
+                    previous, identities = clustered[-1]
+                    clustered[-1] = (
+                        previous._replace(
+                            end_s=max(previous.end_s, effect.end_s),
+                            contacts=previous.contacts + effect.contacts,
+                            napalm=previous.napalm or effect.napalm),
+                        identities + destroyed)
+                else:
+                    clustered.append((effect, list(destroyed)))
+            destructive_effects = clustered
 
         bombs_expended = int(used[2]) if complete else None
         remaining_targets = (max(0, int(corrected_targets))
@@ -1731,6 +1754,11 @@ class CareerAggregator:
             carried = manifests.get(sortie["missionId"], {}).get(sortie["pilotId"])
             airframe = planes.get(sortie["planeId"])
             plane_key = PurePath(airframe["config"]).stem if airframe and airframe["config"] else ""
+            loadout = (self.ammo.describe(plane_key, carried["payload_id"])
+                       if carried and plane_key else "")
+            cluster_bombs = (self.ammo.has_cluster_bombs(
+                plane_key, carried["payload_id"])
+                if carried and plane_key else False)
             events = sorted(by_mission.get(sortie["missionId"], []),
                             key=lambda r: r["date"])
             # mission.result carries the same kills with the victim's pilot
@@ -1876,15 +1904,14 @@ class CareerAggregator:
                 # tanks records 2.0 and the tanks are already listed.
                 "airframe": _tail_code(airframe["tcode"], plane_key) if airframe else "",
                 "plane_id": sortie["planeId"],
-                "loadout": (self.ammo.describe(plane_key, carried["payload_id"])
-                            if carried and plane_key else ""),
+                "loadout": loadout,
                 "fuel_pct": (round(min(carried["fuel"], 1.0) * 100)
                              if carried else None),
                 "range_km": (round(mission["mrange"] / 1000)
                              if mission and mission["mrange"] else None),
                 "gunnery": self._gunnery(
                     flight, sortie["date"][11:], events,
-                    k.airborne + k.ground_targets),
+                    k.airborne + k.ground_targets, cluster_bombs),
                 "log": log,
                 "scenery": scenery,
             })

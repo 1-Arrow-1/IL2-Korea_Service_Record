@@ -1488,12 +1488,10 @@
             '<span class="debrief-no">' +
                 esc(missionLabel(d.mission_num)) + "</span>" +
             '<span class="debrief-date"><span>' + esc(d.date) + " " + esc(d.time) +
-                '</span><span class="debrief-actions"><button class="link-btn" data-mission="' + esc(d.mission_id) +
-                '">' + esc(T("debrief.details")) + "</button>" +
-                (d.gunnery && d.gunnery.available && currentCareer
-                    ? ' &middot; <a class="link-btn" target="_blank" rel="opener" href="/combat-report?career=' +
-                        esc(encodeURIComponent(currentCareer)) + "&mission=" + esc(d.mission_id) + '">' +
-                        esc(T("combat_report.open")) + "</a>" : "") + "</span></span>" +
+                '</span><span class="debrief-actions"><a class="link-btn" target="_blank" rel="opener" ' +
+                    'title="' + esc(T("combat_report.mission_open_hint")) + '" href="/combat-report?career=' +
+                    esc(encodeURIComponent(currentCareer)) + "&mission=" + esc(d.mission_id) +
+                    '&section=details">' + esc(T("combat_report.mission_open")) + "</a></span></span>" +
             "</header>" +
             '<div class="debrief-type">' + esc(d.type) + "</div>" +
             flight +
@@ -2073,9 +2071,15 @@
         if (missionMap) { missionMap.remove(); missionMap = null; }
     }
 
-    // A route or a victory on the operations map opens its debriefing.
+    function openMissionReport(careerId, missionId) {
+        window.open("/combat-report?career=" + encodeURIComponent(careerId) +
+            "&mission=" + encodeURIComponent(missionId) + "&section=details", "_blank");
+    }
+
+    // A route or a victory on the operations map opens the same combined
+    // mission report as the debriefing link.
     document.addEventListener("map:mission", (event) => {
-        if (currentCareer) openMission(currentCareer, Number(event.detail));
+        if (currentCareer) openMissionReport(currentCareer, Number(event.detail));
     });
 
     /* ------------------------------------------------------- pilot modal -- */
@@ -2471,13 +2475,13 @@
             closeMission();
             return;
         }
-        // Any element carrying data-mission opens that debrief: the Details
-        // button, and a row of the victory roll, which is the natural way to
-        // ask "what else happened that sortie".
+        // Mission rows and victory entries use the same folder report as the
+        // debriefing link, so mission details and weapons analysis no longer
+        // compete in two different views.
         const detailsBtn = event.target.closest &&
                            event.target.closest("[data-mission]");
         if (detailsBtn) {
-            openMission(currentCareer, Number(detailsBtn.dataset.mission));
+            openMissionReport(currentCareer, Number(detailsBtn.dataset.mission));
             return;
         }
         // A roster row, or a pilot's name in the airframe table.

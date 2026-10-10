@@ -7,6 +7,7 @@
     const params = new URLSearchParams(location.search);
     const careerId = params.get("career");
     const wantedMission = Number(params.get("mission"));
+    const wantedSection = params.get("section") || "details";
     const done = () => { document.body.dataset.ready = "1"; };
 
     const settings = await fetch("/api/settings").then((r) => r.json()).catch(() => ({}));
@@ -172,7 +173,7 @@
         const missionButtons = listedReports.map((r, idx) => {
             const g = r.gunnery || {};
             const figure = g.complete ? number(g.gun_fired) + " / " + number(g.gun_hits) + " / " + pct(g.gun_rate) : "—";
-            return '<button class="cr-mission-link" data-report-index="' + (idx + 1) + '"><strong>' +
+            return '<button class="cr-mission-link" data-report-index="' + (idx * 2 + 1) + '"><strong>' +
                 esc(missionName(r.mission_num)) + "</strong> " + esc(r.date) + "<span>" + esc(figure) + "</span></button>";
         }).join("");
         el("cr-right").innerHTML = formHead(T("combat_report.gunnery_analysis")) +
@@ -203,12 +204,12 @@
             time: attack.time,
             html: esc(T("combat_report.bomb_attack", {targets: attack.targets}))
         }))).sort((a, b) => String(a.time).localeCompare(String(b.time)));
-        return rows.length ? '<ol class="cr-log cr-scroll-log">' + rows.slice(0, 16).map((row) =>
+        return rows.length ? '<ol class="cr-log cr-attack-log">' + rows.slice(0, 16).map((row) =>
             "<li><time>" + esc(row.time || "—") + "</time><span>" + row.html + "</span></li>").join("") + "</ol>"
             : '<p class="cr-na">' + esc(T("combat_report.none")) + "</p>";
     }
 
-    function missionPage(report) {
+    function combatPage(report) {
         const g = report.gunnery || {available: false, passes: [], targets: []};
         const overview = g.available
             ? '<div class="cr-stat-grid">' +
@@ -219,7 +220,9 @@
                     ? stat(bombFigure(g), T("combat_report.bomb_hits"))
                     : stat(number(g.rocket_impacts), T("combat_report.direct_impacts"))) + "</div>"
             : '<p class="cr-na">' + esc(T("combat_report.not_available")) + "</p>";
-        el("cr-left").innerHTML = formHead(T("combat_report.mission_report")) + reportFields(report) +
+        el("cr-left").innerHTML = formHead(T("combat_report.gunnery_analysis")) +
+            '<p class="cr-context">' + esc(missionName(report.mission_num)) + " · " +
+                esc(report.date) + " · " + esc(report.aircraft || "—") + "</p>" +
             section(T("combat_report.gunnery_analysis"), overview) +
             section(T("combat_report.engagement_log"), reportLog(g)) +
             '<div class="cr-signature">' + esc(data.pilot.name) + "</div>";
@@ -238,20 +241,159 @@
                 '</p><p class="cr-footnote">' + esc(T("combat_report.method")) + "</p>");
     }
 
-    const views = [{summary: true}].concat(data.reports);
+    function briefingParagraphs(raw) {
+        const text = String(raw || "")
+            .replace(/<\s*br\s*\/?>/gi, "\n")
+            .replace(/<\/(h1|h2|p|div)>/gi, "\n\n")
+            .replace(/<[^>]*>/g, "")
+            .replace(/&nbsp;/gi, " ");
+        return text.split(/\n\s*\n/).map((part) => part.trim()).filter(Boolean);
+    }
+
+    function detailTimeline(mission) {
+        const player = (mission.flown || []).find((pilot) => pilot.is_player) || {};
+        const rows = (mission.log || []).filter((row) => row.by_player).map((row) => ({
+            time: row.time,
+            order: 0,
+            html: '<span class="cr-kill">' + esc(row.target || row.victim || "—") +
+                (row.victim && row.victim !== row.target ? " — " + esc(row.victim) : "") + "</span>"
+        })).concat((player.damage_log || []).map((row) => ({
+            time: row.time,
+            order: 1,
+            html: '<span class="cr-hurt">' + esc(T("combat_report.hit_taken", {
+                hits: row.hits, damage: row.total})) +
+                (row.attacker ? " — " + esc(row.attacker) : "") + "</span>"
+        })));
+        rows.sort((a, b) => String(a.time).localeCompare(String(b.time)) || a.order - b.order);
+        return rows.length ? '<ol class="cr-log cr-detail-log">' + rows.map((row) =>
+            "<li><time>" + esc(row.time || "—") + "</time><span>" + row.html + "</span></li>").join("") + "</ol>"
+            : '<p class="cr-na">' + esc(T("combat_report.none")) + "</p>";
+    }
+
+    function flightRoster(mission) {
+        const pilots = mission.flown || [];
+        if (!pilots.length) return '<p class="cr-na">' + esc(T("combat_report.none")) + "</p>";
+        return '<table class="cr-table cr-flight-table"><thead><tr><th>' +
+            esc(T("debrief.rank")) + "</th><th>" + esc(T("debrief.name")) +
+            '</th><th class="num">' + esc(T("debrief.air")) + '</th><th class="num">' +
+            esc(T("debrief.ground")) + '</th><th class="num">' + esc(T("debrief.time")) +
+            "</th><th>" + esc(T("debrief.outcome")) + "</th></tr></thead><tbody>" +
+            pilots.map((pilot) => '<tr' + (pilot.is_player ? ' class="is-player"' : "") + "><td>" +
+                esc(typeof window.shortRank === "function" ? window.shortRank(pilot.rank) : pilot.rank) +
+                "</td><td>" + esc(pilot.name) + '</td><td class="num">' + number(pilot.airborne) +
+                '</td><td class="num">' + number(pilot.ground_targets) + '</td><td class="num">' +
+                esc(pilot.flight_time) + "</td><td>" + esc(T("debrief.outcome_" + pilot.outcome)) +
+                (pilot.wounded ? " · " + esc(T("debrief.wounded")) : "") + "</td></tr>").join("") +
+            "</tbody></table>";
+    }
+
+    let map = null;
+    let renderToken = 0;
+    const detailCache = new Map();
+    async function renderMap(mission, token) {
+        const box = el("cr-map");
+        if (!box || token !== renderToken || !window.KoreaMap || !window.L) return;
+        if (!mission.route || !mission.route.length) {
+            box.textContent = T("combat_report.map_unavailable");
+            return;
+        }
+        map = KoreaMap.createMap(box, {scrollWheelZoom: false, dragging: false,
+            doubleClickZoom: false, boxZoom: false, keyboard: false,
+            touchZoom: false, zoomControl: false});
+        const route = KoreaMap.routeLayer({points: mission.route.map((point) =>
+            [point.x, point.z, point.type])}, false, T).addTo(map);
+        const target = KoreaMap.targetMarker(mission.target, false);
+        if (target) target.addTo(map);
+        const kills = L.layerGroup((mission.log || []).filter((row) => row.x || row.z).map((row) =>
+            row.air ? KoreaMap.victoryMarker({x: row.x, z: row.z, alt: row.altitude,
+                target: row.target, victim: row.victim, pilot: row.actor,
+                number: mission.number, date: mission.date, mission_id: mission.id}, T)
+                : KoreaMap.groundMarker(row, T))).addTo(map);
+        map.invalidateSize();
+        KoreaMap.fitTo(map, [route, kills], 0.12);
+        try {
+            const response = await fetch("/api/track/" + encodeURIComponent(careerId) + "/" + mission.id);
+            const track = response.ok ? await response.json() : null;
+            if (!track || !map || token !== renderToken) return;
+            const layers = [];
+            if (track.front && track.front.length > 1) KoreaMap.frontLayer(track.front, T).addTo(map);
+            if (track.segments && track.segments.length) layers.push(KoreaMap.trackLayer(track, T).addTo(map));
+            if (track.losses && track.losses.length) layers.push(KoreaMap.lossLayer(track.losses, T).addTo(map));
+            if (layers.length) KoreaMap.fitTo(map, [route, kills].concat(layers), 0.12);
+        } catch (_error) { /* The briefed route remains useful without a track. */ }
+    }
+
+    async function detailsPage(report, token) {
+        el("cr-left").innerHTML = formHead(T("combat_report.mission_report")) + reportFields(report) +
+            '<p class="cr-na">' + esc(T("common.loading")) + "</p>";
+        el("cr-right").innerHTML = formHead(T("combat_report.details_page"));
+        fitPilotNames(el("cr-left"));
+        try {
+            let mission = detailCache.get(report.mission_id);
+            if (!mission) {
+                const response = await fetch("/api/mission/" + encodeURIComponent(careerId) + "/" + report.mission_id);
+                if (!response.ok) throw new Error(response.status);
+                mission = await response.json();
+                detailCache.set(report.mission_id, mission);
+            }
+            if (token !== renderToken) return;
+            const player = (mission.flown || []).find((pilot) => pilot.is_player) || {};
+            const hitsTaken = (player.damage_log || []).reduce((total, row) => total + Number(row.hits || 0), 0);
+            const brief = briefingParagraphs(mission.briefing).map((part) => "<p>" + esc(part) + "</p>").join("") ||
+                '<p class="cr-na">' + esc(T("debrief.no_briefing")) + "</p>";
+            const results = '<div class="cr-stat-grid">' +
+                stat(number(report.airborne), T("combat_report.air_victories")) +
+                stat(number(report.ground_targets), T("combat_report.ground_targets")) +
+                stat(number(report.assists), T("combat_report.assists")) +
+                stat(number(hitsTaken), T("combat_report.hits_taken")) + "</div>";
+            el("cr-left").innerHTML = formHead(T("combat_report.mission_report")) + reportFields(report) +
+                section(T("combat_report.combat_results"), results) +
+                section(T("combat_report.mission_map"), '<div id="cr-map" class="cr-map"></div>', "cr-map-wrap") +
+                section(T("combat_report.briefing"), '<div class="cr-briefing">' + brief + "</div>");
+            fitPilotNames(el("cr-left"));
+            const facts = '<p><strong>' + esc(T("debrief.loadout")) + ":</strong> " +
+                esc(report.loadout || T("debrief.guns_only")) + "</p><p>" +
+                esc(T("debrief.took_off")) + " " + esc(report.takeoff || "—") + " · " +
+                esc(T("debrief.landed")) + " " + esc(report.landing_time || "—") + " · " +
+                esc(T("debrief.objectives", {met: mission.obj_success, failed: mission.obj_failure})) +
+                (report.fuel_pct == null ? "" : " · " + esc(T("debrief.fuel", {percent: report.fuel_pct}))) +
+                (report.range_km == null ? "" : " · " + esc(T("debrief.range", {km: report.range_km}))) + "</p>";
+            el("cr-right").innerHTML = formHead(T("combat_report.details_page")) +
+                '<div class="cr-detail-facts">' + facts + "</div>" +
+                section(T("debrief.pilots_on_mission"), flightRoster(mission), "cr-roster-section") +
+                section(T("combat_report.mission_events"), detailTimeline(mission), "cr-events-section");
+            renderMap(mission, token);
+        } catch (_error) {
+            if (token !== renderToken) return;
+            el("cr-right").innerHTML += '<p class="cr-na">' + esc(T("combat_report.failed")) + "</p>";
+        }
+    }
+
+    const views = [{summary: true}];
+    data.reports.forEach((report) => {
+        views.push({report: report, section: "details"});
+        views.push({report: report, section: "combat"});
+    });
     let current = wantedMission
-        ? Math.max(0, views.findIndex((v) => Number(v.mission_id) === wantedMission))
+        ? Math.max(0, views.findIndex((view) => view.report &&
+            Number(view.report.mission_id) === wantedMission && view.section === wantedSection))
         : 0;
-    function render() {
-        if (views[current].summary) summaryPage();
-        else missionPage(views[current]);
+    async function render() {
+        const token = ++renderToken;
+        if (map) { map.remove(); map = null; }
+        const view = views[current];
+        if (view.summary) summaryPage();
+        else if (view.section === "details") await detailsPage(view.report, token);
+        else combatPage(view.report);
         el("cr-prev").disabled = current <= 0;
         el("cr-next").disabled = current >= views.length - 1;
         el("cr-page").textContent = current === 0
             ? T("combat_report.summary")
-            : missionName(views[current].mission_num) + " · " + views[current].date;
+            : missionName(view.report.mission_num) + " · " + view.report.date + " · " +
+                T("combat_report." + (view.section === "details" ? "details_page" : "combat_page"));
         history.replaceState(null, "", "/combat-report?career=" + encodeURIComponent(careerId) +
-            (current ? "&mission=" + encodeURIComponent(views[current].mission_id) : ""));
+            (current ? "&mission=" + encodeURIComponent(view.report.mission_id) +
+                "&section=" + encodeURIComponent(view.section) : ""));
     }
     el("cr-prev").addEventListener("click", () => { if (current > 0) { current -= 1; render(); } });
     el("cr-next").addEventListener("click", () => { if (current + 1 < views.length) { current += 1; render(); } });

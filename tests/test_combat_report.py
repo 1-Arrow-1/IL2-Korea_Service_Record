@@ -1,4 +1,5 @@
 import struct
+from collections import namedtuple
 
 from korea_service_record.career.aggregator import CareerAggregator
 from korea_service_record.flightlog import read_log
@@ -102,3 +103,31 @@ def test_gunnery_report_uses_start_end_counters_and_groups_impacts(tmp_path):
 
     corrected = aggregator._gunnery(flight, "08:00", kills, corrected_targets=1)
     assert (corrected["bomb_hits"], corrected["bomb_targets"]) == (1, 1)
+
+
+def test_cluster_bomblet_effects_count_as_one_canister_hit(tmp_path):
+    flight = _sample_log(tmp_path / "cluster.mlg")
+    Effect = namedtuple("BlastEffect", "start_s end_s contacts napalm")
+    flight = flight._replace(blast_effects=[
+        Effect(110.0, 112.0, 20, False),
+        # A late group of bomblets from the same canister.
+        Effect(124.0, 126.0, 14, False),
+        # The second canister lands well after the first pattern.
+        Effect(180.0, 182.0, 20, False),
+    ])
+    aggregator = object.__new__(CareerAggregator)
+    aggregator.objects = _Objects()
+    kills = [
+        {"id": 1, "date": "1951.06.01 08:01:50", "tpar1": "KS-12"},
+        {"id": 2, "date": "1951.06.01 08:02:04", "tpar1": "US6"},
+        {"id": 3, "date": "1951.06.01 08:03:00", "tpar1": "GAZ55"},
+    ]
+
+    report = aggregator._gunnery(
+        flight, "08:00", kills, corrected_targets=3, cluster_bombs=True)
+
+    assert (report["bomb_hits"], report["bomb_targets"]) == (2, 3)
+    assert report["bomb_attacks"] == [
+        {"time": "08:01:50", "targets": 2},
+        {"time": "08:03:00", "targets": 1},
+    ]

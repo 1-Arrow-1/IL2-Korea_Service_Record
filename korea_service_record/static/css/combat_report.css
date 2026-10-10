@@ -74,6 +74,7 @@ body.combat-report-page {
 
 .cr-section { margin-top: 0.55em; min-height: 0; }
 .cr-section h2 { margin: 0 0 0.28em; padding-bottom: 0.14em; border-bottom: 1.5px solid var(--cr-rule); font: bold 0.86em Arial, Helvetica, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; }
+.cr-context { margin: -0.2em 0 0.75em; text-align: center; color: var(--cr-muted); }
 .cr-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--cr-rule); }
 .cr-stat { padding: 0.42em 0.25em; text-align: center; border-right: 1px solid var(--cr-rule); }
 .cr-stat:last-child { border-right: 0; }
@@ -96,7 +97,7 @@ body.combat-report-page {
 .cr-log li { display: grid; grid-template-columns: 5.1em 1fr; gap: 0.45em; padding: 0.22em 0; border-bottom: 1px dotted rgba(74,61,43,0.35); }
 .cr-log li:last-child { border-bottom: 0; }
 .cr-log time { color: var(--cr-blue); font-variant-numeric: tabular-nums; }
-.cr-scroll-log { max-height: 13.5em; overflow: hidden; }
+.cr-attack-log { margin-bottom: 0.35em; }
 .cr-targets { columns: 2; column-gap: 1.2em; margin: 0.2em 0 0; padding-left: 1.3em; }
 .cr-targets li { break-inside: avoid; }
 .cr-footnote { color: var(--cr-muted); font-size: 0.76em; line-height: 1.2; }
@@ -113,6 +114,28 @@ body.combat-report-page {
 .cr-mission-link:hover { color: var(--cr-blue); }
 .cr-mission-link strong { display: inline-block; min-width: 7.2em; }
 .cr-mission-link span { float: right; color: var(--cr-muted); }
+
+.cr-map-wrap { height: 30%; display: flex; flex-direction: column; }
+.cr-map { flex: 1 1 auto; min-height: 0; border: 1px solid var(--cr-rule); background: #e3d4b7; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.25); }
+.cr-map .leaflet-control-container { display: none; }
+.cr-map .map-airfield .map-label, .cr-map .map-city .map-label { font-size: 8px; }
+.cr-briefing { font-size: 0.78em; line-height: 1.25; }
+.cr-briefing p { margin: 0.25em 0; }
+.cr-detail-facts { margin: 0 0 0.5em; padding: 0.42em 0.5em; border: 1px solid var(--cr-rule); font-size: 0.82em; }
+.cr-detail-facts p { margin: 0.2em 0; }
+.cr-flight-table { font-size: 0.72em; line-height: 1.12; }
+.cr-flight-table th, .cr-flight-table td { padding: 0.22em 0.25em; }
+.cr-flight-table th:nth-child(1) { width: 15%; }
+.cr-flight-table th:nth-child(2) { width: 27%; }
+.cr-flight-table th:nth-child(3), .cr-flight-table th:nth-child(4) { width: 7%; }
+.cr-flight-table th:nth-child(5) { width: 12%; }
+.cr-flight-table tr.is-player td { font-weight: bold; background: rgba(35,61,103,0.08); }
+.cr-roster-section { margin-top: 0.45em; }
+.cr-events-section { margin-top: 0.45em; }
+.cr-detail-log { font-size: 0.78em; line-height: 1.15; }
+.cr-detail-log li { grid-template-columns: 4.9em 1fr; padding: 0.15em 0; }
+.cr-kill { color: var(--cr-blue); }
+.cr-hurt { color: var(--cr-red); }
 
 @media print {
     @page { size: landscape; margin: 0; }
