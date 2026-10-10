@@ -31,15 +31,27 @@ body.combat-report-page {
 .cr-pager button:disabled { opacity: 0.35; cursor: default; }
 #cr-page { min-width: 11rem; text-align: center; font-size: 0.86rem; }
 
-.cr-stage { width: 100%; padding: 1.25rem 0 2.5rem; overflow-x: auto; box-sizing: border-box; }
+.cr-stage {
+    width: 100%;
+    min-height: calc(100vh - 3.2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 0;
+    overflow-x: auto;
+    box-sizing: border-box;
+}
 .cr-stage > .state-message { color: #eee5d2; text-shadow: 0 1px 2px #000; }
 
 .cr-folder {
     position: relative;
-    width: min(96vw, 1600px);
+    /* The former 1600px cap left a postcard-sized folder in the upper half
+       of a large display.  Let the artwork grow to its native 2400px width,
+       while the height term keeps the whole spread inside smaller screens. */
+    width: min(96vw, 2400px, calc((100vh - 5rem) * 2400 / 1501));
     min-width: 1120px;
     aspect-ratio: 2400 / 1501;
-    margin: 0 auto;
+    margin: auto;
     isolation: isolate;
     container-type: inline-size;
     background: url("../images/combat_report/combat_report_folder.png") center / 100% 100% no-repeat;
