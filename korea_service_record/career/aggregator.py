@@ -710,7 +710,9 @@ class CareerAggregator:
             damage_by_pilot={k: [b._replace(at_s=fix(b.at_s)) for b in v]
                              for k, v in flight.damage_by_pilot.items()},
             weapon_hits=[h._replace(at_s=fix(h.at_s))
-                         for h in flight.weapon_hits])
+                         for h in flight.weapon_hits],
+            blast_effects=[e._replace(start_s=fix(e.start_s), end_s=fix(e.end_s))
+                           for e in flight.blast_effects])
 
     @staticmethod
     def _weapon_kind(weapon: str) -> str:
@@ -721,21 +723,24 @@ class CareerAggregator:
             return "rockets"
         return ""
 
-    def _gunnery(self, flight, start: str = "") -> Dict[str, Any]:
+    def _gunnery(self, flight, start: str = "", kill_events=None,
+                 corrected_targets: Optional[int] = None) -> Dict[str, Any]:
         """A factual weapons account from one human player's binary log.
 
         AType 10 and 4 hold the four ammunition counters before and after the
-        sortie.  AType 1 holds projectile contacts.  Generic explosion and
-        napalm contacts were discarded by flightlog.py; treating those as
-        rounds would turn one bomb into thousands of apparent hits.
+        sortie. AType 1 holds projectile contacts and compressed blast
+        effects. Generic explosion and napalm contacts never enter the gun
+        total; treating those as rounds would turn one bomb into thousands
+        of apparent hits.
         """
         empty = {"available": False, "complete": False, "gun_loaded": None,
                  "gun_returned": None, "gun_fired": None, "gun_hits": 0,
                  "gun_rate": None, "bombs_loaded": None,
                  "bombs_returned": None, "bombs_expended": None,
+                 "bomb_hits": None, "bomb_targets": None, "bomb_rate": None,
                  "rockets_loaded": None, "rockets_returned": None,
                  "rockets_expended": None, "rocket_impacts": 0,
-                 "passes": [], "targets": []}
+                 "passes": [], "bomb_attacks": [], "targets": []}
         if flight is None or flight.ammo_start is None:
             return empty
 
@@ -753,6 +758,59 @@ class CareerAggregator:
                     if self._weapon_kind(h.weapon) == "guns"]
         rocket_hits = [h for h in flight.weapon_hits
                        if self._weapon_kind(h.weapon) == "rockets"]
+
+        # The log names every player-owned generic blast but not the store
+        # that made it. A compact blast without a simultaneous projectile is
+        # a bomb candidate; a sustained stream is retained because napalm and
+        # secondary fires continue while the pilot makes later attacks. Only
+        # corrected type-0 kill rows can turn a candidate into a bomb hit.
+        event_offsets = []
+        seen_events = set()
+        for event in kill_events or []:
+            try:
+                event_id = event["id"]
+                stamp = event["date"] or ""
+                target = event["tpar1"] or ""
+            except (KeyError, TypeError, IndexError):
+                continue
+            identity = event_id if event_id is not None else (stamp, target)
+            if identity in seen_events or len(stamp) < 19:
+                continue
+            seen_events.add(identity)
+            event_offsets.append((identity,
+                                  (_seconds(stamp[11:19]) - _seconds(start)) % 86400))
+
+        projectile_times = [h.at_s for h in gun_hits + rocket_hits]
+        destructive_effects = []
+        for effect in flight.blast_effects:
+            sustained = effect.end_s - effect.start_s >= 30.0
+            if (not sustained and any(effect.start_s - 2.0 <= t <= effect.end_s + 3.0
+                                      for t in projectile_times)):
+                continue
+            destroyed = [identity for identity, at_s in event_offsets
+                         if effect.start_s - 2.0 <= at_s <= effect.end_s + 3.0
+                         and not any(abs(at_s - t) <= 2.0 for t in projectile_times)]
+            if destroyed:
+                destructive_effects.append((effect, destroyed))
+
+        bombs_expended = int(used[2]) if complete else None
+        remaining_targets = (max(0, int(corrected_targets))
+                             if corrected_targets is not None else None)
+        assigned_events = set()
+        bomb_attacks = []
+        for effect, destroyed in destructive_effects[:bombs_expended or 0]:
+            count = sum(identity not in assigned_events for identity in destroyed)
+            assigned_events.update(destroyed)
+            if remaining_targets is not None:
+                count = min(count, remaining_targets)
+                remaining_targets -= count
+            if count:
+                bomb_attacks.append({
+                    "time": _clock(start, effect.start_s) if start else "",
+                    "targets": count,
+                })
+        bomb_hits = len(bomb_attacks)
+        bomb_targets = sum(row["targets"] for row in bomb_attacks)
 
         # Group recorded gun impacts into attacks.  This is deliberately an
         # impact timeline, not a burst counter: misses leave no timed record,
@@ -790,12 +848,17 @@ class CareerAggregator:
                          if gun_fired else None),
             "bombs_loaded": int(start_ammo[2]),
             "bombs_returned": int(end_ammo[2]) if complete else None,
-            "bombs_expended": int(used[2]) if complete else None,
+            "bombs_expended": bombs_expended,
+            "bomb_hits": bomb_hits if complete else None,
+            "bomb_targets": bomb_targets if complete else None,
+            "bomb_rate": (round(100.0 * bomb_hits / bombs_expended, 1)
+                          if bombs_expended else None),
             "rockets_loaded": int(start_ammo[3]),
             "rockets_returned": int(end_ammo[3]) if complete else None,
             "rockets_expended": int(used[3]) if complete else None,
             "rocket_impacts": len(rocket_hits),
             "passes": passes,
+            "bomb_attacks": bomb_attacks,
             "targets": [{"name": name, "hits": count}
                         for name, count in target_counts.most_common(8)],
         }
@@ -1819,7 +1882,9 @@ class CareerAggregator:
                              if carried else None),
                 "range_km": (round(mission["mrange"] / 1000)
                              if mission and mission["mrange"] else None),
-                "gunnery": self._gunnery(flight, sortie["date"][11:]),
+                "gunnery": self._gunnery(
+                    flight, sortie["date"][11:], events,
+                    k.airborne + k.ground_targets),
                 "log": log,
                 "scenery": scenery,
             })
@@ -3165,6 +3230,8 @@ class CareerAggregator:
                     "gun_hits": impacts,
                     "gun_rate": round(100.0 * impacts / fired, 1) if fired else None,
                     "bombs_expended": total("bombs_expended"),
+                    "bomb_hits": total("bomb_hits"),
+                    "bomb_targets": total("bomb_targets"),
                     "rockets_expended": total("rockets_expended"),
                     "rocket_impacts": sum(
                         int(r["gunnery"].get("rocket_impacts") or 0)

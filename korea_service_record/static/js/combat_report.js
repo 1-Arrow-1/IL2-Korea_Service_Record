@@ -51,6 +51,8 @@
 
     const number = (value) => Number(value || 0).toLocaleString(pageLang);
     const pct = (value) => value == null ? "—" : number(value) + "%";
+    const bombFigure = (g) => g.bomb_hits == null || g.bomb_targets == null
+        ? "—" : number(g.bomb_hits) + " (" + number(g.bomb_targets) + ")";
     const missionName = (n) => Number(n) < 0
         ? T("debrief.unscheduled", {number: -Number(n)})
         : T("combat_report.mission", {number: n});
@@ -103,11 +105,13 @@
         if (!g || !g.available) {
             return '<p class="cr-na">' + esc(T("combat_report.not_available")) + "</p>";
         }
+        const shownHits = (hits) => hits == null ? "—" :
+            (typeof hits === "string" ? hits : number(hits));
         const row = (name, loaded, expended, returned, hits, rate) =>
             "<tr><td>" + esc(name) + '</td><td class="num">' + esc(number(loaded)) +
             '</td><td class="num">' + esc(expended == null ? "—" : number(expended)) +
             '</td><td class="num">' + esc(returned == null ? "—" : number(returned)) +
-            '</td><td class="num">' + esc(hits == null ? "—" : number(hits)) +
+            '</td><td class="num">' + esc(shownHits(hits)) +
             '</td><td class="num">' + esc(rate == null ? "—" : pct(rate)) + "</td></tr>";
         return '<table class="cr-table cr-weapons"><thead><tr><th>' + esc(T("combat_report.weapon")) +
             '</th><th>' + esc(T("combat_report.loaded")) + '</th><th>' + esc(T("combat_report.expended")) +
@@ -116,7 +120,8 @@
             "</th></tr></thead><tbody>" +
             row(T("combat_report.gun_rounds"), g.gun_loaded, g.gun_fired, g.gun_returned,
                 g.gun_hits, g.gun_rate) +
-            row(T("combat_report.bombs"), g.bombs_loaded, g.bombs_expended, g.bombs_returned, null, null) +
+            row(T("combat_report.bombs"), g.bombs_loaded, g.bombs_expended, g.bombs_returned,
+                bombFigure(g), g.bomb_rate) +
             row(T("combat_report.rockets"), g.rockets_loaded, g.rockets_expended, g.rockets_returned,
                 g.rocket_impacts, g.rockets_expended ? Math.round(1000 * g.rocket_impacts / g.rockets_expended) / 10 : null) +
             "</tbody></table>" + (!g.complete
@@ -141,8 +146,10 @@
         const stores = '<table class="cr-table"><tbody><tr><th>' + esc(T("combat_report.bombs")) +
             '</th><td class="num">' + number(s.bombs_expended) + '</td><th>' +
             esc(T("combat_report.rockets")) + '</th><td class="num">' + number(s.rockets_expended) +
-            '</td></tr><tr><th>' + esc(T("combat_report.direct_impacts")) +
-            '</th><td class="num" colspan="3">' + number(s.rocket_impacts) + "</td></tr></tbody></table>";
+            '</td></tr><tr><th>' + esc(T("combat_report.bomb_hits")) +
+            '</th><td class="num">' + esc(number(s.bomb_hits) + " (" + number(s.bomb_targets) + ")") +
+            '</td><th>' + esc(T("combat_report.direct_impacts")) +
+            '</th><td class="num">' + number(s.rocket_impacts) + "</td></tr></tbody></table>";
         const aircraft = s.by_aircraft.length
             ? '<table class="cr-table"><thead><tr><th>' + esc(T("combat_report.aircraft")) +
                 '</th><th>' + esc(T("combat_report.missions_covered_short")) + '</th><th>' +
@@ -192,7 +199,10 @@
             time: pass.time,
             html: esc(T("combat_report.attack_pass", {hits: pass.hits})) +
                 (pass.targets.length ? " — " + esc(pass.targets.join(", ")) : "")
-        }));
+        })).concat((gunnery.bomb_attacks || []).map((attack) => ({
+            time: attack.time,
+            html: esc(T("combat_report.bomb_attack", {targets: attack.targets}))
+        }))).sort((a, b) => String(a.time).localeCompare(String(b.time)));
         return rows.length ? '<ol class="cr-log cr-scroll-log">' + rows.slice(0, 16).map((row) =>
             "<li><time>" + esc(row.time || "—") + "</time><span>" + row.html + "</span></li>").join("") + "</ol>"
             : '<p class="cr-na">' + esc(T("combat_report.none")) + "</p>";
@@ -205,7 +215,9 @@
                 stat(number(g.gun_fired), T("combat_report.rounds_fired")) +
                 stat(number(g.gun_hits), T("combat_report.recorded_hits")) +
                 stat(pct(g.gun_rate), T("combat_report.overall_rate")) +
-                stat(number(g.rocket_impacts), T("combat_report.direct_impacts")) + "</div>"
+                (g.bombs_expended
+                    ? stat(bombFigure(g), T("combat_report.bomb_hits"))
+                    : stat(number(g.rocket_impacts), T("combat_report.direct_impacts"))) + "</div>"
             : '<p class="cr-na">' + esc(T("combat_report.not_available")) + "</p>";
         el("cr-left").innerHTML = formHead(T("combat_report.mission_report")) + reportFields(report) +
             section(T("combat_report.gunnery_analysis"), overview) +

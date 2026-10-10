@@ -54,6 +54,10 @@ WANTED = {0, 1, 2, 4, 5, 6, 10, 12, 18}
 # and a sortie's worth of them, listed one by one, says nothing a reader can
 # use; the two passes a Mustang actually took were 505 seconds apart.
 BURST_GAP_S = 15.0
+# Generic blast contacts from one detonation arrive in dense groups. Napalm
+# keeps producing them about every two seconds for the lifetime of the fire,
+# so a five-second gap separates strikes without splitting one burning area.
+BLAST_GAP_S = 5.0
 
 
 # The attacker field when the damage came from the aircraft's own ordnance —
@@ -79,6 +83,14 @@ class WeaponHit(NamedTuple):
     target: str                     # target object type, when the log named it
 
 
+class BlastEffect(NamedTuple):
+    """One continuous player-owned bomb or secondary blast effect."""
+    start_s: float
+    end_s: float
+    contacts: int
+    napalm: bool
+
+
 class SortieLog(NamedTuple):
     path: Path
     date: str                       # "1951.06.01"
@@ -93,6 +105,7 @@ class SortieLog(NamedTuple):
     ammo_start: Optional[Tuple[int, int, int, int]] = None  # bullets, shells, bombs, rockets
     ammo_end: Optional[Tuple[int, int, int, int]] = None
     weapon_hits: List["WeaponHit"] = []
+    blast_effects: List["BlastEffect"] = []
 
     @property
     def outcome(self) -> str:
@@ -166,6 +179,7 @@ def read_log(path: Path) -> Optional[SortieLog]:
     ammo_start: Optional[Tuple[int, int, int, int]] = None
     endings: List[Tuple[int, int, Tuple[int, int, int, int]]] = []
     outgoing: List[Tuple[int, str, int]] = []
+    blasts: List[Tuple[int, bool]] = []
     # AType 2 is [float amount][attacker][target][x][y][z]. Collected for
     # everyone because the player's own object id is not known until the
     # AType 10 that names him, which need not come first.
@@ -204,17 +218,22 @@ def read_log(path: Path) -> Optional[SortieLog]:
             elif atype == 1 and player_plid is not None:
                 # [weapon string][attacker object][target object].  The log
                 # also emits enormous clouds of generic "explosion" and
-                # NapalmBullet contacts.  They are blast simulation rather
-                # than one fired round and are intentionally not retained.
+                # NapalmBullet contacts. They are blast simulation rather
+                # than fired rounds, so they are compressed into effects
+                # instead of entering the projectile-hit list.
                 r = _Reader(payload)
                 weapon = r.string()
                 attacker, target = r.int32(), r.int32()
                 upper = weapon.upper()
-                useful = (upper.startswith(("BULLET_", "SHELL_"))
-                          or (upper.endswith("_HIT")
-                              and upper.startswith(("RKT_", "ROCKET_"))))
-                if attacker == player_plid and useful:
-                    outgoing.append((tick, weapon, target))
+                if attacker == player_plid:
+                    if upper in ("EXPLOSION", "NAPALMBULLET"):
+                        blasts.append((tick, upper == "NAPALMBULLET"))
+                    else:
+                        useful = (upper.startswith(("BULLET_", "SHELL_"))
+                                  or (upper.endswith("_HIT")
+                                      and upper.startswith(("RKT_", "ROCKET_"))))
+                        if useful:
+                            outgoing.append((tick, weapon, target))
             elif atype in (5, 6) and player_plid is not None:
                 if _Reader(payload).int32() == player_plid:
                     seconds = tick / TICKS_PER_SECOND
@@ -257,6 +276,7 @@ def read_log(path: Path) -> Optional[SortieLog]:
     weapon_hits = [WeaponHit(tick / TICKS_PER_SECOND, weapon,
                              named.get(target, ""))
                    for tick, weapon, target in outgoing]
+    blast_effects = _blast_effects(blasts)
     by_pilot = {}
     for oid, who in crew.items():
         bursts = _bursts(harm, oid, named)
@@ -264,7 +284,21 @@ def read_log(path: Path) -> Optional[SortieLog]:
             by_pilot[who] = bursts
     return SortieLog(path, date, time, takeoff, landing, ejected, plane,
                      _bursts(harm, player_plid, named), by_pilot, ejected_s,
-                     ammo_start, ammo_end, weapon_hits)
+                     ammo_start, ammo_end, weapon_hits, blast_effects)
+
+
+def _blast_effects(records: List[Tuple[int, bool]]) -> List[BlastEffect]:
+    """Compress thousands of generic blast contacts into timed effects."""
+    out: List[BlastEffect] = []
+    for tick, is_napalm in sorted(records):
+        seconds = tick / TICKS_PER_SECOND
+        if out and seconds - out[-1].end_s <= BLAST_GAP_S:
+            last = out[-1]
+            out[-1] = BlastEffect(last.start_s, seconds, last.contacts + 1,
+                                  last.napalm or is_napalm)
+        else:
+            out.append(BlastEffect(seconds, seconds, 1, is_napalm))
+    return out
 
 
 def _pilot_name(raw: str) -> str:
