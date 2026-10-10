@@ -70,6 +70,11 @@ class SignatureInfo:
     status: str
     thumbprint: str
     subject: str = ""
+    profile_eku: str = ""
+
+
+ARTIFACT_SIGNING_EKU_PREFIX = "1.3.6.1.4.1.311.97."
+ARTIFACT_SIGNING_PUBLIC_TRUST_EKU = "1.3.6.1.4.1.311.97.1.0"
 
 
 def version_key(value: str) -> tuple[int, int, int, int]:
@@ -163,15 +168,20 @@ def _powershells() -> list[str]:
 
 
 def authenticode_signature(path: Path) -> SignatureInfo:
-    """Return the Authenticode status and leaf signer certificate."""
+    """Return Authenticode status and the signer's durable profile identity."""
     script = (
         "$ErrorActionPreference='Stop';"
         "$s=Get-AuthenticodeSignature -LiteralPath $env:IL2K_UPDATE_SIGNATURE_PATH;"
-        "$thumb='';$subject='';"
+        "$thumb='';$subject='';$profileEku='';"
         "if($s.SignerCertificate){$thumb=$s.SignerCertificate.Thumbprint;"
-        "$subject=$s.SignerCertificate.Subject};"
+        "$subject=$s.SignerCertificate.Subject;"
+        "$profileEkus=@($s.SignerCertificate.EnhancedKeyUsageList|"
+        "ForEach-Object{[string]$_.ObjectId}|"
+        "Where-Object{$_ -like '1.3.6.1.4.1.311.97.*' -and "
+        "$_ -ne '1.3.6.1.4.1.311.97.1.0'});"
+        "if($profileEkus.Count -gt 0){$profileEku=[string]$profileEkus[0]}};"
         "[pscustomobject]@{Status=[string]$s.Status;Thumbprint=$thumb;"
-        "Subject=$subject}|ConvertTo-Json -Compress"
+        "Subject=$subject;ProfileEku=$profileEku}|ConvertTo-Json -Compress"
     )
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     environment = os.environ.copy()
@@ -193,6 +203,7 @@ def authenticode_signature(path: Path) -> SignatureInfo:
                 status=str(data.get("Status") or ""),
                 thumbprint=str(data.get("Thumbprint") or ""),
                 subject=str(data.get("Subject") or ""),
+                profile_eku=str(data.get("ProfileEku") or ""),
             )
         except (OSError, subprocess.SubprocessError, json.JSONDecodeError) as exc:
             errors.append(str(exc))
@@ -204,6 +215,32 @@ def _expected_digest(value: str) -> str:
     if not match:
         raise UpdateError("digest_missing", value or "no digest")
     return match.group(1).lower()
+
+
+def _same_signing_identity(left: SignatureInfo, right: SignatureInfo) -> bool:
+    """Compare the durable Artifact Signing profile, with a legacy fallback.
+
+    Artifact Signing renews its short-lived leaf certificate every day.  The
+    profile-specific EKU stays stable for the lifetime of the signing profile
+    and is the value Microsoft provides for durable identity pinning.  Exact
+    thumbprints remain useful for conventional certificates without that EKU.
+    """
+    def durable_eku(value: str) -> str:
+        value = value.strip()
+        if (
+            value.startswith(ARTIFACT_SIGNING_EKU_PREFIX)
+            and value != ARTIFACT_SIGNING_PUBLIC_TRUST_EKU
+        ):
+            return value
+        return ""
+
+    left_eku = durable_eku(left.profile_eku)
+    right_eku = durable_eku(right.profile_eku)
+    if left_eku or right_eku:
+        return bool(left_eku and right_eku and left_eku == right_eku)
+    left_thumb = left.thumbprint.replace(" ", "").upper()
+    right_thumb = right.thumbprint.replace(" ", "").upper()
+    return bool(left_thumb and left_thumb == right_thumb)
 
 
 def download_and_verify(
@@ -251,14 +288,19 @@ def download_and_verify(
         source = signature_source or Path(sys.executable)
         running = signature_reader(Path(source))
         downloaded = signature_reader(partial)
-        if running.status.lower() != "valid" or not running.thumbprint:
+        if running.status.lower() != "valid" or not (
+            running.profile_eku or running.thumbprint
+        ):
             raise UpdateError("running_unsigned", running.status)
-        if downloaded.status.lower() != "valid" or not downloaded.thumbprint:
+        if downloaded.status.lower() != "valid" or not (
+            downloaded.profile_eku or downloaded.thumbprint
+        ):
             raise UpdateError("signature_invalid", downloaded.status)
-        if downloaded.thumbprint.replace(" ", "").upper() != running.thumbprint.replace(" ", "").upper():
+        if not _same_signing_identity(downloaded, running):
             raise UpdateError(
                 "signer_mismatch",
-                f"{downloaded.thumbprint} != {running.thumbprint}",
+                f"{downloaded.profile_eku or downloaded.thumbprint} != "
+                f"{running.profile_eku or running.thumbprint}",
             )
         os.replace(partial, destination)
         return destination

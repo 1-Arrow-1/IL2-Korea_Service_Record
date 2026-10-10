@@ -144,6 +144,44 @@ def test_different_signer_is_rejected(tmp_path):
     assert error.value.code == "signer_mismatch"
 
 
+def test_rotated_leaf_certificate_from_same_signing_profile_is_accepted(tmp_path):
+    profile = "1.3.6.1.4.1.311.97.309776693.42277142.142717871.861640822"
+    signatures = iter([
+        updater.SignatureInfo("Valid", "OLD", profile_eku=profile),
+        updater.SignatureInfo("Valid", "NEW", profile_eku=profile),
+    ])
+    with _Server() as base:
+        release = updater.fetch_latest(base + "/latest")
+        result = updater.download_and_verify(
+            release,
+            destination=tmp_path / release.asset.name,
+            signature_source=tmp_path / "running.exe",
+            signature_reader=lambda _path: next(signatures),
+        )
+    assert result.read_bytes() == b"signed setup bytes"
+
+
+def test_different_artifact_signing_profile_is_rejected(tmp_path):
+    signatures = iter([
+        updater.SignatureInfo(
+            "Valid", "SAME", profile_eku="1.3.6.1.4.1.311.97.1.2.3"
+        ),
+        updater.SignatureInfo(
+            "Valid", "SAME", profile_eku="1.3.6.1.4.1.311.97.4.5.6"
+        ),
+    ])
+    with _Server() as base:
+        release = updater.fetch_latest(base + "/latest")
+        with pytest.raises(updater.UpdateError) as error:
+            updater.download_and_verify(
+                release,
+                destination=tmp_path / release.asset.name,
+                signature_source=tmp_path / "running.exe",
+                signature_reader=lambda _path: next(signatures),
+            )
+    assert error.value.code == "signer_mismatch"
+
+
 def test_installer_waits_for_game_and_tracker_then_uses_silent_flags(tmp_path):
     setup = tmp_path / "setup.exe"
     setup.write_bytes(b"fixture")
