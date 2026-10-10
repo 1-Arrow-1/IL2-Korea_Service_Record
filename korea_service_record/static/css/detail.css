@@ -105,7 +105,7 @@
    squadron panels cannot drift into different paper colours. */
 #detail-body {
     --record-paper: #f8f2e0;
-    --record-paper-wash: rgba(248, 242, 224, 0.84);
+    --record-paper-wash: rgba(248, 242, 224, 0.78);
     --record-scroll-track: #eadfc8;
     --record-scroll-thumb: #9b8666;
     scrollbar-color: var(--record-scroll-thumb) var(--record-scroll-track);
