@@ -297,7 +297,7 @@
             box.textContent = T("combat_report.map_unavailable");
             return;
         }
-        map = KoreaMap.createMap(box, {scrollWheelZoom: true, dragging: false,
+        map = KoreaMap.createMap(box, {scrollWheelZoom: true, dragging: true,
             doubleClickZoom: false, boxZoom: false, keyboard: false,
             touchZoom: false, zoomControl: false});
         const route = KoreaMap.routeLayer({points: mission.route.map((point) =>

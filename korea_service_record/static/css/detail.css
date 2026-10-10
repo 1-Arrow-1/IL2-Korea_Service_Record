@@ -100,38 +100,34 @@
 
 .record-col { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
 
-/* The columns belong to one service record. They share the same warm paper,
-   brown ink and scrollbar palette; the three scans contribute only subtle
-   differences in fibres and wear beneath the common colour wash. */
-.record-col {
+/* Every section is one service-record document. Use the former right-column
+   stock throughout so the columns and the full-width map, aircraft and
+   squadron panels cannot drift into different paper colours. */
+#detail-body {
     --record-paper: #f8f2e0;
     --record-paper-wash: rgba(248, 242, 224, 0.84);
     --record-scroll-track: #eadfc8;
     --record-scroll-thumb: #9b8666;
     scrollbar-color: var(--record-scroll-thumb) var(--record-scroll-track);
 }
-.record-col:nth-child(1) { --record-paper-texture: url("../images/personnel_paper.jpg"); }
-.record-col:nth-child(2) { --record-paper-texture: url("../images/combat_paper.jpg"); }
-.record-col:nth-child(3) { --record-paper-texture: url("../images/debrief_paper.jpg"); }
-.record-col > .panel {
+#detail-body .panel {
     background-color: var(--record-paper);
     background-image: linear-gradient(var(--record-paper-wash), var(--record-paper-wash)),
-        var(--record-paper-texture);
+        url("../images/debrief_paper.jpg");
     background-position: 0 0;
     background-size: auto, 2048px 2048px;
     background-repeat: repeat;
 }
 
-/* Scroll boxes use the same parchment family as their surrounding document. */
-.record-col *::-webkit-scrollbar-track {
+#detail-body *::-webkit-scrollbar-track {
     background: var(--record-scroll-track);
 }
-.record-col *::-webkit-scrollbar-thumb {
+#detail-body *::-webkit-scrollbar-thumb {
     background: var(--record-scroll-thumb);
     border-color: var(--record-scroll-track);
 }
 
-.record-col > .panel h3 {
+#detail-body .panel h3 {
     color: var(--accent-dark);
     border-bottom-color: rgba(90, 64, 34, 0.28);
 }
