@@ -20,7 +20,12 @@
 
 .pf-page {
     position: relative; box-sizing: content-box; margin: 0 auto 1.4rem;
-    background: #fbf7ec; color: #1f140a; box-shadow: 0 4px 16px rgba(60, 40, 15, .35);
+    background-color: var(--record-paper);
+    background-image: linear-gradient(var(--record-paper-wash), var(--record-paper-wash)),
+                      var(--record-paper-image);
+    background-size: auto, 2048px 2048px;
+    background-repeat: repeat;
+    color: #1f140a; box-shadow: 0 4px 16px rgba(60, 40, 15, .35);
     font-family: 'Courier New', Courier, monospace; overflow: hidden;
 }
 .pf-page.portrait { width: 726px; height: 966px; padding: 45px; }
@@ -173,7 +178,7 @@
     /* the whole sheet white: html's desk colour showed under the last page */
     html, .personnel-page { background: #fff !important; padding: 0; }
     .personnel-page::before { display: none; }
-    .pf-page { margin: 0; padding: 0; box-shadow: none; background: transparent;
+    .pf-page { margin: 0; padding: 0; box-shadow: none; background: #fff !important; background-image: none !important;
         break-after: page; page-break-after: always;
         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .pf-page:last-child { break-after: auto; page-break-after: auto; }

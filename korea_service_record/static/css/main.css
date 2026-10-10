@@ -20,6 +20,11 @@
     --desk: #ece1c8;
     --paper-deep: #efe4cc;
     --paper-panel: #fbf6e9;
+    /* Shared document stock: the former Mission Debriefings paper, visible
+       through a 78% wash so every record page carries the same subtle grain. */
+    --record-paper: #f8f2e0;
+    --record-paper-wash: rgba(248, 242, 224, 0.78);
+    --record-paper-image: url("../images/debrief_paper.jpg");
     --accent: #8b6f4a;
     --accent-dark: #5a4022;
     --border: #cbb999;

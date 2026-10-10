@@ -104,8 +104,6 @@
    stock throughout so the columns and the full-width map, aircraft and
    squadron panels cannot drift into different paper colours. */
 #detail-body {
-    --record-paper: #f8f2e0;
-    --record-paper-wash: rgba(248, 242, 224, 0.78);
     --record-scroll-track: #eadfc8;
     --record-scroll-thumb: #9b8666;
     scrollbar-color: var(--record-scroll-thumb) var(--record-scroll-track);
@@ -113,7 +111,7 @@
 #detail-body .panel {
     background-color: var(--record-paper);
     background-image: linear-gradient(var(--record-paper-wash), var(--record-paper-wash)),
-        url("../images/debrief_paper.jpg");
+        var(--record-paper-image);
     background-position: 0 0;
     background-size: auto, 2048px 2048px;
     background-repeat: repeat;

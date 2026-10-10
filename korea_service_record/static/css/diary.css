@@ -48,17 +48,17 @@
 /* -- the sheet -------------------------------------------------------- */
 #wd-sheet {
     position: relative;
-    background-color: var(--paper);
-    /* The book's ruling, then the paper's own grain beneath it. The red
-       rule is the margin a bound daybook is printed with; the feint lines
-       are set to the notes' line height so the text sits on them. */
+    background-color: var(--record-paper);
+    /* The book's ruling sits above the same stock used by the service record,
+       flight record and personnel file. */
     background-image:
         linear-gradient(to right, transparent 3.5rem,
                         rgba(150, 46, 38, .30) 3.5rem, rgba(150, 46, 38, .30) calc(3.5rem + 1px),
                         transparent calc(3.5rem + 1px)),
-        url("../images/paper.png");
-    background-repeat: repeat-y, repeat;
-    background-size: 100% 100%, 512px 512px;
+        linear-gradient(var(--record-paper-wash), var(--record-paper-wash)),
+        var(--record-paper-image);
+    background-repeat: no-repeat, repeat, repeat;
+    background-size: 100% 100%, auto, 2048px 2048px;
     color: var(--ink);
     max-width: 52rem; margin: 0 auto; padding: 3.6rem 2.4rem 2.6rem 5rem;
     box-shadow: var(--shadow-soft);
@@ -236,8 +236,11 @@
 @media (max-width: 40rem) {
     /* No room for a margin rule on a phone. */
     #wd-sheet {
-        padding: 3rem 1rem 1.6rem; background-image: url("../images/paper.png");
-        background-size: 512px 512px;
+        padding: 3rem 1rem 1.6rem;
+        background-image: linear-gradient(var(--record-paper-wash), var(--record-paper-wash)),
+                          var(--record-paper-image);
+        background-size: auto, 2048px 2048px;
+        background-repeat: repeat;
     }
     .wd-edge { height: 2rem; }
     .wd-head-top { grid-template-columns: auto 1fr; }

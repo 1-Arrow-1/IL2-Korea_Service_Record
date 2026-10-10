@@ -49,7 +49,12 @@ body.embed .sheet { width: 1180px; max-width: none; margin: 0; box-shadow: none;
 .paged .sheet.current { display: block; }
 
 .sheet {
-    background: #fbf7ec; color: #1f140a; max-width: 1180px; margin: 0 auto 1.4rem;
+    background-color: var(--record-paper);
+    background-image: linear-gradient(var(--record-paper-wash), var(--record-paper-wash)),
+                      var(--record-paper-image);
+    background-size: auto, 2048px 2048px;
+    background-repeat: repeat;
+    color: #1f140a; max-width: 1180px; margin: 0 auto 1.4rem;
     padding: 1.4rem 1.6rem 1.2rem; box-shadow: var(--shadow-soft);
     font-family: 'Courier New', Courier, monospace; font-size: 0.86rem;
 }
@@ -148,6 +153,8 @@ body.embed .sheet { width: 1180px; max-width: none; margin: 0; box-shadow: none;
     .logbook-page::before { display: none !important; }
     .sheet, .paged .sheet { display: block; box-shadow: none; max-width: none; margin: 0; page-break-after: always; break-after: page; padding: 0.4rem 0.2rem; }
     .sheet:last-child { page-break-after: auto; break-after: auto; }
+    /* Personnel-file embeds must remain plain white when the file is printed. */
+    body.embed .sheet { background: #fff !important; background-image: none !important; }
 }
 @media (max-width: 900px) {
     .form-head { grid-template-columns: 1fr 1fr 1fr; }
