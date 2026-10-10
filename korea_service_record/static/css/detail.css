@@ -100,6 +100,26 @@
 
 .record-col { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
 
+/* Three documents rather than one repeated cream tile.  These are seamless,
+   low-contrast scans supplied at 2048px; drawing them at 1024px keeps the
+   fibres legible on a panel without turning individual flecks into marks.
+   The colours remain as fallbacks while an image is loading. */
+.record-col:nth-child(1) > .panel {
+    background: #ead8b7 url("../images/personnel_paper.jpg") 0 0 / 1024px 1024px repeat;
+}
+.record-col:nth-child(2) > .panel {
+    background: #e7e4d0 url("../images/combat_paper.jpg") 0 0 / 1024px 1024px repeat;
+}
+.record-col:nth-child(3) > .panel {
+    background: #dfe2d4 url("../images/debrief_paper.jpg") 0 0 / 1024px 1024px repeat;
+}
+
+/* A restrained ink cue reinforces the three file types.  It changes only
+   headings and rules; the body copy keeps the record's shared brown ink. */
+.record-col:nth-child(1) > .panel h3 { color: #4f6170; border-bottom-color: rgba(79, 97, 112, 0.34); }
+.record-col:nth-child(2) > .panel h3 { color: #596044; border-bottom-color: rgba(89, 96, 68, 0.34); }
+.record-col:nth-child(3) > .panel h3 { color: #70483e; border-bottom-color: rgba(112, 72, 62, 0.34); }
+
 .list-head {
     font-size: 0.78rem;
     text-transform: uppercase;
