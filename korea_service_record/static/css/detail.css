@@ -100,59 +100,41 @@
 
 .record-col { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
 
-/* Three documents rather than one repeated cream tile. The supplied scans are
-   drawn at their native size and muted by a translucent paper-colour wash so
-   their grain reads as material instead of competing with the type. */
-.record-col:nth-child(1) {
-    --column-paper: #ead8b7;
-    --column-scroll-track: #dfcba7;
-    --column-scroll-thumb: #9f8560;
+/* The columns belong to one service record. They share the same warm paper,
+   brown ink and scrollbar palette; the three scans contribute only subtle
+   differences in fibres and wear beneath the common colour wash. */
+.record-col {
+    --record-paper: #f8f2e0;
+    --record-paper-wash: rgba(248, 242, 224, 0.84);
+    --record-scroll-track: #eadfc8;
+    --record-scroll-thumb: #9b8666;
+    scrollbar-color: var(--record-scroll-thumb) var(--record-scroll-track);
 }
-.record-col:nth-child(2) {
-    --column-paper: #e7e4d0;
-    --column-scroll-track: #d9d7c2;
-    --column-scroll-thumb: #919078;
-}
-.record-col:nth-child(3) {
-    --column-paper: #dfe2d4;
-    --column-scroll-track: #d2d8c8;
-    --column-scroll-thumb: #87937f;
-}
-.record-col:nth-child(1) > .panel {
-    background-color: var(--column-paper);
-    background-image: linear-gradient(rgba(234, 216, 183, 0.72), rgba(234, 216, 183, 0.72)),
-        url("../images/personnel_paper.jpg");
+.record-col:nth-child(1) { --record-paper-texture: url("../images/personnel_paper.jpg"); }
+.record-col:nth-child(2) { --record-paper-texture: url("../images/combat_paper.jpg"); }
+.record-col:nth-child(3) { --record-paper-texture: url("../images/debrief_paper.jpg"); }
+.record-col > .panel {
+    background-color: var(--record-paper);
+    background-image: linear-gradient(var(--record-paper-wash), var(--record-paper-wash)),
+        var(--record-paper-texture);
+    background-position: 0 0;
     background-size: auto, 2048px 2048px;
-}
-.record-col:nth-child(2) > .panel {
-    background-color: var(--column-paper);
-    background-image: linear-gradient(rgba(231, 228, 208, 0.72), rgba(231, 228, 208, 0.72)),
-        url("../images/combat_paper.jpg");
-    background-size: auto, 2048px 2048px;
-}
-.record-col:nth-child(3) > .panel {
-    background-color: var(--column-paper);
-    background-image: linear-gradient(rgba(223, 226, 212, 0.72), rgba(223, 226, 212, 0.72)),
-        url("../images/debrief_paper.jpg");
-    background-size: auto, 2048px 2048px;
+    background-repeat: repeat;
 }
 
-/* Scroll boxes inherit the paper family of the document that contains them. */
-.record-col { scrollbar-color: var(--column-scroll-thumb) var(--column-scroll-track); }
+/* Scroll boxes use the same parchment family as their surrounding document. */
 .record-col *::-webkit-scrollbar-track {
-    background: var(--column-scroll-track);
+    background: var(--record-scroll-track);
 }
 .record-col *::-webkit-scrollbar-thumb {
-    background: var(--column-scroll-thumb);
-    border-color: var(--column-scroll-track);
+    background: var(--record-scroll-thumb);
+    border-color: var(--record-scroll-track);
 }
 
-/* A restrained ink cue reinforces the three file types.  It changes only
-   headings and rules; the body copy keeps the record's shared brown ink. */
-.record-col:nth-child(1) > .panel h3 { color: #4f6170; border-bottom-color: rgba(79, 97, 112, 0.34); }
-.record-col:nth-child(2) > .panel h3 { color: #596044; border-bottom-color: rgba(89, 96, 68, 0.34); }
-.record-col:nth-child(3) > .panel h3 { color: #70483e; border-bottom-color: rgba(112, 72, 62, 0.34); }
-
+.record-col > .panel h3 {
+    color: var(--accent-dark);
+    border-bottom-color: rgba(90, 64, 34, 0.28);
+}
 .list-head {
     font-size: 0.78rem;
     text-transform: uppercase;
