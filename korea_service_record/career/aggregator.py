@@ -708,7 +708,97 @@ class CareerAggregator:
             landing_s=fix(flight.landing_s),
             damage=[b._replace(at_s=fix(b.at_s)) for b in flight.damage],
             damage_by_pilot={k: [b._replace(at_s=fix(b.at_s)) for b in v]
-                             for k, v in flight.damage_by_pilot.items()})
+                             for k, v in flight.damage_by_pilot.items()},
+            weapon_hits=[h._replace(at_s=fix(h.at_s))
+                         for h in flight.weapon_hits])
+
+    @staticmethod
+    def _weapon_kind(weapon: str) -> str:
+        upper = (weapon or "").upper()
+        if upper.startswith(("BULLET_", "SHELL_")):
+            return "guns"
+        if upper.endswith("_HIT") and upper.startswith(("RKT_", "ROCKET_")):
+            return "rockets"
+        return ""
+
+    def _gunnery(self, flight, start: str = "") -> Dict[str, Any]:
+        """A factual weapons account from one human player's binary log.
+
+        AType 10 and 4 hold the four ammunition counters before and after the
+        sortie.  AType 1 holds projectile contacts.  Generic explosion and
+        napalm contacts were discarded by flightlog.py; treating those as
+        rounds would turn one bomb into thousands of apparent hits.
+        """
+        empty = {"available": False, "complete": False, "gun_loaded": None,
+                 "gun_returned": None, "gun_fired": None, "gun_hits": 0,
+                 "gun_rate": None, "bombs_loaded": None,
+                 "bombs_returned": None, "bombs_expended": None,
+                 "rockets_loaded": None, "rockets_returned": None,
+                 "rockets_expended": None, "rocket_impacts": 0,
+                 "passes": [], "targets": []}
+        if flight is None or flight.ammo_start is None:
+            return empty
+
+        start_ammo = flight.ammo_start
+        end_ammo = flight.ammo_end
+        complete = end_ammo is not None
+        used = ([max(0, int(a) - int(b)) for a, b in zip(start_ammo, end_ammo)]
+                if complete else [None, None, None, None])
+        gun_loaded = int(start_ammo[0]) + int(start_ammo[1])
+        gun_returned = (int(end_ammo[0]) + int(end_ammo[1])
+                        if complete else None)
+        gun_fired = (int(used[0]) + int(used[1]) if complete else None)
+
+        gun_hits = [h for h in flight.weapon_hits
+                    if self._weapon_kind(h.weapon) == "guns"]
+        rocket_hits = [h for h in flight.weapon_hits
+                       if self._weapon_kind(h.weapon) == "rockets"]
+
+        # Group recorded gun impacts into attacks.  This is deliberately an
+        # impact timeline, not a burst counter: misses leave no timed record,
+        # so the report never pretends to know when every trigger pull began.
+        passes: List[Dict[str, Any]] = []
+        for hit in sorted(gun_hits, key=lambda h: h.at_s):
+            if not passes or hit.at_s - passes[-1]["at_s"] > 15.0:
+                passes.append({"at_s": hit.at_s, "hits": 0, "targets": []})
+            row = passes[-1]
+            row["at_s"] = hit.at_s
+            row["hits"] += 1
+            if hit.target:
+                info = self.objects.describe(hit.target)
+                if info["named"] and info["name"] not in row["targets"]:
+                    row["targets"].append(info["name"])
+        for row in passes:
+            row["time"] = _clock(start, row.pop("at_s")) if start else ""
+
+        target_counts: Counter = Counter()
+        for hit in gun_hits + rocket_hits:
+            if not hit.target:
+                continue
+            info = self.objects.describe(hit.target)
+            if info["named"]:
+                target_counts[info["name"]] += 1
+
+        return {
+            "available": True,
+            "complete": complete,
+            "gun_loaded": gun_loaded,
+            "gun_returned": gun_returned,
+            "gun_fired": gun_fired,
+            "gun_hits": len(gun_hits),
+            "gun_rate": (round(100.0 * len(gun_hits) / gun_fired, 1)
+                         if gun_fired else None),
+            "bombs_loaded": int(start_ammo[2]),
+            "bombs_returned": int(end_ammo[2]) if complete else None,
+            "bombs_expended": int(used[2]) if complete else None,
+            "rockets_loaded": int(start_ammo[3]),
+            "rockets_returned": int(end_ammo[3]) if complete else None,
+            "rockets_expended": int(used[3]) if complete else None,
+            "rocket_impacts": len(rocket_hits),
+            "passes": passes,
+            "targets": [{"name": name, "hits": count}
+                        for name, count in target_counts.most_common(8)],
+        }
 
     def list_careers(self) -> List[Dict[str, Any]]:
         out = []
@@ -1729,6 +1819,7 @@ class CareerAggregator:
                              if carried else None),
                 "range_km": (round(mission["mrange"] / 1000)
                              if mission and mission["mrange"] else None),
+                "gunnery": self._gunnery(flight, sortie["date"][11:]),
                 "log": log,
                 "scenery": scenery,
             })
@@ -3011,6 +3102,78 @@ class CareerAggregator:
                 "months": [months[k] for k in sorted(months)],
                 "as_of": career["currentDate"],
                 "corrected": getattr(db, "_corr", None) is not None,
+            }
+
+    def combat_report(self, career_id: str) -> Optional[Dict[str, Any]]:
+        """Career gunnery totals and one factual report per player sortie."""
+        meta = self._career_files().get(career_id)
+        if meta is None:
+            return None
+        with self._open(meta) as db:
+            career, player = db.career(), db.player()
+            if career is None or player is None:
+                return None
+            sorties = db.sorties(player["id"])
+            reports = self._debriefings(db, sorties,
+                                        db.events(player["id"], types=[0]),
+                                        with_flight_log=True)
+            detailed = [r for r in reports if r["gunnery"]["available"]]
+            complete = [r for r in detailed if r["gunnery"]["complete"]]
+
+            def total(key: str) -> int:
+                return sum(int(r["gunnery"].get(key) or 0) for r in complete)
+
+            fired = total("gun_fired")
+            # The rate needs the same set in numerator and denominator.  A
+            # truncated log can retain impacts but no mission-end ammunition;
+            # those impacts remain on its report but not in the career rate.
+            impacts = sum(int(r["gunnery"].get("gun_hits") or 0)
+                          for r in complete)
+            by_aircraft: Dict[str, Dict[str, Any]] = {}
+            for report in complete:
+                name = report.get("aircraft") or report.get("airframe") or "—"
+                row = by_aircraft.setdefault(name, {
+                    "aircraft": name, "missions": 0, "gun_fired": 0,
+                    "gun_hits": 0, "gun_rate": None})
+                row["missions"] += 1
+                row["gun_fired"] += int(report["gunnery"].get("gun_fired") or 0)
+                row["gun_hits"] += int(report["gunnery"].get("gun_hits") or 0)
+            for row in by_aircraft.values():
+                if row["gun_fired"]:
+                    row["gun_rate"] = round(
+                        100.0 * row["gun_hits"] / row["gun_fired"], 1)
+
+            return {
+                "career_id": career_id,
+                "pilot": {
+                    "id": player["id"],
+                    "name": f"{player['name']} {player['lastName']}".strip(),
+                    "rank": self.locale.rank_name(player["country"],
+                                                   player["rankId"]),
+                    "country": player["country"],
+                },
+                "squadron": meta.squadron_name,
+                "as_of": (career["currentDate"] or "")[:10],
+                "seal": COUNTRY_SEALS.get(player["country"], ""),
+                "summary": {
+                    "missions": len(reports),
+                    "covered": len(detailed),
+                    "complete": len(complete),
+                    "gun_fired": fired,
+                    "gun_hits": impacts,
+                    "gun_rate": round(100.0 * impacts / fired, 1) if fired else None,
+                    "bombs_expended": total("bombs_expended"),
+                    "rockets_expended": total("rockets_expended"),
+                    "rocket_impacts": sum(
+                        int(r["gunnery"].get("rocket_impacts") or 0)
+                        for r in detailed),
+                    "airborne": sum(int(r.get("airborne") or 0) for r in reports),
+                    "ground_targets": sum(
+                        int(r.get("ground_targets") or 0) for r in reports),
+                    "by_aircraft": sorted(by_aircraft.values(),
+                                          key=lambda r: (-r["missions"], r["aircraft"])),
+                },
+                "reports": reports,
             }
 
     def mission_track(self, career_id: str, mission_id: int) -> Optional[Dict[str, Any]]:

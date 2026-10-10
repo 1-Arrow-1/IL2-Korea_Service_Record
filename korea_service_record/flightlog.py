@@ -17,18 +17,19 @@ A file is a flat sequence of records::
     payload         `size` bytes
     b"\\n"
 
-Only five record types are decoded; the rest are skipped by seeking past their
-payload. That matters: a 1.4 MB log holds ~40,000 records and about a dozen are
-relevant, so a full parse would cost 40,000 string formats for nothing.
+Nine record types are retained; all others are skipped by seeking past their
+payload. A 1.4 MB log can hold about 40,000 records, so only records needed
+for the service record and combat report are decoded.
 
-    0   MissionStart    game date and time — how a log is matched to a sortie
-    5   TakeOff         PID, position
-    6   Landing         PID, position
-    10  PlayerPlane     PLID, PID, ..., TYPE, ..., ISPL (1 = the human)
-    18  BotEjectLeave   BOTID — the pilot got out
-
-``AType:4`` (PlayerMissionEnd) also exists but fires whenever the player leaves,
-including a clean exit after landing, so it says nothing on its own.
+    0   MissionStart       game date and time — how a log is matched to a sortie
+    1   WeaponHit          weapon, attacker and target object ids
+    2   Damage             amount, attacker and target object ids
+    4   PlayerMissionEnd   aircraft ids and ammunition remaining
+    5   TakeOff            PID, position
+    6   Landing            PID, position
+    10  PlayerPlane        aircraft ids, ammunition loaded, type and human flag
+    12  Object             object id, kind, country and display name
+    18  BotEjectLeave      BOTID — the pilot got out
 """
 
 import logging
@@ -42,7 +43,11 @@ logger = logging.getLogger(__name__)
 TICKS_PER_SECOND = 50.0
 HEADER = struct.Struct("<LBH")
 
-WANTED = {0, 2, 5, 6, 10, 12, 18}
+# AType 1 is one projectile impact.  AType 4 is the aircraft's state when it
+# leaves the mission, including the ammunition still aboard.  Together with
+# the four starting counters in AType 10 they are the source of the combat
+# report's expenditure and recorded-hit figures.
+WANTED = {0, 1, 2, 4, 5, 6, 10, 12, 18}
 
 # A burst is a run of damage records with no longer pause than this between
 # them. Cannon fire arrives as several records in the same tenth of a second
@@ -67,6 +72,13 @@ class DamageBurst(NamedTuple):
     attacker: str                   # object type, "" when none recorded, SELF when own
 
 
+class WeaponHit(NamedTuple):
+    """One useful projectile-impact record made by the player's aircraft."""
+    at_s: float
+    weapon: str                     # ammunition object id, e.g. BULLET_12-7_USA_API
+    target: str                     # target object type, when the log named it
+
+
 class SortieLog(NamedTuple):
     path: Path
     date: str                       # "1951.06.01"
@@ -78,6 +90,9 @@ class SortieLog(NamedTuple):
     damage: List["DamageBurst"] = []
     damage_by_pilot: Dict[str, List["DamageBurst"]] = {}
     ejected_s: Optional[float] = None
+    ammo_start: Optional[Tuple[int, int, int, int]] = None  # bullets, shells, bombs, rockets
+    ammo_end: Optional[Tuple[int, int, int, int]] = None
+    weapon_hits: List["WeaponHit"] = []
 
     @property
     def outcome(self) -> str:
@@ -148,6 +163,9 @@ def read_log(path: Path) -> Optional[SortieLog]:
     takeoff = landing = None
     ejected = False
     ejected_s: Optional[float] = None
+    ammo_start: Optional[Tuple[int, int, int, int]] = None
+    endings: List[Tuple[int, int, Tuple[int, int, int, int]]] = []
+    outgoing: List[Tuple[int, str, int]] = []
     # AType 2 is [float amount][attacker][target][x][y][z]. Collected for
     # everyone because the player's own object id is not known until the
     # AType 10 that names him, which need not come first.
@@ -171,7 +189,7 @@ def read_log(path: Path) -> Optional[SortieLog]:
             elif atype == 10 and player_plid is None:
                 r = _Reader(payload)
                 plid, pid = r.int32(), r.int32()
-                r.skip(16)                      # bul, sh, bomb, rct
+                ammunition = (r.int32(), r.int32(), r.int32(), r.int32())
                 r.skip(12)                      # position
                 r.string()                      # ids
                 r.string()                      # login
@@ -182,6 +200,21 @@ def read_log(path: Path) -> Optional[SortieLog]:
                 r.int32()                       # parent
                 if r.int32() == 1:              # ispl — the human
                     player_plid, player_bot, plane = plid, pid, ptype
+                    ammo_start = ammunition
+            elif atype == 1 and player_plid is not None:
+                # [weapon string][attacker object][target object].  The log
+                # also emits enormous clouds of generic "explosion" and
+                # NapalmBullet contacts.  They are blast simulation rather
+                # than one fired round and are intentionally not retained.
+                r = _Reader(payload)
+                weapon = r.string()
+                attacker, target = r.int32(), r.int32()
+                upper = weapon.upper()
+                useful = (upper.startswith(("BULLET_", "SHELL_"))
+                          or (upper.endswith("_HIT")
+                              and upper.startswith(("RKT_", "ROCKET_"))))
+                if attacker == player_plid and useful:
+                    outgoing.append((tick, weapon, target))
             elif atype in (5, 6) and player_plid is not None:
                 if _Reader(payload).int32() == player_plid:
                     seconds = tick / TICKS_PER_SECOND
@@ -192,6 +225,13 @@ def read_log(path: Path) -> Optional[SortieLog]:
             elif atype == 2 and len(payload) >= 12:
                 amount, attacker, target = struct.unpack_from("<fII", payload, 0)
                 harm.append((tick, amount, attacker, target))
+            elif atype == 4 and len(payload) >= 24:
+                # [PLID][PID][bullets][shells][bombs][rockets], followed by
+                # position.  There is one for every aircraft that leaves the
+                # mission; the human's ids are matched after the full scan.
+                plid, pid, bul, shells, bombs, rockets = struct.unpack_from(
+                    "<iiiiii", payload, 0)
+                endings.append((plid, pid, (bul, shells, bombs, rockets)))
             elif atype == 12 and len(payload) > 12:
                 r = _Reader(payload)
                 oid = r.int32()
@@ -212,13 +252,19 @@ def read_log(path: Path) -> Optional[SortieLog]:
 
     if not date:
         return None
+    ammo_end = next((ammo for plid, pid, ammo in reversed(endings)
+                     if plid == player_plid and pid == player_bot), None)
+    weapon_hits = [WeaponHit(tick / TICKS_PER_SECOND, weapon,
+                             named.get(target, ""))
+                   for tick, weapon, target in outgoing]
     by_pilot = {}
     for oid, who in crew.items():
         bursts = _bursts(harm, oid, named)
         if bursts:
             by_pilot[who] = bursts
     return SortieLog(path, date, time, takeoff, landing, ejected, plane,
-                     _bursts(harm, player_plid, named), by_pilot, ejected_s)
+                     _bursts(harm, player_plid, named), by_pilot, ejected_s,
+                     ammo_start, ammo_end, weapon_hits)
 
 
 def _pilot_name(raw: str) -> str:

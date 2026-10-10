@@ -1487,9 +1487,13 @@
         return '<article class="debrief"><header class="debrief-head">' +
             '<span class="debrief-no">' +
                 esc(missionLabel(d.mission_num)) + "</span>" +
-            '<span class="debrief-date">' + esc(d.date) + " " + esc(d.time) +
-                ' <button class="link-btn" data-mission="' + esc(d.mission_id) +
-                '">' + esc(T("debrief.details")) + "</button></span>" +
+            '<span class="debrief-date"><span>' + esc(d.date) + " " + esc(d.time) +
+                '</span><span class="debrief-actions"><button class="link-btn" data-mission="' + esc(d.mission_id) +
+                '">' + esc(T("debrief.details")) + "</button>" +
+                (d.gunnery && d.gunnery.available && currentCareer
+                    ? ' &middot; <a class="link-btn" target="_blank" rel="opener" href="/combat-report?career=' +
+                        esc(encodeURIComponent(currentCareer)) + "&mission=" + esc(d.mission_id) + '">' +
+                        esc(T("combat_report.open")) + "</a>" : "") + "</span></span>" +
             "</header>" +
             '<div class="debrief-type">' + esc(d.type) + "</div>" +
             flight +
@@ -1714,6 +1718,16 @@
                 (d.player && d.player.id != null ? "&pilot=" + encodeURIComponent(d.player.id) : "");
             logbook.title = T("logbook.open_hint");
             logbook.hidden = false;
+            const combatReport = el("d-combat-report");
+            const hasCombatReport = Boolean(d.is_player && (d.debriefings || []).some((r) =>
+                r.gunnery && r.gunnery.available));
+            if (hasCombatReport) {
+                combatReport.href = "/combat-report?career=" + encodeURIComponent(careerId);
+                combatReport.title = T("combat_report.open_hint");
+                combatReport.hidden = false;
+            } else {
+                combatReport.hidden = true;
+            }
             // The personnel file: all six air services. The three U.S.
             // branches share the U.S. file; the others have their own forms.
             const personnel = el("d-personnel");

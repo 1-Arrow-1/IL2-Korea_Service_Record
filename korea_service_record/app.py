@@ -183,6 +183,15 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         html = html.replace("__ASSET_VERSION__", asset_version())
         return Response(html, mimetype="text/html", headers={"Cache-Control": "no-store"})
 
+    @app.route("/combat-report")
+    def combat_report_page():
+        """The player's gunnery record and individual mission reports."""
+        html = (Path(app.static_folder) / "combat_report.html").read_text(
+            encoding="utf-8")
+        html = html.replace("__ASSET_VERSION__", asset_version())
+        return Response(html, mimetype="text/html",
+                        headers={"Cache-Control": "no-store"})
+
     @app.route("/personnel")
     def personnel_page():
         """A USAF pilot's personnel file: one printable document."""
@@ -826,6 +835,17 @@ def create_app(game_dir: Optional[Path] = None) -> Flask:
         wanted = {"usaf": "en", "sov": "ru"}.get(data["form"])
         if wanted and wanted != app.config["SETTINGS"].resolve(career_id):
             data = aggregator_for(wanted).logbook(career_id, pilot_id) or data
+        return jsonify(data)
+
+    @app.route("/api/combat-report/<path:career_id>")
+    def api_combat_report(career_id: str):
+        """Career gunnery totals and the human player's sortie reports."""
+        agg = aggregator(career_id)
+        if agg is None:
+            return jsonify({"error": "game_not_found"}), 404
+        data = agg.combat_report(career_id)
+        if data is None:
+            return jsonify({"error": "career_not_found"}), 404
         return jsonify(data)
 
     @app.route("/api/diary/<path:career_id>")

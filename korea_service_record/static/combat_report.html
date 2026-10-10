@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gunnery and Combat Report</title>
+    <link rel="icon" href="/static/images/icon.png?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/main.css?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="/static/css/map.css?v=__ASSET_VERSION__">
+    <link rel="stylesheet" href="/static/css/combat_report.css?v=__ASSET_VERSION__">
+</head>
+<body class="combat-report-page">
+    <header class="cr-bar no-print">
+        <a id="cr-back" class="nav-btn" href="/">&larr; <span data-i18n="combat_report.back">Service Record</span></a>
+        <span id="cr-note" class="cr-note"></span>
+        <nav class="cr-pager">
+            <button id="cr-prev" class="nav-btn ghost" data-i18n-title="combat_report.previous">&larr;</button>
+            <span id="cr-page"></span>
+            <button id="cr-next" class="nav-btn ghost" data-i18n-title="combat_report.next">&rarr;</button>
+        </nav>
+        <button id="cr-print" class="nav-btn" data-i18n="combat_report.print">Print</button>
+    </header>
+
+    <main class="cr-stage">
+        <section id="cr-folder" class="cr-folder" hidden>
+            <article id="cr-left" class="cr-sheet cr-left"></article>
+            <article id="cr-right" class="cr-sheet cr-right"></article>
+        </section>
+        <p id="cr-state" class="state-message"></p>
+    </main>
+
+<script src="/static/vendor/leaflet/leaflet.js"></script>
+<script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/map.js?v=__ASSET_VERSION__"></script>
+<script src="/static/js/combat_report.js?v=__ASSET_VERSION__"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+:root {
+    --cr-ink: #2b261f;
+    --cr-muted: #665c4d;
+    --cr-rule: rgba(67, 57, 43, 0.62);
+    --cr-blue: #233d67;
+    --cr-red: #8d2e27;
+}
+
+body.combat-report-page {
+    min-width: 1160px;
+    min-height: 100vh;
+    margin: 0;
+    color: var(--cr-ink);
+    background: #24170f url("../images/combat_report/combat_report_background.jpg") center / cover fixed no-repeat;
+}
+
+.cr-bar {
+    min-height: 3.2rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.55rem 1rem;
+    box-sizing: border-box;
+    color: #eee5d2;
+    background: rgba(22, 16, 11, 0.93);
+    border-bottom: 1px solid rgba(255,255,255,0.11);
+}
+.cr-note { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-style: italic; }
+.cr-pager { display: flex; align-items: center; gap: 0.55rem; }
+.cr-pager button:disabled { opacity: 0.35; cursor: default; }
+#cr-page { min-width: 11rem; text-align: center; font-size: 0.86rem; }
+
+.cr-stage { width: 100%; padding: 1.25rem 0 2.5rem; overflow-x: auto; box-sizing: border-box; }
+.cr-stage > .state-message { color: #eee5d2; text-shadow: 0 1px 2px #000; }
+
+.cr-folder {
+    position: relative;
+    width: min(96vw, 1600px);
+    min-width: 1120px;
+    aspect-ratio: 2400 / 1501;
+    margin: 0 auto;
+    isolation: isolate;
+    container-type: inline-size;
+    background: url("../images/combat_report/combat_report_folder.png") center / 100% 100% no-repeat;
+    filter: drop-shadow(0 1.2rem 1.5rem rgba(0,0,0,0.5));
+}
+
+.cr-sheet {
+    position: absolute;
+    top: 15.3%;
+    width: 30.7%;
+    height: 69.2%;
+    box-sizing: border-box;
+    overflow: hidden;
+    color: var(--cr-ink);
+    font: clamp(9px, 0.72cqw, 12px)/1.25 "Courier New", Courier, monospace;
+}
+.cr-left { left: 13.05%; }
+.cr-right { left: 54.6%; }
+
+.cr-form-head { position: relative; min-height: 10.5%; text-align: center; padding: 0 4.5rem 0.45em; box-sizing: border-box; }
+.cr-form-head h1 { margin: 0; font: bold 1.46em/1.05 Arial, Helvetica, sans-serif; letter-spacing: 0.09em; text-transform: uppercase; }
+.cr-form-head .cr-service { margin: 0 0 0.26em; font: 0.78em/1.05 Arial, Helvetica, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+.cr-form-head .cr-classification { display: inline-block; margin-top: 0.35em; padding: 0.12em 0.7em; border: 0.14em solid var(--cr-red); color: var(--cr-red); font: bold 0.78em Arial, sans-serif; letter-spacing: 0.13em; transform: rotate(-1deg); }
+.cr-seal { position: absolute; top: -0.6em; left: 0; width: 4.1em; height: 4.1em; object-fit: contain; opacity: 0.76; }
+
+.cr-fields { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--cr-rule); margin-bottom: 0.55em; }
+.cr-field { min-width: 0; padding: 0.3em 0.45em 0.35em; border-right: 1px solid var(--cr-rule); border-bottom: 1px solid var(--cr-rule); }
+.cr-field:nth-child(2n) { border-right: 0; }
+.cr-field:nth-last-child(-n+2) { border-bottom: 0; }
+.cr-k { display: block; font: 0.68em Arial, Helvetica, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cr-muted); }
+.cr-v { display: block; margin-top: 0.08em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.cr-section { margin-top: 0.55em; min-height: 0; }
+.cr-section h2 { margin: 0 0 0.28em; padding-bottom: 0.14em; border-bottom: 1.5px solid var(--cr-rule); font: bold 0.86em Arial, Helvetica, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; }
+.cr-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--cr-rule); }
+.cr-stat { padding: 0.42em 0.25em; text-align: center; border-right: 1px solid var(--cr-rule); }
+.cr-stat:last-child { border-right: 0; }
+.cr-stat strong { display: block; font: bold 1.32em/1 Arial, Helvetica, sans-serif; }
+.cr-stat span { display: block; margin-top: 0.22em; font: 0.63em/1.1 Arial, Helvetica, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+
+.cr-map-wrap { height: 38%; display: flex; flex-direction: column; }
+.cr-map { flex: 1 1 auto; min-height: 0; border: 1px solid var(--cr-rule); background: #e3d4b7; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.25); }
+.cr-map .leaflet-control-container { display: none; }
+.cr-map .map-airfield .map-label, .cr-map .map-city .map-label { font-size: 8px; }
+
+.cr-result-line, .cr-remark, .cr-footnote { margin: 0.3em 0 0; }
+.cr-signature { margin-top: 0.65em; text-align: right; color: var(--cr-blue); font: 1.45em/1 "Segoe Script", "Lucida Handwriting", cursive; transform: rotate(-1deg); }
+.cr-signature::after { content: ""; display: block; width: 45%; margin: -0.12em 0 0 auto; border-bottom: 1px solid var(--cr-rule); }
+
+.cr-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.cr-table th, .cr-table td { border: 1px solid var(--cr-rule); padding: 0.28em 0.34em; vertical-align: top; }
+.cr-table th { background: rgba(119,93,54,0.08); font: 0.66em Arial, Helvetica, sans-serif; letter-spacing: 0.04em; text-transform: uppercase; }
+.cr-table td { overflow: hidden; text-overflow: ellipsis; }
+.cr-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cr-weapons th:first-child { width: 28%; }
+.cr-na { color: var(--cr-muted); }
+
+.cr-log { margin: 0; padding: 0; list-style: none; }
+.cr-log li { display: grid; grid-template-columns: 5.1em 1fr; gap: 0.45em; padding: 0.22em 0; border-bottom: 1px dotted rgba(74,61,43,0.35); }
+.cr-log li:last-child { border-bottom: 0; }
+.cr-log time { color: var(--cr-blue); font-variant-numeric: tabular-nums; }
+.cr-log .cr-kill { font-weight: bold; }
+.cr-log .cr-hurt { color: var(--cr-red); }
+.cr-scroll-log { max-height: 13.5em; overflow: hidden; }
+.cr-targets { columns: 2; column-gap: 1.2em; margin: 0.2em 0 0; padding-left: 1.3em; }
+.cr-targets li { break-inside: avoid; }
+.cr-footnote { color: var(--cr-muted); font-size: 0.76em; line-height: 1.2; }
+
+.cr-summary-title { margin-bottom: 0.75em; }
+.cr-summary-title h1 { margin: 0; font: bold 1.55em/1.05 Arial, Helvetica, sans-serif; letter-spacing: 0.09em; text-align: center; text-transform: uppercase; }
+.cr-summary-title p { margin: 0.35em 0 0; text-align: center; }
+.cr-summary-big { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55em; margin: 0.6em 0; }
+.cr-summary-card { padding: 0.65em; border: 1px solid var(--cr-rule); text-align: center; }
+.cr-summary-card strong { display: block; font: bold 2em/1 Arial, Helvetica, sans-serif; }
+.cr-summary-card span { display: block; margin-top: 0.28em; font: 0.7em Arial, Helvetica, sans-serif; letter-spacing: 0.06em; text-transform: uppercase; }
+.cr-mission-list { max-height: 43em; overflow: hidden; }
+.cr-mission-link { width: 100%; padding: 0.32em 0; border: 0; border-bottom: 1px dotted rgba(74,61,43,0.35); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.cr-mission-link:hover { color: var(--cr-blue); }
+.cr-mission-link strong { display: inline-block; min-width: 7.2em; }
+.cr-mission-link span { float: right; color: var(--cr-muted); }
+
+@media print {
+    @page { size: landscape; margin: 0; }
+    html, body.combat-report-page { width: 100%; min-width: 0; background: #fff; }
+    .no-print { display: none !important; }
+    .cr-stage { padding: 0; overflow: visible; }
+    .cr-folder { width: 100vw; min-width: 0; filter: none; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
