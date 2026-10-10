@@ -355,7 +355,7 @@
     "aircraft": "Aircraft",
     "airframe": "Tail number",
     "mission_type": "Mission",
-    "flight": "Flight",
+    "flight": "Flight time",
     "outcome": "Outcome",
     "combat_results": "Combat Results",
     "air_victories": "Air victories",
@@ -379,7 +379,7 @@
     "overall_rate": "Recorded hit rate",
     "targets_destroyed": "Targets destroyed",
     "ordnance_expended": "Ordnance Expended",
-    "engagement_log": "Engagement Log",
+    "engagement_log": "Recorded Attack Passes",
     "attack_pass": "Attack pass — {hits} recorded impacts",
     "hit_taken": "Aircraft hit {hits}× — {damage}% damaged",
     "targets_struck": "Targets Struck",
@@ -397,7 +397,7 @@
     "result_line": "Result: {air} air victories, {ground} ground targets; aircraft {outcome}.",
     "damage_line": "The aircraft received {hits} recorded hits, reached {damage}% cumulative damage and was {outcome}.",
     "no_damage": "No incoming damage was recorded; aircraft {outcome}.",
-    "remarks_line": "Fired {fired} rounds; {hits} impacts recorded ({rate}%). Destroyed {air} aircraft and {ground} ground targets."
+    "remarks_line": "Fired {fired} rounds; {hits} impacts recorded ({rate}%)."
   },
   "certificate": {
     "sheet": {

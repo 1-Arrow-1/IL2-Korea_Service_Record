@@ -80,12 +80,7 @@ body.combat-report-page {
 .cr-stat strong { display: block; font: bold 1.32em/1 Arial, Helvetica, sans-serif; }
 .cr-stat span { display: block; margin-top: 0.22em; font: 0.63em/1.1 Arial, Helvetica, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
 
-.cr-map-wrap { height: 38%; display: flex; flex-direction: column; }
-.cr-map { flex: 1 1 auto; min-height: 0; border: 1px solid var(--cr-rule); background: #e3d4b7; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.25); }
-.cr-map .leaflet-control-container { display: none; }
-.cr-map .map-airfield .map-label, .cr-map .map-city .map-label { font-size: 8px; }
-
-.cr-result-line, .cr-remark, .cr-footnote { margin: 0.3em 0 0; }
+.cr-remark, .cr-footnote { margin: 0.3em 0 0; }
 .cr-signature { margin-top: 0.65em; text-align: right; color: var(--cr-blue); font: 1.45em/1 "Segoe Script", "Lucida Handwriting", cursive; transform: rotate(-1deg); }
 .cr-signature::after { content: ""; display: block; width: 45%; margin: -0.12em 0 0 auto; border-bottom: 1px solid var(--cr-rule); }
 
@@ -101,8 +96,6 @@ body.combat-report-page {
 .cr-log li { display: grid; grid-template-columns: 5.1em 1fr; gap: 0.45em; padding: 0.22em 0; border-bottom: 1px dotted rgba(74,61,43,0.35); }
 .cr-log li:last-child { border-bottom: 0; }
 .cr-log time { color: var(--cr-blue); font-variant-numeric: tabular-nums; }
-.cr-log .cr-kill { font-weight: bold; }
-.cr-log .cr-hurt { color: var(--cr-red); }
 .cr-scroll-log { max-height: 13.5em; overflow: hidden; }
 .cr-targets { columns: 2; column-gap: 1.2em; margin: 0.2em 0 0; padding-left: 1.3em; }
 .cr-targets li { break-inside: avoid; }

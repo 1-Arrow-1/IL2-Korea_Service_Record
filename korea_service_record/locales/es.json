@@ -355,7 +355,7 @@
     "aircraft": "Avión",
     "airframe": "Matrícula",
     "mission_type": "Misión",
-    "flight": "Vuelo",
+    "flight": "Tiempo de vuelo",
     "outcome": "Resultado",
     "combat_results": "Resultados de combate",
     "air_victories": "Victorias aéreas",
@@ -379,7 +379,7 @@
     "overall_rate": "Índice de impactos registrado",
     "targets_destroyed": "Objetivos destruidos",
     "ordnance_expended": "Armamento consumido",
-    "engagement_log": "Registro del combate",
+    "engagement_log": "Pasadas de ataque registradas",
     "attack_pass": "Pasada de ataque — {hits} impactos registrados",
     "hit_taken": "Avión alcanzado {hits}× — {damage}% dañado",
     "targets_struck": "Objetivos alcanzados",
@@ -397,7 +397,7 @@
     "result_line": "Resultado: {air} victorias aéreas, {ground} objetivos terrestres; avión {outcome}.",
     "damage_line": "El avión recibió {hits} impactos registrados, alcanzó un {damage}% de daño acumulado y quedó {outcome}.",
     "no_damage": "No se registraron daños recibidos; avión {outcome}.",
-    "remarks_line": "Disparó {fired} proyectiles; {hits} impactos registrados ({rate}%). Destruyó {air} aviones y {ground} objetivos terrestres."
+    "remarks_line": "Disparó {fired} proyectiles; {hits} impactos registrados ({rate}%)."
   },
   "certificate": {
     "sheet": {

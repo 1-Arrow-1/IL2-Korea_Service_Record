@@ -8,7 +8,6 @@
     const careerId = params.get("career");
     const wantedMission = Number(params.get("mission"));
     const done = () => { document.body.dataset.ready = "1"; };
-    let map = null;
 
     const settings = await fetch("/api/settings").then((r) => r.json()).catch(() => ({}));
     const override = (settings.overrides || []).find((o) => o.career === careerId);
@@ -70,6 +69,36 @@
         '<p class="cr-service">' + esc(service()) + "</p><h1>" + esc(title) +
         '</h1><span class="cr-classification">' + esc(T("combat_report.restricted")) + "</span></header>";
 
+    const pilotCandidates = () => {
+        const first = String(data.pilot.first_name || "").trim();
+        const last = String(data.pilot.last_name || "").trim();
+        const fullName = String(data.pilot.name || [first, last].filter(Boolean).join(" ")).trim();
+        const short = typeof window.shortRank === "function" ? window.shortRank(data.pilot.rank) : data.pilot.rank;
+        const initialName = first && last ? first.charAt(0) + ". " + last : fullName;
+        return Array.from(new Set([
+            [data.pilot.rank, fullName].filter(Boolean).join(" "),
+            [short, fullName].filter(Boolean).join(" "),
+            [short, initialName].filter(Boolean).join(" ")
+        ].map((value) => value.trim()).filter(Boolean)));
+    };
+    const pilotField = () => {
+        const full = pilotCandidates()[0] || "—";
+        return '<div class="cr-field"><span class="cr-k">' + esc(T("combat_report.pilot")) +
+            '</span><span class="cr-v cr-pilot-name" title="' + esc(full) + '">' + esc(full) + "</span></div>";
+    };
+    const fitPilotNames = (root) => {
+        const candidates = pilotCandidates();
+        root.querySelectorAll(".cr-pilot-name").forEach((line) => {
+            line.style.fontSize = "";
+            for (const candidate of candidates) {
+                line.textContent = candidate;
+                if (line.clientWidth && line.scrollWidth <= line.clientWidth) return;
+            }
+            const room = line.clientWidth;
+            const width = line.scrollWidth;
+            if (room && width > room) line.style.fontSize = Math.min(1, room / width * 0.97) + "em";
+        });
+    };
     function weaponRows(g) {
         if (!g || !g.available) {
             return '<p class="cr-na">' + esc(T("combat_report.not_available")) + "</p>";
@@ -97,7 +126,7 @@
     function summaryPage() {
         const s = data.summary;
         const identity = '<div class="cr-fields">' +
-            field("pilot", data.pilot.rank + " " + data.pilot.name) +
+            pilotField() +
             field("unit", data.squadron) + field("date", data.as_of) +
             field("missions_covered_short", s.covered + " / " + s.missions) + "</div>";
         const totals = '<div class="cr-summary-big">' +
@@ -131,6 +160,7 @@
             section(T("combat_report.ordnance_expended"), stores) +
             '<p class="cr-footnote">' + esc(T("combat_report.coverage", {covered: s.complete, total: s.missions})) +
             "</p><p class=\"cr-footnote\">" + esc(T("combat_report.method")) + "</p>";
+        fitPilotNames(el("cr-left"));
         const listedReports = data.reports.slice(0, 20);
         const missionButtons = listedReports.map((r, idx) => {
             const g = r.gunnery || {};
@@ -150,107 +180,50 @@
     }
 
     function reportFields(report) {
-        const flight = [report.takeoff, report.landing_time].filter(Boolean).join(" – ");
-        return '<div class="cr-fields">' + field("pilot", data.pilot.rank + " " + data.pilot.name) +
+        return '<div class="cr-fields">' + pilotField() +
             field("unit", data.squadron) + field("date", report.date + " " + report.time) +
             field("mission_type", report.type) + field("aircraft", report.aircraft || "—") +
-            field("airframe", report.airframe || "—") + field("flight", flight || report.duration) +
+            field("airframe", report.airframe || "—") + field("flight", report.duration) +
             field("outcome", T("debrief.outcome_" + report.outcome)) + "</div>";
     }
 
-    function reportLog(report) {
-        const rows = [];
-        (report.gunnery.passes || []).forEach((p) => rows.push({
-            time: p.time, order: 0, html: esc(T("combat_report.attack_pass", {hits: p.hits})) +
-                (p.targets.length ? " — " + esc(p.targets.join(", ")) : "")
+    function reportLog(gunnery) {
+        const rows = (gunnery.passes || []).map((pass) => ({
+            time: pass.time,
+            html: esc(T("combat_report.attack_pass", {hits: pass.hits})) +
+                (pass.targets.length ? " — " + esc(pass.targets.join(", ")) : "")
         }));
-        (report.log || []).forEach((item) => {
-            if (item.hurt) {
-                rows.push({time: item.time, order: 2, html: '<span class="cr-hurt">' +
-                    esc(T("combat_report.hit_taken", {hits: item.hurt.hits, damage: item.hurt.total})) + "</span>"});
-            } else {
-                rows.push({time: item.time, order: 1, html: '<span class="cr-kill">' + esc(item.target) +
-                    (item.victim ? " — " + esc(item.victim) : "") + "</span>"});
-            }
-        });
-        rows.sort((a, b) => String(a.time).localeCompare(String(b.time)) || a.order - b.order);
-        return rows.length ? '<ol class="cr-log cr-scroll-log">' + rows.slice(0, 16).map((r) =>
-            "<li><time>" + esc(r.time || "—") + "</time><span>" + r.html + "</span></li>").join("") + "</ol>"
+        return rows.length ? '<ol class="cr-log cr-scroll-log">' + rows.slice(0, 16).map((row) =>
+            "<li><time>" + esc(row.time || "—") + "</time><span>" + row.html + "</span></li>").join("") + "</ol>"
             : '<p class="cr-na">' + esc(T("combat_report.none")) + "</p>";
-    }
-
-    async function renderMap(report) {
-        const box = el("cr-map");
-        if (!box || !window.KoreaMap || !window.L) return;
-        try {
-            const mission = await fetch("/api/mission/" + encodeURIComponent(careerId) + "/" + report.mission_id)
-                .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
-            if (!mission.route || !mission.route.length) {
-                box.textContent = T("combat_report.map_unavailable");
-                return;
-            }
-            map = KoreaMap.createMap(box, {scrollWheelZoom: false, dragging: false,
-                doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false, zoomControl: false});
-            const route = KoreaMap.routeLayer({points: mission.route.map((p) => [p.x, p.z, p.type])}, false, T).addTo(map);
-            const target = KoreaMap.targetMarker(mission.target, false);
-            if (target) target.addTo(map);
-            const kills = L.layerGroup((mission.log || []).filter((k) => k.x || k.z).map((k) => k.air
-                ? KoreaMap.victoryMarker({x: k.x, z: k.z, alt: k.altitude, target: k.target,
-                    victim: k.victim, pilot: k.actor, number: mission.number, date: mission.date,
-                    mission_id: mission.id}, T)
-                : KoreaMap.groundMarker(k, T))).addTo(map);
-            map.invalidateSize();
-            KoreaMap.fitTo(map, [route, kills], 0.12);
-            fetch("/api/track/" + encodeURIComponent(careerId) + "/" + report.mission_id)
-                .then((r) => r.ok ? r.json() : null).then((track) => {
-                    if (!track || !map) return;
-                    const layers = [];
-                    if (track.front && track.front.length > 1) KoreaMap.frontLayer(track.front, T).addTo(map);
-                    if (track.segments && track.segments.length) layers.push(KoreaMap.trackLayer(track, T).addTo(map));
-                    if (track.losses && track.losses.length) layers.push(KoreaMap.lossLayer(track.losses, T).addTo(map));
-                    if (layers.length) KoreaMap.fitTo(map, [route, kills].concat(layers), 0.12);
-                }).catch(() => {});
-        } catch (_error) {
-            box.textContent = T("combat_report.map_unavailable");
-        }
     }
 
     function missionPage(report) {
         const g = report.gunnery || {available: false, passes: [], targets: []};
-        const hitsTaken = (report.log || []).filter((x) => x.hurt);
-        const hitCount = hitsTaken.reduce((n, x) => n + Number(x.hurt.hits || 0), 0);
-        const damage = hitsTaken.reduce((n, x) => Math.max(n, Number(x.hurt.total || 0)), 0);
+        const overview = g.available
+            ? '<div class="cr-stat-grid">' +
+                stat(number(g.gun_fired), T("combat_report.rounds_fired")) +
+                stat(number(g.gun_hits), T("combat_report.recorded_hits")) +
+                stat(pct(g.gun_rate), T("combat_report.overall_rate")) +
+                stat(number(g.rocket_impacts), T("combat_report.direct_impacts")) + "</div>"
+            : '<p class="cr-na">' + esc(T("combat_report.not_available")) + "</p>";
         el("cr-left").innerHTML = formHead(T("combat_report.mission_report")) + reportFields(report) +
-            section(T("combat_report.combat_results"), '<div class="cr-stat-grid">' +
-                stat(number(report.airborne), T("combat_report.air_victories")) +
-                stat(number(report.ground_targets), T("combat_report.ground_targets")) +
-                stat(number(report.assists), T("combat_report.assists")) +
-                stat(number(hitCount), T("combat_report.hits_taken")) + "</div>") +
-            section(T("combat_report.mission_map"), '<div id="cr-map" class="cr-map"></div>', "cr-map-wrap") +
-            '<p class="cr-result-line">' + esc(T("combat_report.result_line", {
-                air: report.airborne, ground: report.ground_targets,
-                outcome: T("debrief.outcome_" + report.outcome)})) + "</p>" +
+            section(T("combat_report.gunnery_analysis"), overview) +
+            section(T("combat_report.engagement_log"), reportLog(g)) +
             '<div class="cr-signature">' + esc(data.pilot.name) + "</div>";
+        fitPilotNames(el("cr-left"));
         const targets = (g.targets || []).length
-            ? '<ul class="cr-targets">' + g.targets.map((t) => "<li>" + esc(t.name) + " ×" + number(t.hits) + "</li>").join("") + "</ul>"
+            ? '<ul class="cr-targets">' + g.targets.map((target) => "<li>" + esc(target.name) + " ×" + number(target.hits) + "</li>").join("") + "</ul>"
             : '<p class="cr-na">' + esc(T("combat_report.none")) + "</p>";
-        const damageText = hitCount
-            ? T("combat_report.damage_line", {hits: hitCount, damage: damage,
-                outcome: T("debrief.outcome_" + report.outcome)})
-            : T("combat_report.no_damage", {outcome: T("debrief.outcome_" + report.outcome)});
         const remarks = g.complete
             ? T("combat_report.remarks_line", {fired: g.gun_fired, hits: g.gun_hits,
-                rate: g.gun_rate == null ? "—" : number(g.gun_rate),
-                air: report.airborne, ground: report.ground_targets})
+                rate: g.gun_rate == null ? "—" : number(g.gun_rate)})
             : T("combat_report.not_available");
         el("cr-right").innerHTML = formHead(T("combat_report.gunnery_analysis")) +
             section(T("combat_report.weapons_expenditure"), weaponRows(g)) +
-            section(T("combat_report.engagement_log"), reportLog(report)) +
             section(T("combat_report.targets_struck"), targets) +
-            section(T("combat_report.damage_sustained"), '<p class="cr-remark">' + esc(damageText) + "</p>") +
             section(T("combat_report.remarks"), '<p class="cr-remark">' + esc(remarks) +
                 '</p><p class="cr-footnote">' + esc(T("combat_report.method")) + "</p>");
-        renderMap(report);
     }
 
     const views = [{summary: true}].concat(data.reports);
@@ -258,7 +231,6 @@
         ? Math.max(0, views.findIndex((v) => Number(v.mission_id) === wantedMission))
         : 0;
     function render() {
-        if (map) { map.remove(); map = null; }
         if (views[current].summary) summaryPage();
         else missionPage(views[current]);
         el("cr-prev").disabled = current <= 0;

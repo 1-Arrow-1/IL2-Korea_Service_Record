@@ -3148,6 +3148,8 @@ class CareerAggregator:
                 "pilot": {
                     "id": player["id"],
                     "name": f"{player['name']} {player['lastName']}".strip(),
+                    "first_name": player["name"] or "",
+                    "last_name": player["lastName"] or "",
                     "rank": self.locale.rank_name(player["country"],
                                                    player["rankId"]),
                     "country": player["country"],

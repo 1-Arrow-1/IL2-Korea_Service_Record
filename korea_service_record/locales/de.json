@@ -355,7 +355,7 @@
     "aircraft": "Flugzeug",
     "airframe": "Kennzeichen",
     "mission_type": "Auftrag",
-    "flight": "Flug",
+    "flight": "Flugzeit",
     "outcome": "Ausgang",
     "combat_results": "Gefechtsresultate",
     "air_victories": "Luftsiege",
@@ -379,7 +379,7 @@
     "overall_rate": "Erfasste Trefferquote",
     "targets_destroyed": "Zerstörte Ziele",
     "ordnance_expended": "Verbrauchte Abwurfmunition",
-    "engagement_log": "Gefechtsverlauf",
+    "engagement_log": "Erfasste Angriffe",
     "attack_pass": "Angriff — {hits} erfasste Treffer",
     "hit_taken": "Flugzeug {hits}× getroffen — {damage}% beschädigt",
     "targets_struck": "Getroffene Ziele",
@@ -397,7 +397,7 @@
     "result_line": "Ergebnis: {air} Luftsiege, {ground} Bodenziele; Flugzeug {outcome}.",
     "damage_line": "Das Flugzeug erhielt {hits} erfasste Treffer, erreichte {damage}% Gesamtschaden und war {outcome}.",
     "no_damage": "Keine Feindeinwirkung aufgezeichnet; Flugzeug {outcome}.",
-    "remarks_line": "{fired} Schuss abgegeben; {hits} Treffer erfasst ({rate}%). {air} Flugzeuge und {ground} Bodenziele zerstört."
+    "remarks_line": "{fired} Schuss abgegeben; {hits} Treffer erfasst ({rate}%)."
   },
   "certificate": {
     "sheet": {

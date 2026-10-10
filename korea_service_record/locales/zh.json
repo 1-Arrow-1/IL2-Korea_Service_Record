@@ -350,7 +350,7 @@
     "aircraft": "飞机",
     "airframe": "机号",
     "mission_type": "任务",
-    "flight": "飞行",
+    "flight": "飞行时间",
     "outcome": "结果",
     "combat_results": "战斗成果",
     "air_victories": "空中胜利",
@@ -374,7 +374,7 @@
     "overall_rate": "记录命中率",
     "targets_destroyed": "摧毁目标",
     "ordnance_expended": "已用武器",
-    "engagement_log": "交战记录",
+    "engagement_log": "记录的攻击航次",
     "attack_pass": "攻击航次——记录命中 {hits} 次",
     "hit_taken": "座机中弹 {hits} 次——损伤 {damage}%",
     "targets_struck": "命中目标",
@@ -392,7 +392,7 @@
     "result_line": "战果：空中胜利 {air}，地面目标 {ground}；飞机{outcome}。",
     "damage_line": "座机记录中弹 {hits} 次，累计损伤达到 {damage}%，结果为{outcome}。",
     "no_damage": "未记录受到损伤；飞机{outcome}。",
-    "remarks_line": "发射 {fired} 发，记录命中 {hits} 次（{rate}%）。摧毁飞机 {air} 架、地面目标 {ground} 个。"
+    "remarks_line": "发射 {fired} 发，记录命中 {hits} 次（{rate}%）。"
   },
   "certificate": {
     "sheet": {
