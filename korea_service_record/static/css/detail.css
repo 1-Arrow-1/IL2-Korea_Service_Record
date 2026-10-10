@@ -100,18 +100,51 @@
 
 .record-col { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
 
-/* Three documents rather than one repeated cream tile.  These are seamless,
-   low-contrast scans supplied at 2048px; drawing them at 1024px keeps the
-   fibres legible on a panel without turning individual flecks into marks.
-   The colours remain as fallbacks while an image is loading. */
+/* Three documents rather than one repeated cream tile. The supplied scans are
+   drawn at their native size and muted by a translucent paper-colour wash so
+   their grain reads as material instead of competing with the type. */
+.record-col:nth-child(1) {
+    --column-paper: #ead8b7;
+    --column-scroll-track: #dfcba7;
+    --column-scroll-thumb: #9f8560;
+}
+.record-col:nth-child(2) {
+    --column-paper: #e7e4d0;
+    --column-scroll-track: #d9d7c2;
+    --column-scroll-thumb: #919078;
+}
+.record-col:nth-child(3) {
+    --column-paper: #dfe2d4;
+    --column-scroll-track: #d2d8c8;
+    --column-scroll-thumb: #87937f;
+}
 .record-col:nth-child(1) > .panel {
-    background: #ead8b7 url("../images/personnel_paper.jpg") 0 0 / 1024px 1024px repeat;
+    background-color: var(--column-paper);
+    background-image: linear-gradient(rgba(234, 216, 183, 0.72), rgba(234, 216, 183, 0.72)),
+        url("../images/personnel_paper.jpg");
+    background-size: auto, 2048px 2048px;
 }
 .record-col:nth-child(2) > .panel {
-    background: #e7e4d0 url("../images/combat_paper.jpg") 0 0 / 1024px 1024px repeat;
+    background-color: var(--column-paper);
+    background-image: linear-gradient(rgba(231, 228, 208, 0.72), rgba(231, 228, 208, 0.72)),
+        url("../images/combat_paper.jpg");
+    background-size: auto, 2048px 2048px;
 }
 .record-col:nth-child(3) > .panel {
-    background: #dfe2d4 url("../images/debrief_paper.jpg") 0 0 / 1024px 1024px repeat;
+    background-color: var(--column-paper);
+    background-image: linear-gradient(rgba(223, 226, 212, 0.72), rgba(223, 226, 212, 0.72)),
+        url("../images/debrief_paper.jpg");
+    background-size: auto, 2048px 2048px;
+}
+
+/* Scroll boxes inherit the paper family of the document that contains them. */
+.record-col { scrollbar-color: var(--column-scroll-thumb) var(--column-scroll-track); }
+.record-col *::-webkit-scrollbar-track {
+    background: var(--column-scroll-track);
+}
+.record-col *::-webkit-scrollbar-thumb {
+    background: var(--column-scroll-thumb);
+    border-color: var(--column-scroll-track);
 }
 
 /* A restrained ink cue reinforces the three file types.  It changes only
