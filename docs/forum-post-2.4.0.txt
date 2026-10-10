@@ -8,6 +8,19 @@ The new report brings the route, crew, combat log and weapon results together
 in one navigable manila folder, using the information recorded by the game's
 flight logs.
 
+IMPORTANT: ONE MANUAL UPDATE
+
+If you are running 2.3.0, download and run the 2.4.0 installer manually. The
+updater in 2.3.0 compares the exact signing certificate, but Microsoft
+Artifact Signing renews that short-lived certificate every day. It can
+therefore report that the installer was signed by a different certificate
+even though both signatures are valid and belong to the same publisher.
+
+The updater in 2.4.0 checks the durable Artifact Signing profile identity
+instead. It still requires GitHub's matching SHA-256 digest and a valid
+Windows Authenticode signature. Future certificate renewals will no longer
+interrupt normal in-app updates.
+
 NEW: COMBAT MISSION REPORTS
 
 Open "Combat mission report" under Mission Debriefings for any flown mission.
