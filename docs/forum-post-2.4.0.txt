@@ -1,0 +1,76 @@
+IL-2 Korea Service Record 2.4.0 — combat mission reports
+
+
+Gentlemen,
+
+2.4.0 turns every mission debriefing into a proper Combat Mission Report.
+The new report brings the route, crew, combat log and weapon results together
+in one navigable manila folder, using the information recorded by the game's
+flight logs.
+
+NEW: COMBAT MISSION REPORTS
+
+Open "Combat mission report" under Mission Debriefings for any flown mission.
+
+- The first spread records the pilot, unit, date, mission, aircraft, tail
+  number, flight time and outcome, followed by the combat results, mission
+  route, briefing, flight roster and chronological combat log.
+- The second spread is the gunnery and weapons analysis: weapons loaded,
+  expended and returned, recorded impacts, hit rate, attack passes, targets
+  struck and a short summary of the sortie.
+- Move through the career with the previous and next mission buttons, or
+  print the report.
+- The report uses the language selected for the Service Record.
+- Long pilot names keep the surname visible by abbreviating the rank first
+  and the first name only when necessary.
+
+GUNS, ROCKETS AND BOMBS
+
+- Gun figures count the player's fired rounds and recorded projectile
+  impacts. A hit rate is shown when the flight log contains complete
+  ammunition figures.
+- Rockets record direct impacts separately.
+- A bomb counts as a hit when its blast destroys at least one target. The
+  number in parentheses shows how many targets that bomb destroyed.
+- Napalm cannot claim the same target repeatedly: the report uses the same
+  correction as the Player Career Points calculation.
+- Cluster weapons are recognized as complete canisters. Their bomblets are
+  consolidated into the parent weapon, so one canister counts as no more
+  than one hit while all targets destroyed by it remain visible.
+- When corrected flight time is enabled, the report uses that corrected
+  time too.
+
+MISSION MAP
+
+- Use the mouse wheel to zoom the mission route.
+- Hold and drag the map to move around it.
+- Route markers and the recorded track make the sortie easier to follow
+  without leaving the report.
+
+RECORD ROOM VISUAL REFRESH
+
+- The former mission-details view and combat section are now one report, so
+  the same mission information is no longer shown twice.
+- The Service Record columns, operations map, aircraft and squadron
+  statistics now share one warm paper stock with subtle grain.
+- Flight Record, War Diary and Personnel File use the same paper treatment.
+  Printed Personnel Files remain clean white for readable paper copies.
+
+FIXES
+
+- The manila folder and its type now scale properly on large displays.
+- The final attack-pass line is no longer clipped.
+- Scrollbars match the paper instead of standing out from it.
+
+
+DOWNLOAD
+
+    https://github.com/1-Arrow-1/IL2-Korea_Service_Record/releases/tag/v2.4.0
+
+Installer  IL2_Korea_Service_Record_Setup_v2.4.0.exe
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Zip        IL-2.Korea.Service.Record.v2.4.0.zip
+           SHA-256  0000000000000000000000000000000000000000000000000000000000000000
+
+Everything is Authenticode signed.
