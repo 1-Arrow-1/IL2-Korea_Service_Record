@@ -27,6 +27,45 @@ Installed copies update themselves from the **Update** page in the Career
 Helper. Please always run the latest version: older ones are not kept
 available.
 
+## Running alongside the game
+
+While the Service Record is open, it corrects your career as the game
+writes it. Since the game build of 29 September 2026, napalm on airfields
+books the same destroyed buildings again and again, and the game pays
+career points for every phantom kill; the Service Record takes them back
+out seconds after each debriefing, before the next day change, so no
+promotion is granted on them. That only works while it is running, so let
+it start and stop with the game:
+
+| Switch | What it does |
+|---|---|
+| `--companion` | Starts the Service Record quietly in the tray, without opening the browser. If it is already open, nothing happens. |
+| `--quit --companion` | Closes it again after any correction in progress has finished. If you opened it yourself, it stays open. |
+
+### With Game Companion
+
+[Game Companion](https://github.com/izolini/GameCompanion) by izolini
+starts and stops utilities such as TrackIR, CrewChief or Joystick Gremlin
+together with a game. Register the Service Record as one more utility:
+
+| Field | Value |
+|---|---|
+| Name | IL-2 Korea Service Record |
+| Executable Path | your installation folder, `IL2_Korea_Service_Record.exe` |
+| Start Arguments | `--companion` |
+| Post-launch wait (ms) | `0` |
+| Instant, Delay Start, Run as Administrator, Auto-restart | unchecked |
+| Stop Method | **Command**, with the arguments `--quit --companion` |
+
+Then tick it in both the launch and the stop sequence of your IL-2 Korea
+card (process name `IL2Series.exe`). Use **Command**, not **Kill**: Kill
+could stop the Service Record in the middle of writing to your career.
+
+### Without Game Companion
+
+A desktop shortcut to `IL2_Korea_Service_Record.exe --companion`, started
+before the game, does the same; close it from the tray afterwards.
+
 ## Support and feedback
 
 Questions, bug reports and suggestions are welcome in the forum thread:
